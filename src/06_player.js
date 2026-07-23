@@ -301,15 +301,16 @@ class Player {
     // --- jumping ---
     if(this.grounded){ this.coyote = 0.12; this.canDouble = true; this.batFlutters = 0; }
     else this.coyote -= dt;
+    this.jumpT = (this.jumpT||0) + dt;
     if(INPUT.jumpEdge) this.jumpBuf = 0.14; else this.jumpBuf -= dt;
     if(this.jumpBuf>0 && !this.pounding && !this.climbing){
       if(this.coyote>0){
-        this.vel.y = 10.0; this.grounded=false; this.coyote=0; this.jumpBuf=0;
+        this.vel.y = 10.0; this.grounded=false; this.coyote=0; this.jumpBuf=0; this.jumpT=0;
         AUDIO.jump();
         this.squashV = 6;
         G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.1,this.pos.z), 0xcccccc, 5, {speed:1.5, life:0.3, gravity:2, size:0.7});
       } else if(this.canDouble){
-        this.vel.y = 9.0; this.canDouble=false; this.jumpBuf=0;
+        this.vel.y = 9.0; this.canDouble=false; this.jumpBuf=0; this.jumpT=0;
         AUDIO.djump();
         this.squashV = 6;
         if(this.costumeKey==='skeleton') AUDIO.noise({t:0.15,vol:0.1,fFrom:3000,fTo:1000});
@@ -322,8 +323,9 @@ class Player {
         G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.9,this.pos.z), 0x8e5bd9, 5, {speed:1.8, life:0.3, gravity:1, size:0.6});
       }
     }
-    // variable jump height
-    if(!INPUT.jumpHeld && this.vel.y>4.5 && !this.pounding) this.vel.y = 4.5;
+    // variable jump height — but every jump keeps full power for its first 0.10s,
+    // so touch TAPS still get a strong arc (a tap used to be cut to a stunted hop)
+    if(!INPUT.jumpHeld && this.jumpT>0.10 && this.vel.y>5.5 && !this.pounding) this.vel.y = 5.5;
 
     // --- ground pound ---
     if(INPUT.poundEdge && !this.grounded && !this.pounding){
