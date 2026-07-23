@@ -23,6 +23,8 @@ function buildW1L2(G){
   G.ents.add(new Boo(G, 28, 0, 0, {speed:2.4}));
   G.ents.add(new Skelly(G, 15, 0, 0, {px:2.5}));
   G.ents.add(new SwoopBat(G, 30, 4.5, 0, {range:5}));   // air pressure over the second mud crossing
+  G.ents.add(new Rat(G, 24, 0, 0));                     // mud-edge scavenger
+  G.ents.add(new Boo(G, 38, 0, 0, {speed:2.3}));
   G.ents.add(new Heart(13.5, 1.2, 0));
   G.ents.add(new Checkpoint(12.5, 0, 1.6, 0)); // District 1 curve: 2 lanterns per level
   const decoB = new THREE.Group();

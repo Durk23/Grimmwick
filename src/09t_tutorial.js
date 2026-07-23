@@ -47,6 +47,10 @@ function buildTutorial(G){
   G.ents.add(new BonkLantern(G, 54, 1.3, 0, 'candy'));
 
   // 5) ground pound mega-bounce
+  // practice partners — Gran arranged volunteers (they drop candy, teaching pickups too)
+  signPost(G, 51, 1.8, -0.15, 'That Boo volunteered for bonking practice. Such a nice boy. Give him a good WHACK. — Gran ♥');
+  G.ents.add(new Boo(G, 54, 0, 0, {speed:1.5, range:5}));
+  G.ents.add(new Hopper(G, 68, 0, 0, {aggroR:4}));
   signPost(G, 59, 1.8, -0.2, INPUT.isTouch ?
     'Jump, then press \ud83d\udca5 in the air \u2014 the GROUND POUND! Pound the big pumpkin for a MEGA bounce! \u2014 Gran \u2665' :
     'Jump, then press K in the air \u2014 the GROUND POUND! Pound the big pumpkin for a MEGA bounce! \u2014 Gran \u2665');

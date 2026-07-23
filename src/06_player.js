@@ -304,12 +304,12 @@ class Player {
     if(INPUT.jumpEdge) this.jumpBuf = 0.14; else this.jumpBuf -= dt;
     if(this.jumpBuf>0 && !this.pounding && !this.climbing){
       if(this.coyote>0){
-        this.vel.y = 9.4; this.grounded=false; this.coyote=0; this.jumpBuf=0;
+        this.vel.y = 10.0; this.grounded=false; this.coyote=0; this.jumpBuf=0;
         AUDIO.jump();
         this.squashV = 6;
         G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.1,this.pos.z), 0xcccccc, 5, {speed:1.5, life:0.3, gravity:2, size:0.7});
       } else if(this.canDouble){
-        this.vel.y = 8.6; this.canDouble=false; this.jumpBuf=0;
+        this.vel.y = 9.0; this.canDouble=false; this.jumpBuf=0;
         AUDIO.djump();
         this.squashV = 6;
         if(this.costumeKey==='skeleton') AUDIO.noise({t:0.15,vol:0.1,fFrom:3000,fTo:1000});

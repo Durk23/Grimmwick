@@ -37,6 +37,8 @@ function buildW1L3(G){
   // rafter bats — a barn's rightful tenants, and the loft run's air lane
   G.ents.add(new SwoopBat(G, 8, 5.6, 0, {range:3.5, period:3}));
   G.ents.add(new SwoopBat(G, 26, 4.2, 0, {range:5, phase:1.7}));
+  G.ents.add(new Boo(G, 20, 0, 0, {speed:2.1}));
+  G.ents.add(new Rat(G, 30, 0, 0));                     // barn rat, obviously
   G.ents.add(new Rat(G, 9, 0, 0));
   G.ents.add(new Skelly(G, 11, 3.8, 0, {px:4}));  // loft patroller
   candyLine(G, [[-5,2,0],[1,4,0],[7,5.2,0]], 6);
