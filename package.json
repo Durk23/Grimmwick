@@ -8,6 +8,9 @@
     "test": "node build.js && node test/playtest.js"
   },
   "dependencies": {
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "@capacitor/ios": "^8.4.2",
     "esbuild": "^0.28.1",
     "three": "0.165.0"
   },
