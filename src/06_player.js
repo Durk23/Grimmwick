@@ -367,7 +367,9 @@ class Player {
     }
 
     // --- gravity ---
-    if(!this.climbing) this.vel.y -= 24*dt;
+    // long-hold lift: holding jump keeps you rising farther (tap arcs unchanged; no effect on bounces/pound)
+    const lift = INPUT.jumpHeld && this.vel.y>0 && this.jumpT<0.22 && !this.pounding;
+    if(!this.climbing) this.vel.y -= (lift?16:24)*dt;
     if(this.vel.y < -26 && !this.pounding) this.vel.y = -26;
     if(this.batT>0 && !this.pounding && this.vel.y < -4.5) this.vel.y = -4.5; // gentle bat glide
 
