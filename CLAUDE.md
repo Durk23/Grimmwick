@@ -4,7 +4,7 @@ Cute-spooky 3D platformer (Mario-64 style) for **iPhone, iPad, and Mac**.
 Free-to-play with cosmetic monetization (costumes, characters, Spook Pass).
 Built as a single-bundle Three.js web game, wrapped for the App Store with Capacitor → Xcode.
 
-**Current state: v0.1 playable slice** — hub town, World 1 (Pumpkin Patch), Boss 1 (Pumpkin King), 4 enemy types, 6 costumes, store UI (test mode), save system. Worlds 2–5 are designed but not built (see Roadmap).
+**Current state: v0.2 — level-select restructure DONE** — hub town, District 1 split into Levels 1-1…1-5 (selected from a district map screen) + Pumpkin King boss node, per-level saves/stars (fast/all-candy/no-damage), 4 enemy types, 6 costumes, store UI (test mode), save system (key `grimmwick_save`, migrates old saves). iOS Capacitor project scaffolded in `ios/` (SPM, no CocoaPods). Districts 2–5 are designed but not built (see Roadmap).
 
 ## Commands
 
@@ -36,7 +36,9 @@ Everything is hand-built procedural geometry (three.js primitives + vertex color
 | `src/06_player.js` | `COSTUMES` dict + `Player` — rig built from primitives per costume, moveset (run/jump/double/pound/bag-spin), hearts, i-frames, squash&stretch, stomp detection. |
 | `src/07_enemies.js` | `Enemy` base + `Boo` (shy — freezes when faced), `Hopper`, `Skelly` (telegraph→lunge), `Spider` (hang→drop→chase). |
 | `src/08_hub.js` | `WORLDS` table (5 districts), `buildHub/updateHub`, Everflame centerpiece, Mayor Boo NPC, Costume Cauldron, gates (open/locked/beaten-relit), shared deco builders (`deadTree`, `pumpkinDeco`, `fenceRun`, `makeBats`). |
-| `src/09_level1.js` | `buildLevel1/updateLevel1` — 5 sections A–E with rising difficulty, signs, checkpoints, movers, boss gate trigger. |
+| `src/09_levelkit.js` | Shared level-building kit: `grave/bigPumpkin/hayBale/platform/groundX/mudPitX/signPost/thornsX`, the `W1_LEVELS` registry + `findLevel(id)`, `levelBegin/exitGate/levelFinish/updateLevelCommon`. |
+| `src/09a…09e_w1lN.js` | One file per District-1 level (`w1l1` GRAVEYARD LANE · `w1l2` PUMPKIN FIELD (warp) · `w1l3` THE CROOKED BARN · `w1l4` THE WITCH'S GARDEN (leap of faith) · `w1l5` THE KING'S DOORSTEP). Each self-registers in `W1_LEVELS`. |
+| `src/09t_tutorial.js` | `buildTutorial/updateTutorial` — Gran's Backyard move-teaching area. |
 | `src/10_boss1.js` | `buildBossArena` + `PumpkinKing` — phase state machine (intro→hop→bigslam→stun→enrage→seeds→defeat), shockwave rings, seed lobs, minion spawns. |
 | `src/11_ui.js` | `UI` — all DOM/CSS: HUD, title, story intro slides, dialogue, prompts, toasts, pause/settings, store (3 tabs), death/victory, boss bar, touch controls, fade. |
 | `src/12_main.js` | `G` — renderer, scene lifecycle (`switchArea` rebuilds per area), save (`Store` safe-storage wrapper), game-state machine, main loop, adaptive pixel-ratio, `__game` debug hooks. |
@@ -45,7 +47,7 @@ Everything is hand-built procedural geometry (three.js primitives + vertex color
 - **Enemy contract**: set `isEnemy=true`, `hitR`, `headH` (stomp height), `touchDamage`, implement `update(dt)` + inherit `takeHit(player, kind)` / `die()`. Register via `G.ents.add(...)`. Player stomp/attack/pound detection then works automatically.
 - **World/collider contract**: visible mesh + `G.world.addBox(...)` (or `addMesh`) — physics is invisible-box-driven, meshes are decoration. Merge non-interactive deco with `bakeGroup()` (one draw call).
 - **Scene lifecycle**: `G.switchArea('hub'|'level1'|'boss1')` tears down and rebuilds. Never keep references across areas.
-- **Save schema**: `{candy, embers, worlds:{w1:true}, gp:{w1:[b,b,b]}, owned:[keys], equipped, seenIntro}` → JSON in localStorage (with in-memory fallback).
+- **Save schema**: `{candy, embers, worlds:{w1:true}, gp:{w1:[b,b,b]}, levels:{w1l1:{done,stars:{time,candy,clean},best}}, best:{w1boss}, owned:[keys], equipped, seenIntro, lastLevel}` → JSON in localStorage key `grimmwick_save` (in-memory fallback; auto-migrates old `hollowville_save`, and a beaten pre-split World 1 marks all five levels done).
 
 ### Performance budget (60fps on A14+ / M1)
 - Point lights: physical falloff (three r165) — use intensity ~30–70 with distance set; **max ~6 per scene**.
@@ -298,6 +300,9 @@ A feature that serves none of the three joys doesn't ship.
 
 ## Owner decisions locked (July 2026 Q&A)
 
+- **STRUCTURED CHAOS** (owner call, July 22 2026 — "make sure the levels have structured chaos and they are challenging and fun"): levels should feel ALIVE and busy — overlapping motion, enemies on multiple lanes, bounce chains, particles, near-misses — but every element deterministic, telegraphed, and fair (the constitution's flow + determinism rules ARE the "structure"; the density and energy are the "chaos"). Fun-first: when a tuning call is close, pick the more exciting option.
+- **RELEASE SHAPE: the whole game ships at once** (owner call, July 22 2026 — "i want the whole game released at once"): all 5 districts + the Grimm finale at launch; no partial or seasonal story launch. Target: App Store launch October 1 2026 ("earlier the better"), content-complete quality gate ~Sept 15, submission ~Sept 22. Post-launch seasons carry modes/cosmetics (Nightmare Mode, Boo Rush, new districts as spin-off seasons) — never the base story. Audio budget is $0: the in-engine synth is the launch soundtrack (upgrade it, don't replace it) unless a free/credit composer materializes via docs/COMPOSER_BRIEF.md. English-only at launch. Test devices: owner's iPhone 15/16 + MacBook Air; perf floor stays A14.
+
 - **PIP IS VISIBLY HUMAN by default** (owner call, ✅ implemented): default skin "Just Pip" — visible face, chestnut hair, orange hoodie, sneakers. Reason: relatability (the one human anchor in a spirit town) + gameplay clarity (the old ghost-sheet default made the hero resemble Boo enemies). Gran's Ghost Sheet remains a free heirloom costume. Future: a first-run skin-tone picker (5 tones) so every kid sees themselves — high-value, low-cost inclusivity feature.
 
 - **Music direction: ORCHESTRAL CUTE-SPOOKY** — the composer brief: Danny-Elfman-meets-Luigi's-Mansion; music box, theremin, pizzicato strings, tuba, glockenspiel. Timeless storybook feel, cuts great in trailers. (Brief goes out by Aug 1.)
@@ -319,7 +324,7 @@ Implementation guardrails: never add an analytics/ads dependency to package.json
 ## Roadmap (in priority order)
 
 1. **Feel pass with real players** — tune jump heights, camera distance, enemy density from feedback.
-2. **Restructure to level-select** — district map UI, split World 1 into Levels 1-1…1-5 + boss gate, per-level save/stars. This is the foundation for the 50-level plan and the pass.
+2. ✅ **DONE (July 2026): Restructure to level-select** — district map UI (functional v1; the BEAUTIFUL MAP jewel pass still to come), World 1 split into Levels 1-1…1-5 + boss node, per-level save/stars. Known minors deferred: a movement key held across the map screen needs a re-press in the level; tutorial keeps its pre-existing 1-unit slot behind spawn; baked clutter props poke through mud-pool surfaces in w1l2/w1l5.
 3. **District 2: Ravenmoor Cemetery** — 10 levels + Mossgrave boss (bat swarms). New enemies: Wisp (chases in the dark), Gravemite, Crow flocks. Implement the boss-skill system with Gourd Slam + Bat Swarm as the first two skills.
 4. **District 3: Witchwood + the Broomstick** — Broomhilda fight, broom mount (hold jump to glide-fly bursts), broom skins in store + pass. Spider enemies/webs live here as level hazards (Madame Webweaver becomes a Season 2 mini-boss).
 5. **Districts 4–5 + bosses** — Ghost Harbor stare/lantern fight, Grimm finale with the invite finisher; keep the difficulty tuning table.

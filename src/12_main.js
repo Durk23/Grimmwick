@@ -22,7 +22,7 @@ const G = {
 
   loadSave(){
     try{
-      const raw = Store.get('hollowville_save');
+      const raw = Store.get('grimmwick_save') || Store.get('hollowville_save');
       if(raw) this.save = JSON.parse(raw);
     }catch(e){}
     if(!this.save || !this.save.owned){
@@ -34,9 +34,15 @@ const G = {
     if(this.save.tutDone===undefined) this.save.tutDone = false;
     if(!this.save.owned.includes('kid')) this.save.owned.unshift('kid');
     if(this.save.pass===undefined) this.save.pass = false;
+    if(!this.save.levels) this.save.levels = {};
+    if(!this.save.best) this.save.best = {};
+    // pre-level-select saves: a beaten World 1 counts as all five levels cleared
+    if(this.save.worlds.w1 && !Object.keys(this.save.levels).length){
+      for(const id of ['w1l1','w1l2','w1l3','w1l4','w1l5']) this.save.levels[id] = {done:true, stars:{}, best:null};
+    }
   },
-  persist(){ Store.set('hollowville_save', JSON.stringify(this.save)); },
-  resetSave(){ Store.del('hollowville_save'); },
+  persist(){ Store.set('grimmwick_save', JSON.stringify(this.save)); },
+  resetSave(){ Store.del('grimmwick_save'); Store.del('hollowville_save'); },
 
   addCandy(n){
     this.save.candy += n;
@@ -95,7 +101,9 @@ const G = {
     return s;
   },
   switchArea(area){
+    const def = findLevel(area);
     this.area = area;
+    this.levelDef = def || null;
     this.mode = (area==='hub') ? 'free' : 'side';
     this._entering = false;
     this.boss = null;
@@ -108,15 +116,18 @@ const G = {
     this.fx = new Particles(this.scene);
     AUDIO.setMood(area==='hub' ? 'hub' : (area==='boss1' ? 'boss' : 'level'));
     if(area==='hub') buildHub(this);
-    else if(area==='level1') buildLevel1(this);
     else if(area==='boss1') buildBossArena(this);
     else if(area==='tut') buildTutorial(this);
+    else if(def) def.build(this);
+    // all-candy star baseline: what the build itself placed
+    this.levelCandyTotal = 0;
+    for(const e of this.ents.list) if(e instanceof Candy){ this.levelCandyTotal++; e._placed = true; }
     // player
     this.player = new Player(this.scene, this);
     this.player.pos.copy(this.spawnPoint);
     this.checkpoint.copy(this.spawnPoint);
     // remove already-collected golden pumpkins
-    const got = this.save.gp['w1']||[];
+    const got = this.save.gp[def ? def.district : 'w1']||[];
     for(const e of this.ents.list){
       if(e instanceof GoldPumpkin && got[e.idx]) e.dead = true;
       if(e instanceof GoldPumpkin && this.runPumpkins[e.idx]) e.dead = true;
@@ -159,26 +170,90 @@ const G = {
       UI.toast("🧵 \"That's my little hero.\" — Find Mayor Boo by the Everflame 👻");
     }, 500);
   },
-  startLevel1(){
+  enterLevel(id){
+    const def = findLevel(id);
+    if(!def){ if(this.state==='map') this.state='play'; UI.toast('🌘 That road is still dark...'); return; }
+    if(UI.hideMap) UI.hideMap();
     this.state='transition';
     UI.fade(true, 450);
     setTimeout(()=>{
-      this.runPumpkins=[false,false,false];
+      this.currentLevel = id;
+      // seed with banked district pumpkins so the HUD count and spawn filter stay honest
+      this.runPumpkins = (this.save.gp[def.district]||[false,false,false]).slice();
       this.runCandy0=this.save.candy; this.runT0=this.time;
-      this.runT = 0;   // speedrun clock — only ticks while actually playing
+      this.runT = 0;   // per-level clock — only ticks while actually playing
+      this.runCandyPicked = 0;
       this.runDamage = 0;
       this.runCozy = !!this.save.cozy;
-      this.save.lives = 5; this.persist();
-      this.switchArea('level1');
+      this.save.lives = 5; this.save.lastLevel = id; this.persist();
+      this.switchArea(id);
       this.state='play';
       UI.fade(false, 450);
-      UI.levelIntro('PUMPKIN PATCH', 'World 1 · Free the Pumpkin King!');
+      UI.levelIntro(def.name, 'Pumpkin Patch · Level '+(W1_LEVELS.indexOf(def)+1));
+    }, 500);
+  },
+  completeLevel(opts={}){
+    if(this.state!=='play' || !this.levelDef) return;
+    const def = this.levelDef, id = def.id;
+    this.state='levelclear';
+    AUDIO.checkpoint(); AUDIO.goldPumpkin();
+    const secs = Math.floor(this.runT||0);
+    const collected = this.runCandyPicked||0;
+    const skip = opts.warp||opts.leap;   // secret finishes honor their promised rewards
+    const stars = {
+      time: skip ? true : secs <= def.parTime,
+      candy: skip ? true : collected >= this.levelCandyTotal,
+      clean: opts.leap ? true : (this.runDamage||0)===0,
+    };
+    const rec = this.save.levels[id] || (this.save.levels[id] = {done:false, stars:{}, best:null});
+    rec.done = true;
+    const isRecord = !this.runCozy && secs>=3 && (!rec.best || secs<rec.best);
+    if(!this.runCozy){
+      rec.stars.time = rec.stars.time||stars.time;
+      rec.stars.candy = rec.stars.candy||stars.candy;
+      rec.stars.clean = rec.stars.clean||stars.clean;
+      if(isRecord) rec.best = secs;
+    }
+    // bank golden pumpkins at every clear — no longer lost if you stop before the boss
+    const prev = this.save.gp[def.district]||[false,false,false];
+    this.save.gp[def.district] = prev.map((v,i)=>v||this.runPumpkins[i]);
+    this.persist();
+    const idx = W1_LEVELS.indexOf(def);
+    const nextId = (idx>=0 && idx<W1_LEVELS.length-1) ? W1_LEVELS[idx+1].id : null;
+    const fmt = t => Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
+    const stats = { levelId:id, levelName:def.name, time:fmt(secs), best:fmt(rec.best||secs), isRecord,
+      stars, candy:collected, candyTotal:this.levelCandyTotal, nextId, cozy:this.runCozy };
+    setTimeout(()=>UI.levelClear(stats), 650);
+  },
+  openMap(district){
+    if(this.state!=='play') return;
+    this.state='map';
+    UI.showMap(district||'w1');
+  },
+  closeMap(){
+    if(UI.hideMap) UI.hideMap();
+    if(this.state==='map') this.state='play';
+  },
+  toMap(district){
+    this.state='transition';
+    UI.fade(true, 450);
+    setTimeout(()=>{
+      this.switchArea('hub');
+      this.state='map';
+      UI.fade(false, 450);
+      UI.showMap(district||'w1');
     }, 500);
   },
   startBoss1(){
+    if(UI.hideMap) UI.hideMap();
     this.state='transition';
     UI.fade(true, 450);
     setTimeout(()=>{
+      // a fresh guardian attempt: its own clock, damage tally, and full lives
+      this.runCandy0=this.save.candy; this.runT0=this.time;
+      this.runT=0; this.runCandyPicked=0; this.runDamage=0; this.runCozy=!!this.save.cozy;
+      this.runPumpkins=(this.save.gp.w1||[false,false,false]).slice();
+      this.save.lives=5; this.persist();
       this.switchArea('boss1');
       this.state='play';
       UI.fade(false, 450);
@@ -243,7 +318,8 @@ const G = {
     this.persist();
     const gs = document.getElementById('gameover-screen');
     if(gs) gs.style.display='none';
-    this.startLevel1();
+    if(this.area==='boss1') this.startBoss1();
+    else this.enterLevel(this.levelDef ? this.levelDef.id : (this.save.lastLevel||'w1l1'));
   },
   candyContinue(){
     const COST = 500;
@@ -306,16 +382,17 @@ const G = {
     this.persist();
     const secs = Math.floor(this.runT||this.time-this.runT0);
     if(!this.save.best) this.save.best = {};
-    const prevBest = this.save.best.w1;
+    // boss-only clock lives under its own key — legacy full-run best.w1 is preserved, never compared
+    const prevBest = this.save.best.w1boss;
     const isRecord = !this.runCozy && secs >= 5 && (!prevBest || secs < prevBest);   // cozy runs & debug runs don't set records
-    if(isRecord) this.save.best.w1 = secs;
+    if(isRecord) this.save.best.w1boss = secs;
     this.persist();
     const fmt = t => Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
     const stats = {
       candy: this.save.candy-this.runCandy0+0,
       gp: this.runPumpkins.filter(Boolean).length,
       time: fmt(secs),
-      best: fmt(this.save.best.w1),
+      best: fmt(this.save.best.w1boss),
       isRecord,
       dmg: this.runDamage||0,
       cozy: this.runCozy,
@@ -345,7 +422,7 @@ const G = {
       warp:(x,y,z)=>{ G.player.pos.set(x,y,z); G.player.vel.set(0,0,0); },
       state:()=>({state:G.state, area:G.area, pos:G.player&&G.player.pos.toArray().map(v=>+v.toFixed(2)), hearts:G.player&&G.player.hearts, candy:G.save.candy, fps:+G.fps.toFixed(1), ents:G.ents.list.length, boss:G.boss?{hp:G.boss.hp,state:G.boss.state}:null}),
       start:()=>{ if(G.state==='title'){ AUDIO.init(); G.begin(); } },
-      scene:(a)=>{ G.switchArea(a); G.state='play'; UI.hideTitle(); },
+      scene:(a)=>{ a = (a==='level1') ? 'w1l1' : a; UI.hideTitle(); if(findLevel(a)){ G.save.tutDone=true; G.enterLevel(a); } else { G.switchArea(a); G.state='play'; } },
     };
     addEventListener('error', e=>{ window.__game.errors.push(String(e.message)); });
     if(params.get('test')){
@@ -411,14 +488,14 @@ const G = {
     else if(this.state==='play'){
       AUDIO.resume();
       if(INPUT.pauseEdge){ UI.togglePause(); INPUT.endFrame(); return; }
-      if(this.area==='level1'||this.area==='boss1') this.runT = (this.runT||0)+dt;
+      if(this.area!=='hub' && this.area!=='tut') this.runT = (this.runT||0)+dt;
       this.world.updateMovers(dt);
       this.player.update(dt);
       const eDt = dt * (this.save.cozy ? 0.72 : 1);   // Cozy Mode: enemies at 72% speed
       this.ents.update(eDt, this);
       if(this.boss) this.boss.update(eDt);
       if(this.area==='hub') updateHub(this, dt);
-      else if(this.area==='level1') updateLevel1(this, dt);
+      else if(this.levelDef) this.levelDef.update(this, dt);
       else if(this.area==='tut') updateTutorial(this, dt);
       else { updateBats(this.bats, dt); updateAmbience(this.amb, this.time); UI.setPrompt(null); }
       this.fx.update(dt);
@@ -429,9 +506,10 @@ const G = {
       this.fx.update(dt);
       this.ents.update(dt, this);
     }
-    else if(this.state==='victory' || this.state==='paused' || this.state==='shop' || this.state==='intro'){
+    else if(this.state==='victory' || this.state==='paused' || this.state==='shop' || this.state==='intro' || this.state==='map' || this.state==='levelclear'){
       // idle simmer
       if(this.boss && this.state==='victory') this.boss.update(dt*0.5);
+      if(this.state==='map' && UI.mapNav) UI.mapNav();   // gamepad drives the map
       this.fx.update(dt);
     }
     this.renderer.render(this.scene, this.camera);

@@ -1,7 +1,7 @@
 {
-  "name": "hollowville",
-  "version": "0.1.0",
-  "description": "Hollowville — Relight the Night. Cute-spooky 3D platformer for iPhone/iPad/Mac.",
+  "name": "grimmwick",
+  "version": "0.2.0",
+  "description": "Grimmwick — Relight the Night. Cute-spooky side-scrolling 3D platformer for iPhone/iPad/Mac.",
   "private": true,
   "scripts": {
     "build": "node build.js",

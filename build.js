@@ -7,11 +7,8 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const ROOT = __dirname;
-const SRC_ORDER = [
-  '00_utils.js','01_audio.js','02_input.js','03_physics.js','04_camera.js',
-  '05_entities.js','06_player.js','07_enemies.js','08_hub.js','09_level1.js',
-  '10_boss1.js','11_ui.js','12_main.js',
-];
+// every src/*.js, concatenated in filename order (single shared scope)
+const SRC_ORDER = fs.readdirSync(path.join(ROOT,'src')).filter(f=>f.endsWith('.js')).sort();
 
 // 1) three.js as a plain global (IIFE) via esbuild
 const entry = path.join(ROOT, '.three-entry.js');

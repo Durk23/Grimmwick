@@ -86,6 +86,50 @@ const UI = {
       .tcell.prem { background:linear-gradient(135deg, rgba(142,91,217,.4), rgba(255,94,168,.28)); border:1.5px solid #b37dff; }
       .tcell.marquee { background:linear-gradient(135deg, rgba(255,157,62,.35), rgba(255,94,168,.35)); border:2px solid #ffd23f; box-shadow:0 0 16px rgba(255,210,63,.35); font-weight:800; font-size:13.5px; }
       .trackhead { display:grid; grid-template-columns:40px 1fr 1.2fr; gap:7px; margin-bottom:6px; font-size:12px; font-weight:900; opacity:.8; text-align:center; }
+      /* district map */
+      #map-screen { background:linear-gradient(180deg,#070414 0%,#150d33 52%,#241548 100%); pointer-events:auto; overflow:hidden; gap:10px; }
+      #mapSky { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+      #mapMoon { position:absolute; top:7%; right:9%; width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 38% 34%, #fff8dc, #ffd98a 62%, #e8a950); box-shadow:0 0 60px 20px rgba(255,208,120,.22); }
+      .mstar { position:absolute; border-radius:50%; background:#fff; animation:mtwinkle 3s ease-in-out infinite; }
+      @keyframes mtwinkle { 0%,100%{opacity:.12} 50%{opacity:.9} }
+      .mcloud { position:absolute; height:46px; border-radius:60px; background:rgba(140,110,210,.14); filter:blur(12px); animation:mdrift linear infinite; }
+      @keyframes mdrift { from{transform:translateX(-40vw)} to{transform:translateX(140vw)} }
+      #mapVig { position:absolute; inset:0; box-shadow:inset 0 0 150px 55px rgba(4,2,12,.8); }
+      #mapHead { position:relative; z-index:2; margin-top:calc(6px + env(safe-area-inset-top)); }
+      #mapTitle { font-size:min(6.5vw,32px); font-weight:900; letter-spacing:2px; color:#ffb35e; text-shadow:0 3px 0 #7a3040, 0 6px 18px #000; }
+      #mapEmber { font-size:14.5px; font-weight:800; color:#e8dcff; opacity:.92; margin-top:4px; text-shadow:0 2px 6px #000; }
+      #mapCozy { font-size:13px; font-weight:800; color:#ffd9a8; margin-top:3px; text-shadow:0 2px 6px #000; }
+      #mapWrap { position:relative; z-index:2; width:min(880px,92vw); height:min(56vh,430px); }
+      #mapSvg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+      #mapHint { position:relative; z-index:2; font-size:12.5px; font-weight:800; opacity:.55; text-shadow:0 2px 4px #000; }
+      #mapClose { position:absolute; top:calc(10px + env(safe-area-inset-top)); right:calc(12px + env(safe-area-inset-right)); width:46px; height:46px; border-radius:14px; background:rgba(20,12,40,.75); border:1.5px solid rgba(255,255,255,.28); color:#fff; font-size:19px; font-weight:800; font-family:inherit; z-index:3; cursor:pointer; }
+      .mnode { position:absolute; width:118px; margin-left:-59px; margin-top:-30px; text-align:center; cursor:pointer; z-index:2; }
+      .mnode.lock { cursor:default; }
+      .mnode .mring { position:absolute; left:50%; top:27px; width:62px; height:62px; margin:-31px 0 0 -31px; border-radius:50%; border:3px dashed rgba(255,225,160,.95); opacity:0; animation:mspin 9s linear infinite; }
+      .mnode.sel .mring { opacity:1; }
+      @keyframes mspin { to{ transform:rotate(360deg); } }
+      .mlamp { position:relative; font-size:38px; line-height:54px; height:54px; filter:grayscale(.15) brightness(.9); }
+      .mnode.done .mlamp { filter:drop-shadow(0 0 10px #ffb35e) drop-shadow(0 0 26px rgba(255,150,60,.55)); }
+      .mnode.avail .mlamp { animation:mpulse 1.5s ease-in-out infinite; }
+      @keyframes mpulse { 0%,100%{ filter:drop-shadow(0 0 4px #ffb35e); transform:scale(1);} 50%{ filter:drop-shadow(0 0 18px #ffd27a); transform:scale(1.12);} }
+      .mnode.lock .mlamp { filter:grayscale(1) brightness(.45); }
+      .mnode.mboss.avail .mlamp { animation:mpulseB 1.3s ease-in-out infinite; }
+      @keyframes mpulseB { 0%,100%{ filter:drop-shadow(0 0 6px #b34aff) brightness(.85); transform:scale(1);} 50%{ filter:drop-shadow(0 0 22px #ff3a60) brightness(1.1); transform:scale(1.1);} }
+      .mcrown { position:absolute; top:-16px; left:50%; transform:translateX(-50%) rotate(-8deg); font-size:20px; }
+      .mstars { font-size:12px; letter-spacing:1px; height:16px; }
+      .mstars .off { filter:grayscale(1); opacity:.32; }
+      .mname { font-size:12px; font-weight:900; line-height:1.2; text-shadow:0 2px 4px #000; margin-top:2px; }
+      .mtime { font-size:10.5px; font-weight:700; opacity:.75; margin-top:2px; text-shadow:0 1px 3px #000; }
+      .mnode.lock .mname, .mnode.lock .mtime { opacity:.55; }
+      /* level clear */
+      #clearName { font-size:15px; font-weight:800; color:#e8dcff; opacity:.9; letter-spacing:1px; }
+      .cstarRow { display:flex; gap:12px; justify-content:center; margin:12px 0 2px; }
+      .cstar { width:98px; background:rgba(255,255,255,.06); border:2px solid rgba(255,255,255,.14); border-radius:16px; padding:10px 6px 8px; opacity:0; transform:scale(.4); animation:cstarIn .45s cubic-bezier(.34,1.56,.64,1) forwards; }
+      .cstar:nth-child(1){ animation-delay:.15s } .cstar:nth-child(2){ animation-delay:.55s } .cstar:nth-child(3){ animation-delay:.95s }
+      @keyframes cstarIn { to{ opacity:1; transform:scale(1);} }
+      .cstar .big { font-size:28px; }
+      .cstar.off .big { filter:grayscale(1); opacity:.35; }
+      .cstar .lbl { font-size:11.5px; font-weight:800; opacity:.9; margin-top:4px; }
       #fade { position:fixed; inset:0; background:#0d0a18; opacity:1; transition:opacity .5s; pointer-events:none; z-index:50; }
       #hurtvig { position:fixed; inset:0; box-shadow:inset 0 0 120px 40px rgba(255,30,50,.55); opacity:0; transition:opacity .4s; pointer-events:none; z-index:40; }
       .heartsRow { font-size:34px; }
@@ -147,6 +191,29 @@ const UI = {
         <div id="shopBody"></div>
         <button class="btn ui-block" id="shopClose" style="margin-top:14px">Done</button>
       </div></div>
+      <div id="map-screen" class="screen">
+        <div id="mapSky"></div>
+        <div id="mapHead">
+          <div id="mapTitle"></div>
+          <div id="mapEmber"></div>
+          <div id="mapCozy" style="display:none">🧸 cozy night — records asleep</div>
+        </div>
+        <div id="mapWrap"></div>
+        <div id="mapHint">← → choose &nbsp;·&nbsp; Enter start &nbsp;·&nbsp; Esc town</div>
+        <button id="mapClose" class="ui-block">✕</button>
+      </div>
+      <div id="clear-screen" class="screen"><div class="card">
+        <div style="font-size:46px">🏮</div>
+        <h2 style="margin:6px 0;color:#ffb35e">LEVEL CLEAR!</h2>
+        <div id="clearName"></div>
+        <div id="clearStars" class="cstarRow"></div>
+        <div id="clearStats" style="font-size:15px;opacity:.92;margin:8px 0"></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn orange ui-block" id="clearNext">▶️ NEXT LEVEL</button>
+          <button class="btn ui-block" id="clearReplay">🔁 REPLAY</button>
+          <button class="btn ghost2 ui-block" id="clearMap">🗺️ MAP</button>
+        </div>
+      </div></div>
       <div id="death-screen" class="screen"><div class="card">
         <div style="font-size:50px">👻</div>
         <h2 style="margin:10px 0">The night got you!</h2>
@@ -190,6 +257,14 @@ const UI = {
     tap('cozyBtn', ()=>{ G.toggleCozy(); this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(G.save.cozy?'ON':'OFF'); });
     tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Tap again'; } });
     tap('shopClose', ()=>this.closeShop());
+    tap('mapClose', ()=>{ AUDIO.ui(); this.hideMap(); G.closeMap(); });
+    tap('clearNext', ()=>{ const s=this._clearStats; this.el('clear-screen').style.display='none'; AUDIO.ui(); if(s&&s.nextId) G.enterLevel(s.nextId); });
+    tap('clearReplay', ()=>{ const s=this._clearStats; this.el('clear-screen').style.display='none'; AUDIO.ui(); if(s) G.enterLevel(s.levelId); });
+    tap('clearMap', ()=>{ const s=this._clearStats; this.el('clear-screen').style.display='none'; AUDIO.ui(); G.toMap((s&&s.levelId&&s.levelId.slice(0,2))||'w1'); });
+    // fullbleed map: swallow background touches so they never reach the game input layer
+    const ms=this.el('map-screen');
+    ms.addEventListener('touchstart', e=>e.stopPropagation(), {passive:true});
+    ms.addEventListener('mousedown', e=>e.stopPropagation());
     tap('respawnBtn', ()=>{ this.el('death-screen').style.display='none'; G.respawnPlayer(); });
     tap('reviveBtn', ()=>{ G.reviveHere(); });
     tap('vHome', ()=>{ this.el('victory-screen').style.display='none'; G.returnToHub(true); });
@@ -247,7 +322,7 @@ const UI = {
     }
     this.el('candyN').textContent = G.save.candy;
     this.el('emberN').textContent = G.save.embers+'/5';
-    const inLevel = G.area==='level1'||G.area==='boss1';
+    const inLevel = !!G.levelDef || G.area==='boss1';
     this.el('gpPill').style.display = inLevel?'block':'none';
     this.el('livesPill').style.display = inLevel?'block':'none';
     this.el('livesN').textContent = G.save.lives??5;
@@ -454,6 +529,172 @@ const UI = {
           <div class="tcell ${t[2]?'marquee':'prem'}">${t[1]}</div>
         </div>`).join('')}`;
     }
+  },
+  // ---------- district map (level select) ----------
+  showMap(district){
+    const G=this.G;
+    this._mapDistrict = district||'w1';
+    // night sky: stars + drifting clouds + moon — built once, cheap CSS anims
+    if(!this._skyBuilt){
+      this._skyBuilt = true;
+      let h = '<div id="mapMoon"></div>';
+      for(let i=0;i<40;i++){
+        const s=(1.4+Math.random()*1.8).toFixed(1);
+        h += `<div class="mstar" style="left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*90).toFixed(1)}%;width:${s}px;height:${s}px;animation-delay:${(Math.random()*3).toFixed(2)}s;animation-duration:${(2.2+Math.random()*2.4).toFixed(2)}s"></div>`;
+      }
+      for(let i=0;i<3;i++)
+        h += `<div class="mcloud" style="top:${9+i*14}%;width:${190+i*80}px;animation-duration:${55+i*28}s;animation-delay:-${13+i*21}s"></div>`;
+      this.el('mapSky').innerHTML = h + '<div id="mapVig"></div>';
+    }
+    const world = (typeof WORLDS!=='undefined' && WORLDS.find(w=>w.key===this._mapDistrict)) || {name:'Pumpkin Patch', guardian:'The Guardian'};
+    const dNum = parseInt(this._mapDistrict.slice(1),10)||1;
+    const beaten = !!(G.save.worlds && G.save.worlds[this._mapDistrict]);
+    this.el('mapTitle').textContent = world.name.toUpperCase()+' — District '+dNum;
+    this.el('mapEmber').textContent = beaten ? '🔥 Ember recovered — the district burns warm again!' : '🌑 Ember stolen — '+world.guardian+' still holds it';
+    this.el('mapCozy').style.display = G.save.cozy ? 'block' : 'none';
+    this.el('mapHint').style.display = INPUT.isTouch ? 'none' : 'block';
+    this.renderMap(world, dNum, beaten);
+    this.setPrompt(null);
+    this.el('map-screen').style.display='flex';
+    this.el('hud').style.display='none';
+    this.el('pauseBtn').style.display='none';
+    if(INPUT.isTouch) this.el('touchBtns').style.display='none';
+    // keyboard nav — attached ONLY while the map is open; removed in hideMap (capture so INPUT never sees these keys)
+    this._mapKey = e=>{
+      const nodes=this._mapNodes||[];
+      if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+        e.preventDefault(); e.stopPropagation();
+        const dir=e.key==='ArrowLeft'?-1:1;
+        let i=this._mapSel+dir;
+        while(i>=0 && i<nodes.length && nodes[i].st==='lock') i+=dir;
+        if(i>=0 && i<nodes.length && i!==this._mapSel){ this._mapSetSel(i); AUDIO.ui(); }
+      } else if(e.key==='Enter'||e.key===' '){
+        e.preventDefault(); e.stopPropagation();
+        this._mapActivate(this._mapSel);
+      } else if(e.key==='Escape'){
+        e.preventDefault(); e.stopPropagation();
+        AUDIO.ui(); this.hideMap(); this.G.closeMap();
+      }
+    };
+    window.addEventListener('keydown', this._mapKey, true);
+    AUDIO.ui();
+  },
+  hideMap(){
+    if(this._mapKey){ window.removeEventListener('keydown', this._mapKey, true); this._mapKey=null; }
+    this.el('map-screen').style.display='none';
+    this.el('hud').style.display='flex';
+    this.el('pauseBtn').style.display='block';
+    if(INPUT.isTouch) this.el('touchBtns').style.display='flex';
+  },
+  renderMap(world, dNum, beaten){
+    const G=this.G, district=this._mapDistrict;
+    let levels = (typeof W1_LEVELS!=='undefined' && Array.isArray(W1_LEVELS)) ? W1_LEVELS.filter(l=>l.district===district) : [];
+    if(!levels.length) levels = [1,2,3,4,5].map(n=>({id:district+'l'+n, name:'LEVEL '+dNum+'-'+n, parTime:0}));
+    const sv = G.save.levels || {};
+    const fmt = s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+    // node models: done / avail (first not-done) / lock
+    const nodes=[]; let availSeen=false;
+    levels.forEach(lv=>{
+      const rec = sv[lv.id]||{};
+      const st = rec.done ? 'done' : (!availSeen ? (availSeen=true,'avail') : 'lock');
+      nodes.push({id:lv.id, name:lv.name, par:lv.parTime, best:rec.best, stars:rec.stars||{}, st});
+    });
+    const bossReady = !!(sv[levels[levels.length-1].id]||{}).done;
+    nodes.push({boss:true, name:(world.guardian||'The Guardian').toUpperCase(), st: beaten?'done':(bossReady?'avail':'lock')});
+    this._mapNodes = nodes;
+    // winding dotted path through the lantern positions (percent coords)
+    const POS=[[12,80],[32,60],[20,34],[46,19],[64,48],[84,22]];
+    const P = nodes.map((n,i)=>{ const p=POS[Math.min(i,POS.length-1)]; return [p[0]*10, p[1]*5.6]; });
+    let d='M '+P[0][0]+' '+P[0][1];
+    for(let i=1;i<P.length;i++){
+      const a=P[i-1], b=P[i], mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2;
+      const dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy)||1, bow=30*(i%2?1:-1);
+      d += ' Q '+(mx-dy/L*bow).toFixed(1)+' '+(my+dx/L*bow).toFixed(1)+' '+b[0]+' '+b[1];
+    }
+    let html = `<svg id="mapSvg" viewBox="0 0 1000 560" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="rgba(255,205,130,.45)" stroke-width="5" stroke-dasharray="0.1 16" stroke-linecap="round"/></svg>`;
+    nodes.forEach((n,i)=>{
+      const p=POS[Math.min(i,POS.length-1)];
+      const lamp = n.boss ? '<span class="mcrown">👑</span>🎃' : '🏮';
+      const stars = (!n.boss && n.st==='done')
+        ? ['time','candy','clean'].map(k=>`<span${n.stars[k]?'':' class="off"'}>⭐</span>`).join('')
+        : '&nbsp;';
+      const label = n.boss ? n.name : dNum+'-'+(i+1)+' · '+n.name;
+      let sub;
+      if(n.boss) sub = n.st==='done' ? '🔥 relit — fight again?' : (n.st==='avail' ? 'the guardian stirs…' : '🔒 clear '+dNum+'-'+levels.length);
+      else {
+        const bits=[];
+        if(n.par) bits.push('par '+fmt(n.par));
+        if(n.best!=null) bits.push('best '+fmt(n.best));
+        sub = bits.length ? '⏱ '+bits.join(' · ') : (n.st==='lock' ? '🔒' : '&nbsp;');
+      }
+      html += `<div class="mnode ui-block ${n.st}${n.boss?' mboss':''}" data-i="${i}" style="left:${p[0]}%;top:${p[1]}%">
+        <div class="mring"></div>
+        <div class="mlamp">${lamp}</div>
+        <div class="mstars">${stars}</div>
+        <div class="mname">${label}</div>
+        <div class="mtime">${sub}</div>
+      </div>`;
+    });
+    const wrap=this.el('mapWrap');
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('.mnode').forEach(nd=>{
+      const act = ev=>{ ev.stopPropagation(); this._mapActivate(+nd.dataset.i); };
+      nd.addEventListener('mousedown', act);
+      nd.addEventListener('touchstart', ev=>{ev.preventDefault();act(ev);},{passive:false});
+    });
+    // default selection: the pulsing node, else the furthest unlocked one
+    let sel = nodes.findIndex(n=>n.st==='avail');
+    if(sel<0){ sel = nodes.length-1; while(sel>0 && nodes[sel].st==='lock') sel--; }
+    this._mapSetSel(sel);
+  },
+  _mapSetSel(i){
+    this._mapSel = i;
+    this.el('mapWrap').querySelectorAll('.mnode').forEach(nd=>nd.classList.toggle('sel', +nd.dataset.i===i));
+  },
+  _mapActivate(i){
+    const n=(this._mapNodes||[])[i]; if(!n) return;
+    if(n.st==='lock'){ this.toast(n.boss ? '🔒 Light every lantern on the path first!' : '🔒 Beat the level before it first'); return; }
+    this._mapSetSel(i);
+    AUDIO.ui();
+    this.hideMap();
+    if(n.boss) this.G.startBoss1(); else this.G.enterLevel(n.id);
+  },
+  mapNav(){
+    // gamepad drives the map — called each frame from the loop while state==='map'
+    // (keyboard arrows/Enter/Space are captured by _mapKey and never reach INPUT, so no double-fire)
+    if(!this._mapNodes || this.el('map-screen').style.display==='none') return;
+    const ax = INPUT.moveX||0;
+    const t = performance.now();
+    if(Math.abs(ax)>0.5){
+      if(!this._mapNavT || t-this._mapNavT>260){
+        this._mapNavT = t;
+        const dir = ax>0?1:-1, nodes=this._mapNodes;
+        let i=this._mapSel+dir;
+        while(i>=0 && i<nodes.length && nodes[i].st==='lock') i+=dir;
+        if(i>=0 && i<nodes.length && i!==this._mapSel){ this._mapSetSel(i); AUDIO.ui(); }
+      }
+    } else this._mapNavT = 0;
+    if(INPUT.jumpEdge || INPUT.interactEdge) this._mapActivate(this._mapSel);
+    else if(INPUT.pauseEdge){ AUDIO.ui(); this.hideMap(); this.G.closeMap(); }
+  },
+  // ---------- level clear ----------
+  levelClear(stats){
+    this._clearStats = stats;
+    const fmt = v => typeof v==='number' ? (Math.floor(v/60)+':'+String(Math.floor(v%60)).padStart(2,'0')) : v;
+    this.el('clearName').textContent = stats.levelName || '';
+    const st = stats.stars||{};
+    const slot = (on,lbl)=>`<div class="cstar${(on&&!stats.cozy)?'':' off'}"><div class="big">⭐</div><div class="lbl">${lbl}</div></div>`;
+    this.el('clearStars').innerHTML =
+      slot(st.time, '⏱ fast') +
+      slot(st.candy, '🍬 '+(stats.candy??0)+'/'+(stats.candyTotal??0)) +
+      slot(st.clean, '💜 no damage');
+    const rec = stats.cozy ? `<div style="margin-top:6px;opacity:.85">🧸 cozy night — stars & records asleep</div>`
+      : stats.isRecord ? `<div style="margin-top:8px;font-weight:900;color:#ffd23f;font-size:18px">🏆 NEW RECORD — ${fmt(stats.time)}!</div>`
+      : (stats.best!=null ? `<div style="margin-top:6px;opacity:.85">🏆 Your best: <b>${fmt(stats.best)}</b></div>` : '');
+    this.el('clearStats').innerHTML = `⏱️ Time: <b>${fmt(stats.time)}</b>${rec}`;
+    this.el('clearNext').style.display = stats.nextId ? 'block' : 'none';
+    this.setPrompt(null);
+    this.el('clear-screen').style.display='flex';
   },
   // ---------- death & victory ----------
   deathScreen(){

@@ -352,7 +352,7 @@ function updateHub(G, dt){
   if(prompt && INPUT.interactEdge){
     if(prompt.kind==='mayor') UI.mayorDialogue();
     else if(prompt.kind==='shop') UI.openShop();
-    else if(prompt.kind==='enter'){ AUDIO.portal(); G.startLevel1(); }
+    else if(prompt.kind==='enter'){ AUDIO.portal(); G.openMap(prompt.gate.w.key||'w1'); }
     else if(prompt.kind==='locked') UI.toast('🔒 This district is still dark... free the other guardians first! (Coming in the next update)');
   }
 }

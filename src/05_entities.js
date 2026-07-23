@@ -66,6 +66,7 @@ class Candy {
         if(d<0.7){
           this.dead = true;
           G.addCandy(1);
+          if(this._placed) G.runCandyPicked = (G.runCandyPicked||0)+1;   // all-candy star counts placed candy only
           AUDIO.candy(G.save.candy);
           G.fx.spawn(p, pick(CANDY_COLORS), 4, {speed:2, life:0.3, size:0.5});
         }

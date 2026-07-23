@@ -1,4 +1,4 @@
-// Headless playtest: load game, verify no errors, simulate input, screenshot.
+// Headless playtest: boot, hub, map flow, all five W1 levels, level-clear, boss.
 const { chromium } = require('playwright');
 const path = require('path');
 
@@ -13,88 +13,120 @@ const path = require('path');
   const consoleErrs = [];
   page.on('console', m=>{ if(m.type()==='error') consoleErrs.push(m.text().slice(0,300)); });
   page.on('pageerror', e=>consoleErrs.push('PAGEERROR: '+String(e).slice(0,300)));
+  let failed = false;
+  const check = (name, ok)=>{ console.log((ok?'OK  ':'FAIL')+' '+name); if(!ok) failed = true; };
 
   const url = 'file://'+path.join(__dirname,'..','dist','grimmwick.html')+'?test=1';
   await page.goto(url);
-  await page.waitForTimeout(3500);
+  await page.waitForTimeout(3000);
 
   const shot = (n)=>page.screenshot({path:path.join(__dirname, n)});
   const state = ()=>page.evaluate(()=>window.__game ? window.__game.state() : null);
   const errs = ()=>page.evaluate(()=>window.__game ? window.__game.errors : ['no __game']);
+  // wait for GAME-seconds (headless RAF throttling makes wall-clock unreliable)
+  const gameWait = (secs)=>page.evaluate(async (s)=>{
+    const t0 = window.G.time;
+    await new Promise(res=>{ const iv=setInterval(()=>{ if(window.G.time-t0>s){clearInterval(iv);res();} },50); });
+  }, secs);
 
   let s = await state();
-  console.log('BOOT state:', JSON.stringify(s));
-  console.log('game errors:', JSON.stringify(await errs()));
-  console.log('console errors:', JSON.stringify(consoleErrs));
+  console.log('BOOT:', JSON.stringify(s));
+  check('boots into hub play', s && s.state==='play' && s.area==='hub');
   await shot('shot_hub.png');
 
-  // walk for 1.5 GAME-seconds (headless RAF throttling makes wall-clock unreliable)
+  // hub walk (free mode)
   await page.keyboard.down('s');
   const walk = await page.evaluate(async ()=>{
     const G = window.G;
     const t0 = G.time, x0 = G.player.pos.x, z0 = G.player.pos.z;
     await new Promise(res=>{ const iv=setInterval(()=>{ if(G.time-t0>1.5){clearInterval(iv);res();} },50); });
     const d = Math.hypot(G.player.pos.x-x0, G.player.pos.z-z0);
-    return {gameDt:+(G.time-t0).toFixed(2), dist:+d.toFixed(2), speed:+(d/(G.time-t0)).toFixed(2)};
+    return +(d/(G.time-t0)).toFixed(2);
   });
   await page.keyboard.up('s');
-  console.log('WALK (game-time):', JSON.stringify(walk), walk.speed>4 ? 'OK' : 'FAIL');
-  s = await state();
-  // jump
-  await page.keyboard.press('Space');
-  await page.waitForTimeout(250);
-  s = await state();
-  console.log('mid-jump y:', s && s.pos && s.pos[1]);
-  await page.waitForTimeout(800);
+  check('hub walk speed '+walk, walk>4);
 
-  // walk near mayor & everflame for a nicer screenshot
-  await page.evaluate(()=>window.__game.warp(3,1,8));
-  await page.waitForTimeout(600);
-  await shot('shot_hub2.png');
-
-  // level 1
-  await page.evaluate(()=>window.__game.scene('level1'));
-  await page.waitForTimeout(1800);
-  s = await state();
-  console.log('LEVEL1 state:', JSON.stringify(s));
-  await shot('shot_level_start.png');
-  // run forward into the level
-  await page.keyboard.down('w');
-  await page.waitForTimeout(2500);
-  await page.keyboard.up('w');
+  // map flow
+  await page.evaluate(()=>window.G.openMap('w1'));
   await page.waitForTimeout(400);
   s = await state();
-  console.log('level after run:', JSON.stringify(s));
-  await shot('shot_level_run.png');
-  // warp to pumpkin field & barn for screenshots
-  await page.evaluate(()=>window.__game.warp(0,1,-60));
-  await page.waitForTimeout(700);
-  await shot('shot_pumpkin_field.png');
-  await page.evaluate(()=>window.__game.warp(0,1,-88));
-  await page.waitForTimeout(700);
-  await shot('shot_barn.png');
-  await page.evaluate(()=>window.__game.warp(0,1,-125));
-  await page.waitForTimeout(700);
-  await shot('shot_garden.png');
-  console.log('after warps:', JSON.stringify(await state()));
+  check('map opens (state=map)', s && s.state==='map');
+  await shot('shot_map.png');
+  await page.evaluate(()=>window.G.closeMap());
+  await page.waitForTimeout(200);
+  s = await state();
+  check('map closes back to play', s && s.state==='play');
+
+  // each level: enter, verify side-scroll movement with a real held key, screenshot
+  const levels = ['w1l1','w1l2','w1l3','w1l4','w1l5'];
+  for(const id of levels){
+    await page.evaluate((i)=>window.__game.scene(i), id);
+    await page.waitForTimeout(1400);
+    s = await state();
+    check(id+' loads', s && s.state==='play' && s.area===id);
+    // run right like a player: held direction + a hop every half game-second.
+    // assert MAX x reached — a fall + checkpoint respawn (by design) may reset the final position
+    let maxX = 0;
+    await page.keyboard.down('d');
+    for(let i=0;i<4;i++){
+      await gameWait(0.5);
+      await page.keyboard.press('Space');
+      s = await state();
+      if(s && s.pos) maxX = Math.max(maxX, s.pos[0]);
+    }
+    await page.keyboard.up('d');
+    await page.waitForTimeout(300);
+    check(id+' side movement maxX='+maxX.toFixed(1), maxX>3);
+    await shot('shot_'+id+'.png');
+  }
+
+  // level-clear flow: walk into w1l1's exit gate for real
+  await page.evaluate(()=>window.__game.scene('w1l1'));
+  await page.waitForTimeout(1400);
+  const gateX = await page.evaluate(()=>{
+    const trigs = window.G.world.cols.filter(c=>c.type==='trigger');
+    return Math.max(...trigs.map(c=>c.min.x));
+  });
+  console.log('w1l1 exit trigger min.x =', gateX);
+  await page.evaluate((x)=>window.__game.warp(x-3, 1, 0), gateX);
+  await page.keyboard.down('d');
+  await gameWait(1.5);
+  await page.keyboard.up('d');
+  await page.waitForTimeout(900);
+  const clear = await page.evaluate(()=>({
+    state: window.G.state,
+    saved: window.G.save.levels && window.G.save.levels.w1l1,
+  }));
+  check('exit gate → levelclear state', clear.state==='levelclear');
+  check('w1l1 saved done', !!(clear.saved && clear.saved.done));
+  check('w1l1 stars object saved', !!(clear.saved && clear.saved.stars));
+  await shot('shot_levelclear.png');
+
+  // NEXT LEVEL from the clear screen
+  await page.evaluate(()=>window.G.enterLevel('w1l2'));
+  await page.waitForTimeout(1400);
+  s = await state();
+  check('next-level into w1l2', s && s.state==='play' && s.area==='w1l2');
 
   // boss
-  await page.evaluate(()=>window.__game.scene('boss1'));
-  await page.waitForTimeout(2500);
+  await page.evaluate(()=>window.G.startBoss1());
+  await page.waitForTimeout(1800);
   s = await state();
-  console.log('BOSS state:', JSON.stringify(s));
-  await shot('shot_boss.png');
-  // survive a few seconds of the fight
+  check('boss1 loads with boss', s && s.area==='boss1' && !!s.boss);
   await page.keyboard.down('a');
-  await page.waitForTimeout(1500);
+  await gameWait(1.5);
   await page.keyboard.up('a');
   await page.keyboard.press('Space');
-  await page.waitForTimeout(2500);
-  s = await state();
-  console.log('boss after 4s:', JSON.stringify(s));
+  await page.waitForTimeout(1500);
   await shot('shot_boss_fight.png');
 
-  console.log('FINAL game errors:', JSON.stringify(await errs()));
-  console.log('FINAL console errors:', JSON.stringify(consoleErrs.slice(0,10)));
+  const gameErrs = await errs();
+  check('zero game errors', gameErrs.length===0);
+  check('zero console errors', consoleErrs.length===0);
+  if(gameErrs.length) console.log('game errors:', JSON.stringify(gameErrs.slice(0,5)));
+  if(consoleErrs.length) console.log('console errors:', JSON.stringify(consoleErrs.slice(0,5)));
+
   await browser.close();
+  if(failed){ console.error('PLAYTEST FAILED'); process.exit(1); }
+  console.log('PLAYTEST PASSED');
 })().catch(e=>{ console.error('TEST CRASH', e); process.exit(1); });
