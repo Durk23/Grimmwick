@@ -150,7 +150,7 @@ function buildMapScene(G, district){
   emberHalo.scale.setScalar(emberR*3.2);
   emberHalo.position.copy(ember.position);
   scene.add(ember, emberHalo);
-  const emberLight = new THREE.PointLight(0xff8c3e, 90+embers*45, 28);
+  const emberLight = new THREE.PointLight(0xff8c3e, 90+embers*28, 28);
   emberLight.position.set(0,3.6,0);
   scene.add(emberLight);
 
@@ -198,7 +198,7 @@ function buildMapScene(G, district){
     const g = new THREE.Group();
     // tilled field, warm soil, soft dark border so the edge isn't a hard CG rectangle
     const skirt = mesh('box',[48.5,0.16,32.5], mat(0x372a50)); skirt.position.set(0,0.04,26); g.add(skirt);
-    const field = mesh('box',[46,0.2,30], mat(0x593a58)); field.position.set(0,0.1,26); g.add(field);
+    const field = mesh('box',[46,0.2,30], mat(0x523a54)); field.position.set(0,0.1,26); g.add(field);
     for(let k=0;k<10;k++){
       const row = mesh('box',[41,0.06,0.5], mat(0x452c50));
       row.position.set(rand(-1.5,1.5), 0.2, 13+k*2.9);
@@ -213,12 +213,18 @@ function buildMapScene(G, district){
       tuft.position.set(x,0.3,z); crook(tuft,0.3);
       g.add(tuft);
     }
-    // glowing road cobbles
+    // the road: a continuous dirt ribbon with glowing cobbles marking progress
+    for(let i=0;i<roadPts.length;i++){
+      const p = roadPts[i];
+      const rb = mesh('cyl',[0.85,0.85,0.05,7], mat(0x6b5589));
+      rb.position.set(p.x, 0.225, p.z);
+      g.add(rb);
+    }
     for(let i=0;i<roadPts.length;i+=2){
       const p = roadPts[i];
       const lit = i<=litIdx;
-      const c = mesh('cyl',[rand(0.3,0.42),rand(0.3,0.42),0.1,6], lit ? emat(0xffca6e,0xff9a3e,0.85) : mat(0x5c4a8c));
-      c.position.set(p.x+rand(-0.15,0.15), 0.27, p.z+rand(-0.15,0.15));
+      const c = mesh('cyl',[rand(0.3,0.42),rand(0.3,0.42),0.1,6], lit ? emat(0xffca6e,0xff9a3e,0.85) : mat(0x51447c));
+      c.position.set(p.x+rand(-0.15,0.15), 0.28, p.z+rand(-0.15,0.15));
       g.add(c);
     }
     // pumpkins everywhere (clear of the road & nodes)
@@ -237,12 +243,12 @@ function buildMapScene(G, district){
     // little barn + silo (east, behind the boss knoll — never between camera and a node)
     {
       const bx=18.5, bz=33.5;
-      const barn = mesh('box',[5,3.2,4], mat(0x7a3b46)); barn.position.set(bx,1.6,bz);
-      const roof = mesh('cone',[3.6,2.2,4], mat(0x452837)); roof.position.set(bx,4.2,bz); roof.rotation.y=Math.PI/4;
-      const door = mesh('box',[1.4,1.8,0.1], mat(0x2e1b28)); door.position.set(bx,0.9,bz-2.02);
-      const loft = mesh('box',[0.8,0.8,0.1], emat(PAL.window,PAL.window,0.9)); loft.position.set(bx,3.1,bz-2.02);
-      const silo = mesh('cyl',[1.1,1.2,3.8,10], mat(0x6a5a7e)); silo.position.set(bx-4.2,1.9,bz+0.5);
-      const cap = mesh('sph',[1.15,10,7], mat(0x453153)); cap.position.set(bx-4.2,3.9,bz+0.5); cap.scale.y=0.6;
+      const barn = mesh('box',[5,3.2,4], mat(0x94484f)); barn.position.set(bx,1.6,bz);
+      const roof = mesh('cone',[3.9,2.4,4], mat(0x7a4056)); roof.position.set(bx,4.3,bz); roof.rotation.y=Math.PI/4;
+      const door = mesh('box',[1.4,1.8,0.1], mat(0x3a2232)); door.position.set(bx,0.9,bz-2.02);
+      const loft = mesh('box',[0.9,0.9,0.1], emat(PAL.window,PAL.window,1)); loft.position.set(bx,3.6,bz-2.03); loft.rotation.z=Math.PI/4;
+      const silo = mesh('cyl',[1.1,1.2,3.8,10], mat(0x8a7a9e)); silo.position.set(bx-4.2,1.9,bz+0.5);
+      const cap = mesh('sph',[1.15,10,7], mat(0x5c4370)); cap.position.set(bx-4.2,3.9,bz+0.5); cap.scale.y=0.6;
       g.add(barn,roof,door,loft,silo,cap);
     }
     // scarecrow (west field)
@@ -255,11 +261,11 @@ function buildMapScene(G, district){
     }
     // hay bales + a couple of dead trees at the corners
     for(const [hx,hz] of [[-19,15.5],[20,37],[-9.5,37.5]]){
-      const b = mesh('box',[1.5,0.9,1.1], mat(0xc2a24f)); b.position.set(hx,0.55,hz); b.rotation.y=rand(TAU); g.add(b);
+      const b = mesh('box',[1.5,0.9,1.1], mat(0x8f7642)); b.position.set(hx,0.55,hz); b.rotation.y=rand(TAU); g.add(b);
     }
     g.add(deadTree(-21.5,41.5,1.2), deadTree(21.8,12,1));
     // the boss knoll
-    const knoll = mesh('sph',[3.6,12,9], mat(0x604a80)); knoll.position.set(bossPos.x+0.4,0,bossPos.z); knoll.scale.y=0.42; g.add(knoll);
+    const knoll = mesh('sph',[3.6,12,9], mat(0x51406e)); knoll.position.set(bossPos.x+0.4,0,bossPos.z); knoll.scale.y=0.42; g.add(knoll);
     g.add(pumpkinDeco(bossPos.x-2.6, bossPos.z+2.4, 0.8, false), pumpkinDeco(bossPos.x+2.9, bossPos.z-2, 0.7, false));
     bake(g);
   }
@@ -395,6 +401,10 @@ function buildMapScene(G, district){
     const hroof = mesh('cone',[1.9,1.9,4], mat(tone(0x2a1f3e,on))); hroof.position.set(hx,4,hz); hroof.rotation.y=Math.PI/4; crook(hroof,0.05);
     const hwin = mesh('box',[0.4,0.44,0.06], on ? emat(0x7dff9e,0x7dff9e,1) : mat(0x2a3a30)); hwin.position.set(hx,2.35,hz+1.02);
     g.add(cabin,hroof,hwin);
+    // a bubbling cauldron clearing — the district's potion-glow seen from above
+    const cpot = mesh('sph',[0.55,9,7], mat(tone(0x1e1830,on))); cpot.position.set(cx+5.5,0.5,cz+5.5); cpot.scale.y=0.8;
+    const cbrew = mesh('cyl',[0.44,0.44,0.1,10], on ? emat(0x7dff9e,0x7dff9e,1) : emat(0x2e4a3a,0x2e6a4a,0.5)); cbrew.position.set(cx+5.5,0.82,cz+5.5);
+    g.add(cpot,cbrew);
     if(wSave.w3) relitLanterns(g, cx-6,cz+7, cx+6,cz+6);
     bake(g);
     if(!on) mistOver(cx,cz,13);
@@ -405,7 +415,7 @@ function buildMapScene(G, district){
     const on = unlocked('w4');
     const g = new THREE.Group();
     const cx=-34, cz=24;
-    const bed = mesh('cyl',[10.5,11.5,0.3,18], mat(tone(0x746c5c,on))); bed.position.set(cx,0.05,cz); g.add(bed);
+    const bed = mesh('cyl',[10.5,11.5,0.3,18], mat(tone(0x685f4e,on))); bed.position.set(cx,0.05,cz); g.add(bed);
     // fissure cracks
     for(let i=0;i<11;i++){
       const a=rand(TAU), r=rand(1,9.5);
@@ -421,15 +431,22 @@ function buildMapScene(G, district){
       tp.position.set(cx+Math.cos(a)*r, 0.22, cz+Math.sin(a)*r);
       g.add(tp);
     }
-    // the Salty Phantom, beached on her side
+    // the Salty Phantom, beached on her side (one tilted hull, ribs showing, masts low)
     const sx=cx-1, szz=cz-2;
-    const hull = mesh('sph',[2.2,12,9], mat(tone(0x5e4560,on))); hull.position.set(sx,1.1,szz); hull.scale.set(2.5,0.9,0.8); hull.rotation.z=0.55; hull.rotation.y=0.5;
-    const keel = mesh('box',[8.5,0.35,0.35], mat(tone(0x7a5f78,on))); keel.position.set(sx,2,szz); keel.rotation.z=0.16; keel.rotation.y=0.5;
-    g.add(hull,keel);
+    const shipTilt = 0.5, shipYaw = 0.55;
+    const hull = mesh('sph',[2.2,12,9], mat(tone(0x6a4e66,on))); hull.position.set(sx,1,szz); hull.scale.set(2.6,0.95,0.85); hull.rotation.z=shipTilt; hull.rotation.y=shipYaw;
+    const deckStripe = mesh('sph',[2.24,10,8], mat(tone(0x8a6f84,on))); deckStripe.position.set(sx,1.15,szz); deckStripe.scale.set(2.5,0.35,0.8); deckStripe.rotation.z=shipTilt; deckStripe.rotation.y=shipYaw;
+    g.add(hull,deckStripe);
+    // exposed rib arcs at the broken stern
+    for(let i=0;i<3;i++){
+      const rib = mesh('tor',[0.9-i*0.12,0.07,5,10], mat(tone(0x8a86a0,on)));
+      rib.position.set(sx+3.4+i*0.7, 0.9, szz+1.6+i*0.5); rib.rotation.y=shipYaw+0.3; rib.rotation.z=0.3;
+      g.add(rib);
+    }
     // two tilted masts w/ tattered sails
-    for(const [mx,mzz,tilt] of [[sx-1.6,szz-0.7,1.05],[sx+1.8,szz+0.7,1.2]]){
-      const mast = mesh('cyl',[0.09,0.11,5,5], mat(tone(0x4a3a5a,on))); mast.position.set(mx,2.1,mzz); mast.rotation.z=tilt;
-      const sail = mesh('box',[2.2,1.4,0.06], mat(tone(0x9a98b4,on))); sail.position.set(mx-1.6,2.9,mzz); sail.rotation.z=tilt*0.8; crook(sail,0.1);
+    for(const [mx,mzz,tilt] of [[sx-1.6,szz-0.7,1.0],[sx+1.4,szz+0.7,1.15]]){
+      const mast = mesh('cyl',[0.09,0.11,4.6,5], mat(tone(0x4a3a5a,on))); mast.position.set(mx,1.9,mzz); mast.rotation.z=tilt;
+      const sail = mesh('box',[2,1.3,0.06], mat(tone(0x9a98b4,on))); sail.position.set(mx-1.5,2.6,mzz); sail.rotation.z=tilt*0.8; crook(sail,0.1);
       g.add(mast,sail);
     }
     // dead coral
@@ -480,18 +497,24 @@ function buildMapScene(G, district){
   // drifting clouds + their dim roaming ground shadows
   const clouds = [];
   {
-    const cmat = ownMat(new THREE.MeshLambertMaterial({color:0x565a86, transparent:true, opacity:0.36, depthWrite:false}));
+    const cmat = ownMat(new THREE.MeshLambertMaterial({color:0x767aa8, transparent:true, opacity:0.32, depthWrite:false}));
     const smat = ownMat(new THREE.MeshBasicMaterial({color:0x000000, transparent:true, opacity:0.1, depthWrite:false}));
     for(let i=0;i<4;i++){
-      const cl = new THREE.Mesh(geo('sph',rand(3.5,5.5),8,6), cmat);
-      cl.scale.set(1.8,0.32,0.7);
+      // puffy three-lobe cloud
+      const cl = new THREE.Group();
+      const R = rand(2.6,3.8);
+      for(const [ox,oy,os] of [[-R*1.1,0,0.72],[0,R*0.28,1],[R*1.15,-R*0.05,0.6]]){
+        const puff = new THREE.Mesh(geo('sph',1,9,7), cmat);
+        puff.scale.set(R*os*1.5, R*os*0.55, R*os*0.95);
+        puff.position.set(ox,oy,0);
+        cl.add(puff);
+      }
       const sh = new THREE.Mesh(geo('circ',1,16), smat);
       sh.rotation.x=-Math.PI/2; sh.renderOrder=1;
-      sh.scale.setScalar(cl.geometry.parameters.radius*1.9);
+      sh.scale.setScalar(R*2.4);
       const u = {x:rand(-55,55), z:rand(-40,8), y:rand(30,35), sp:rand(0.55,1.1)};
       cl.position.set(u.x,u.y,u.z);
       sh.position.set(u.x,0.42,u.z);
-      cl.userData=u;
       scene.add(cl,sh);
       clouds.push({cl,sh,u});
     }
@@ -501,10 +524,10 @@ function buildMapScene(G, district){
   {
     const fg = new THREE.BufferGeometry();
     const fp=[];
-    for(let i=0;i<42;i++) fp.push(rand(-19,19), rand(0.6,3.2), rand(12,40));
+    for(let i=0;i<26;i++) fp.push(rand(-19,19), rand(0.8,3.4), rand(12,40));
     fg.setAttribute('position', new THREE.Float32BufferAttribute(fp,3));
     ownGeos.push(fg);
-    flies = new THREE.Points(fg, ownMat(new THREE.PointsMaterial({color:0xd6ff9e, size:0.5, transparent:true, opacity:0.85})));
+    flies = new THREE.Points(fg, ownMat(new THREE.PointsMaterial({color:0xc8f28e, size:0.38, transparent:true, opacity:0.8})));
     scene.add(flies);
   }
   // path shimmer — sparse warm points floating just over the lit cobbles
@@ -539,7 +562,7 @@ function buildMapScene(G, district){
     const eb = 1 + Math.sin(t*3)*0.18 + Math.sin(t*7.3)*0.06;
     ember.scale.setScalar(emberR*eb);
     emberHalo.scale.setScalar(emberR*3.2*(1+Math.sin(t*2.1)*0.12));
-    emberLight.intensity = 90 + embers*45 + Math.sin(t*3)*22;
+    emberLight.intensity = 90 + embers*28 + Math.sin(t*3)*22;
     // lantern flames
     for(let i=0;i<flames.length;i++){
       const f = flames[i];

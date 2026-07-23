@@ -197,9 +197,9 @@ const UI = {
           <div id="mapTitle"></div>
           <div id="mapEmber"></div>
           <div id="mapCozy" style="display:none">🧸 cozy night — records asleep</div>
+          <div id="mapHint">← → choose &nbsp;·&nbsp; Enter start &nbsp;·&nbsp; Esc town</div>
         </div>
         <div id="mapWrap"></div>
-        <div id="mapHint">← → choose &nbsp;·&nbsp; Enter start &nbsp;·&nbsp; Esc town</div>
         <button id="mapClose" class="ui-block">✕</button>
       </div>
       <div id="clear-screen" class="screen"><div class="card">
