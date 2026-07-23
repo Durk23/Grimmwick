@@ -22,6 +22,7 @@ function buildW1L2(G){
   G.ents.add(new Boo(G, 6, 0, 0, {speed:2.2}));
   G.ents.add(new Boo(G, 28, 0, 0, {speed:2.4}));
   G.ents.add(new Skelly(G, 15, 0, 0, {px:2.5}));
+  G.ents.add(new SwoopBat(G, 30, 4.5, 0, {range:5}));   // air pressure over the second mud crossing
   G.ents.add(new Heart(13.5, 1.2, 0));
   G.ents.add(new Checkpoint(12.5, 0, 1.6, 0)); // District 1 curve: 2 lanterns per level
   const decoB = new THREE.Group();
@@ -51,6 +52,7 @@ function buildW1L2(G){
   platform(G, 2.5, 4.2, 0, 2.4, 3, 0x5a4066);
   platform(G, 8, 5.0, 0, 2.6, 3, 0x5a4066);
   platform(G, 14, 5.5, 0, 3.0, 3, 0x5a4066);
+  platform(G, 20, 5.8, 0, 2.4, 3, 0x5a4066);   // bridges the 14→26 stretch — the high road must not dead-end
   platform(G, 26, 4.7, 0, 2.6, 3, 0x5a4066);
   platform(G, 32, 3.8, 0, 2.4, 3, 0x5a4066);
   G.ents.add(new Boo(G, 14, 6.0, 0, {speed:2.0}));   // floater fits the narrow platform — a hopper would hop off and hover the void

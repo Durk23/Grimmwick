@@ -442,3 +442,76 @@ class Rat extends Enemy {
     this.updateShadow();
   }
 }
+
+// ---- Swoop Bat: patrols the night air on a fixed loop; squeaks, then dives a fixed arc ----
+// The dive targets a SNAPSHOT of the player's position — never homing, a sidestep always beats it.
+class SwoopBat extends Enemy {
+  constructor(G,x,y,z,opts={}){
+    super(G,x,y,z);
+    this.t = opts.phase||0;              // fixed phase — identical flight every attempt (determinism rule)
+    this.baseY = y;
+    this.rangeX = opts.range||5;
+    this.aggroR = opts.aggroR||5.5;
+    this.period = opts.period||3.4;
+    this.hitR=0.5; this.headH=0.5; this.hitY=0.15; this.touchR=0.6;
+    this.candyDrop = 2;
+    this.state='patrol'; this.st=0; this.cool=0;
+    this.diveFrom=new THREE.Vector3(); this.diveTo=new THREE.Vector3();
+    const bodyM = mat(0x4a3d6b);
+    this.body = mesh('sph',[0.32,8,7], bodyM); this.body.scale.set(1,0.9,0.8);
+    const belly = mesh('sph',[0.2,7,6], mat(0x6b5d94)); belly.position.set(0,-0.05,0.18);
+    this.earL = mesh('cone',[0.09,0.28,5], bodyM); this.earL.position.set(-0.14,0.32,0);
+    this.earR = this.earL.clone(); this.earR.position.x=0.14;
+    const eL = mesh('sph',[0.06,5,5], emat(0xffd34d,0.9)); eL.position.set(-0.12,0.05,0.26);
+    const eR = eL.clone(); eR.position.x=0.12;
+    this.wingL = mesh('box',[0.55,0.05,0.3], bodyM); this.wingL.position.set(-0.42,0.05,0);
+    this.wingR = this.wingL.clone(); this.wingR.position.x=0.42;
+    this.group.add(this.body, belly, this.earL, this.earR, eL, eR, this.wingL, this.wingR);
+    G.scene.add(this.group);
+  }
+  update(dt){
+    this.t += dt;
+    if(this.cool>0) this.cool -= dt;
+    const p = this.group.position, pl = this.G.player;
+    const flap = this.state==='dive' ? 14 : 8;
+    this.wingL.rotation.z =  Math.sin(this.t*flap)*0.7;
+    this.wingR.rotation.z = -Math.sin(this.t*flap)*0.7;
+    if(this.state==='patrol'){
+      const ph = this.t*(TAU/this.period);
+      p.x = this.home.x + Math.sin(ph)*this.rangeX;
+      p.y = this.baseY + Math.sin(ph*2)*0.35;
+      this.group.rotation.y = Math.cos(ph)>=0 ? Math.PI/2 : -Math.PI/2;
+      if(pl && !pl.dead && this.cool<=0){
+        const dx = pl.pos.x-p.x;
+        if(Math.abs(dx)<this.aggroR && pl.pos.y < p.y+0.5){
+          this.state='telegraph'; this.st=0;
+          AUDIO.noise({t:0.14, vol:0.2, fFrom:1500, fTo:950});   // the squeak IS the warning
+        }
+      }
+    } else if(this.state==='telegraph'){
+      this.st += dt;
+      p.y += Math.sin(this.st*40)*0.02;                          // agitated hover
+      if(this.st>0.45 && pl){
+        this.state='dive'; this.st=0;
+        this.diveFrom.copy(p);
+        this.diveTo.set(pl.pos.x, pl.pos.y+0.3, 0);              // snapshot taken NOW — move and it misses
+      }
+    } else if(this.state==='dive'){
+      this.st += dt;
+      const u = Math.min(this.st/0.55, 1);
+      p.x = this.diveFrom.x + (this.diveTo.x-this.diveFrom.x)*u;
+      p.y = this.diveFrom.y + (this.diveTo.y-this.diveFrom.y)*u*u;
+      if(u>=1){ this.state='recover'; this.st=0; this.diveFrom.copy(p); }
+    } else { // recover — climb back to the patrol line
+      this.st += dt;
+      const u = Math.min(this.st/0.9, 1);
+      p.y = this.diveFrom.y + (this.baseY-this.diveFrom.y)*u;
+      if(u>=1){
+        this.state='patrol'; this.cool = 1.6;
+        this.home.x = p.x - Math.sin(this.t*(TAU/this.period))*this.rangeX;  // resume patrol from here, no teleport
+      }
+    }
+    this.touchPlayer(dt);
+    this.updateShadow();
+  }
+}

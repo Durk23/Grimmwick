@@ -55,6 +55,7 @@ function buildW1L4(G){
   G.ents.add(new Boo(G, 42, 0, 0, {speed:2.6, range:13}));
   G.ents.add(new Boo(G, 44, 0, 0, {speed:2.2, range:10}));
   G.ents.add(new Heart(30, 2.3, 0));
+  G.ents.add(new SwoopBat(G, 33, 3.6, 0, {range:5.5}));   // garden air patrol — thorns below, wings above
   const cofB = new CursedCoffin(35, 0, 1.7, -0.4);
   G.ents.add(cofB); G.coffins.push(cofB);
   G.world.addBox(35, 0, 1.7, 1.4, 0.9, 2.4, {});

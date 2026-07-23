@@ -35,6 +35,7 @@ function buildW1L5(G){
   platform(G, 24.5, 5.2, 0, 2.6, 3, 0x5a4066);
   candyLine(G, [[20,5.8,0],[24.5,6.4,0]], 4);
   G.ents.add(new Heart(24.5, 6.6, 0));
+  candyLine(G, [[22.5,3.2,0],[23.5,4.6,0],[24.5,5.9,0]], 4);   // traces the pound-mega-bounce arc up to the shelf — the trail teaches the move
 
   // ================= BEAT 3: The briar row (x 28..42) — ground pressure between bounces =================
   G.ents.add(new Skelly(G, 30, 0, 0, {px:1.5}));

@@ -183,7 +183,7 @@ They GLOW with a pulsing red light — temptation visible from across the level.
 
 ### Enemy rosters by district (variety mandate — no district reuses more than 2 earlier enemies)
 
-- **Pumpkin Patch** ✅: Boo, Jump-o'-Lantern, Skelly, Web Spider (barn)
+- **Pumpkin Patch** ✅: Boo, Jump-o'-Lantern, Skelly, Web Spider (barn), Swoop Bat (air lane — fixed patrol, squeak-telegraphed snapshot dive, never homing)
 - **Ravenmoor Cemetery**: Wisps (chase in darkness), Gravemites, crow flocks, Skelly variants; spiders in the crypt levels
 - **Witchwood**: THE spider district — Weblings (web-wall builders), Widowmite swarms, drop-Spiders everywhere; enchanted brooms that sweep you off ledges
 - **Ghost Harbor / the Salty Phantom**: **Boo Buccaneers** — ghost pirates with bandanas and cutlasses, and a twist on the learned rule: stare at them and they *wink and keep creeping, just slower* (the harbor's ghosts are bolder); **Barrel Mimics** — deck barrels that sprout teeth and lunge when you pass (trust no prop on a haunted ship); **Cannon Crabs** — crabs in cannon-shell armor lobbing arcing shots (tide pools + deck); and the unique one: the **Rigging Wraith** — a specter that travels ONLY along the ship's ropes and rigging, sliding like a zipline predator above the deck fight
@@ -300,6 +300,7 @@ A feature that serves none of the three joys doesn't ship.
 
 ## Owner decisions locked (July 2026 Q&A)
 
+- **FEEL-PASS #1** (owner call, July 22 2026, after playing 1-1): the intro level stays gentle — "an enemy here and there to learn to defeat one" — but never empty, and later levels carry the real chaos ("lots of enemy and flying objects to avoid... an actual challenge... fun for the long run"). Every level must have ≥2 visible routes (1-1 shipped with one — high road added same day). Airborne threats are a standing requirement; the Swoop Bat is their D1 form. Skill-gated pickups must have their move telegraphed by a candy trail.
 - **STRUCTURED CHAOS** (owner call, July 22 2026 — "make sure the levels have structured chaos and they are challenging and fun"): levels should feel ALIVE and busy — overlapping motion, enemies on multiple lanes, bounce chains, particles, near-misses — but every element deterministic, telegraphed, and fair (the constitution's flow + determinism rules ARE the "structure"; the density and energy are the "chaos"). Fun-first: when a tuning call is close, pick the more exciting option.
 - **RELEASE SHAPE: the whole game ships at once** (owner call, July 22 2026 — "i want the whole game released at once"): all 5 districts + the Grimm finale at launch; no partial or seasonal story launch. Target: App Store launch October 1 2026 ("earlier the better"), content-complete quality gate ~Sept 15, submission ~Sept 22. Post-launch seasons carry modes/cosmetics (Nightmare Mode, Boo Rush, new districts as spin-off seasons) — never the base story. Audio budget is $0: the in-engine synth is the launch soundtrack (upgrade it, don't replace it) unless a free/credit composer materializes via docs/COMPOSER_BRIEF.md. English-only at launch. Test devices: owner's iPhone 15/16 + MacBook Air; perf floor stays A14.
 

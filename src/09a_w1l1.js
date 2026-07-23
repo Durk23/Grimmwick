@@ -28,6 +28,21 @@ function buildW1L1(G){
   candyLine(G, [[5,0.8,0],[12,0.8,0]], 5);
   candyLine(G, [[20,0.8,0],[27,1.6,0],[31,0.8,0]], 6);
   G.ents.add(new Rat(G, 38, 0, 0));
+
+  // ---- HIGH ROAD: gravestone-top hops above the lane — extra candy + the heart, rejoins at the gap ----
+  hayBale(G, 13, 0, 0, 2, 1.2, 1.6);
+  platform(G, 16.5, 2.2, 0, 2.4, 3, 0x6b6580);
+  platform(G, 21, 2.9, 0, 2.4, 3, 0x6b6580);
+  platform(G, 25.5, 3.4, 0, 2.6, 3, 0x6b6580);
+  platform(G, 30, 3.4, 0, 2.6, 3, 0x6b6580);
+  platform(G, 34.5, 3.0, 0, 2.4, 3, 0x6b6580);
+  platform(G, 39, 2.6, 0, 2.4, 3, 0x6b6580);
+  platform(G, 44, 2.1, 0, 2.6, 3, 0x6b6580);
+  candyLine(G, [[16.5,3.0,0],[21,3.7,0],[25.5,4.2,0]], 6);
+  candyLine(G, [[30,4.2,0],[34.5,3.8,0],[39,3.4,0],[44,2.9,0]], 7);
+  G.ents.add(new Heart(30, 4.4, 0));
+  // the Patch's first swoop bat guards the prize — learn the squeak-then-dive rule here
+  G.ents.add(new SwoopBat(G, 33, 3.9, 0, {range:4.5, aggroR:4.5}));
   G.ents.add(new Checkpoint(23, 0, 1.2, 0)); // District 1 curve: 2 lanterns per level
   const cofA = new CursedCoffin(41, 0, -1.6, 0.3);
   G.ents.add(cofA); G.coffins.push(cofA);
