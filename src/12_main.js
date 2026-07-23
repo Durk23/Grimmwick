@@ -174,6 +174,7 @@ const G = {
     const def = findLevel(id);
     if(!def){ if(this.state==='map') this.state='play'; UI.toast('🌘 That road is still dark...'); return; }
     if(UI.hideMap) UI.hideMap();
+    if(this.mapView){ this.mapView.dispose && this.mapView.dispose(); this.mapView = null; }
     this.state='transition';
     UI.fade(true, 450);
     setTimeout(()=>{
@@ -228,10 +229,12 @@ const G = {
   openMap(district){
     if(this.state!=='play') return;
     this.state='map';
+    this.mapView = (typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;
     UI.showMap(district||'w1');
   },
   closeMap(){
     if(UI.hideMap) UI.hideMap();
+    if(this.mapView){ this.mapView.dispose && this.mapView.dispose(); this.mapView = null; }
     if(this.state==='map') this.state='play';
   },
   toMap(district){
@@ -240,12 +243,14 @@ const G = {
     setTimeout(()=>{
       this.switchArea('hub');
       this.state='map';
-      UI.fade(false, 450);
+      this.mapView = (typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;
       UI.showMap(district||'w1');
+      UI.fade(false, 450);
     }, 500);
   },
   startBoss1(){
     if(UI.hideMap) UI.hideMap();
+    if(this.mapView){ this.mapView.dispose && this.mapView.dispose(); this.mapView = null; }
     this.state='transition';
     UI.fade(true, 450);
     setTimeout(()=>{
@@ -509,10 +514,17 @@ const G = {
     else if(this.state==='victory' || this.state==='paused' || this.state==='shop' || this.state==='intro' || this.state==='map' || this.state==='levelclear'){
       // idle simmer
       if(this.boss && this.state==='victory') this.boss.update(dt*0.5);
-      if(this.state==='map' && UI.mapNav) UI.mapNav();   // gamepad drives the map
+      if(this.state==='map'){
+        if(UI.mapNav) UI.mapNav();   // gamepad drives the map
+        if(this.mapView){ this.mapView.update(dt); UI.positionMapNodes && UI.positionMapNodes(this.mapView); }
+      }
       this.fx.update(dt);
     }
-    this.renderer.render(this.scene, this.camera);
+    if(this.state==='map' && this.mapView){
+      this.mapView.camera.aspect = this.camera.aspect;
+      this.mapView.camera.updateProjectionMatrix();
+      this.renderer.render(this.mapView.scene, this.mapView.camera);
+    } else this.renderer.render(this.scene, this.camera);
     INPUT.endFrame();
   },
 };

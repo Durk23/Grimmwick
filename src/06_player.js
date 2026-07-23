@@ -1,6 +1,7 @@
 // ============ PLAYER — Pip the trick-or-treater, costumes, moveset ============
 const COSTUMES = {
-  kid:      {name:'Just Pip',      price:0,    body:0xff8c42, accent:0x4a3a6e, hat:'none',  cape:null,     human:true, desc:'The smallest kid in Grimmwick. Hoodie by Gran, bravery by nature.'},
+  kid:      {name:'Just Pip',      price:0,    body:0xe8503c, accent:0x4d7bc4, hat:'none',  cape:null,     human:true, flannel:true, desc:'The smallest kid in Grimmwick. Red flannel, white tee, bravery by nature.'},
+  hoodie:   {name:'Pumpkin Hoodie', price:0,   body:0xff8c42, accent:0x4a3a6e, hat:'none',  cape:null,     human:true, desc:'Pip\'s old favorite. Hoodie by Gran, worn soft at the sleeves.'},
   ghost:    {name:'Gran\'s Ghost Sheet', price:0, body:0xf2f0ff, accent:0xd8d4f0, hat:'none', cape:null,   desc:'The sheet Gran sewed, crooked eye-holes and all. An heirloom.'},
   pumpkin:  {name:'Pumpkin Pal',   price:150,  body:0xff8c2e, accent:0xd96a12, hat:'stem',  cape:null,     desc:'Round, orange, and proud of it.'},
   witch:    {name:'Witchling',     price:250,  body:0x8e5bd9, accent:0x5b3a8e, hat:'witch', cape:null,     desc:'Comes with a very pointy hat.'},
@@ -50,8 +51,11 @@ class Player {
     // sheet/body: cone with rounded top
     const bodyMat = c.glow ? emat(c.body, c.glow, 0.4) : mat(c.body);
     const skin = mat(0xf2c096);
-    const sheet = mesh('cone',[0.52,1.05,9], bodyMat);
-    sheet.position.y=0.62;
+    if(!c.flannel){
+      const sheet = mesh('cone',[0.52,1.05,9], bodyMat);
+      sheet.position.y=0.62;
+      body.add(sheet);
+    }
     const head = mesh('sph',[0.42,12,10], c.human ? skin : bodyMat);
     head.position.y=1.18; head.scale.set(1,0.95,1);
     if(c.human){
@@ -59,11 +63,14 @@ class Player {
       const hairM = mat(0x5a3a26);
       const hair = mesh('sph',[0.43,10,9], hairM); hair.position.set(0,1.32,-0.06); hair.scale.set(1,0.8,0.95);
       const swoosh = mesh('sph',[0.14,7,6], hairM); swoosh.position.set(0.12,1.6,0.18); swoosh.scale.set(1.6,0.6,0.9); swoosh.rotation.z=-0.3;
-      // hood (down) around the neck + zipper stripe on the hoodie
-      const hood = mesh('tor',[0.3,0.12,7,14], mat(c.accent)); hood.position.set(0,1.0,-0.12); hood.rotation.x=1.2;
-      const zip = mesh('box',[0.05,0.8,0.04], mat(c.accent)); zip.position.set(0,0.62,0.5);
-      const pocket = mesh('box',[0.4,0.2,0.06], mat(c.accent)); pocket.position.set(0,0.34,0.48);
-      body.add(hair, swoosh, hood, zip, pocket);
+      body.add(hair, swoosh);
+      if(!c.flannel){
+        // hood (down) around the neck + zipper stripe on the hoodie
+        const hood = mesh('tor',[0.3,0.12,7,14], mat(c.accent)); hood.position.set(0,1.0,-0.12); hood.rotation.x=1.2;
+        const zip = mesh('box',[0.05,0.8,0.04], mat(c.accent)); zip.position.set(0,0.62,0.5);
+        const pocket = mesh('box',[0.4,0.2,0.06], mat(c.accent)); pocket.position.set(0,0.34,0.48);
+        body.add(hood, zip, pocket);
+      }
     }
     // eyes
     const eyeM = mat(0x14101f);
@@ -73,20 +80,77 @@ class Player {
     const chM = mat(0xffb0c0);
     const ch1 = mesh('sph',[0.05,6,6], chM); ch1.position.set(-0.24,1.14,0.33); ch1.scale.set(1,0.7,0.5);
     const ch2 = ch1.clone(); ch2.position.x=0.24;
-    // stubby feet
-    const fM = c.human ? mat(0xf4f4f8) : mat(c.accent);
-    this.footL = mesh('sph',[0.13,7,6], fM); this.footL.position.set(-0.18,0.1,0.05);
-    this.footR = mesh('sph',[0.13,7,6], fM); this.footR.position.set(0.18,0.1,0.05);
-    // arms
-    this.armL = mesh('sph',[0.13,7,6], bodyMat); this.armL.position.set(-0.48,0.78,0); this.armL.scale.set(1,1.5,1);
-    this.armR = mesh('sph',[0.13,7,6], bodyMat); this.armR.position.set(0.48,0.78,0); this.armR.scale.set(1,1.5,1);
+    if(c.flannel){
+      // === Just Pip: OPEN red flannel over a white tee, jeans, white sneakers ===
+      // faint emissive lift so the hero pops against the purple night (moonlight is a backlight)
+      const red = emat(c.body, 0x6e150a, 0.45), redD = mat(0x9c2c22);
+      const denim = emat(c.accent, 0x182d55, 0.4), denimD = mat(0x33517e);
+      const white = emat(0xf6f3ea, 0x35323e, 0.35), shoeW = emat(0xf4f4f6, 0x2e2e34, 0.4), shoeG = mat(0xd7d9de);
+      // white t-shirt — the visible center chest + a white ring at the neckline
+      const tee = mesh('cyl',[0.30,0.335,0.52,10], white); tee.position.y=0.72;
+      // jean hips tuck under the tee
+      const hips = mesh('cyl',[0.315,0.27,0.26,10], denim); hips.position.y=0.36;
+      // flannel shell wraps back + sides, open at the front (gap shows the tee)
+      const shell = new THREE.Mesh(geo('cyl',0.345,0.385,0.46,12,1,true,0.62,TAU-1.24), red);
+      shell.position.y=0.725;
+      // plaid hint: two thin darker bands + two thin back stripes (subtle gingham)
+      const band1 = new THREE.Mesh(geo('cyl',0.360,0.364,0.05,12,1,true,0.62,TAU-1.24), redD); band1.position.y=0.83;
+      const band2 = new THREE.Mesh(geo('cyl',0.380,0.384,0.05,12,1,true,0.62,TAU-1.24), redD); band2.position.y=0.60;
+      const bs1 = new THREE.Mesh(geo('cyl',0.352,0.392,0.46,3,1,true,Math.PI-0.55,0.14), redD); bs1.position.y=0.725;
+      const bs2 = new THREE.Mesh(geo('cyl',0.352,0.392,0.46,3,1,true,Math.PI+0.41,0.14), redD); bs2.position.y=0.725;
+      // open front flap panels, slightly apart — unbuttoned
+      const flapL = mesh('box',[0.15,0.48,0.05], red); flapL.position.set(-0.155,0.72,0.30); flapL.rotation.y=-0.42;
+      const flapR = mesh('box',[0.15,0.48,0.05], red); flapR.position.set(0.155,0.72,0.30); flapR.rotation.y=0.42;
+      for(const f of [flapL,flapR]){
+        const vs = mesh('box',[0.03,0.49,0.055], redD); vs.position.x=0.035;
+        const hs = mesh('box',[0.16,0.03,0.055], redD); hs.position.y=0.08;
+        f.add(vs,hs);
+      }
+      // small collar
+      const collar = mesh('tor',[0.24,0.06,6,14], redD); collar.position.set(0,1.03,0); collar.rotation.x=1.35;
+      // jeans legs + white Converse-style sneakers (foot groups keep the run-swing anim)
+      const mkLeg = (sx)=>{
+        const gp = new THREE.Group();
+        const jean = mesh('cyl',[0.105,0.12,0.32,8], denim); jean.position.y=0.29;
+        const cuff = mesh('cyl',[0.115,0.122,0.06,8], denimD); cuff.position.y=0.16;
+        const shoe = mesh('sph',[0.135,8,6], shoeW); shoe.position.set(0,0.02,0.05); shoe.scale.set(0.9,0.75,1.35);
+        const toe = mesh('sph',[0.09,6,5], shoeG); toe.position.set(0,0,0.21); toe.scale.set(1.05,0.68,0.9);
+        const sole = mesh('box',[0.21,0.05,0.36], shoeG); sole.position.set(0,-0.04,0.06);
+        gp.add(jean,cuff,shoe,toe,sole);
+        gp.position.set(sx,0.1,0.05);
+        return gp;
+      };
+      this.footL = mkLeg(-0.17); this.footR = mkLeg(0.17);
+      // red flannel sleeves with cuffs + skin hands
+      const mkArm = (sx)=>{
+        const gp = new THREE.Group();
+        const sleeve = mesh('sph',[0.13,7,6], red); sleeve.scale.set(1,1.42,1);
+        const cuffA = mesh('cyl',[0.095,0.105,0.045,7], redD); cuffA.position.y=-0.135;
+        const hand = mesh('sph',[0.09,6,5], skin); hand.position.y=-0.235;
+        gp.add(sleeve,cuffA,hand);
+        gp.position.set(sx,0.78,0);
+        return gp;
+      };
+      this.armL = mkArm(-0.48); this.armR = mkArm(0.48);
+      body.add(tee, hips, shell, band1, band2, bs1, bs2, flapL, flapR, collar,
+               this.footL, this.footR, this.armL, this.armR);
+    } else {
+      // stubby feet
+      const fM = c.human ? mat(0xf4f4f8) : mat(c.accent);
+      this.footL = mesh('sph',[0.13,7,6], fM); this.footL.position.set(-0.18,0.1,0.05);
+      this.footR = mesh('sph',[0.13,7,6], fM); this.footR.position.set(0.18,0.1,0.05);
+      // arms
+      this.armL = mesh('sph',[0.13,7,6], bodyMat); this.armL.position.set(-0.48,0.78,0); this.armL.scale.set(1,1.5,1);
+      this.armR = mesh('sph',[0.13,7,6], bodyMat); this.armR.position.set(0.48,0.78,0); this.armR.scale.set(1,1.5,1);
+      body.add(this.footL, this.footR, this.armL, this.armR);
+    }
     // candy bag (attack weapon) in right hand
     this.bag = new THREE.Group();
     const sack = mesh('sph',[0.2,8,7], mat(0xc27a3f)); sack.scale.set(1,1.15,1);
     const tie = mesh('cyl',[0.055,0.075,0.12,6], mat(0x8a5228)); tie.position.y=0.24;
     this.bag.add(sack,tie);
     this.bag.position.set(0.58,0.62,0.1);
-    body.add(sheet, head, e1,e2, ch1,ch2, this.footL, this.footR, this.armL, this.armR, this.bag);
+    body.add(head, e1,e2, ch1,ch2, this.bag);
     // costume extras
     if(c.hat==='witch'){
       const brim = mesh('cyl',[0.5,0.5,0.05,10], mat(0x2a1f3d)); brim.position.y=1.5;

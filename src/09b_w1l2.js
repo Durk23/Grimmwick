@@ -50,7 +50,7 @@ function buildW1L2(G){
 
   // ===== HIGH ROAD: elevated route above the pumpkin field (harder, richer) =====
   // enter via the web-net at -3 (or mega-bounce) — exits at the gold-pumpkin ledge (x36)
-  platform(G, -3, 3.2, 0, 2.6, 3, 0x5a4066);
+  platform(G, -3, 2.9, 0, 2.6, 3, 0x5a4066);   // was 3.2 — exactly at the double-jump ceiling (owner rule: margin, never exact)
   platform(G, 2.5, 4.2, 0, 2.4, 3, 0x5a4066);
   platform(G, 8, 5.0, 0, 2.6, 3, 0x5a4066);
   platform(G, 14, 5.5, 0, 3.0, 3, 0x5a4066);

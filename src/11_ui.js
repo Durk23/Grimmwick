@@ -559,6 +559,10 @@ const UI = {
     this.el('mapHint').style.display = INPUT.isTouch ? 'none' : 'block';
     this.renderMap(world, dNum, beaten);
     this.setPrompt(null);
+    // 3D map scene behind (the beautiful map): hide the CSS sky, let the render through
+    const has3D = !!this.G.mapView;
+    this.el('mapSky').style.display = has3D ? 'none' : 'block';
+    this.el('map-screen').style.background = has3D ? 'transparent' : '';
     this.el('map-screen').style.display='flex';
     this.el('hud').style.display='none';
     this.el('pauseBtn').style.display='none';
@@ -615,7 +619,7 @@ const UI = {
       const dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy)||1, bow=30*(i%2?1:-1);
       d += ' Q '+(mx-dy/L*bow).toFixed(1)+' '+(my+dx/L*bow).toFixed(1)+' '+b[0]+' '+b[1];
     }
-    let html = `<svg id="mapSvg" viewBox="0 0 1000 560" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="rgba(255,205,130,.45)" stroke-width="5" stroke-dasharray="0.1 16" stroke-linecap="round"/></svg>`;
+    let html = this.G.mapView ? '' : `<svg id="mapSvg" viewBox="0 0 1000 560" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="rgba(255,205,130,.45)" stroke-width="5" stroke-dasharray="0.1 16" stroke-linecap="round"/></svg>`;
     nodes.forEach((n,i)=>{
       const p=POS[Math.min(i,POS.length-1)];
       const lamp = n.boss ? '<span class="mcrown">👑</span>🎃' : '🏮';
@@ -662,6 +666,20 @@ const UI = {
     AUDIO.ui();
     this.hideMap();
     if(n.boss) this.G.startBoss1(); else this.G.enterLevel(n.id);
+  },
+  positionMapNodes(mv){
+    // project the 3D lantern anchors onto the screen and pin the DOM nodes to them
+    const wrap = this.el('mapWrap'); if(!wrap || !mv || !mv.anchors) return;
+    const rect = wrap.getBoundingClientRect();
+    if(!this._projV) this._projV = new THREE.Vector3();
+    wrap.querySelectorAll('.mnode').forEach(nd=>{
+      const i = +nd.dataset.i;
+      const id = (typeof W1_LEVELS!=='undefined' && i<W1_LEVELS.length) ? W1_LEVELS[i].id : 'boss';
+      const a = mv.anchors.find(x=>x.id===id); if(!a) return;
+      this._projV.copy(a.pos).project(mv.camera);
+      nd.style.left = (((this._projV.x*0.5+0.5)*innerWidth - rect.left))+'px';
+      nd.style.top  = (((-this._projV.y*0.5+0.5)*innerHeight - rect.top))+'px';
+    });
   },
   mapNav(){
     // gamepad drives the map — called each frame from the loop while state==='map'
