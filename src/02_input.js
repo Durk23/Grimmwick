@@ -148,8 +148,10 @@ class InputSys {
       if(len>1){ kx/=len; ky/=len; }
     }
     this.moveX=kx; this.moveY=ky;
-    this.jumpHeld = (this.isTouch ? !!this._touchJumpHeld : !!this.keys['Space']) || !!this.gpJumpHeld;
-    this.poundHeld = (this.isTouch ? !!this._touchPoundHeld : (!!this.keys['KeyK']||!!this.keys['ShiftLeft'])) || !!this.gpPoundHeld;
+    // ALL sources count as "held" — touch devices with keyboards (Simulator, iPad+keyboard)
+    // used to ignore Space entirely, so keyboard jumps were cut to tap height
+    this.jumpHeld = !!this._touchJumpHeld || !!this.keys['Space'] || !!this.gpJumpHeld;
+    this.poundHeld = !!this._touchPoundHeld || !!this.keys['KeyK'] || !!this.keys['ShiftLeft'] || !!this.gpPoundHeld;
   }
   endFrame(){
     this.jumpEdge=false; this.attackEdge=false; this.poundEdge=false;

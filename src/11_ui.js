@@ -278,10 +278,12 @@ const UI = {
     const bA=this.el('btnA');
     bA.addEventListener('touchstart', e=>{e.preventDefault();e.stopPropagation();INPUT.pressJump();},{passive:false});
     bA.addEventListener('touchend', e=>{INPUT.releaseJump();});
+    bA.addEventListener('touchcancel', e=>{INPUT.releaseJump();});
     tap('btnB', ()=>INPUT.pressAttack());
     const bC=this.el('btnC');   // pound needs press AND release — grounded hold = spring charge
     bC.addEventListener('touchstart', e=>{e.preventDefault();e.stopPropagation();INPUT.pressPound();},{passive:false});
     bC.addEventListener('touchend', e=>{INPUT.releasePound();});
+    bC.addEventListener('touchcancel', e=>{INPUT.releasePound();});
     // volume sliders
     this.el('musVol').addEventListener('input', e=>AUDIO.setMusVol(e.target.value/100));
     this.el('sfxVol').addEventListener('input', e=>AUDIO.setSfxVol(e.target.value/100));

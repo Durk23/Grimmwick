@@ -63,7 +63,7 @@ const G = {
     this.renderer.setPixelRatio(this.basePR);
     this.renderer.setSize(innerWidth, innerHeight);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.28;
+    this.renderer.toneMappingExposure = 1.40;
     document.body.appendChild(this.renderer.domElement);
     this.camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.1, 260);
     this.camc = new CamCtrl(this.camera);

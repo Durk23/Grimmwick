@@ -325,7 +325,7 @@ class Player {
     }
     // variable jump height — but every jump keeps full power for its first 0.10s,
     // so touch TAPS still get a strong arc (a tap used to be cut to a stunted hop)
-    if(!INPUT.jumpHeld && this.jumpT>0.10 && this.vel.y>5.5 && !this.pounding && !this._springAir) this.vel.y = 5.5;
+    if(!INPUT.jumpHeld && this.jumpT>0.10 && this.vel.y>6.5 && !this.pounding && !this._springAir) this.vel.y = 6.5;   // tap apex ~1.8 — always clears common enemies (speedrun rule)
 
     // --- spring charge: hold pound on the ground — squiiish down, release to LAUNCH ---
     if(this.grounded && !this.climbing && !this.pounding && INPUT.poundHeld){
