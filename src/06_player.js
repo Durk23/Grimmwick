@@ -288,7 +288,7 @@ class Player {
     const speed = 7.2 * (this.moonT>0 ? 1.35 : 1);
     const accel = this.grounded ? 50 : 28;
     if(this.climbing){ /* velocities set by climb logic above */ }
-    else if(mag>0.01 && !this.pounding){
+    else if(mag>0.01 && !this.pounding && !(this.springT>0)){   // a winding spring holds its ground
       this.vel.x = damp(this.vel.x, md.x*speed, accel/speed, dt);
       if(G.mode!=='side') this.vel.z = damp(this.vel.z, md.z*speed, accel/speed, dt);
       this.facing = angleDamp(this.facing, G.mode==='side' ? (md.x>0?Math.PI/2:-Math.PI/2) : Math.atan2(md.x, md.z), 12, dt);
@@ -299,7 +299,7 @@ class Player {
     }
 
     // --- jumping ---
-    if(this.grounded){ this.coyote = 0.12; this.canDouble = true; this.batFlutters = 0; }
+    if(this.grounded){ this.coyote = 0.12; this.canDouble = true; this.batFlutters = 0; this._springAir = false; }
     else this.coyote -= dt;
     this.jumpT = (this.jumpT||0) + dt;
     if(INPUT.jumpEdge) this.jumpBuf = 0.14; else this.jumpBuf -= dt;
@@ -325,7 +325,27 @@ class Player {
     }
     // variable jump height — but every jump keeps full power for its first 0.10s,
     // so touch TAPS still get a strong arc (a tap used to be cut to a stunted hop)
-    if(!INPUT.jumpHeld && this.jumpT>0.10 && this.vel.y>5.5 && !this.pounding) this.vel.y = 5.5;
+    if(!INPUT.jumpHeld && this.jumpT>0.10 && this.vel.y>5.5 && !this.pounding && !this._springAir) this.vel.y = 5.5;
+
+    // --- spring charge: hold pound on the ground — squiiish down, release to LAUNCH ---
+    if(this.grounded && !this.climbing && !this.pounding && INPUT.poundHeld){
+      const was = this.springT||0;
+      this.springT = Math.min(was+dt, 0.6);
+      if(was<0.6 && this.springT>=0.6) AUDIO.tone({f:300, f2:520, type:'sine', t:0.12, vol:0.15});   // fully wound
+      this.squash = damp(this.squash, 1-0.4*(this.springT/0.6), 14, dt); this.squashV = 0;
+      if(Math.floor(this.springT*8)!==Math.floor(was*8))
+        G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.2,this.pos.z), 0xffd34d, 1, {speed:1.2, life:0.25, size:0.5});
+    } else if((this.springT||0)>0){
+      if(this.grounded && this.springT>0.18){
+        const k = this.springT/0.6;
+        this.vel.y = 11 + 3.5*k;                       // ~2.9u quick-release … ~4.4u fully wound (mega-bounce stays king)
+        this.grounded=false; this.jumpT=0; this.canDouble=true; this._springAir=true;   // no hold-lift stacking
+        this.squashV = 12;
+        AUDIO.bounce(); AUDIO.jump();
+        G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.1,this.pos.z), 0xffd34d, 10, {speed:3, life:0.35, gravity:2});
+      }
+      this.springT = 0;
+    }
 
     // --- ground pound ---
     if(INPUT.poundEdge && !this.grounded && !this.pounding){
@@ -368,7 +388,7 @@ class Player {
 
     // --- gravity ---
     // long-hold lift: holding jump keeps you rising farther (tap arcs unchanged; no effect on bounces/pound)
-    const lift = INPUT.jumpHeld && this.vel.y>0 && this.jumpT<0.22 && !this.pounding;
+    const lift = INPUT.jumpHeld && this.vel.y>0 && this.jumpT<0.22 && !this.pounding && !this._springAir;
     if(!this.climbing) this.vel.y -= (lift?16:24)*dt;
     if(this.vel.y < -26 && !this.pounding) this.vel.y = -26;
     if(this.batT>0 && !this.pounding && this.vel.y < -4.5) this.vel.y = -4.5; // gentle bat glide

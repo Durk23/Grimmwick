@@ -102,7 +102,7 @@ class InputSys {
     let gp = null;
     for(const g of gps){ if(g && g.connected){ gp = g; break; } }
     this.gpActive = !!gp;
-    if(!gp){ this._gpPrev = null; this.gpJumpHeld = false; return {gx:0, gy:0}; }
+    if(!gp){ this._gpPrev = null; this.gpJumpHeld = false; this.gpPoundHeld = false; return {gx:0, gy:0}; }
     const dz = v => Math.abs(v) > 0.22 ? v : 0;
     let gx = dz(gp.axes[0]||0), gy = dz(gp.axes[1]||0);
     const b = i => !!(gp.buttons[i] && gp.buttons[i].pressed);
@@ -114,6 +114,7 @@ class InputSys {
     this.gpJumpHeld = b(0);
     if(edge(2)){ this.attackEdge = true; this.anyEdge = true; }    // X / Square
     if(edge(1) || edge(5)){ this.poundEdge = true; this.anyEdge = true; } // B / Circle / RB
+    this.gpPoundHeld = b(1) || b(5);
     if(edge(3)){ this.interactEdge = true; this.anyEdge = true; }  // Y / Triangle
     if(edge(9)){ this.pauseEdge = true; this.anyEdge = true; }     // Start / Options
     const np = {};
@@ -125,7 +126,8 @@ class InputSys {
   pressJump(){ this.jumpEdge=true; this._touchJumpHeld=true; this.anyEdge=true; }
   releaseJump(){ this._touchJumpHeld=false; }
   pressAttack(){ this.attackEdge=true; this.anyEdge=true; }
-  pressPound(){ this.poundEdge=true; this.anyEdge=true; }
+  pressPound(){ this.poundEdge=true; this._touchPoundHeld=true; this.anyEdge=true; }
+  releasePound(){ this._touchPoundHeld=false; }
   pressInteract(){ this.interactEdge=true; this.anyEdge=true; }
 
   update(){
@@ -147,6 +149,7 @@ class InputSys {
     }
     this.moveX=kx; this.moveY=ky;
     this.jumpHeld = (this.isTouch ? !!this._touchJumpHeld : !!this.keys['Space']) || !!this.gpJumpHeld;
+    this.poundHeld = (this.isTouch ? !!this._touchPoundHeld : (!!this.keys['KeyK']||!!this.keys['ShiftLeft'])) || !!this.gpPoundHeld;
   }
   endFrame(){
     this.jumpEdge=false; this.attackEdge=false; this.poundEdge=false;

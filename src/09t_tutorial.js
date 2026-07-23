@@ -59,6 +59,9 @@ function buildTutorial(G){
   candyLine(G, [[68.5,6.8,0],[68.5,6.8,0]], 3);
   G.ents.add(new Heart(68.5, 7, 0));
 
+  signPost(G, 71.5, 1.8, -0.2, INPUT.isTouch ?
+    'One more trick! Stand still and HOLD \ud83d\udca5... squiiiish... now let go. SPROING! \u2014 Gran \u2665' :
+    'One more trick! Stand still and HOLD K... squiiiish... now let go. SPROING! \u2014 Gran \u2665');
   // 6) checkpoint + go
   signPost(G, 74, 1.8, 0.2, 'Light every lantern you pass \u2014 they remember your place. Now off you go, my little hero. \u2014 Gran \u2665');
   G.ents.add(new Checkpoint(77, 0, 1.4, 0));
