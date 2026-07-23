@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "grimmwick",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["esbuild", "--serve=8471", "--servedir=dist"],
+      "port": 8471
+    }
+  ]
+}

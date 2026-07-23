@@ -1,0 +1,483 @@
+// ============ UI — HUD, title, dialogue, store, pause, boss bar, touch ============
+const STORY_SLIDES = [
+  {icon:'🌕', text:'Welcome to GRIMMWICK — the town where Halloween never ends. Every 100 years, the Ember Moon rises to recharge the Everflame... the magical bonfire that keeps every ghost friendly and every candy sweet.\n\n(Nobody remembers why the town is called Grimmwick. Not even the Mayor.)'},
+  {icon:'🌑', text:'But tonight, moments before the ceremony, a jealous shadow named GRIMM swallowed the flame and shattered it into five embers — scattering them across the five districts. The beloved guardians who found them have been corrupted by ember-fire!'},
+  {icon:'🍬', text:'Everyone always says Pip is too small for adventures.\n\nEveryone is about to be wrong.\n\nGrab your candy bag. Free the guardians. RELIGHT THE NIGHT!'},
+];
+const MAYOR_LINES = [
+  '"Pip! Thank goodness you\'re here. Grimm\'s shadow put every grown-up spirit into a gloomy sleepwalk — you\'re the only one he overlooked. Being small has its perks!"',
+  '"Each guardian clutches a stolen ember. Start with the PUMPKIN KING — the Pumpkin Patch gate is the only one still open. He was the kindest of them all... bring him back to us."',
+  '"Collect candy 🍬 and trade it at the Costume Cauldron! And keep an eye out — 3 GOLDEN PUMPKINS are hidden in every district. They say gold pumpkins sweeten the Everflame."',
+  '"Boos are terribly shy — stare right at them and they freeze! The Pumpkin King, though... he\'s not shy. Bring your bouncing shoes, little one."',
+];
+
+const UI = {
+  init(G){
+    this.G = G;
+    const css = document.createElement('style');
+    css.textContent = `
+      * { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; margin:0; padding:0; box-sizing:border-box; }
+      html,body { overflow:hidden; background:#0d0a18; height:100%; }
+      #ui { position:fixed; inset:0; pointer-events:none; font-family:-apple-system,'SF Pro Rounded','Segoe UI',system-ui,sans-serif; color:#fff; z-index:10; }
+      .ui-block { pointer-events:auto; }
+      .btn { background:linear-gradient(180deg,#7b4fd4,#5b35a8); border:none; border-radius:16px; color:#fff; font-weight:800; font-size:17px; padding:13px 26px; box-shadow:0 4px 0 #3d2178, 0 6px 14px rgba(0,0,0,.4); cursor:pointer; font-family:inherit; }
+      .btn:active { transform:translateY(3px); box-shadow:0 1px 0 #3d2178; }
+      .btn.orange { background:linear-gradient(180deg,#ff9d3e,#e8701a); box-shadow:0 4px 0 #9c4a0e, 0 6px 14px rgba(0,0,0,.4); }
+      .btn.ghost2 { background:rgba(255,255,255,.12); box-shadow:none; border:2px solid rgba(255,255,255,.25); }
+      /* HUD */
+      #hud { position:absolute; top:calc(10px + env(safe-area-inset-top)); left:calc(12px + env(safe-area-inset-left)); display:flex; flex-direction:column; gap:6px; }
+      #hearts { font-size:26px; letter-spacing:2px; filter:drop-shadow(0 2px 3px rgba(0,0,0,.6)); }
+      .hud-pill { background:rgba(20,12,40,.72); border:1.5px solid rgba(255,255,255,.14); border-radius:20px; padding:5px 14px; font-size:16px; font-weight:800; width:max-content; box-shadow:0 2px 8px rgba(0,0,0,.35); }
+      #pauseBtn { position:absolute; top:calc(10px + env(safe-area-inset-top)); right:calc(12px + env(safe-area-inset-right)); width:46px; height:46px; border-radius:14px; background:rgba(20,12,40,.72); border:1.5px solid rgba(255,255,255,.18); color:#fff; font-size:20px; }
+      /* boss bar */
+      #bossbar { position:absolute; top:calc(12px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); text-align:center; display:none; }
+      #bossname { font-size:15px; font-weight:900; text-shadow:0 2px 4px #000; letter-spacing:1px; color:#ffb35e; }
+      #bosshp { display:flex; gap:6px; justify-content:center; margin-top:4px; }
+      .bhp { width:44px; height:14px; border-radius:7px; background:#3a2a55; border:2px solid #1c1230; }
+      .bhp.on { background:linear-gradient(180deg,#ff9d3e,#ff5030); box-shadow:0 0 10px #ff7030; }
+      /* prompt + dialogue */
+      #prompt { position:absolute; bottom:170px; left:50%; transform:translateX(-50%); display:none; font-size:16px; padding:11px 20px; }
+      #dlg { position:absolute; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%); width:min(640px, 92vw); background:rgba(22,14,44,.94); border:2px solid #8e5bd9; border-radius:20px; padding:16px 20px; display:none; font-size:16.5px; line-height:1.45; box-shadow:0 10px 30px rgba(0,0,0,.6); }
+      #dlg .ic { font-size:30px; float:left; margin-right:12px; }
+      #dlg .tap { opacity:.6; font-size:12px; margin-top:8px; text-align:right; }
+      /* toast */
+      #toast { position:absolute; top:22%; left:50%; transform:translateX(-50%); background:rgba(22,14,44,.92); border:1.5px solid rgba(255,255,255,.2); padding:10px 22px; border-radius:30px; font-weight:800; font-size:16px; opacity:0; transition:opacity .3s; white-space:nowrap; max-width:92vw; text-overflow:ellipsis; overflow:hidden; }
+      /* touch controls */
+      #stick { position:absolute; width:110px; height:110px; border-radius:50%; background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.2); display:none; }
+      #nub { position:absolute; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,.35); left:29px; top:29px; }
+      #touchBtns { position:absolute; right:calc(14px + env(safe-area-inset-right)); bottom:calc(20px + env(safe-area-inset-bottom)); display:none; flex-direction:column; align-items:flex-end; gap:12px; }
+      .tbtn { border-radius:50%; border:2.5px solid rgba(255,255,255,.35); color:#fff; font-weight:900; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,.4); }
+      #btnA { width:84px; height:84px; font-size:22px; background:radial-gradient(circle at 35% 30%, #8e5bd9, #5b35a8); }
+      #btnB { width:64px; height:64px; font-size:15px; background:radial-gradient(circle at 35% 30%, #ff9d3e, #e8701a); margin-right:92px; margin-bottom:-66px; }
+      #btnC { width:56px; height:56px; font-size:20px; background:radial-gradient(circle at 35% 30%, #63c6e6, #2a7fa8); margin-right:8px; }
+      /* full screens */
+      .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; justify-content:center; flex-direction:column; gap:18px; text-align:center; padding:20px; }
+      .card { background:rgba(26,16,50,.97); border:2px solid #8e5bd9; border-radius:26px; padding:26px 30px; max-width:min(680px,94vw); max-height:86vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.7); }
+      #title-screen { display:flex; background:transparent; pointer-events:auto; }
+      #logo { font-size:min(13vw,84px); font-weight:900; letter-spacing:2px; color:#ffb35e; text-shadow:0 0 30px #ff8c2e88, 0 4px 0 #7a3040, 0 8px 0 #4a1f30, 0 12px 24px #000; transform:rotate(-2deg); }
+      #logo .v { color:#b37dff; text-shadow:0 0 30px #8e5bd988, 0 4px 0 #3d2178, 0 8px 0 #241245, 0 12px 24px #000; }
+      #tagline { font-size:19px; font-weight:800; color:#e8dcff; text-shadow:0 2px 8px #000; opacity:.92; }
+      #tap { margin-top:26px; font-size:17px; animation:pulse 1.4s infinite; text-shadow:0 2px 6px #000; font-weight:800; }
+      @keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+      #introSlide { font-size:18px; line-height:1.55; white-space:pre-line; }
+      /* level card */
+      #lvlcard { position:absolute; top:26%; width:100%; text-align:center; display:none; pointer-events:none; }
+      #lvlname { font-size:min(9vw,52px); font-weight:900; color:#ffb35e; text-shadow:0 3px 0 #7a3040, 0 8px 22px #000; }
+      #lvlsub { font-size:18px; font-weight:800; color:#e8dcff; text-shadow:0 2px 8px #000; margin-top:6px; }
+      /* store */
+      .tabs { display:flex; gap:8px; justify-content:center; margin-bottom:14px; }
+      .tab { padding:9px 18px; border-radius:14px; background:rgba(255,255,255,.08); font-weight:800; cursor:pointer; border:2px solid transparent; font-size:15px; }
+      .tab.on { background:#5b35a8; border-color:#b37dff; }
+      #shopGrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; text-align:left; }
+      .item { background:rgba(255,255,255,.06); border:2px solid rgba(255,255,255,.14); border-radius:18px; padding:14px; }
+      .item .sw { width:100%; height:52px; border-radius:12px; margin-bottom:8px; border:2px solid rgba(0,0,0,.3); }
+      .item h4 { font-size:15px; margin-bottom:2px; }
+      .item p { font-size:12px; opacity:.75; line-height:1.3; min-height:31px; }
+      .item .buy { margin-top:8px; width:100%; padding:8px; font-size:14px; border-radius:12px; }
+      .ribbon { background:linear-gradient(90deg,#ff9d3e,#ff5ea8); border-radius:10px; font-size:12.5px; font-weight:800; padding:6px 12px; display:inline-block; margin-bottom:10px; }
+      .tier { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.05); border-radius:12px; padding:8px 12px; margin-bottom:6px; font-size:14px; text-align:left; }
+      .tier .n { font-weight:900; color:#ffb35e; width:52px; }
+      .passhead { background:linear-gradient(100deg,#5b35a8,#a83e8f,#e8701a); border-radius:18px; padding:16px; margin-bottom:12px; box-shadow:0 6px 20px rgba(142,91,217,.35); }
+      .passhead h3 { font-size:22px; text-shadow:0 2px 6px #000; letter-spacing:1px; }
+      .passhead p { font-size:13px; opacity:.95; margin-top:4px; }
+      .tierrow { display:grid; grid-template-columns:40px 1fr 1.2fr; gap:7px; margin-bottom:6px; text-align:left; }
+      .tn { font-weight:900; color:#ffb35e; display:flex; align-items:center; justify-content:center; font-size:13px; background:rgba(255,255,255,.05); border-radius:10px; }
+      .tcell { border-radius:12px; padding:8px 11px; font-size:13px; background:rgba(255,255,255,.05); display:flex; align-items:center; }
+      .tcell.prem { background:linear-gradient(135deg, rgba(142,91,217,.4), rgba(255,94,168,.28)); border:1.5px solid #b37dff; }
+      .tcell.marquee { background:linear-gradient(135deg, rgba(255,157,62,.35), rgba(255,94,168,.35)); border:2px solid #ffd23f; box-shadow:0 0 16px rgba(255,210,63,.35); font-weight:800; font-size:13.5px; }
+      .trackhead { display:grid; grid-template-columns:40px 1fr 1.2fr; gap:7px; margin-bottom:6px; font-size:12px; font-weight:900; opacity:.8; text-align:center; }
+      #fade { position:fixed; inset:0; background:#0d0a18; opacity:1; transition:opacity .5s; pointer-events:none; z-index:50; }
+      #hurtvig { position:fixed; inset:0; box-shadow:inset 0 0 120px 40px rgba(255,30,50,.55); opacity:0; transition:opacity .4s; pointer-events:none; z-index:40; }
+      .heartsRow { font-size:34px; }
+      #dbg { position:fixed; bottom:2px; left:4px; font-size:10px; opacity:.45; z-index:60; pointer-events:none; }
+    `;
+    document.head.appendChild(css);
+    const ui = document.createElement('div');
+    ui.id='ui';
+    ui.innerHTML = `
+      <div id="hud">
+        <div id="hearts">♥♥♥</div>
+        <div class="hud-pill">🍬 <span id="candyN">0</span></div>
+        <div class="hud-pill" id="livesPill" style="display:none">👻 ×<span id="livesN">5</span></div>
+        <div class="hud-pill" id="gpPill" style="display:none">🎃 <span id="gpN">0/3</span></div>
+        <div class="hud-pill" id="emberPill">🔥 <span id="emberN">0/5</span> embers</div>
+      </div>
+      <button id="pauseBtn" class="ui-block">⚙️</button>
+      <div id="bossbar"><div id="bossname"></div><div id="bosshp"></div></div>
+      <button id="prompt" class="btn orange ui-block"></button>
+      <div id="dlg" class="ui-block"><span class="ic"></span><span class="tx"></span><div class="tap">tap to close</div></div>
+      <div id="toast"></div>
+      <div id="stick"><div id="nub"></div></div>
+      <div id="touchBtns">
+        <div id="btnC" class="tbtn ui-block">💥</div>
+        <div id="btnB" class="tbtn ui-block">SPIN</div>
+        <div id="btnA" class="tbtn ui-block">JUMP</div>
+      </div>
+      <div id="lvlcard"><div id="lvlname"></div><div id="lvlsub"></div></div>
+      <div id="title-screen" class="screen">
+        <div id="logo">GRIMM<span class="v">WICK</span></div>
+        <div id="tagline">🎃 Relight the Night 🎃</div>
+        <div id="tap">— tap anywhere to play —</div>
+        <div style="opacity:.55;font-size:12px;margin-top:40px">v0.1 playable slice · World 1 of 5</div>
+      </div>
+      <div id="intro-screen" class="screen"><div class="card">
+        <div style="font-size:44px" id="introIcon">🌕</div>
+        <div id="introSlide" style="margin:14px 0"></div>
+        <button id="introNext" class="btn orange ui-block">Next ➜</button>
+      </div></div>
+      <div id="pause-screen" class="screen"><div class="card">
+        <h2 style="margin-bottom:16px">⏸️ Paused</h2>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn ui-block" id="resumeBtn">▶️ Resume</button>
+          <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🎵 Music</span><input type="range" id="musVol" class="ui-block" min="0" max="100" value="50" style="width:150px"></div>
+          <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🔊 Sounds</span><input type="range" id="sfxVol" class="ui-block" min="0" max="100" value="80" style="width:150px"></div>
+          <button class="btn ghost2 ui-block" id="cozyBtn">🧸 Cozy Mode: OFF</button>
+          <button class="btn ghost2 ui-block" id="townBtn">🏘️ Return to Town</button>
+          <button class="btn ghost2 ui-block" id="resetBtn">🗑️ Reset Save</button>
+        </div>
+      </div></div>
+      <div id="shop-screen" class="screen"><div class="card">
+        <h2 style="margin-bottom:4px">🎩 Costume Cauldron</h2>
+        <div style="opacity:.8;font-size:14px;margin-bottom:12px">Your candy: 🍬 <span id="shopCandy">0</span></div>
+        <div class="tabs">
+          <div class="tab on ui-block" data-tab="costumes">Costumes</div>
+          <div class="tab ui-block" data-tab="chars">Characters</div>
+          <div class="tab ui-block" data-tab="pass">Spook Pass</div>
+        </div>
+        <div id="shopBody"></div>
+        <button class="btn ui-block" id="shopClose" style="margin-top:14px">Done</button>
+      </div></div>
+      <div id="death-screen" class="screen"><div class="card">
+        <div style="font-size:50px">👻</div>
+        <h2 style="margin:10px 0">The night got you!</h2>
+        <p style="opacity:.8;margin-bottom:16px">Don't worry — Grimmwick believes in you.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn ui-block" id="reviveBtn" style="display:none">🍬 Second Wind — revive here (200 candy)</button>
+          <button class="btn orange ui-block" id="respawnBtn">🕯️ Back to the lantern</button>
+        </div>
+      </div></div>
+      <div id="gameover-screen" class="screen"><div class="card">
+        <div style="font-size:52px">🌑</div>
+        <h2 style="margin:10px 0;color:#ff5e7a">OUT OF LIVES!</h2>
+        <p style="opacity:.85;margin-bottom:14px">The night got the better of you this time...</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn ui-block" id="continueBtn" style="display:none">🍬 Keep going from the lantern — 3 lives (500 candy)</button>
+          <button class="btn orange ui-block" id="gameoverBtn">🔁 Restart the level (5 fresh lives)</button>
+        </div>
+      </div></div>
+      <div id="victory-screen" class="screen"><div class="card">
+        <div style="font-size:54px">🔥</div>
+        <h2 style="margin:8px 0;color:#ffb35e">GUARDIAN FREED!</h2>
+        <p style="font-size:16px;line-height:1.5;margin-bottom:8px">The Pumpkin King is himself again — and the first ember is yours! The Harvest District glows warm tonight.<br><b>👻 A blessing from the guardian: lives refilled!</b></p>
+        <div id="vstats" style="font-size:15px;opacity:.9;margin:10px 0"></div>
+        <button class="btn orange ui-block" id="vHome">🏘️ Return to Grimmwick</button>
+      </div></div>
+      <div id="vig" style="position:fixed;inset:0;pointer-events:none;z-index:5;box-shadow:inset 0 0 140px 46px rgba(8,4,20,.5)"></div>
+      <div id="hurtvig"></div>
+      <div id="fade"></div>
+      <div id="dbg"></div>
+    `;
+    document.body.appendChild(ui);
+    this.el = id=>document.getElementById(id);
+    // wire buttons
+    const tap = (id,fn)=>{ const e=this.el(id);
+      e.addEventListener('touchstart', ev=>{ev.preventDefault();ev.stopPropagation();fn();},{passive:false});
+      e.addEventListener('mousedown', ev=>{ev.stopPropagation();fn();});
+    };
+    tap('pauseBtn', ()=>this.togglePause());
+    tap('resumeBtn', ()=>this.togglePause(false));
+    tap('townBtn', ()=>{ this.togglePause(false); G.returnToHub(false); });
+    tap('cozyBtn', ()=>{ G.toggleCozy(); this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(G.save.cozy?'ON':'OFF'); });
+    tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Tap again'; } });
+    tap('shopClose', ()=>this.closeShop());
+    tap('respawnBtn', ()=>{ this.el('death-screen').style.display='none'; G.respawnPlayer(); });
+    tap('reviveBtn', ()=>{ G.reviveHere(); });
+    tap('vHome', ()=>{ this.el('victory-screen').style.display='none'; G.returnToHub(true); });
+    tap('gameoverBtn', ()=>G.gameOverRestart());
+    tap('continueBtn', ()=>G.candyContinue());
+    tap('introNext', ()=>this.nextIntro());
+    tap('prompt', ()=>INPUT.pressInteract());
+    this.el('dlg').addEventListener('mousedown', ()=>this.closeDialogue());
+    this.el('dlg').addEventListener('touchstart', e=>{e.preventDefault();this.closeDialogue();},{passive:false});
+    // touch action buttons
+    const bA=this.el('btnA');
+    bA.addEventListener('touchstart', e=>{e.preventDefault();e.stopPropagation();INPUT.pressJump();},{passive:false});
+    bA.addEventListener('touchend', e=>{INPUT.releaseJump();});
+    tap('btnB', ()=>INPUT.pressAttack());
+    tap('btnC', ()=>INPUT.pressPound());
+    // volume sliders
+    this.el('musVol').addEventListener('input', e=>AUDIO.setMusVol(e.target.value/100));
+    this.el('sfxVol').addEventListener('input', e=>AUDIO.setSfxVol(e.target.value/100));
+    // shop tabs
+    document.querySelectorAll('.tab').forEach(t=>{
+      const h = ev=>{ ev.stopPropagation(); document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on'); this.renderShop(t.dataset.tab); };
+      t.addEventListener('mousedown', h);
+      t.addEventListener('touchstart', ev=>{ev.preventDefault();h(ev);},{passive:false});
+    });
+    if(INPUT.isTouch) this.el('touchBtns').style.display='flex';
+  },
+  // ---------- title & intro ----------
+  showTitle(){ this.el('title-screen').style.display='flex'; this.el('hud').style.display='none'; this.el('pauseBtn').style.display='none'; },
+  hideTitle(){ this.el('title-screen').style.display='none'; this.el('hud').style.display='flex'; this.el('pauseBtn').style.display='block'; },
+  startIntro(done){
+    this._introDone = done; this._slide = 0;
+    this.el('intro-screen').style.display='flex';
+    this.showSlide();
+  },
+  showSlide(){
+    const s = STORY_SLIDES[this._slide];
+    this.el('introIcon').textContent = s.icon;
+    this.el('introSlide').textContent = s.text;
+    this.el('introNext').textContent = this._slide===STORY_SLIDES.length-1 ? '🎃 Begin!' : 'Next ➜';
+  },
+  nextIntro(){
+    AUDIO.ui();
+    this._slide++;
+    if(this._slide>=STORY_SLIDES.length){
+      this.el('intro-screen').style.display='none';
+      this._introDone && this._introDone();
+    } else this.showSlide();
+  },
+  // ---------- HUD ----------
+  updateHUD(){
+    const G=this.G, pl=G.player;
+    if(pl){
+      let h=''; for(let i=0;i<pl.maxHearts;i++) h += i<pl.hearts?'❤️':'🖤';
+      this.el('hearts').textContent = h;
+    }
+    this.el('candyN').textContent = G.save.candy;
+    this.el('emberN').textContent = G.save.embers+'/5';
+    const inLevel = G.area==='level1'||G.area==='boss1';
+    this.el('gpPill').style.display = inLevel?'block':'none';
+    this.el('livesPill').style.display = inLevel?'block':'none';
+    this.el('livesN').textContent = G.save.lives??5;
+    this.el('emberPill').style.display = inLevel?'none':'block';
+    if(inLevel) this.el('gpN').textContent = G.runPumpkins.filter(Boolean).length+'/3';
+  },
+  hurtFlash(){
+    const v=this.el('hurtvig'); v.style.opacity=1;
+    setTimeout(()=>v.style.opacity=0, 300);
+  },
+  // ---------- prompt & dialogue ----------
+  setPrompt(p){
+    const el = this.el('prompt');
+    if(!p){ el.style.display='none'; this._prompt=null; return; }
+    this._prompt = p;
+    el.style.display='block';
+    el.textContent = p.label + (INPUT.isTouch?'':'  (E)');
+  },
+  dialogue(icon, text){
+    const d = this.el('dlg');
+    d.querySelector('.ic').textContent = icon;
+    d.querySelector('.tx').textContent = text;
+    d.style.display='block';
+    AUDIO.ui();
+    clearTimeout(this._dlgT);
+    this._dlgT = setTimeout(()=>this.closeDialogue(), 9000);
+  },
+  closeDialogue(){ this.el('dlg').style.display='none'; },
+  mayorDialogue(){
+    this._mayorI = (this._mayorI===undefined?0:this._mayorI+1)%MAYOR_LINES.length;
+    this.dialogue('👻', MAYOR_LINES[this._mayorI]);
+  },
+  toast(msg){
+    if(!msg) return;
+    const t=this.el('toast');
+    t.textContent=msg; t.style.opacity=1;
+    clearTimeout(this._toastT);
+    this._toastT=setTimeout(()=>t.style.opacity=0, 2600);
+  },
+  // ---------- level card ----------
+  levelIntro(name, sub){
+    const c=this.el('lvlcard');
+    this.el('lvlname').textContent=name;
+    this.el('lvlsub').textContent=sub;
+    c.style.display='block'; c.style.opacity=1;
+    setTimeout(()=>{ c.style.transition='opacity 1s'; c.style.opacity=0; }, 2400);
+    setTimeout(()=>{ c.style.display='none'; c.style.transition=''; }, 3500);
+  },
+  // ---------- boss bar ----------
+  showBossBar(name, hp, max){
+    this.el('bossbar').style.display='block';
+    this.el('bossname').textContent = '👑 '+name;
+    const bar=this.el('bosshp'); bar.innerHTML='';
+    for(let i=0;i<max;i++){ const d=document.createElement('div'); d.className='bhp'+(i<hp?' on':''); bar.appendChild(d); }
+  },
+  updateBossBar(hp){
+    document.querySelectorAll('.bhp').forEach((d,i)=>d.classList.toggle('on', i<hp));
+  },
+  hideBossBar(){ this.el('bossbar').style.display='none'; },
+  // ---------- touch stick ----------
+  showStick(x,y){ const s=this.el('stick'); s.style.display='block'; s.style.left=(x-55)+'px'; s.style.top=(y-55)+'px'; },
+  moveStick(st){ const n=this.el('nub'); const dx=clamp(st.x-st.ox,-40,40), dy=clamp(st.y-st.oy,-40,40); n.style.left=(29+dx)+'px'; n.style.top=(29+dy)+'px'; },
+  hideStick(){ this.el('stick').style.display='none'; const n=this.el('nub'); n.style.left='29px'; n.style.top='29px'; },
+  // ---------- pause ----------
+  togglePause(force){
+    const G=this.G;
+    const show = force!==undefined?force:(G.state!=='paused');
+    if(show && G.state!=='play') return;
+    this._resetArm=false; this.el('resetBtn').textContent='🗑️ Reset Save';
+    if(show){ G.state='paused'; this.el('pause-screen').style.display='flex'; this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(this.G.save.cozy?'ON':'OFF'); }
+    else { G.state='play'; this.el('pause-screen').style.display='none'; }
+    AUDIO.ui();
+  },
+  // ---------- shop ----------
+  openShop(){
+    if(this.G.state==='play'){ this.G.state='shop'; this.el('shop-screen').style.display='flex'; this.renderShop('costumes'); AUDIO.ui(); }
+  },
+  closeShop(){ this.el('shop-screen').style.display='none'; this.G.state='play'; AUDIO.ui(); },
+  renderShop(tab){
+    const G=this.G, body=this.el('shopBody');
+    this.el('shopCandy').textContent = G.save.candy;
+    if(tab==='costumes'){
+      body.innerHTML = '<div class="ribbon">🧪 TEST MODE — real purchases arrive with the App Store version</div><div id="boostGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;text-align:left;margin-bottom:12px"></div><div id="shopGrid"></div>';
+      // ---- heart containers (buy "lives" with candy — expensive on purpose) ----
+      const BOOSTS = [
+        {need:3, price:500,  name:'Heart Container', desc:'A fourth heart, forever. Pricey — Boos drop candy for a reason!'},
+        {need:4, price:1500, name:'Heart Container II', desc:'A FIFTH heart. Only legends carry this much love.'},
+      ];
+      const bgrid = body.querySelector('#boostGrid');
+      for(const bo of BOOSTS){
+        const owned = G.save.maxHearts > bo.need;
+        const locked = G.save.maxHearts < bo.need;
+        const div = document.createElement('div');
+        div.className='item';
+        div.innerHTML = `<div class="sw" style="background:linear-gradient(135deg,#ff4d6d 60%,#8f1030);display:flex;align-items:center;justify-content:center;font-size:30px">❤️</div>
+          <h4>${bo.name}</h4><p>${bo.desc}</p>
+          <button class="btn buy ui-block ${owned?'ghost2':'orange'}">${owned?'✓ Owned':(locked?'🔒 Buy previous first':'🍬 '+bo.price)}</button>`;
+        const btn = div.querySelector('button');
+        const act = ev=>{
+          ev.stopPropagation();
+          if(owned || locked) return;
+          if(G.save.candy >= bo.price){
+            G.save.candy -= bo.price;
+            G.save.maxHearts = bo.need+1;
+            if(G.player){ G.player.maxHearts = G.save.maxHearts; G.player.hearts = G.save.maxHearts; }
+            G.persist(); AUDIO.buy();
+            this.toast('❤️ Max hearts: '+G.save.maxHearts+'!');
+          } else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
+          this.renderShop('costumes'); this.updateHUD();
+        };
+        btn.addEventListener('mousedown', act);
+        btn.addEventListener('touchstart', ev=>{ev.preventDefault();act(ev);},{passive:false});
+        bgrid.appendChild(div);
+      }
+      const grid = body.querySelector('#shopGrid');
+      for(const key in COSTUMES){
+        const c = COSTUMES[key];
+        const owned = G.save.owned.includes(key);
+        const equipped = G.save.equipped===key;
+        const div = document.createElement('div');
+        div.className='item';
+        const cs = '#'+c.body.toString(16).padStart(6,'0');
+        const ac = '#'+c.accent.toString(16).padStart(6,'0');
+        const passBadge = c.pass ? `<div style="position:absolute;top:8px;right:8px;background:linear-gradient(90deg,#8e5bd9,#ff5ea8);border-radius:8px;font-size:10.5px;font-weight:900;padding:3px 7px">🌕 PASS</div>` : '';
+        div.style.position='relative';
+        div.innerHTML = `${passBadge}<div class="sw" style="background:linear-gradient(135deg,${cs} 60%,${ac})${c.glow?';box-shadow:0 0 18px '+cs+' inset, 0 0 12px '+cs:''}"></div>
+          <h4>${c.name}</h4><p>${c.desc}</p>
+          <button class="btn buy ui-block ${equipped?'ghost2':(owned?'':'orange')}">${equipped?'✓ Equipped':(owned?'Equip':(c.pass?'Try it (Pass)':(c.price===0?'Free':'🍬 '+c.price)))}</button>`;
+        const btn = div.querySelector('button');
+        const act = ev=>{
+          ev.stopPropagation();
+          if(equipped) return;
+          if(owned || c.price===0){ G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy(); }
+          else if(G.save.candy>=c.price){ G.save.candy-=c.price; G.save.owned.push(key); G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy(); this.toast('🎉 New costume: '+c.name+'!'); }
+          else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
+          this.renderShop('costumes'); this.updateHUD();
+        };
+        btn.addEventListener('mousedown', act);
+        btn.addEventListener('touchstart', ev=>{ev.preventDefault();act(ev);},{passive:false});
+        grid.appendChild(div);
+      }
+    } else if(tab==='chars'){
+      body.innerHTML = `<div id="shopGrid">
+        <div class="item"><div class="sw" style="background:linear-gradient(135deg,#f2f0ff 60%,#d8d4f0)"></div><h4>Pip</h4><p>The smallest hero in Grimmwick. Never underestimated twice.</p><button class="btn buy ghost2">✓ Playing</button></div>
+        <div class="item"><div class="sw" style="background:linear-gradient(135deg,#8e5bd9 60%,#3d2178)"></div><h4>Zoe the Witchling</h4><p>Double-jump becomes a broom glide! Arrives in Update 2.</p><button class="btn buy ghost2">Coming soon</button></div>
+        <div class="item"><div class="sw" style="background:linear-gradient(135deg,#2a2438 60%,#0d0a18)"></div><h4>??? </h4><p>They say the shadow himself might join you... if you finish the story.</p><button class="btn buy ghost2">🔒 Story</button></div>
+      </div>`;
+    } else {
+      // 25 tiers — one per level completed. [free, premium, marquee?]
+      setTimeout(()=>{
+        const b=document.getElementById('buyPassBtn');
+        if(b){
+          const act=ev=>{ev.stopPropagation(); G.buyPassTest(); this.renderShop('pass');};
+          b.addEventListener('mousedown',act);
+          b.addEventListener('touchstart',ev=>{ev.preventDefault();act(ev);},{passive:false});
+        }
+      },0);
+      const T = [
+        ['🍬 50','🍬 500 + 🔥 EMBERLING — a pet wisp that orbits you', 1],
+        ['🍬 50','🎨 Ember-orange bag skin'],
+        ['🍭 Candy-swirl trail (3 uses)','🍬 300'],
+        ['🍬 75','💫 Sparkle jump-puffs'],
+        ['🍬 75','👻 EMBER SPIRIT costume — glows + fire run-trail', 1],
+        ['🍬 100','🍬 400'],
+        ['🎨 Rusty bag skin','🦴 Bone-rattle footsteps'],
+        ['🍬 100','🎩 Tiny top hat (any costume)'],
+        ['🍬 100','🍬 500'],
+        ['🧵 Patchwork Pip costume','☄️ CANDY COMET jump-trail', 1],
+        ['🍬 150','🎨 Witchwood-green bag skin'],
+        ['🍬 150','🍬 600'],
+        ['✨ Purple jump-puffs','🕸️ Cobweb cape'],
+        ['🍬 150','🍬 600'],
+        ['🍬 200','🧙 ZOE THE WITCHLING — playable character', 1],
+        ['🍬 200','🎨 Harbor-teal bag skin'],
+        ['🍬 200','🍬 800'],
+        ['🌙 Moon-white bag skin','⚓ Ghost-anchor backbling'],
+        ['🍬 250','🍬 800'],
+        ['🍬 250','🧹 MOLTEN GOURD broom skin (for District 3\'s broom)', 1],
+        ['🍬 300','🍬 1000'],
+        ['🎨 Midnight bag skin','🌫️ Fog-walker aura'],
+        ['🍬 300','🍬 1000'],
+        ['🍬 350','👑 Ember crown (any costume)'],
+        ['🎉 500 + fireworks','😈 GRIMM\'S HERALD — animated shadow costume + title + 🍬 1500', 1],
+      ];
+      const totFree = 3250, totPrem = 8000;
+      body.innerHTML = `
+        <div class="passhead">
+          <h3>🌕 SEASON 1: THE EMBER MOON</h3>
+          ${G.save.pass
+            ? '<p style="font-weight:900;font-size:15px;margin-top:8px">✅ PASS ACTIVE — Nightstitch unlocked instantly. Climb those tiers!</p>'
+            : '<button id="buyPassBtn" class="btn orange ui-block" style="margin-top:10px;font-size:16px">🌙 GET THE PASS — $4.99 · NIGHTSTITCH outfit INSTANTLY (test: free)</button>'}
+          <p>25 tiers — climb one for every level you complete. Free track for everyone. Spook Pass unlocks the right column. <b>${totPrem.toLocaleString()}+ candy</b> in the premium track alone — enough for every Heart Container and half the store.</p>
+          <p style="margin-top:6px;font-weight:800">Arrives with the App Store release · nothing here is pay-to-win, it's pay-to-SPARKLE ✨</p>
+        </div>
+        <div style="display:grid;grid-template-columns:40px 1fr 1.2fr;gap:7px;margin-bottom:6px;text-align:left">
+          <div class="tn">⚡</div>
+          <div class="tcell">—</div>
+          <div class="tcell marquee">🌙 NIGHTSTITCH outfit — yours the INSTANT you buy</div>
+        </div>
+        <div class="trackhead"><span></span><span>FREE</span><span>🎃 SPOOK PASS</span></div>
+        ${T.map((t,i)=>`<div class="tierrow">
+          <div class="tn">${i+1}</div>
+          <div class="tcell">${t[0]}</div>
+          <div class="tcell ${t[2]?'marquee':'prem'}">${t[1]}</div>
+        </div>`).join('')}`;
+    }
+  },
+  // ---------- death & victory ----------
+  deathScreen(){
+    this.el('death-screen').style.display='flex';
+    this.el('reviveBtn').style.display = this.G.save.candy>=200 ? 'block' : 'none';
+    const p = this.el('death-screen').querySelector('p');
+    p.innerHTML = 'Don\'t worry — Grimmwick believes in you.<br><b style="font-size:18px">👻 Lives left: '+this.G.save.lives+'</b>';
+  },
+  gameOverScreen(){
+    this.el('gameover-screen').style.display='flex';
+    this.el('continueBtn').style.display = this.G.save.candy>=500 ? 'block' : 'none';
+    AUDIO.gameover();
+  },
+  victoryScreen(stats){
+    const rec = stats.cozy ? `<div style="margin-top:6px;opacity:.85">🧸 Cozy run — records take a nap</div>` : stats.isRecord
+      ? `<div style="margin-top:8px;font-weight:900;color:#ffd23f;font-size:18px">🏆 NEW RECORD — ${stats.time}!</div>`
+      : `<div style="margin-top:6px;opacity:.85">🏆 Your best: <b>${stats.best}</b></div>`;
+    this.el('vstats').innerHTML = `🍬 Candy collected: <b>${stats.candy}</b> &nbsp;·&nbsp; 🎃 Golden Pumpkins: <b>${stats.gp}/3</b><br>⏱️ Time: <b>${stats.time}</b>${rec}`;
+    this.el('victory-screen').style.display='flex';
+  },
+  fade(toBlack, dur=500){
+    const f=this.el('fade');
+    f.style.transition=`opacity ${dur}ms`;
+    f.style.opacity = toBlack?1:0;
+  },
+};
+window.UI = UI;
