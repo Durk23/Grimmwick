@@ -600,7 +600,8 @@ const UI = {
   },
   renderMap(world, dNum, beaten){
     const G=this.G, district=this._mapDistrict;
-    let levels = (typeof W1_LEVELS!=='undefined' && Array.isArray(W1_LEVELS)) ? W1_LEVELS.filter(l=>l.district===district) : [];
+    let levels = [];
+    if(typeof LEVEL_LISTS!=='undefined') for(const list of LEVEL_LISTS) for(const l of list) if(l.district===district) levels.push(l);
     if(!levels.length) levels = [1,2,3,4,5].map(n=>({id:district+'l'+n, name:'LEVEL '+dNum+'-'+n, parTime:0}));
     const sv = G.save.levels || {};
     const fmt = s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
@@ -669,7 +670,7 @@ const UI = {
     this._mapSetSel(i);
     AUDIO.ui();
     this.hideMap();
-    if(n.boss) this.G.startBoss1(); else this.G.enterLevel(n.id);
+    if(n.boss) this.G.startBoss(this._mapDistrict); else this.G.enterLevel(n.id);
   },
   positionMapNodes(mv){
     // project the 3D lantern anchors onto the screen and pin the DOM nodes to them

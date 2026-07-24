@@ -230,7 +230,7 @@ const G = {
   openMap(district){
     if(this.state!=='play') return;
     this.state='map';
-    this.mapView = (typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;
+    this.mapView = ((district||'w1')==='w1' && typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;   // 3D "beautiful map" is Patch-only for now; other districts use the clean DOM map
     UI.showMap(district||'w1');
   },
   closeMap(){
@@ -244,7 +244,7 @@ const G = {
     setTimeout(()=>{
       this.switchArea('hub');
       this.state='map';
-      this.mapView = (typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;
+      this.mapView = ((district||'w1')==='w1' && typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;
       UI.showMap(district||'w1');
       UI.fade(false, 450);
     }, 500);
@@ -264,6 +264,14 @@ const G = {
       this.state='play';
       UI.fade(false, 450);
     }, 500);
+  },
+  startBoss(district){
+    // district-aware boss router (the map's boss node calls this). Each district's boss
+    // registers a startBossN; until it exists the node politely defers.
+    district = district || 'w1';
+    if(district==='w1') return this.startBoss1();
+    if(district==='w2' && typeof this.startBoss2==='function') return this.startBoss2();
+    UI.toast('🔒 That guardian is not ready yet — coming soon!');
   },
   returnToHub(afterVictory){
     this.state='transition';

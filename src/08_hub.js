@@ -1,10 +1,10 @@
 // ============ HUB — Grimmwick town square ============
 const WORLDS = [
   {key:'w1', name:'Pumpkin Patch',  sub:'The Harvest District', guardian:'The Pumpkin King', angle: -0.62, color:PAL.pumpkin, open:true},
-  {key:'w2', name:'Ravenmoor Cemetery', sub:'The Silent District', guardian:'Mossgrave, the Tombstone Titan', angle: -1.42, color:0x9fe066, open:false},
-  {key:'w3', name:'Witchwood',      sub:'The Wild District',    guardian:'Broomhilda the Broom Witch', angle: Math.PI+1.42, color:0xb37dff, open:false},
-  {key:'w4', name:'Ghost Harbor',   sub:'The Misty District',   guardian:'Captain Wraith',   angle: Math.PI+0.62, color:0x63e6e2, open:false},
-  {key:'w5', name:'Cursed Castle',  sub:'Grimm\'s Keep',        guardian:'Grimm, the Forgotten Guest', angle: Math.PI, color:0xff5e7a, open:false},
+  {key:'w2', name:'Ravenmoor Cemetery', sub:'The Silent District', guardian:'Mossgrave, the Tombstone Titan', angle: -1.42, color:0x9fe066, open:false, req:'w1'},
+  {key:'w3', name:'Witchwood',      sub:'The Wild District',    guardian:'Broomhilda the Broom Witch', angle: Math.PI+1.42, color:0xb37dff, open:false, req:'w2'},
+  {key:'w4', name:'Ghost Harbor',   sub:'The Misty District',   guardian:'Captain Wraith',   angle: Math.PI+0.62, color:0x63e6e2, open:false, req:'w3'},
+  {key:'w5', name:'Cursed Castle',  sub:'Grimm\'s Keep',        guardian:'Grimm, the Forgotten Guest', angle: Math.PI, color:0xff5e7a, open:false, req:'w4'},
 ];
 
 function buildHouse(x,z,rotY,w,h,c1,c2,winColor){
@@ -157,7 +157,7 @@ function buildHub(G){
     const g = new THREE.Group();
     const x = Math.sin(w.angle)*(R-1.2), z = Math.cos(w.angle)*(R-1.2);
     const beaten = G.save.worlds[w.key];
-    const open = w.open || false;
+    const open = w.open || (w.req && G.save.worlds[w.req]) || false;   // a district opens once you've freed the previous guardian
     // arch
     const pL = mesh('box',[0.7,4.6,0.7], mat(0x38294f)); pL.position.set(-1.9,2.3,0);
     const pR = pL.clone(); pR.position.x=1.9;
