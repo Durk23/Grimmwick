@@ -96,6 +96,7 @@ function levelBegin(G){
   G.spawnPoint.set(0,0.6,0);
   G.world.killY = -14;
   G.camMinY = 0;   // side-camera vertical floor; a level that descends underground lowers this
+  G.lightPools = [];   // D2 darkness mechanic: lit lanterns push {x,z,r}; Wisps read this to know where it's safe
 }
 
 // end-of-level relight arch — the boss gate's visual language, scaled down
@@ -137,7 +138,7 @@ function updateLevelCommon(G, dt){
   if(!pl) return;
   let prompt = null;
   for(const c of (G.coffins||[])){
-    if(!c.opened && c.group.position.distanceTo(pl.pos)<2.8){ prompt={kind:'coffin', label:'⚰️ Open the cursed coffin...?', coffin:c}; break; }
+    if(!c.opened && c.group.position.distanceTo(pl.pos)<2.8){ prompt={kind:'coffin', label:c.promptLabel||'⚰️ Open the cursed coffin...?', coffin:c}; break; }
   }
   if(!prompt) for(const s of G.signs){
     if(Math.hypot(s.x-pl.pos.x, s.z-pl.pos.z)<2.6){ prompt={kind:'sign', label:'📖 Read sign', sign:s}; break; }

@@ -109,15 +109,18 @@ const G = {
     this.boss = null;
     if(this.ents) this.ents.clear();
     if(this.fx) this.fx.clear();
-    this.scene = this.freshScene(area==='boss1'?14:20, area==='boss1'?70:95);
+    const isBossArea = area.startsWith('boss');
+    if(isBossArea) this.bossDistrict = 'w'+area.slice(4);   // keep bossDistrict correct even on debug ?scene= jumps
+    this.scene = this.freshScene(isBossArea?14:20, isBossArea?70:95);
     this.world = this.world || new PhysWorld();
     this.world.reset();
     this.ents = new EntityMgr(this.scene);
     this.fx = new Particles(this.scene);
-    AUDIO.setMood(area==='hub' ? 'hub' : (area==='boss1' ? 'boss' : 'level'));
+    AUDIO.setMood(area==='hub' ? 'hub' : (isBossArea ? 'boss' : 'level'));
     srand(seedFrom(area));   // deco scatter is seeded per area — a level replays IDENTICALLY, pebble for pebble
     if(area==='hub') buildHub(this);
     else if(area==='boss1') buildBossArena(this);
+    else if(area==='boss2' && typeof buildBossArena2==='function') buildBossArena2(this);
     else if(area==='tut') buildTutorial(this);
     else if(def) def.build(this);
     // all-candy star baseline: what the build itself placed
@@ -191,7 +194,10 @@ const G = {
       this.switchArea(id);
       this.state='play';
       UI.fade(false, 450);
-      UI.levelIntro(def.name, 'Pumpkin Patch · Level '+(W1_LEVELS.indexOf(def)+1));
+      const dWorld = (typeof WORLDS!=='undefined') ? WORLDS.find(x=>x.key===def.district) : null;
+      const dList = (typeof LEVEL_LISTS!=='undefined') ? LEVEL_LISTS.find(L=>L.includes(def)) : null;
+      const dNum = dList ? dList.indexOf(def)+1 : 1;
+      UI.levelIntro(def.name, (dWorld?dWorld.name:'Grimmwick')+' · Level '+dNum);
     }, 500);
   },
   completeLevel(opts={}){
@@ -249,7 +255,14 @@ const G = {
       UI.fade(false, 450);
     }, 500);
   },
-  startBoss1(){
+  bossAreaFor(district){ return ({w1:'boss1',w2:'boss2',w3:'boss3',w4:'boss4',w5:'boss5'})[district]; },
+  bossBuilt(area){ return area==='boss1' || (area==='boss2' && typeof buildBossArena2==='function'); },
+  startBoss(district){
+    // district-aware boss router (the map's boss node calls this). Defers politely if a boss isn't built yet.
+    district = district || 'w1';
+    const area = this.bossAreaFor(district);
+    if(!area || !this.bossBuilt(area)){ UI.toast('🔒 That guardian is not ready yet — coming soon!'); return; }
+    this.bossDistrict = district;
     if(UI.hideMap) UI.hideMap();
     if(this.mapView){ this.mapView.dispose && this.mapView.dispose(); this.mapView = null; }
     this.state='transition';
@@ -258,21 +271,14 @@ const G = {
       // a fresh guardian attempt: its own clock, damage tally, and full lives
       this.runCandy0=this.save.candy; this.runT0=this.time;
       this.runT=0; this.runCandyPicked=0; this.runDamage=0; this.runCozy=!!this.save.cozy;
-      this.runPumpkins=(this.save.gp.w1||[false,false,false]).slice();
+      this.runPumpkins=(this.save.gp[district]||[false,false,false]).slice();
       this.save.lives=5; this.persist();
-      this.switchArea('boss1');
+      this.switchArea(area);
       this.state='play';
       UI.fade(false, 450);
     }, 500);
   },
-  startBoss(district){
-    // district-aware boss router (the map's boss node calls this). Each district's boss
-    // registers a startBossN; until it exists the node politely defers.
-    district = district || 'w1';
-    if(district==='w1') return this.startBoss1();
-    if(district==='w2' && typeof this.startBoss2==='function') return this.startBoss2();
-    UI.toast('🔒 That guardian is not ready yet — coming soon!');
-  },
+  startBoss1(){ this.startBoss('w1'); },
   returnToHub(afterVictory){
     this.state='transition';
     UI.fade(true, 450);
@@ -331,7 +337,7 @@ const G = {
     this.persist();
     const gs = document.getElementById('gameover-screen');
     if(gs) gs.style.display='none';
-    if(this.area==='boss1') this.startBoss1();
+    if(this.area.startsWith('boss')) this.startBoss(this.bossDistrict||'w1');
     else this.enterLevel(this.levelDef ? this.levelDef.id : (this.save.lastLevel||'w1l1'));
   },
   candyContinue(){
@@ -374,11 +380,12 @@ const G = {
   respawnPlayer(){
     const ds = document.getElementById('death-screen');
     if(ds) ds.style.display='none';
-    if(this.area==='boss1'){
-      // fresh boss fight
+    if(this.area.startsWith('boss')){
+      // fresh boss fight (rebuild the current boss arena)
+      const ba = this.area;
       this.state='transition';
       UI.fade(true,400);
-      setTimeout(()=>{ this.switchArea('boss1'); this.state='play'; UI.fade(false,400); },450);
+      setTimeout(()=>{ this.switchArea(ba); this.state='play'; UI.fade(false,400); },450);
       return;
     }
     this.player.respawn(this.checkpoint);
@@ -387,25 +394,28 @@ const G = {
   },
   onBossDefeated(){
     // record progress; a guardian's blessing refills your lives
+    const district = this.bossDistrict || 'w1';
+    const bestKey = district+'boss';
     this.save.lives = 5;
-    this.save.worlds.w1 = true;
-    this.save.embers = Math.max(this.save.embers, 1);
-    const prev = this.save.gp.w1||[false,false,false];
-    this.save.gp.w1 = prev.map((v,i)=>v||this.runPumpkins[i]);
+    this.save.worlds[district] = true;
+    // one ember per freed district — the Everflame grows with each
+    this.save.embers = Object.keys(this.save.worlds).filter(k=>this.save.worlds[k]).length;
+    const prev = this.save.gp[district]||[false,false,false];
+    this.save.gp[district] = prev.map((v,i)=>v||this.runPumpkins[i]);
     this.persist();
     const secs = Math.floor(this.runT||this.time-this.runT0);
     if(!this.save.best) this.save.best = {};
-    // boss-only clock lives under its own key — legacy full-run best.w1 is preserved, never compared
-    const prevBest = this.save.best.w1boss;
+    // boss-only clock under its own key — legacy full-run bests preserved, never compared
+    const prevBest = this.save.best[bestKey];
     const isRecord = !this.runCozy && secs >= 5 && (!prevBest || secs < prevBest);   // cozy runs & debug runs don't set records
-    if(isRecord) this.save.best.w1boss = secs;
+    if(isRecord) this.save.best[bestKey] = secs;
     this.persist();
     const fmt = t => Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
     const stats = {
       candy: this.save.candy-this.runCandy0+0,
       gp: this.runPumpkins.filter(Boolean).length,
       time: fmt(secs),
-      best: fmt(this.save.best.w1boss),
+      best: fmt(this.save.best[bestKey]),
       isRecord,
       dmg: this.runDamage||0,
       cozy: this.runCozy,

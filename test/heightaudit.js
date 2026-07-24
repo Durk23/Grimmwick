@@ -11,7 +11,7 @@ const LIMITS = { step: 2.2, dbl: 3.0, spring: 4.0, mega: 6.5, gapTap: 4.0, gapHe
   await page.goto('file://' + path.join(__dirname, '..', 'dist', 'grimmwick.html') + '?test=1');
   await page.waitForTimeout(2500);
 
-  const levels = ['tut', 'w1l1', 'w1l2', 'w1l3', 'w1l4', 'w1l5'];
+  const levels = ['w2l1','w2l2','w2l3','w2l4','w2l5'];
   let issues = 0;
   for (const id of levels) {
     await page.evaluate((i) => window.__game.scene(i), id);
