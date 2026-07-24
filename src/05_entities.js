@@ -159,7 +159,10 @@ class Checkpoint {
     const pole = mesh('cyl',[0.09,0.12,2.6,6], mat(0x2c2140)); pole.position.y=1.3;
     const cage = mesh('box',[0.55,0.6,0.55], mat(0x2c2140)); cage.position.y=2.75;
     this.flame = mesh('sph',[0.19,8,6], emat(0x666688, 0x666688, 0.8)); this.flame.position.y=2.75;
-    this.group.add(pole,cage,this.flame);
+    // soft glow halo — invisible until lit, then stays glowing so a passed checkpoint reads as ON for the rest of the level
+    this.halo = new THREE.Mesh(geo('sph',0.7,10,8), new THREE.MeshBasicMaterial({color:PAL.purpleFx, transparent:true, opacity:0, depthWrite:false}));
+    this.halo.position.y=2.75; this.halo.renderOrder=1;
+    this.group.add(pole,cage,this.flame,this.halo);
     // opts.noLight: emissive flame only, no real PointLight (keeps long levels within the ~6-light budget)
     if(!opts.noLight){ this.light = new THREE.PointLight(0x9955ff, 0, 10); this.light.position.y=2.8; this.group.add(this.light); }
     this.group.position.set(x,y,z);
@@ -168,13 +171,16 @@ class Checkpoint {
   update(dt,G){
     this.t+=dt;
     if(this.lit){
-      this.flame.scale.setScalar(1+Math.sin(this.t*7)*0.15);
+      const pulse = 1+Math.sin(this.t*7)*0.15;
+      this.flame.scale.setScalar(pulse);
+      this.halo.scale.setScalar(pulse);
       if(this.light) this.light.intensity = 55+Math.sin(this.t*9)*12;
     }
     const pl=G.player;
     if(!this.lit && pl && Math.hypot(pl.pos.x-this.group.position.x, pl.pos.z-this.group.position.z)<2.6){
       this.lit=true;
-      this.flame.material = emat(PAL.purpleFx, PAL.purpleFx, 1);
+      this.flame.material = emat(0xe6ccff, PAL.purpleFx, 1.8);   // brighter, and it stays lit from here on
+      this.halo.material.opacity = 0.42;
       G.setCheckpoint(this.group.position.x, this.group.position.y+0.2, this.group.position.z);
       AUDIO.checkpoint();
       G.fx.spawn(new THREE.Vector3(this.group.position.x, this.group.position.y+2.7, this.group.position.z), PAL.purpleFx, 14, {speed:2.5, gravity:1});
@@ -298,6 +304,13 @@ class PowerUp {
       const e1 = mesh('sph',[0.045,5,5], emat(0xffe08a,0xffe08a,1)); e1.position.set(-0.07,0.06,0.15);
       const e2 = e1.clone(); e2.position.x=0.07;
       this.group.add(bb, this.wL, this.wR, e1, e2); // fluttering bat charm
+    } else if(type==='salt'){
+      // a floating salt shaker — a WEAPON grant (persistent), not a timed power-up
+      const glass = mesh('cyl',[0.12,0.15,0.3,9], emat(0xf4f6ff, 0xbfe0ff, 0.6));
+      const saltFill = mesh('cyl',[0.1,0.12,0.16,9], emat(0xffffff, 0xffffff, 0.6)); saltFill.position.y=-0.05;
+      const cap = mesh('cyl',[0.14,0.12,0.1,9], mat(0xc9ccd6)); cap.position.y=0.2;
+      const knob = mesh('sph',[0.04,6,5], mat(0xd6d9e2)); knob.position.y=0.26;
+      this.group.add(glass, saltFill, cap, knob);
     } else {
       const orb = mesh('sph',[0.3,10,9], emat(0xfff2c4, 0xffe08a, 0.9));
       const ring = mesh('tor',[0.42,0.04,6,20], emat(0xb37dff, 0xb37dff, 0.8));
@@ -327,6 +340,10 @@ class PowerUp {
         pl.gainBat();
         UI.toast('🦇 BAT WINGS! Tap jump in the air to flutter — 4 beats per flight!');
         AUDIO.ghostGiggle();
+      } else if(this.type==='salt'){
+        pl.armWeapon('salt');   // persistent weapon — keeps until a death or a different weapon replaces it
+        UI.toast('🧂 SALT SHAKER! Spin to fling salt — ghosts HATE it. (Keeps until you fall.)');
+        AUDIO.goldPumpkin();
       } else {
         pl.moonT = 10;
         UI.toast('🌙 MOON DROP! Unstoppable for 10 seconds!');
@@ -376,5 +393,111 @@ class Crow {
       this.group.rotation.y = this.vx>0 ? Math.PI/2 : -Math.PI/2;
       if(p.y > 16) this.dead = true;
     }
+  }
+}
+
+
+// ---- SALT SHAKER weapon: a pinch of salt wards off spirits (non-violent projectile) ----
+// A small white salt-pinch that flies forward along the player's facing x-direction (side-scroller),
+// short range, popping the first spirit it overlaps via the same hit-path a stomp/swing uses. A few can
+// be airborne at once. Deterministic straight-line motion. Bosses (G.boss) aren't in ents.list, so it
+// never chips their stone hide.
+class SaltPinch {
+  constructor(G, x, y, z, dir){
+    this.G = G;
+    this.dir = dir;            // +1 (right) or -1 (left)
+    this.group = new THREE.Group();
+    const gm = emat(0xffffff, 0xf4f4ff, 0.75);   // bright so it reads against the dark levels
+    for(let i=0;i<4;i++){
+      const gr = mesh('box',[0.08,0.08,0.08], gm);
+      gr.position.set(rand(-0.07,0.07), rand(-0.07,0.07), rand(-0.07,0.07));
+      gr.rotation.set(rand(TAU), rand(TAU), rand(TAU));
+      this.group.add(gr);
+    }
+    this.group.position.set(x,y,z);
+    this.speed = 15;           // deterministic forward speed
+    this.life = 0.55;          // short range (~8u)
+    this.dead = false;
+    this.cull = false;         // never cull a live projectile — it's short-lived and always near the player
+    this.t = 0;
+  }
+  update(dt, G){
+    this.t += dt;
+    this.life -= dt;
+    if(this.life<=0){ this.dead = true; return; }
+    const p = this.group.position;
+    p.x += this.dir*this.speed*dt;
+    this.group.rotation.z -= this.dir*dt*11;   // tumble
+    // little salt trail
+    G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), 0xffffff, 1, {speed:0.5, life:0.2, gravity:6, size:0.35});
+    // pop the first spirit it overlaps
+    for(const e of G.ents.list){
+      if(!e.isEnemy || e.dead) continue;
+      const ep = e.group.position;
+      const dx = ep.x-p.x, dz = ep.z-p.z, dy = (ep.y+(e.hitY||0.5))-p.y;
+      const rr = (e.hitR||0.6)+0.45;
+      if(dx*dx+dz*dz < rr*rr && Math.abs(dy)<1.1){
+        e.takeHit(G.player, 'swing');   // same path a bag-swing uses — pops Boos/Wisps/Gravemites/etc.
+        this.G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), 0xffffff, 7, {speed:2.6, life:0.3, gravity:3, size:0.6});
+        AUDIO.stomp();
+        this.dead = true;   // one pinch, one pop
+        return;
+      }
+    }
+  }
+}
+
+// ---- Salt Crypt: the tomb you take the Salt Shaker from ----
+// Integrates EXACTLY like CursedCoffin/RestlessUrn: has .opened / .group.position / .open(G) / .promptLabel;
+// a level pushes it to G.coffins AND G.ents.add(...)s it, so 09_levelkit.updateLevelCommon renders the
+// interact prompt and calls .open(G) on interact. Opening GRANTS the persistent Salt Shaker weapon.
+class SaltCrypt {
+  constructor(x,y,z,ry=0){
+    this.group = new THREE.Group();
+    const stone = mat(0x6c6f86), stoneD = mat(0x4a4c63), stoneL = mat(0x8e91a8);
+    const slab = mesh('box',[1.5,0.22,2.2], stoneD); slab.position.y=0.11;
+    const box  = mesh('box',[1.15,0.72,1.85], stone); box.position.y=0.52;
+    const rune = mesh('box',[0.5,0.5,0.06], emat(0xbfe0ff,0x8ac6ff,0.5)); rune.position.set(0,0.55,0.94);   // salt-ward carving
+    // the salt shaker glowing inside (revealed as the lid slides off)
+    this.shaker = new THREE.Group();
+    const glass = mesh('cyl',[0.13,0.16,0.34,10], emat(0xf4f6ff,0xbfe0ff,0.6));
+    const saltFill = mesh('cyl',[0.11,0.13,0.2,10], emat(0xffffff,0xffffff,0.7)); saltFill.position.y=-0.05;
+    const cap = mesh('cyl',[0.15,0.13,0.12,10], mat(0xc9ccd6)); cap.position.y=0.22;
+    for(let i=0;i<5;i++){ const h=mesh('sph',[0.02,4,4], emat(0xffffff,0xffffff,1)); const a=i/5*TAU; h.position.set(Math.cos(a)*0.06, 0.27, Math.sin(a)*0.06); this.shaker.add(h); }
+    this.shaker.add(glass, saltFill, cap);
+    this.shaker.position.set(0,0.95,0);
+    // sliding lid
+    this.lid = mesh('box',[1.2,0.16,1.9], stoneL); this.lid.position.set(0,0.94,0);
+    const lidRune = mesh('box',[0.4,0.4,0.05], emat(0xbfe0ff,0x8ac6ff,0.4)); lidRune.rotation.x=Math.PI/2; lidRune.position.set(0,1.03,0);
+    this.lid.add(lidRune);
+    this.glow = new THREE.PointLight(0xbfe0ff, 14, 7); this.glow.position.set(0,1.3,0);
+    this.group.add(slab, box, rune, this.shaker, this.lid, this.glow);
+    this.group.position.set(x,y,z); this.group.rotation.y=ry;
+    this.opened=false; this.dead=false; this.t=rand(0,9);
+    this.promptLabel='⚰️🧂 Take the Salt Shaker from the crypt?';
+  }
+  update(dt, G){
+    this.t += dt;
+    if(!this.opened){
+      this.shaker.position.y = 0.95 + Math.sin(this.t*2.2)*0.05;
+      this.shaker.rotation.y = this.t*1.2;
+      this.glow.intensity = 11 + Math.sin(this.t*2.6)*6;
+    } else {
+      this.lid.position.z = damp(this.lid.position.z, 2.0, 4, dt);       // lid slides off
+      this.glow.intensity = damp(this.glow.intensity, 0, 2.5, dt);
+      this.shaker.position.y = damp(this.shaker.position.y, 1.7, 3, dt); // shaker rises...
+      this.shaker.scale.setScalar(damp(this.shaker.scale.x, 0.01, 4, dt)); // ...and is taken
+    }
+  }
+  open(G){
+    if(this.opened) return;
+    this.opened = true;
+    const p = this.group.position;
+    G.camc.shake(0.15,0.3);
+    AUDIO.noise({t:0.2, vol:0.12, fFrom:5000, fTo:2000});   // salt pour
+    AUDIO.goldPumpkin();
+    G.fx.spawn(new THREE.Vector3(p.x,p.y+1.3,p.z), 0xffffff, 20, {speed:3.5, life:0.7, gravity:4, size:0.6});
+    if(G.player) G.player.armWeapon('salt');
+    if(window.UI) UI.toast('🧂 SALT SHAKER! Spin to fling salt — ghosts HATE it. (Keeps until you fall.)');
   }
 }

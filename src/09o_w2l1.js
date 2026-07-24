@@ -53,9 +53,17 @@ function buildW2L1(G){
   signPost(G, 1.5, 1.6, -0.2, 'RAVENMOOR CEMETERY. Mind the crows — they remember faces. And mind your step: some of the stones mind you back.');
   w2Lantern(G, 3, 0, -1.8, {light:true, lightR:12});          // the gate's one warm glow — hero light #1
   G.ents.add(new BonkLantern(G, 6, 1.4, 0, 'shield'));         // a gentle gift for the cold welcome
+  // THE SALT CRYPT — the district's armoury: a glowing ward-crypt in a clear FOREGROUND pocket just off
+  // the gate lane. It has NO ambush, so opening is always a safe, deliberate act (CLEAR-PATCH honoured —
+  // the nearest patrol, the Gravemite at x13, is >5u off). Grants the persistent SALT SHAKER (spin flings
+  // salt that pops ghosts/wisps/gravemites); it CARRIES level-to-level through District 2, lost only on a
+  // death — re-arm lanterns wait in 2-3 and 2-5. Placed early so the player arms up for the whole cemetery.
+  { const sc = new SaltCrypt(5, 0, 2.0, -0.2);
+    G.ents.add(sc); G.coffins.push(sc);
+    G.world.addBox(5, 0, 2.0, 1.5, 0.9, 1.9, {}); }             // solid off-lane plinth (never blocks the z=0 run)
   hopStone(9, 1.0); hopStone(12.5, 1.3); hopStone(16, 1.1); hopStone(19.5, 1.4);
   hopCandy(9,1.0, 12.5,1.3, 3); hopCandy(12.5,1.3, 16,1.1, 3); hopCandy(16,1.1, 19.5,1.4, 3);
-  G.ents.add(new Gravemite(G, 13, 0, 0, {range:3, axis:'x'}));  // knee-high pest scuttling UNDER the hop lane — hop past, or drop-stomp it
+  G.ents.add(new Gravemite(G, 13, 0, 0, {range:3, axis:'x', speed:4.1}));  // knee-high pest scuttling UNDER the hop lane — livelier (+14%) — hop past, or drop-stomp it
   candyLine(G, [[-6,0.9,0],[-4,0.9,0],[-2,0.9,0]], 3);
 
   // =============================== BEAT 2 — FIRST GAP & FIRST CROW (x 22..42): the air lane arrives ===============================
@@ -119,8 +127,8 @@ function buildW2L1(G){
   for(let i=0;i<murd.length-1;i++) hopCandy(murd[i][0],murd[i][1], murd[i+1][0],murd[i+1][1], 3);
   // the flock: two crows on the same clock, offset half a cycle (homes 6u apart) — their dives stagger
   // into a dodge rhythm as you advance through their aggro zones. Each dive: caw, pull-up, snapshot, arc.
-  G.ents.add(new DiveCrow(G, 107, 5.2, 0, {phase:0.0, period:4.0, range:6, aggroR:6.5}));
-  G.ents.add(new DiveCrow(G, 113, 4.8, 0, {phase:2.0, period:4.0, range:6, aggroR:6.5}));
+  G.ents.add(new DiveCrow(G, 107, 5.2, 0, {phase:0.0, period:3.7, range:6, aggroR:7.0}));   // tighter dive cadence + a touch more reach (harder D2 pass)
+  G.ents.add(new DiveCrow(G, 113, 4.8, 0, {phase:2.0, period:3.7, range:6, aggroR:7.0}));   // still phase-offset ~½ cycle → alternating, never simultaneous
   groundX(G, 120, 134, GA);
   G.ents.add(new Checkpoint(133, 0, 1.4, 3, {noLight:true}));
 
@@ -147,6 +155,7 @@ function buildW2L1(G){
   // the final approach + THE RAVENMOOR GATE (the descent, foreshadowed)
   groundX(G, 170, 186, GC);
   w2Lantern(G, 172, 0, -1.8);
+  G.ents.add(new Gravemite(G, 177, 0, 0, {range:2.5, axis:'x', speed:3.8}));   // one low pest keeps the master walk-in honest (owner: no empty stretches); 4.5u clear of the span-two Boo
   candyLine(G, [[171,0.9,0],[173.5,0.9,0],[176,0.9,0],[178.5,0.9,0]], 4);
   G._gateGlow = mesh('sph',[0.42,10,8], emat(W2PAL.crystal, W2PAL.crystal, 0.9));
   G._gateGlow.position.set(184, 2.5, -1.0); S.add(G._gateGlow);

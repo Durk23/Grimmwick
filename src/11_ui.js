@@ -50,6 +50,8 @@ const UI = {
       #btnA { width:84px; height:84px; font-size:22px; background:radial-gradient(circle at 35% 30%, #8e5bd9, #5b35a8); }
       #btnB { width:64px; height:64px; font-size:15px; background:radial-gradient(circle at 35% 30%, #ff9d3e, #e8701a); margin-right:92px; margin-bottom:-66px; }
       #btnC { width:56px; height:56px; font-size:20px; background:radial-gradient(circle at 35% 30%, #63c6e6, #2a7fa8); margin-right:8px; }
+      /* landscape + touch: keep dialogue/sign text clear of the right-hand action buttons (owner: horizontal is the primary orientation) */
+      @media (orientation:landscape){ .touch #dlg{ left:16px; right:210px; transform:none; width:auto; max-width:600px; margin-inline:auto; } .touch #prompt{ bottom:200px; } }
       /* full screens */
       .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; flex-direction:column; gap:18px; text-align:center; overflow-y:auto; -webkit-overflow-scrolling:touch; box-sizing:border-box; padding:calc(16px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom)); }
       /* auto-margin centering that degrades to a scroll when the card is taller than the viewport (landscape safe) */
@@ -297,7 +299,7 @@ const UI = {
       t.addEventListener('mousedown', h);
       t.addEventListener('touchstart', ev=>{ev.preventDefault();h(ev);},{passive:false});
     });
-    if(INPUT.isTouch) this.el('touchBtns').style.display='flex';
+    if(INPUT.isTouch){ this.el('touchBtns').style.display='flex'; document.documentElement.classList.add('touch'); }
   },
   // ---------- title & intro ----------
   showTitle(){ this.el('title-screen').style.display='flex'; this.el('hud').style.display='none'; this.el('pauseBtn').style.display='none'; },

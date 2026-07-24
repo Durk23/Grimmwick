@@ -76,7 +76,13 @@ function buildW2L2(G){
   w2DarkLantern(G, 76, 0, 0.8, {r:5});                         // L4
   w2DarkLantern(G, 88, 0, 0.8, {r:5});                         // L5
   G.ents.add(new Wisp(G, 59, 1.4, 0));                         // W4 — the entry dash (H3 edge → L3)
-  G.ents.add(new Gravemite(G, 70, 0, 0, {range:3, speed:3.4}));// low pest in the L3→L4 gap (its own beat)
+  G.ents.add(new Gravemite(G, 70, 0, 0, {range:3, speed:3.8}));// low pest in the L3→L4 gap (its own beat) — nudged +12%
+  // AIRBORNE CASTER — D2's new ranged air threat: a floating skull-witch hovering over the open dark ground
+  // between L3 and the gravemite, lobbing a slow arcing violet bolt at a SNAPSHOT of the player (one sidestep
+  // beats it — never homing). Fires only while you're within ~9u AND still ahead of it: RUN PAST (reach L4's
+  // light ~x71) to shut it off, or STOMP it (hp2). Its own high lane, clear of the gravemite's ground patrol
+  // (67-73); 14u from CP2 so no respawn drops you under its fire. Deterministic clock; bolts land on solid ground.
+  G.ents.add(new AirborneCaster(G, 65, 4.6, 0, {aggroR:9, arcX:1.5, arcY:0.4, period:3.2, tele:0.65, firstCast:1.2, hp:2}));
   G.ents.add(new Wisp(G, 82, 1.4, 0));                         // W5 — the L4→L5 gap
   candyLine(G, [[49,0.9,0],[54,0.9,0],[59,0.9,0]], 5);         // H3 → L3
   candyLine(G, [[64,0.9,0],[70,0.9,0],[74,0.9,0]], 5);         // L3 → L4 (traces past the gravemite)
@@ -100,11 +106,11 @@ function buildW2L2(G){
   groundX(G, 104, 117.5, DARK);
   signPost(G, 101, 1.8, 0.2, "The long dark has but a few candles left. Watch your footing over the fallen row — and never, ever stop moving.");
   w2DarkLantern(G, 110, 0, 0.8, {r:5});                       // L6
-  G.ents.add(new Wisp(G, 108, 1.4, 0));                       // W6 — the H4 edge → L6 dash
+  G.ents.add(new Wisp(G, 108, 1.4, 0, {speed:1.6}));         // W6 — the H4 edge → L6 dash (nudged +14% for the master run)
   candyLine(G, [[102,0.9,0],[106,0.9,0],[109,0.9,0]], 4);     // H4 → L6
 
   // the fallen row (void 117.5..120.5) — a wisp hangs over the breach in the dark
-  G.ents.add(new Wisp(G, 118, 1.6, 0, {range:9}));            // W7 — over the void, the master's teeth
+  G.ents.add(new Wisp(G, 118, 1.6, 0, {range:9, speed:1.6})); // W7 — over the void, the master's teeth (nudged +14%)
   candyLine(G, [[113,0.9,0],[116,1.7,0],[119,1.7,0],[123,0.9,0]], 6);   // arcs the void, L6 → L7
 
   groundX(G, 120.5, 134, DARK);

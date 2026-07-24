@@ -163,7 +163,7 @@ function buildW2L5(G){
   groundX(G, 50, 113, FLOOR);
   G.ents.add(new Checkpoint(52, 0, 1.2, 1, {noLight:true}));   // lantern 2
   G.ents.add(new BonkLantern(G, 54, 1.3, 0, 'shield'));        // mercy vessel before the crowd
-  G.ents.add(new Gravemite(G, 58, 0, 0, {range:2, dir:1}));    // bag OUT here — then you must holster it
+  G.ents.add(new Gravemite(G, 58, 0, 0, {range:2, dir:1, speed:4.0}));    // bag OUT here — then you must holster it (nudged +11%)
   signPost(G, 61, 1.8, -0.2, 'GUIDED TOUR IN PROGRESS. The guests are perfectly harmless — SO LONG AS you do not poke them. Kindly holster your candy bag. — Barrow Historical Society');
 
   // THE LOST TOUR GROUP — six hand-holding skeletons behind a bored guide (footprint ~x 62.7..79).
@@ -203,6 +203,10 @@ function buildW2L5(G){
 
   // ================= ACT 3 — THE SUNKEN GALLERY (x 113..169, floor y=-2.4) : the descent climax =================
   G.ents.add(new Checkpoint(108, 0, 1.2, 2, {noLight:true}));  // lantern 3 — at the lip, right before the descent
+  // SALT RE-ARM — bonk to get the Salt Shaker back before the deep (it's lost on a death; the 2-1 crypt is
+  // the source). Arms you for the Sunken-Gallery wisps (x124, x148) AND the Witch Cannon's bats on the
+  // doorstep (spin/salt pops them mid-air). Clear pocket: nearest patrol (CoffinHopper@100, edge 102.5) is >7u off.
+  G.ents.add(new BonkLantern(G, 110, 1.4, 0, 'salt'));
   signPost(G, 111, 1.8, -0.2, 'THE BARROW GOES DEEPER. Down into the dark the guardian sleeps. Relight a lantern to hold the wisps at bay — and MIND YOUR HEAD.');
   // DESCENT steps down off the y=0 lip onto the -2.4 floor (drops of 0.6 — a gentle, telegraphed climb-down)
   platform(G, 113.5, -0.6, 0, 1.7, 4, W2PAL.caveWallL);
@@ -213,7 +217,7 @@ function buildW2L5(G){
 
   // the darkness beat: a relightable lantern to make a safe pool, a wisp to repel, then a lower crawl
   w2DarkLantern(G, 120, -2.4, -1.4, {r:5, relightR:2.6});      // relight it → wisps shrink from the pool
-  G.ents.add(new Wisp(G, 124, -1.4, 0, {range:8}));            // hunts in the dark; face it (or the pool) to repel it
+  G.ents.add(new Wisp(G, 124, -1.4, 0, {range:8, speed:1.6})); // hunts in the dark; face it (or the pool) to repel it (nudged +14%)
   // (crawl 2 is telegraphed by the descent sign's "MIND YOUR HEAD", the bright DUCK stripe, and the entry gag —
   //  no signPost down here: signPost has no y-arg and would float at y=0 above the -2.4 gallery)
   w2l5LowCrawl(G, 126, 133, -2.4, {toast:'🪦 DUCK! ...*CLONK-clatter* — a wisp just face-planted the barrow ceiling. Serves it right.'});
@@ -223,7 +227,7 @@ function buildW2L5(G){
   w2Lantern(G, 144, -2.4, -1.9, {r:5.2, light:true});         // real light #2 — lights Mossgrave's shrine
   w2l5Memorial(G, 143, -1.1, -2.4);                            // THE QUIET PROP (never signposted)
   G.ents.add(new Heart(140, -1.5, 0));                         // the scenic route's guaranteed reward
-  G.ents.add(new Wisp(G, 148, -1.4, 0, {range:8}));            // repelled while you linger in the lantern pool
+  G.ents.add(new Wisp(G, 148, -1.4, 0, {range:8, speed:1.6})); // repelled while you linger in the lantern pool (nudged +14%)
 
   // SKILL-GATED GOLDEN PUMPKIN (idx 2): only reachable by CLIMBING the hanging chain and boosted-hopping
   // east onto the crystal ledge — a floor-level double-jump (apex ~-0.9) can never touch a y=2.5 ledge.
@@ -262,6 +266,7 @@ function buildW2L5(G){
   groundX(G, 169, 216, FLOOR);
   G.ents.add(new Checkpoint(178, 0, 1.2, 3, {noLight:true}));  // lantern 4 — a fair walk-back before the tomb
   signPost(G, 172, 1.8, -0.2, 'You climbed back into the light, and yet you keep walking DOWN the hall. Brave. Or something. — The (increasingly worried) Management');
+  G.ents.add(new Gravemite(G, 174, 0, 0, {range:2, dir:1, speed:3.8}));   // one low pest so the doorstep walk-in isn't empty; sits LEFT of CP4 (x178), 3.5u clear of the CoffinHopper's patrol (179.5..184.5)
   G.ents.add(new CoffinHopper(G, 182, 0, 0, {range:2.5, dir:1}));   // the doorstep medley
   candyLine(G, [[174,0.8,0],[179,0.8,0]], 5);
   G.ents.add(new BonkLantern(G, 184, 1.3, 0, 'shield'));       // last mercy before the guardian's rest
@@ -296,6 +301,20 @@ function buildW2L5(G){
   w2Lantern(G, 196, 0, -1.9, {r:4.5, light:false});
   w2Lantern(G, 205, 0, 1.9, {r:4.5, light:false});
   signPost(G, 207, 1.8, -0.2, 'You came all this way. Of course you are not turning back. Deep breath, then. — The Management');
+
+  // ===== THE WITCH CANNON — the pre-boss BULLET-BAT gauntlet (D2's BOMBARDMENT, on Mossgrave's doorstep) =====
+  // A spectral graveyard-hag half-risen from the tomb threshold, planted just inside the exit, casts big
+  // menacing BulletBats LEFT (dir -1) down the final approach on a FIXED clock — deterministic from level
+  // start, so the pattern is learnable and speedrunnable. She sits at y=-0.5 so the bats fly at ~0.85 (chest
+  // height): a standing Pip IS hit and must act, but a tap-jump clears them (apex ~1.8 > ~1.7 pass-over), and
+  // a spin / thrown SALT / stomp pops them — several fair counters (the salt re-armed at x110 flings them out
+  // of the air). despawnX 196.5 caps the barrage to the flat 196.5..210 corridor (past the last low crawl), so
+  // it never floods the level and never reaches the safe crawl/entry (195). period 2.5s → ~1 bat airborne at a
+  // time, ~2-3 met across the crossing — SNES-Mario tension, never bullet-hell. She is INVULNERABLE set-dressing
+  // (no hp / no collider): the job is to survive the tense walk to the guardian, not to fight her.
+  { const nback = mesh('box',[3.4,3.8,0.5], mat(0x140f22)); nback.position.set(210, 1.4, -1.6); S.add(nback); }   // the tomb's dark mouth behind her (dresses the half-risen base)
+  G.ents.add(new WitchCannon(G, 210, -0.5, 0, {period:2.5, tele:0.8, firstCast:2.5, batSpeed:6.6, despawnX:196.5, dir:-1}));
+  candyLine(G, [[198,1.6,0],[201,1.7,0],[204,1.6,0]], 3);   // jump-height candy rewards the leaps over the bats (traces the dodge rhythm)
 
   exitGate(G, 213);
 

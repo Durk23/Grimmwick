@@ -34,6 +34,7 @@ class Player {
     this.coyote = 0; this.jumpBuf = 0;
     this.pounding = false; this.poundHover = 0;
     this.attackT = 0; this.attackCD = 0;
+    this.saltCD = 0;   // Salt Shaker throw cadence (persistent weapon; equipped via G.carryWeapon)
     this.hitSet = new Set();
     this.squash = 1; this.squashV = 0;
     this.animT = 0;
@@ -199,8 +200,40 @@ class Player {
         body.add(rib);
       }
     }
+    // persistent-weapon tell: a little salt shaker on Pip's belt when the Salt Shaker is equipped.
+    // buildRig runs on every switchArea (Player is rebuilt per area), so reading G.carryWeapon here
+    // is exactly what re-arms the weapon's visible tell after crossing between levels.
+    this.saltTell = null;
+    if(this.G && this.G.carryWeapon==='salt'){ this.saltTell = this._makeSaltTell(); body.add(this.saltTell); }
     this.body = body;
     this.group.add(body);
+  }
+  _makeSaltTell(){
+    const shaker = new THREE.Group();
+    const glass = mesh('cyl',[0.085,0.1,0.19,8], emat(0xf4f6ff, 0xbfe0ff, 0.4));
+    const saltFill = mesh('cyl',[0.07,0.085,0.11,8], emat(0xffffff, 0xffffff, 0.45)); saltFill.position.y=-0.03;
+    const cap = mesh('cyl',[0.095,0.085,0.06,8], mat(0xc9ccd6)); cap.position.y=0.12;
+    const knob = mesh('sph',[0.035,6,5], mat(0xd6d9e2)); knob.position.y=0.16;
+    shaker.add(glass, saltFill, cap, knob);
+    shaker.position.set(-0.46, 0.5, 0.14); shaker.rotation.z = 0.25;
+    return shaker;
+  }
+  // --- persistent weapon: equip + show the belt tell WITHOUT rebuilding the rig (rebuild would orphan an active shield/wings) ---
+  armWeapon(w){
+    this.G.carryWeapon = w;
+    this.saltCD = 0;                 // first throw is instant
+    if(w==='salt' && !this.saltTell && this.body){ this.saltTell = this._makeSaltTell(); this.body.add(this.saltTell); }
+  }
+  // --- fling a pinch of salt forward along the facing x-direction (side-scroller) ---
+  throwSalt(){
+    const G = this.G;
+    this.saltCD = 0.35;                              // pleasant tap-to-throw cadence
+    const dir = Math.sin(this.facing) >= 0 ? 1 : -1; // +x when facing right, -x when facing left
+    const x = this.pos.x + dir*0.55, y = this.pos.y + 0.72, z = this.pos.z;
+    G.ents.add(new SaltPinch(G, x, y, z, dir));
+    AUDIO.tone({f:1250, f2:1550, type:'sine', t:0.05, vol:0.08});
+    AUDIO.noise({t:0.05, vol:0.07, fFrom:6500, fTo:3200});   // a light "shk!" shake
+    G.fx.spawn(new THREE.Vector3(x,y,z), 0xffffff, 3, {speed:1.6, life:0.22, gravity:3, size:0.45});
   }
   heal(n){ this.hearts = Math.min(this.maxHearts, this.hearts+n); if(window.UI) UI.updateHUD(); }
   gainShield(){
@@ -259,6 +292,8 @@ class Player {
   die(){
     if(this.dead) return;
     this.dead = true;
+    this.G.carryWeapon = null;   // carried weapon (Salt Shaker) is LOST on death — "continues till a death"
+    if(this.saltTell){ if(this.saltTell.parent) this.saltTell.parent.remove(this.saltTell); this.saltTell=null; }   // clear the belt tell so it doesn't linger after respawn
     AUDIO.gameover();
     this.G.onPlayerDeath();
   }
@@ -278,6 +313,7 @@ class Player {
     this.animT += dt;
     if(this.iframes>0) this.iframes -= dt;
     if(this.attackCD>0) this.attackCD -= dt;
+    if(this.saltCD>0) this.saltCD -= dt;
 
     // --- climbing (vines / web-nets — Mario-style) ---
     let onClimbable = null;
@@ -423,11 +459,15 @@ class Player {
       else { this.vel.y = -27; this.body.rotation.x = 0; }
     }
 
-    // --- attack (bag spin) ---
-    if(INPUT.attackEdge && this.attackCD<=0 && !this.pounding){
-      this.attackT = 0.34; this.attackCD = 0.42;
-      this.hitSet.clear();
-      AUDIO.swing();
+    // --- attack (bag spin) + salt throw when the Salt Shaker is equipped ---
+    if(INPUT.attackEdge && !this.pounding){
+      if(this.attackCD<=0){
+        this.attackT = 0.34; this.attackCD = 0.42;
+        this.hitSet.clear();
+        AUDIO.swing();
+      }
+      // salt is an ADDED projectile on the same button, on its own faster cooldown (the bag-swing stays)
+      if(this.G.carryWeapon==='salt' && this.saltCD<=0) this.throwSalt();
     }
     if(this.attackT>0){
       this.attackT -= dt;

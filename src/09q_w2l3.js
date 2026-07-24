@@ -96,7 +96,7 @@ function buildW2L3(G){
   w2Chain(G, 15.3, 0.9, 3.9, 0);                            // grab from the ledge edge, ride down
   candyLine(G, [[15.3,3.4,0],[15.3,2.2,0],[15.3,1.1,0]], 4);
   platform(G, 16.5, 0.6, 0, 17, 4, W2PAL.stoneD);          // belfry base floor, top 0.6 (x8..25) — also catches a fumbled first hop
-  G.ents.add(new Gravemite(G, 20.5, 0.6, 0, {range:3, axis:'x'}));
+  G.ents.add(new Gravemite(G, 20.5, 0.6, 0, {range:3, axis:'x', speed:3.9}));   // belfry-base pest, nudged +8%
   candyLine(G, [[16.5,1.2,0],[21,1.2,0]], 4);
   G.ents.add(new BonkLantern(G, 23, 1.9, 0, 'shield'));     // mercy before the shaft
 
@@ -153,6 +153,10 @@ function buildW2L3(G){
   platform(G, 76.5, -3, 0, 11, 5, W2PAL.caveWallD);        // near bank (x71..82) — overlaps the entry so the step down is clean, no pit
   G.ents.add(new Checkpoint(80, -3, 0, 2));                // CP2 — right before the river (short walk-back)
   w2Lantern(G, 76, -3, 0, {r:5.5});                        // SAFE POOL (emissive) — wisps shrink from it; a rest
+  // SALT RE-ARM — bonk this lantern to get the Salt Shaker back mid-district (it's lost on a death; the
+  // 2-1 crypt is the source). Arms you for the river wisp (x89) and the final-climb wisp (x124). Clear
+  // pocket: the nearest patrol is the river wisp 11u off (CLEAR-PATCH honoured).
+  G.ents.add(new BonkLantern(G, 78, -1.9, 0, 'salt'));
   signPost(G, 77.5, -2.2, -0.15, 'THE UNDERGROUND RIVER. Time the crystal steps - they rise and fall on their own. Stay in the light where you can; the wisps love the dark.');
 
   // the river — pure glowing VISUAL at the bottom of the void; falling in costs a heart + the lantern
@@ -173,7 +177,7 @@ function buildW2L3(G){
   G.world.addMover(2.4, 0.5, 3, t=>new THREE.Vector3(94,   -3 + Math.sin(t*1.4 + 3.2)*0.7, 0), crystalSlab);
   w2Chain(G, 96.5, -3.5, -1.6, 0);                         // climb out onto the far bank
   candyLine(G, [[83.5,-1.2,0],[87,-1.8,0],[90.5,-1.8,0],[94,-1.8,0],[96.5,-2.2,0]], 7);   // rhythm across
-  G.ents.add(new Wisp(G, 89, -2, 0, {range:8, speed:1.4}));   // hunts the dark middle; face it or stay lit
+  G.ents.add(new Wisp(G, 89, -2, 0, {range:8, speed:1.6}));   // hunts the dark middle; face it or stay lit (nudged +14%)
 
   // far bank + reward
   platform(G, 101, -2.6, 0, 8, 5, W2PAL.caveWallD);        // far bank (x97..105)
@@ -220,7 +224,7 @@ function buildW2L3(G){
   // and the candy up it make the intended path plain). Its bell finally rings you out.
   w2BellRope(G, 122, -3.2, 0.3, 0, {bell:true});
   candyLine(G, [[122,-2.4,0],[122,-1.2,0],[122,0.0,0]], 4);
-  G.ents.add(new Wisp(G, 124, -0.6, -0.4, {range:7, speed:1.3}));   // a last wisp lunges as you climb - face it, or hurry
+  G.ents.add(new Wisp(G, 124, -0.6, -0.4, {range:7, speed:1.5}));   // a last wisp lunges as you climb - face it, or hurry (nudged +15%)
 
   // the exit landing — the catacomb passage onward (to 2-4 The Glittering Deep)
   platform(G, 130, 0, 0, 14, 5, W2PAL.caveWallL);          // top y0 (x123..137) — hop off the rope-top onto it
@@ -228,6 +232,7 @@ function buildW2L3(G){
   { const arch = catacombArch(133, -1.2, 1.3); S.add(bakeGroup((()=>{const g=new THREE.Group(); g.add(arch); return g;})())); }
   { const cc = new THREE.Group(); cc.add(crystalCluster(127, 2.5, 1.1, W2PAL.crystal), crystalCluster(138, -2.4, 1.0, W2PAL.crystalP)); S.add(bakeGroup(cc)); }
   G.ents.add(new Gravemite(G, 131, 0, 0, {range:2, axis:'x'}));   // keeps the run-out honest
+  G.ents.add(new SwoopBat(G, 128, 2.6, 0, {range:3.5, period:3.4, phase:0.5}));   // one air threat over the exit run so the catacomb walk-out isn't empty (owner: no long empty stretches) — air lane paired with the ground gravemite, over solid floor
   candyLine(G, [[124.5,0.6,0],[128,0.6,0],[135,0.6,0]], 5);
 
   exitGate(G, 140);

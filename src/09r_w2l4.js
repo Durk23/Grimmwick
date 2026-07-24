@@ -123,7 +123,7 @@ function buildW2L4(G){
   // ================= BEAT 4: THE RUSHING DEEP (x 104..150) — ESCALATE: river + bats + a moving barge =================
   G.ents.add(new Checkpoint(106, 0, 1.3, 2, {noLight:true}));   // CP3 — before the escalate
   signPost(G, 108, -0.3, 0.12, 'THE RUSHING DEEP. Bats roost where the water runs fast. Keep moving — they only dive when you dawdle.');
-  G.ents.add(new Gravemite(G, 111, 0, 0, {range:2.4, dir:1}));   // leftmost reach 108.6 → ≥7u clear of the urn at x101 (clear-patch law)
+  G.ents.add(new Gravemite(G, 111, 0, 0, {range:2.4, dir:1, speed:4.0}));   // leftmost reach 108.6 → ≥7u clear of the urn at x101 (clear-patch law); nudged +11%
   // river R3 crossed on crystals WHILE two bats dive it (same crossing skill, now under air pressure)
   undergroundRiver(G, 110, 122, {hazard:true, d:4.4, speed:3.2});
   crystalStep(112,   1.6, 0, 2.4, ROCKC, CYAN);
@@ -132,7 +132,7 @@ function buildW2L4(G){
   candyLine(G, [[109.5,1.0,0],[111,1.9,0],[112,1.9,0]], 3);
   candyLine(G, [[112,2.1,0],[114.3,2.8,0],[116.5,2.4,0]], 4);
   candyLine(G, [[116.5,2.4,0],[118.5,2.1,0],[120.5,1.9,0]], 3);
-  G.ents.add(new SwoopBat(G, 114, 3.4, 0, {range:4.0, period:3.2, phase:0.0}));   // snapshot dives — sidestep on the stones
+  G.ents.add(new SwoopBat(G, 114, 3.4, 0, {range:4.0, period:3.0, phase:0.0}));   // snapshot dives — sidestep on the stones (tighter dive cadence)
   G.ents.add(new SwoopBat(G, 118, 4.0, 0, {range:4.0, period:3.4, phase:1.3}));
   // THE BARGE (D2 "moving platform over a hazard"): a crystal ferry shuttling the true chasm (x124..131),
   // fixed clock from level start, kissing both ledges (period 4.5s). Miss = 1 heart + walk back to CP3.
@@ -153,6 +153,12 @@ function buildW2L4(G){
   // the tail up to the Roost
   candyLine(G, [[132,0.8,0],[136,0.8,0],[140,0.8,0]], 4);
   G.ents.add(new Gravemite(G, 136, 0, 0, {range:3, dir:-1}));
+  // AIRBORNE CASTER — the escalation ramp INTO the Roost: a floating skull-witch hovering over the open tail
+  // floor (solid 131..197), lobbing a slow arcing violet bolt at a SNAPSHOT of the player (one sidestep beats
+  // it — never homing). RUN PAST (into the Roost, x>145) to shut it off, or STOMP it (hp2). Its own high lane,
+  // ~3u clear of the Gravemite's ground patrol (133..139). It fires only at players to its LEFT, so respawning
+  // at CP4 (x150, to its right) never drops you under its fire; CP3 is 37u back. Deterministic clock.
+  G.ents.add(new AirborneCaster(G, 143, 4.2, 0, {aggroR:9, arcX:1.3, arcY:0.35, period:3.2, tele:0.65, firstCast:1.4, hp:2}));
   candyLine(G, [[143,0.8,0],[147,0.8,0]], 3);
 
   // ================= BEAT 5: THE ROOST (x 150..192) — MASTER: THE BAT BOMBARDMENT, then the gate =================
