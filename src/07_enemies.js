@@ -263,15 +263,16 @@ class Spider extends Enemy {
     this.groundY = opts.groundY!==undefined?opts.groundY:0;
     this.state='hang'; this.stateT=0;
     this.hitR=0.5; this.headH=0.6; this.candyDrop=3;
-    const body = mesh('sph',[0.38,9,8], mat(PAL.spider)); body.scale.set(1,0.8,1.15);
-    const head = mesh('sph',[0.22,8,7], mat(PAL.spider)); head.position.set(0,0.05,0.42);
+    const spiderM = emat(0x6a5a92, 0x453a68, 0.4);   // lifted out of the murk so it reads on drop (readability pass)
+    const body = mesh('sph',[0.38,9,8], spiderM); body.scale.set(1,0.8,1.15);
+    const head = mesh('sph',[0.22,8,7], spiderM); head.position.set(0,0.05,0.42);
     const eM = emat(0xff5e5e,0xff5e5e,0.9);
     for(const [ex,ey] of [[-0.08,0.12],[0.08,0.12],[-0.14,0.04],[0.14,0.04]]){
       const e = mesh('sph',[0.045,5,5], eM); e.position.set(ex,ey+0.05,0.6); this.group.add(e);
     }
     this.legs=[];
     for(let s=-1;s<=1;s+=2) for(let i=0;i<4;i++){
-      const leg = mesh('cyl',[0.03,0.02,0.7,4], mat(PAL.spider));
+      const leg = mesh('cyl',[0.03,0.02,0.7,4], spiderM);
       leg.position.set(s*0.4, 0.05, -0.25+i*0.18);
       leg.rotation.z = s*0.9;
       this.legs.push(leg); this.group.add(leg);
@@ -461,12 +462,13 @@ class SwoopBat extends Enemy {
     this.candyDrop = 2;
     this.state='patrol'; this.st=0; this.cool=0;
     this.diveFrom=new THREE.Vector3(); this.diveTo=new THREE.Vector3();
-    const bodyM = mat(0x4a3d6b);
+    // moonlit lavender + emissive lift so the flyer reads clearly against the dark sky (owner readability pass)
+    const bodyM = emat(0xb49ae0, 0x7a5fc0, 0.55);
     this.body = mesh('sph',[0.32,8,7], bodyM); this.body.scale.set(1,0.9,0.8);
-    const belly = mesh('sph',[0.2,7,6], mat(0x6b5d94)); belly.position.set(0,-0.05,0.18);
+    const belly = mesh('sph',[0.2,7,6], emat(0xe0d2f7, 0x8a72c0, 0.5)); belly.position.set(0,-0.05,0.18);
     this.earL = mesh('cone',[0.09,0.28,5], bodyM); this.earL.position.set(-0.14,0.32,0);
     this.earR = this.earL.clone(); this.earR.position.x=0.14;
-    const eL = mesh('sph',[0.06,5,5], emat(0xffd34d,0.9)); eL.position.set(-0.12,0.05,0.26);
+    const eL = mesh('sph',[0.07,6,6], emat(0xffd34d, 0xffd34d, 1)); eL.position.set(-0.12,0.05,0.27);
     const eR = eL.clone(); eR.position.x=0.12;
     this.wingL = mesh('box',[0.55,0.05,0.3], bodyM); this.wingL.position.set(-0.42,0.05,0);
     this.wingR = this.wingL.clone(); this.wingR.position.x=0.42;

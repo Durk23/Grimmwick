@@ -83,9 +83,10 @@ class Player {
     if(c.flannel){
       // === Just Pip: OPEN red flannel over a white tee, jeans, white sneakers ===
       // faint emissive lift so the hero pops against the purple night (moonlight is a backlight)
-      const red = emat(c.body, 0x6e150a, 0.45), redD = mat(0x9c2c22);
-      const denim = emat(c.accent, 0x182d55, 0.4), denimD = mat(0x33517e);
-      const white = emat(0xf6f3ea, 0x35323e, 0.35), shoeW = emat(0xf4f4f6, 0x2e2e34, 0.4), shoeG = mat(0xd7d9de);
+      // brighter emissive lift so Pip clearly reads red-torso / white-chest / white-feet in the dark levels (owner readability pass)
+      const red = emat(c.body, 0x9a2810, 0.7), redD = emat(0xb83828, 0x6a1810, 0.4);
+      const denim = emat(c.accent, 0x233a66, 0.5), denimD = mat(0x4a6aa0);
+      const white = emat(0xf8f5ee, 0x54505e, 0.55), shoeW = emat(0xf8f8fa, 0x4a4652, 0.6), shoeG = mat(0xdadce2);
       // white t-shirt — the visible center chest + a white ring at the neckline
       const tee = mesh('cyl',[0.30,0.335,0.52,10], white); tee.position.y=0.72;
       // jean hips tuck under the tee
