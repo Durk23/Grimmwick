@@ -51,8 +51,12 @@ const UI = {
       #btnB { width:64px; height:64px; font-size:15px; background:radial-gradient(circle at 35% 30%, #ff9d3e, #e8701a); margin-right:92px; margin-bottom:-66px; }
       #btnC { width:56px; height:56px; font-size:20px; background:radial-gradient(circle at 35% 30%, #63c6e6, #2a7fa8); margin-right:8px; }
       /* full screens */
-      .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; justify-content:center; flex-direction:column; gap:18px; text-align:center; padding:20px; }
-      .card { background:rgba(26,16,50,.97); border:2px solid #8e5bd9; border-radius:26px; padding:26px 30px; max-width:min(680px,94vw); max-height:86vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.7); }
+      .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; flex-direction:column; gap:18px; text-align:center; overflow-y:auto; -webkit-overflow-scrolling:touch; box-sizing:border-box; padding:calc(16px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom)); }
+      /* auto-margin centering that degrades to a scroll when the card is taller than the viewport (landscape safe) */
+      .screen:not(#map-screen)::before { content:""; margin-top:auto; flex:0 0 0; }
+      .screen:not(#map-screen)::after { content:""; margin-bottom:auto; flex:0 0 0; }
+      .card { background:rgba(26,16,50,.97); border:2px solid #8e5bd9; border-radius:26px; padding:26px 30px; max-width:min(680px,94vw); flex:0 0 auto; box-shadow:0 20px 60px rgba(0,0,0,.7); }
+      @media (max-height:540px){ .screen{gap:8px;} .card{padding:12px 22px;border-radius:18px;} .card h2{margin:2px 0;font-size:19px;} .card>div:first-child{font-size:24px;} .btn{padding:8px 20px;font-size:15px;} .cstarRow{margin:5px 0 2px;} .cstar{padding:5px 6px 4px;} .cstar .big{font-size:22px;} .cstar .lbl{font-size:10.5px;margin-top:2px;} #clearStats{margin:4px 0 !important;} .clearBtns{flex-direction:row !important;flex-wrap:wrap;justify-content:center;} .clearBtns .btn{flex:1 1 30%;} }
       #title-screen { display:flex; background:transparent; pointer-events:auto; }
       #logo { font-size:min(13vw,84px); font-weight:900; letter-spacing:2px; color:#ffb35e; text-shadow:0 0 30px #ff8c2e88, 0 4px 0 #7a3040, 0 8px 0 #4a1f30, 0 12px 24px #000; transform:rotate(-2deg); }
       #logo .v { color:#b37dff; text-shadow:0 0 30px #8e5bd988, 0 4px 0 #3d2178, 0 8px 0 #241245, 0 12px 24px #000; }
@@ -208,7 +212,7 @@ const UI = {
         <div id="clearName"></div>
         <div id="clearStars" class="cstarRow"></div>
         <div id="clearStats" style="font-size:15px;opacity:.92;margin:8px 0"></div>
-        <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="clearBtns" style="display:flex;flex-direction:column;gap:10px">
           <button class="btn orange ui-block" id="clearNext">▶️ NEXT LEVEL</button>
           <button class="btn ui-block" id="clearReplay">🔁 REPLAY</button>
           <button class="btn ghost2 ui-block" id="clearMap">🗺️ MAP</button>
