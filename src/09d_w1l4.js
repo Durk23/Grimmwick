@@ -1,9 +1,13 @@
-// ============ LEVEL 1-4 — THE WITCH'S GARDEN (x -8..114) ============
-// Signature gimmick: GHOST MOVERS over the dark, run through the full kishotenketsu arc:
+// ============ LEVEL 1-4 — THE WITCH'S GARDEN (x -8..187, ~4 min) ============
+// Signature gimmick (Acts 1-2): GHOST MOVERS over the dark, run through the full kishotenketsu arc:
 //   introduce (two bobbing platforms over Gap 1 — plus its unmarked secret), twist (a pair
 //   on OPPOSITE clocks that trade places around a stone shelf), escalate (a mover that sinks
-//   past a briar while you ride), master (one long diagonal ride DOWN into the hedge walk).
-// Every mover clock runs from level start (m.t=0 at build) — deterministic, learnable, speedrunnable.
+//   past a briar while you ride), master (one long diagonal ride DOWN into the clearing).
+// SECOND gimmick (Act 3 — THE CAULDRON CLEARING, x104..167): Broomhilda's cauldrons are hexed
+//   BOUNCE PADS. Bounce-chain across a potion-bog void — introduce (one bounce), twist (a chain
+//   over a timed brew GEYSER), escalate (a chain past a sweeping BROOM). A vine-climb candy DETOUR
+//   at the junction loops back (all-candy stays single-run winnable) and hands out Bat Wings.
+// Every mover/hazard clock runs from level start — deterministic, learnable, speedrunnable.
 // (Act 1 sits +8 right of the strict -146 rebase so an entry runway fits before the gap.)
 function buildW1L4(G){
   const S = G.scene;
@@ -117,8 +121,8 @@ function buildW1L4(G){
   candyLine(G, [[81.6,6.4,0],[83.2,6.4,0]], 3);
   candyLine(G, [[83.6,5.8,0],[86,4.2,0],[88.6,1.6,0]], 5);   // the glide down rejoins the path
 
-  // ---- CP3 + THE RIDE DOWN (x 91..104) — MASTER: one long diagonal mover over the last dark ----
-  G.ents.add(new Checkpoint(90.2, 0, 1.4, 2));   // immediately before the final mover gap
+  // ---- CP3 + THE RIDE DOWN (x 91..104) — MASTER of the ghost-mover arc: one long diagonal mover down into the clearing ----
+  G.ents.add(new Checkpoint(90.2, 0, 1.4, 2));   // immediately before the last ghost-mover gap (Act 3's bounce gaps get CP4)
   signPost(G, 91.3, 1.8, -0.3, 'The last ghost platform rides the night wind DOWN the hill. Step aboard when it greets you - it knows the way.');
   platform(G, 91.9, 1.2, 0, 2.4, 3, 0x5a4066);   // boarding step
   platform(G, 94, 2.4, 0, 2.6, 3, 0x5a4066);     // the departure ledge
@@ -127,12 +131,7 @@ function buildW1L4(G){
   candyLine(G, [[95.2,3.9,0],[97.5,3.3,0],[100,2.3,0],[102.6,1.2,0]], 6);   // the descent line
   G.ents.add(new Boo(G, 99, 1.8, 0, {speed:1.9, range:8}));   // drifts beside the ride — stare to freeze him
 
-  // ---- the hedge walk (x 104..114): a framed breath, then the King's arch ----
-  groundX(G, 104, 114, 0x3e5347);
-  candyLine(G, [[105.5,0.8,0],[109,0.8,0]], 4);
-  G.ents.add(new Crow(105.6, 1.78, -2.7));   // on the hedge top — flaps off as you pass
-  G.ents.add(new Hopper(G, 108, 0, 0, {aggroR:3.5}));   // the King's outer guard — engages past the ride's landing, never on it
-  signPost(G, 107.8, 1.8, -0.3, 'The Pumpkin King waits beyond this gate. He was the kindest guardian of all... until the ember burned his heart. Free him, Pip!');
+  // (The hedge walk + King's gate finale transplants RIGHT, past the new Act 3 — rebuilt below at x167..187.)
 
   // ---- Act 2 deco — all baked, one draw call ----
   const decoD2 = new THREE.Group();
@@ -180,7 +179,8 @@ function buildW1L4(G){
   cauldron(85.2,-1.7,1.45,true);    // the centerpiece — carries the act's one real light
   cauldron(88.2,-2.35,0.85,false);
   cauldron(84.6,2.3,0.9,false);     // foreground silhouette brew
-  // light budget: 3 checkpoints + gold pumpkin + coffin + this = 6 (the scene max)
+  // light budget: 4 checkpoints (Act 3 adds CP4) + gold pumpkin + coffin + this brewLight = 7 —
+  // the only PointLight in the ~180u course; Act 3's cauldrons/geyser/broom/brews are emissive fakes.
   const brewLight = new THREE.PointLight(0x7dff9e, 45, 9); brewLight.position.set(85.2, 2.4, -1.7); S.add(brewLight);
   // the quiet prop (never signposted): a stool, a still-warm cup, and someone's knitting —
   // the witch stepped away mid-row. Story-readers will wonder; everyone else walks past.
@@ -194,17 +194,7 @@ function buildW1L4(G){
   teaBreak.add(stool,cup,tea,kn1,kn2,yarn);
   teaBreak.position.set(87.1,0,-2.1);
   decoD2.add(teaBreak);
-  // hedge frames for the final walk
-  for(const hz of [-2.7, 2.5]){
-    const row = mesh('box',[9.6,1.7,1.1], mat(0x2e4a3d)); row.position.set(108.6,0.85,hz); decoD2.add(row);
-    for(let i=0;i<5;i++){
-      const puff = mesh('sph',[rand(0.5,0.75),7,6], mat(0x35543f));
-      puff.position.set(104.6+i*2.1+rand(-0.35,0.35), 1.65+rand(0,0.3), hz+rand(-0.3,0.3));
-      decoD2.add(puff);
-    }
-  }
-  decoD2.add(pumpkinDeco(104.9,-2.0,0.6,true), pumpkinDeco(110.6,1.95,0.55,true));
-  S.add(bakeGroup(decoD2));
+  S.add(bakeGroup(decoD2));   // (the hedge-walk frames transplant RIGHT with the finale — rebuilt in Act 3 below)
 
   // brew-wisps: three little lights doing slow laps of the centerpiece cauldron, and the
   // brew surfaces breathe. Fixed phases — the same dance every night (determinism rule).
@@ -227,17 +217,157 @@ function buildW1L4(G){
     });
   }});
 
-  exitGate(G, 111);
+  // ================= ACT 3 — THE CAULDRON CLEARING (x 104..167) =================
+  // FRESH gimmick beyond ghost-movers: Broomhilda's cauldrons are hexed BOUNCE PADS. Bounce-chain
+  // across a potion-bog void — INTRODUCE (one bounce onto the bank), TWIST (a 2-pad chain over a
+  // rising brew GEYSER you time), ESCALATE (a chain past a riderless SWEEP-BROOM). At the junction, a
+  // CLIMB DETOUR (vine -> hedge-top candy stash + Bat Wings, loops back) rewards the greedy and tames
+  // the broom. Every gap is crossed by a bounce (>=6u = the verb-gate); a mistimed hop costs a heart
+  // into the brew, never a life. Every clock runs from level start — learnable, speedrunnable.
+
+  // landing apron (the ride-down mover sets Pip down here) — arm up, read the clearing's rules
+  groundX(G, 104, 113, 0x3a4c42);
+  G.ents.add(new BonkLantern(G, 108, 1.4, 0, 'shield'));            // shield before the bog
+  signPost(G, 110.5, 1.8, -0.3, "Broomhilda's brewing clearing. Her cauldrons are hexed to BOUNCE - hop the brew-pots across the bog. Mind the geyser's spout... and the tidy-up broom.");
+  candyLine(G, [[105.5,0.9,0],[108,0.9,0],[110.6,0.9,0]], 4);
+  G.ents.add(new Crow(106.3, 0.95, -2.8));                          // ambient — flaps off the apron fence
+
+  // cauldron bounce-pad factory: bounce ON TOP (surface y1.2 -> ~3.5u apex; hold-lift never stacks on bounces)
+  const decoAct = new THREE.Group();
+  const bounceCauldron = (px, w)=>{
+    G.world.addBox(px, 0.2, 0, w, 1.0, 3, {type:'bounce', bounce:13});   // solid sides, springy top at y1.2
+    const cg = new THREE.Group();
+    const pot = mesh('sph',[1.15,14,10], mat(0x1e1830)); pot.position.y=0.6; pot.scale.set(1.08,0.78,1.08);
+    const rim = mesh('tor',[0.98,0.12,6,16], mat(0x120e1e)); rim.rotation.x=Math.PI/2; rim.position.y=1.2;
+    cg.add(pot, rim);
+    for(let i=0;i<3;i++){ const a=i/3*TAU+0.4; const leg=mesh('cyl',[0.08,0.1,0.62,6], mat(0x120e1e)); leg.position.set(Math.cos(a)*0.72, 0.28, Math.sin(a)*0.72); cg.add(leg); }
+    cg.position.set(px,0,0); decoAct.add(cg);
+    const brew = mesh('cyl',[0.9,0.9,0.12,16], emat(0x8dffb0, 0x4ecf6f, 0.9)); brew.position.set(px,1.24,0); decoAct.add(brew);   // the glowing bounce lip
+  };
+
+  // ---- INTRODUCE (Gap I, x113..121.5): a single bounce onto the mid-bank ----
+  bounceCauldron(116.5, 3.0);
+  candyLine(G, [[114.5,1.7,0],[116.5,4.4,0],[119,3.4,0],[121.6,1.2,0]], 6);   // the arc, taught by candy
+  groundX(G, 121.5, 130, 0x37493f);
+  G.ents.add(new Checkpoint(123.5, 0, 1.3, 3, {noLight:true}));     // CP4 (the 4th) — before the twist & escalate gaps; noLight keeps the level at 6 real lights
+  G.ents.add(new Skelly(G, 127.5, 0, 0, {px:1.5}));                 // the landing patroller (paces 126..129)
+  candyLine(G, [[125,0.9,0],[128.5,0.9,0]], 3);
+
+  // ---- TWIST (Gap II, x130..142): a 2-pad bounce-chain over a fixed-cycle brew GEYSER ----
+  bounceCauldron(134, 2.8);
+  bounceCauldron(141, 2.8);
+  candyLine(G, [[132,1.6,0],[134,4.4,0],[137.5,4.7,0],[141,4.4,0],[143,1.4,0]], 7);   // cross HIGH, and only when the spout sleeps
+  {   // the geyser: dormant ~1.7s -> swells 0.6s (telegraph) -> erupts ~0.9s, tall enough to singe even the apex.
+    const gx = 137.5;                                              // wait it out on C2 (bounce in place), then chain across.
+    const colMat = new THREE.MeshLambertMaterial({color:0x9dffb8, emissive:0x4ecf6f, emissiveIntensity:0.85, transparent:true, opacity:0.2});
+    const col = new THREE.Mesh(geo('cyl',0.7,0.45,5.4,10), colMat);
+    col.position.set(gx, 0.1, 0); col.scale.y = 0.02; S.add(col);
+    const cap = mesh('sph',[0.95,10,8], emat(0x7dff9e, 0x4ecf6f, 0.6)); cap.position.set(gx, 0.25, 0); cap.scale.y=0.5; S.add(cap);
+    G.ents.add({ group:col, dead:false, cull:false, gt:0, update(dt){   // cull:false — the geyser clock runs from level start (deterministic, speedrun-fair)
+      this.gt += dt;
+      const c = this.gt % 3.2;
+      let e, danger=false;
+      if(c < 1.7) e = 0.02;                                         // dormant — a quiet surface
+      else if(c < 2.3) e = 0.02 + (c-1.7)/0.6*0.33;                 // TELEGRAPH — the brew swells & brightens (still safe)
+      else { e = 0.35 + (1 - Math.abs(c-2.75)/0.45)*0.65; danger = true; }   // ERUPT — the spout shoots up
+      e = clamp(e, 0.02, 1);
+      col.scale.y = e; col.position.y = 2.7*e; colMat.opacity = 0.18 + e*0.6;
+      cap.scale.setScalar(1 + Math.sin(this.gt*7)*0.1 + (c>1.7 ? 0.6 : 0));
+      const pl = G.player;                                          // singe only within the VISIBLE spout (fair: hazard tracks the column top)
+      if(danger && pl && !pl.dead && Math.abs(pl.pos.x-gx) < 1.0 && pl.pos.y < 5.4*e){
+        pl.damage(1, new THREE.Vector3(gx, 0.4, 0));
+      }
+    }});
+  }
+
+  // ---- chain-bank + the route junction (x142..152) ----
+  groundX(G, 142, 152, 0x37493f);
+  G.ents.add(new Boo(G, 148, 0, 0, {speed:2.0, range:5}));          // stare to freeze — range trimmed off the pads & the climber
+  G.ents.add(new SwoopBat(G, 146, 4.2, 0, {range:2.5, aggroR:3.5, phase:0.7}));   // air lane over SOLID ground — aggro trimmed so its dive can't reach the bounce pads (no void-knock)
+  signPost(G, 152, 1.8, 0.3, "Climb the hedge for a candy stash and BAT WINGS - the wings make the sweep-broom a breeze. Skip it and hop the cauldrons the hard way.");
+  candyLine(G, [[143,0.9,0],[145.6,0.9,0]], 3);
+
+  // CLIMB HIGH ROAD — a candy DETOUR that REJOINS (climb, grab the greedy stash + BAT WINGS, drop back
+  // onto the chain-bank): the wings then turn the low-road broom into an easy glide. The all-candy star
+  // wants this climb — but it loops back, so a single run can still collect every candy in the level.
+  buildVine(G, 144, -0.4, 6.0);
+  platform(G, 148.25, 5.6, 0, 5.5, 2.6, 0x2e4a3d);                 // hedge-top prize ledge (145.5..151) over the SOLID chain-bank
+  G.ents.add(new BonkLantern(G, 147, 6.2, 0, 'bat'));             // Bat Wings — telegraphed by the sign; spin/stomp to pop it
+  candyLine(G, [[145.8,6.3,0],[148,6.3,0],[150.5,6.3,0]], 5);      // the greedy high line
+  G.ents.add(new Heart(150.6, 6.3, 0));                            // a heart before the drop back down to continue
+
+  // ---- ESCALATE (Gap III, x152..167): a bounce-chain past the sweeping broom ----
+  bounceCauldron(156, 2.8);
+  bounceCauldron(163, 2.8);
+  candyLine(G, [[154,1.6,0],[156,4.4,0],[159.5,4.7,0],[163,4.4,0],[165,1.6,0]], 7);
+  {   // riderless sweep-broom: slides across the chain at apex-height on a fixed clock — fly over when it's swept aside.
+    const cx = 159.5;
+    const bg = new THREE.Group();
+    const handle = mesh('cyl',[0.05,0.06,1.7,6], mat(0x6b4a2e)); handle.rotation.z = Math.PI*0.42;
+    const bris = mesh('cone',[0.26,0.62,7], mat(0xc2a24f)); bris.position.set(0,-0.85,0);
+    const tie = mesh('tor',[0.16,0.04,5,10], mat(0x8a6f2e)); tie.rotation.x=Math.PI/2; tie.position.y=-0.5;
+    bg.add(handle, bris, tie); bg.position.set(cx, 5.0, 0); S.add(bg);
+    G.ents.add({ group:bg, dead:false, cull:false, bt:0, update(dt){   // cull:false — the broom sweep runs from level start (deterministic)
+      this.bt += dt;
+      const ph = this.bt*1.85;                                      // period ~3.4s
+      const x = cx + Math.sin(ph)*2.5;
+      bg.position.x = x; bg.position.y = 5.0 + Math.sin(this.bt*3)*0.12;
+      bg.rotation.z = 0.4 + Math.sin(ph)*0.25;
+      const pl = G.player;                                          // tight hitbox — you must be right ON the broom
+      if(pl && !pl.dead){
+        const dx = pl.pos.x - x, dy = (pl.pos.y+0.6) - bg.position.y;
+        if(dx*dx*0.7 + dy*dy < 0.85) pl.damage(1, new THREE.Vector3(x, bg.position.y, 0));
+      }
+    }});
+  }
+
+  // ---- convergence + the transplanted hedge walk to the King's gate (x167..187) ----
+  groundX(G, 167, 187, 0x3e5347);
+  candyLine(G, [[168.5,0.9,0],[171,0.9,0]], 3);                     // the low-road chain lands here
+  candyLine(G, [[178,0.8,0],[182,0.8,0]], 4);
+  G.ents.add(new Crow(178.6, 1.78, -2.7));                          // on the hedge top — flaps off as you pass
+  G.ents.add(new Hopper(G, 181, 0, 0, {aggroR:3.5}));              // the King's outer guard
+  signPost(G, 180.8, 1.8, -0.3, 'The Pumpkin King waits beyond this gate. He was the kindest guardian of all... until the ember burned his heart. Free him, Pip!');
+
+  // ---- Act 3 deco (baked, one draw call): glowing bog floors, background trees, the hedge-tree, silhouettes ----
+  for(const g of [[113,121.5],[130,142],[152,167]]){
+    const bog = mesh('box',[g[1]-g[0], 0.2, 4.4], emat(0x2f6b45, 0x1e4a30, 0.7));
+    bog.position.set((g[0]+g[1])/2, -0.85, 0); decoAct.add(bog);    // the brew below each void (scenery, well under the pads)
+  }
+  for(let i=0;i<7;i++) decoAct.add(deadTree(rand(106,186), rand(-8,-4.4), rand(1.0,1.6)));
+  const bt1 = mesh('cyl',[0.3,0.44,6.6,7], mat(0x241a33)); bt1.position.set(143.7,3.3,-0.7); bt1.rotation.z=0.07;
+  const bt2 = mesh('cyl',[0.22,0.32,6.4,6], mat(0x2e2140)); bt2.position.set(144.4,3.2,-0.9); bt2.rotation.z=-0.09;
+  const bcan = mesh('sph',[1.6,8,7], mat(0x2e4a3d)); bcan.position.set(144.1,6.6,-0.8); bcan.scale.set(1.3,0.8,1.1);
+  decoAct.add(bt1, bt2, bcan);                                      // the braided hedge-tree that carries the vine
+  for(let i=0;i<9;i++){ const puff = mesh('sph',[rand(0.5,0.75),7,6], mat(0x35543f)); puff.position.set(145.5+i*0.7+rand(-0.25,0.25), 5.85+rand(0,0.3), rand(-0.9,0.9)); decoAct.add(puff); }   // hedge-top foliage on the prize ledge
+  decoAct.add(pumpkinDeco(126.5, 2.5, 0.7, false), grave(139, 2.6), pumpkinDeco(159, 2.6, 0.85, false), grave(171, 2.7));   // foreground silhouettes (z>0)
+  // a stray broom leaning at the junction (regular deco — this level's ONE quiet prop is Act 2's tea-break)
+  const leanB = new THREE.Group();
+  const lh = mesh('cyl',[0.04,0.05,1.5,6], mat(0x6b4a2e)); lh.position.y=0.72; lh.rotation.z=0.5;
+  const lbr = mesh('cone',[0.2,0.5,7], mat(0xc2a24f)); lbr.position.set(0.36,1.4,0); lbr.rotation.z=0.5;
+  leanB.add(lh, lbr); leanB.position.set(146.5, 0, 1.8); decoAct.add(leanB);
+  // the hedge frames for the final walk (transplanted from the old finale, shifted right +73)
+  for(const hz of [-2.7, 2.5]){
+    const row = mesh('box',[9.6,1.7,1.1], mat(0x2e4a3d)); row.position.set(181.6,0.85,hz); decoAct.add(row);
+    for(let i=0;i<5;i++){ const puff = mesh('sph',[rand(0.5,0.75),7,6], mat(0x35543f)); puff.position.set(177.6+i*2.1+rand(-0.35,0.35), 1.65+rand(0,0.3), hz+rand(-0.3,0.3)); decoAct.add(puff); }
+  }
+  decoAct.add(pumpkinDeco(177.9,-2.0,0.6,true), pumpkinDeco(183.6,1.95,0.55,true));
+  S.add(bakeGroup(decoAct));
+
+  exitGate(G, 184);
   // clutter per solid span ONLY — never over a void, and NOTHING inside x 2..14: the leap
   // gap keeps its zero-tell rule (no clutter, no lights, no signs, no geometry hints — sacred).
   buildClutter(G, -7, 1, 'garden');     // runway clutter only — nothing may float over the gap
   buildClutter(G, 14, 49, 'garden');
   buildClutter(G, 64.5, 90.5, 'garden');
-  buildClutter(G, 104, 112.5, 'garden');
-  levelFinish(G, -8, 114, null);        // ambience spans the whole level; theme=null keeps kit clutter off the gaps
-  return {spawnX:0, exitX:111};
+  buildClutter(G, 104, 112.5, 'garden');     // apron (solid 104..113) — stops before Gap I at 113
+  buildClutter(G, 122, 129.5, 'garden');     // mid-bank
+  buildClutter(G, 142.5, 151.5, 'garden');   // chain-bank
+  buildClutter(G, 167.5, 186, 'garden');     // convergence + hedge walk
+  levelFinish(G, -8, 187, null);        // ambience spans the whole level; theme=null keeps kit clutter off the gaps
+  return {spawnX:0, exitX:184};
 }
 function updateW1L4(G, dt){
   updateLevelCommon(G, dt);
 }
-W1_LEVELS.push({id:'w1l4', district:'w1', name:"THE WITCH'S GARDEN", build:buildW1L4, update:updateW1L4, parTime:115});
+W1_LEVELS.push({id:'w1l4', district:'w1', name:"THE WITCH'S GARDEN", build:buildW1L4, update:updateW1L4, parTime:155});

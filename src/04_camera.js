@@ -35,7 +35,7 @@ class CamCtrl {
     if(window.G && G.mode==='side'){
       this.sideLook = damp(this.sideLook||0, clamp(player.vel.x*0.5,-3,3), 2.5, dt);
       const tx = player.pos.x + this.sideLook;
-      const ty = Math.max(player.pos.y, 0);
+      const ty = Math.max(player.pos.y, (window.G && typeof G.camMinY==='number') ? G.camMinY : 0);   // levels that go underground (crypt) lower camMinY so the camera follows down
       this.pos.x = damp(this.pos.x, tx, 8, dt);
       this.pos.y = damp(this.pos.y, ty+2.3, 4, dt);
       this.pos.z = damp(this.pos.z, 11.5, 6, dt);

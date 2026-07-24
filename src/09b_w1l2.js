@@ -1,5 +1,7 @@
 // ============ W1-L2 — PUMPKIN FIELD ============
-// Signature gimmick: BOUNCY GOURDS + MUD, given the full kishotenketsu arc across x -6..112:
+// ~4-minute course. The kishotenketsu of the BOUNCY-GOURDS+MUD gimmick fills x -6..96, then a
+// FRESH ACT — THE OLD MILL (a working windmill you ride the turning sails up) — carries x 96..158,
+// before the master-beat bounce-run FINALE at x 159..172.
 //   ACT 1 (x -6..38, the original slice, intact): introduce — gourds as stepping-bounces over
 //     two mud pits, the elevated HIGH ROAD, and the Old Shortcut warp island (untouched).
 //   TRANSITION (x 38..53): the field gate — breather, sign, checkpoint, shield before the deep field.
@@ -9,8 +11,15 @@
 //   ACT 2B (x 76..96): breathe — the scarecrow flats: crop rows, union-meeting scarecrows,
 //     a windmill turning on the skyline, one patrolling Skelly, and a coffin in a CLEAR PATCH
 //     (clear-patch law: no patrol route within ~6u — opening it is a deliberate, safe act).
-//   FINALE (x 96..112): master — one clean rising bounce-run under a swooping bat, straight
-//     through the relight arch. Threat budget stays in the D1 band: chaos = motion, not gangs.
+//   ACT 3 · THE OLD MILL (x 96..158) — THE NEW IDEA: not gourds, not mud — RIDE THE TURNING SAILS.
+//     Four sail-platforms sweep a slow vertical wheel on a fixed deterministic clock. It is a ROUTE
+//     CHOICE: climb the mill's gear-chain and ride the sails up to the loft (harder, richer — a
+//     heart, bat wings, candy), or take the low road round the back at ground level (safe, plain).
+//     The roads cross in plain sight UNDER the wheel (the low-roader sees the loft candy overhead),
+//     a wind-caught sail glides you back down, and both rejoin for one lively run to the gate. CP4
+//     sits right before the movers (walk-back over movers is misery). Grain-sacks keep it springy.
+//   FINALE (x 159..172): master — one clean rising bounce-run over the mud, under a swooping bat,
+//     straight through the relight arch. Threat budget stays in the D1 band: chaos = motion, not gangs.
 function buildW1L2(G){
   const S = G.scene;
   levelBegin(G);
@@ -28,7 +37,7 @@ function buildW1L2(G){
   };
 
   // ================= ACT 1: Pumpkin field (x -6..38) — the original slice, intact =================
-  groundX(G, -6, 112, 0x49603f);
+  groundX(G, -6, 176, 0x49603f);   // one continuous farm floor under the whole 4-min course (mud pits sit on top)
   signPost(G, -4.5, 1.8, -0.3, 'Giant pumpkins are EXTRA bouncy. Ground pound one for a MEGA bounce... and keep your eyes open up there.');
   G.ents.add(new BonkLantern(G, -3, 1.3, 0, 'moon'));
   mudPitX(G, 6.5, 7); // pulled off the spawn pad (was 0..10 pre-rebase) — fair start
@@ -159,33 +168,182 @@ function buildW1L2(G){
   G.ents.add(new Skelly(G, 84, 0, 0, {px:2}));   // patrols the meeting (82..86) — the flats' one real guard
   candyLine(G, [[86.5,0.8,0],[90.5,0.8,0]], 4);
   // the temptation on the way out — pulsing red glow visible from the lake's far bank.
-  // CLEAR-PATCH LAW: nearest patrol edges are the Skelly at 86 and the finale bat at 99 —
+  // CLEAR-PATCH LAW: nearest patrol edges are the Skelly at 84 and the mill-yard Rat at 103 —
   // both ≥6u away; opening the lid is a deliberate act, never a drive-by ambush stack.
   const cofC = new CursedCoffin(92.5, 0, 1.8, -0.35);
   G.ents.add(cofC); G.coffins.push(cofC);
   G.world.addBox(92.5, 0, 1.8, 1.4, 0.9, 2.4, {});
-  hayBale(G, 95, 0, 0, 2, 1.1, 1.6);   // the launch step — sight-line to the finale arcs
+  hayBale(G, 95, 0, 0, 2, 1.1, 1.6);   // the step up into the mill yard — sight-line to the sails ahead
 
-  // ================= FINALE: the last bounce-run (x 96..112) — one clean rising line into the arch =================
-  mudPitX(G, 100, 8);
-  bigPumpkin(G, 97.5, -0.5, 0, 1.7);
-  bigPumpkin(G, 101.3, -0.3, 0, 2.1);   // rises toward the gate — the level ends going UP
-  G.ents.add(new SwoopBat(G, 102, 4.6, 0, {range:3, aggroR:4.5, phase:1.6}));   // arch harasser — patrol 99..105 stays 6u+ off the coffin patch
-  candyLine(G, [[95,2.0,0],[97.5,3.7,0],[99.4,4.4,0]], 4);
-  candyLine(G, [[99.4,4.4,0],[101.3,4.8,0],[104.5,2.4,0]], 4);
-  candyLine(G, [[105.2,0.9,0],[107,0.9,0]], 3);
-  G.ents.add(new Crow(103.8, 0.95, -2.6));   // one last witness on the apron fence
-  exitGate(G, 108);
+  // ================= ACT 3 · THE OLD MILL (x 96..158) — the fresh idea: ride the turning sails =================
+  // grain-sack bounce pad — the mill's springy sacks (bounce 12 ≈ 3.0u apex over the sack's 1.05 top)
+  const grainSack = (px, pz, s=1, bounce=12)=>{
+    const g = new THREE.Group();
+    const sack = mesh('box',[1.2*s,1.0*s,1.2*s], mat(0xbfa46a)); sack.position.y=0.5*s;
+    const neck = mesh('cyl',[0.24*s,0.4*s,0.42*s,7], mat(0xa88f52)); neck.position.y=1.02*s;
+    const tie = mesh('tor',[0.28*s,0.06*s,5,9], mat(0x6b5a2e)); tie.rotation.x=Math.PI/2; tie.position.y=1.12*s;
+    const seam = mesh('box',[1.24*s,0.05*s,0.05*s], mat(0x8a7440)); seam.position.set(0,0.5*s,0.61*s);
+    g.add(sack,neck,tie,seam);
+    g.position.set(px,0,pz); crook(g,0.03);
+    G.scene.add(g);
+    G.world.addBox(px, 0, pz, 1.2*s, 1.05*s, 1.2*s, {type:'bounce', bounce});
+    return g;
+  };
+
+  // ---- MILL YARD APPROACH (x 96..110) ----
+  signPost(G, 100.5, 1.8, -0.3, 'THE OLD MILL still turns on the night wind. Ride the sails up to the loft for the good stuff — or take the low road round the back if you value your sneakers. — Farmhand Maud');
+  G.ents.add(new Rat(G, 103, 0, 0));                    // a grain-mill rat — thematic thief; steals loose candy only
+  candyLine(G, [[97,0.8,0],[99,0.8,0]], 3);
+  grainSack(G, 106, 0);                                 // springy sack — bounce for the overhead candy (teaches the bounce, safely)
+  candyLine(G, [[105.5,2.6,0],[106.5,3.4,0],[107.5,2.6,0]], 3);
+  G.ents.add(new Checkpoint(108, 0, 1.6, 3, {noLight:true}));   // CP4 (NEW) — before the mill's movers; noLight keeps the level at 6 real lights
+  G.ents.add(new BonkLantern(G, 109.5, 1.3, 0, 'shield'));   // armor up for the climb + the ride
+
+  // ---- THE JUNCTION: low road round the back vs. up through the mill (x 110..131) ----
+  // LOW ROAD (safe, plain): stays on the ground at y=0, straight under the wheel, to the rejoin (~131).
+  G.ents.add(new Boo(G, 118, 0.4, 0, {speed:2.0, range:6}));   // drifts under the wheel on the low road
+  G.ents.add(new Crow(126, 0.95, -2.6));                       // low-road ambient life — no dead stretch
+  candyLine(G, [[112,0.8,0],[116,0.8,0]], 3);
+  candyLine(G, [[121,0.8,0],[128,0.8,0]], 4);
+
+  // ---- HIGH ROAD: the gear-chain climb + the loft (owner rule 6a: climbing is fun, not a chore) ----
+  const gearChain = (px, pz, h)=>{
+    const g = new THREE.Group();
+    for(let y=0.4; y<h; y+=0.55){                       // the drive chain — links the player grabs
+      const lk = mesh('tor',[0.11,0.045,4,8], mat(0x6b5a44));
+      lk.position.set(px, y, pz); lk.rotation.x = (Math.round(y/0.55)%2)?0:Math.PI/2;
+      g.add(lk);
+    }
+    for(const gy of [1.4, 3.6, 5.6]){                   // cog wheels the chain runs over
+      const cog = mesh('cyl',[0.5,0.5,0.16,9], mat(0x5a4a3a)); cog.rotation.x=Math.PI/2; cog.position.set(px-0.02,gy,pz-0.1);
+      for(let k=0;k<8;k++){ const th=mesh('box',[0.14,0.14,0.16], mat(0x6b5a44)); const a=k/8*TAU; th.position.set(px-0.02+Math.cos(a)*0.56, gy+Math.sin(a)*0.56, pz-0.1); g.add(th); }
+      g.add(cog);
+    }
+    G.scene.add(bakeGroup(g));
+    return G.world.addBox(px, 0, pz, 1.1, h, 1.2, {type:'climb'});   // press UP to grab — the low road walks past it
+  };
+  gearChain(114, 0, 6.0);
+  platform(G, 116, 6.0, 0, 2.4, 3, 0x4a3a55);           // G1 — the gear landing, offset from the climb (jump off the top onto it, w1l4-style)
+  candyLine(G, [[114,1.6,0],[114,3.4,0],[114,5.2,0]], 3);   // rhythm candy up the climb
+  candyLine(G, [[115,6.6,0],[116.8,6.8,0],[118.4,7.6,0]], 3);   // the climb-exit hop onto G1, then onto an ascending sail
+
+  // ---- THE TURNING SAILS: four sail-platforms on a slow vertical wheel (x 117..123) ----
+  // Deterministic clock: hub (120, 5.7 collider), radius 2.4, ω 0.5 rad/s CLOCKWISE (θ = phase − t·0.5).
+  // Sails ASCEND on the left (board from G1), and vertical speed → 0 at the TOP (a clean hover). Envelope
+  // SURFACES (fn.y+0.45): bottom 3.75 · left 6.15 · TOP 8.55 · right 6.15. Board step G1→left = +0.15;
+  // dismount top→loft = +0.65 (a tap); the low road clears the 3.3 underside (head 1.25). Comparable-heights ✓.
+  const sailMesh = ()=>{
+    const g = new THREE.Group();
+    const board = mesh('box',[2.0,0.45,2.4], mat(0x6b5844)); board.position.y=0.225;   // local [0,0.45] → visual top = collider top
+    const canvas = mesh('box',[1.86,0.06,1.9], emat(0xe6dcb8, 0xcbbd8a, 0.25)); canvas.position.y=0.5;
+    const rib = mesh('box',[0.1,0.06,2.0], mat(0x4a3d33)); rib.position.y=0.53;
+    g.add(board, canvas, rib);
+    G.scene.add(g); return g;
+  };
+  for(const ph of [0, Math.PI/2, Math.PI, Math.PI*1.5]){
+    G.world.addMover(2.0,0.45,2.4, t=> new THREE.Vector3(120 + Math.cos(ph - t*0.5)*2.4, 5.7 + Math.sin(ph - t*0.5)*2.4, 0), sailMesh);
+  }
+
+  // ---- THE LOFT (top-of-mill vista, surface 9.2) — the reward for the harder road ----
+  platform(G, 120.5, 9.2, 0, 3.6, 3, 0x4a3a55);         // sits just above the sails' top point (no overlap): 8.7 > 8.55
+  G.ents.add(new Heart(119.4, 9.9, 0));
+  G.ents.add(new BonkLantern(G, 121.6, 9.5, 0, 'bat'));   // BAT WINGS — glide the descent (or anywhere): a high-road prize
+  candyLine(G, [[120,8.7,0],[120,9.05,0]], 2);          // bridges the top→loft dismount hop
+  candyLine(G, [[119.4,9.9,0],[120.5,10.0,0],[121.6,9.9,0]], 4);
+  G.ents.add(new Crow(120.5, 9.5, -2.4));                // a lookout crow shares the view (ambient)
+
+  // ---- THE RIDE DOWN: a wind-caught sail glides you off the loft (x 123..131) ----
+  // Diagonal mover, HOVERS at both extremes (clean board + dismount): upper-right (123, surf 9.1) beside
+  // the loft ↔ lower-right (131, surf 1.9) at the rejoin. Period ~7.9s. Low road clears its 1.45 underside.
+  const glideMesh = ()=>{
+    const g = new THREE.Group();
+    const board = mesh('box',[2.4,0.45,2.4], mat(0x6b5844)); board.position.y=0.225;
+    const sail = mesh('box',[0.06,1.6,1.8], emat(0xe6dcb8, 0xcbbd8a, 0.25)); sail.position.set(-1.1,0.95,0); sail.rotation.z=0.22;
+    g.add(board, sail);
+    G.scene.add(g); return g;
+  };
+  G.world.addMover(2.4,0.45,2.4, t=> new THREE.Vector3(127 - Math.cos(t*0.8)*4, 5.05 + Math.cos(t*0.8)*3.6, 0), glideMesh);
+  candyLine(G, [[123,8.4,0],[126,5.6,0],[129,3.2,0],[131,2.0,0]], 5);   // the descent line — trails teach the timing
+
+  // ---- the playable mill body + its live sail-cross (visual; emissive window keeps the light budget) ----
+  const millB = new THREE.Group();
+  millB.add(mesh('cyl',[2.2,2.7,1.2,10], mat(0x565070)));                                  // stone base (placed below)
+  millB.children[0].position.set(120,0.6,-2.5);
+  const millBody = mesh('cyl',[1.9,2.6,7.0,10], mat(0x4a3a55)); millBody.position.set(120,3.5,-2.5);
+  const millCap = mesh('cone',[2.2,1.8,10], mat(0x38294f)); millCap.position.set(120,7.9,-2.5);
+  const winFrame = mesh('box',[1.15,1.35,0.16], mat(PAL.woodD)); winFrame.position.set(120,6.4,-0.6);
+  const win = mesh('box',[0.9,1.1,0.14], emat(PAL.window, PAL.window, 0.9)); win.position.set(120,6.4,-0.55);
+  millB.add(millBody, millCap, winFrame, win);
+  S.add(bakeGroup(millB));
+  const sails = new THREE.Group();
+  sails.add(mesh('cyl',[0.55,0.55,0.3,10], mat(0x5a4a3a)).rotateX(Math.PI/2));             // hub cog
+  sails.add(mesh('sph',[0.3,8,7], mat(PAL.woodD)));                                        // hub boss
+  for(let i=0;i<4;i++){
+    const pv = new THREE.Group(); pv.rotation.z = i*Math.PI/2;
+    const arm = mesh('box',[0.18,2.4,0.12], mat(0x4a3d33)); arm.position.y=1.2; pv.add(arm);
+    const latt = mesh('box',[0.7,1.6,0.04], emat(0xcbbd8a,0x9e9060,0.15)); latt.position.set(0.35,1.4,0); pv.add(latt);
+    sails.add(pv);
+  }
+  sails.position.set(120, 5.925, -0.45);   // arm tips meet the sail-platforms (which ride at z=0)
+  S.add(sails);
+  G._w1l2Sails = sails;
+  G._w1l2SailT0 = G.time;   // the movers' clock starts at 0 at build; offset the visual so the arms track the platforms
+
+  // ---- REJOIN + RUN TO THE GATE (x 131..158) — both roads converge, one lively stretch ----
+  G.ents.add(new Skelly(G, 136, 0, 0, {px:2}));
+  candyLine(G, [[132.5,0.8,0],[135,0.8,0]], 3);
+  grainSack(G, 140, 0);                                  // a bounce-chain flourish
+  bigPumpkin(G, 143, -0.5, 0, 1.8);                      // a friendly gourd hop keeps momentum (the motif, no mud)
+  candyLine(G, [[139.5,2.4,0],[141.5,3.4,0],[143,3.6,0],[145,2.6,0]], 5);
+  G.ents.add(new SwoopBat(G, 147, 4.4, 0, {range:4.5, phase:0.5}));   // fixed-phase air threat — same flight every run
+  G.ents.add(new Hopper(G, 152, 0, 0, {aggroR:5}));
+  candyLine(G, [[149,0.8,0],[154,0.8,0]], 4);
+  hayBale(G, 158.5, 0, 0, 2, 1.1, 1.6);                  // the finale launch step — sight-line to the arch arcs
+
+  // ---- mill-act deco (x 96..158) — baked, one draw call; nothing over a mud span (there is none here) ----
+  const decoM = new THREE.Group();
+  fenceRun(decoM, 96, -3.4, 113, -3.4, 8);
+  fenceRun(decoM, 128, -3.4, 158, -3.4, 14);
+  for(let i=0;i<5;i++) decoM.add(deadTree(rand(97,157), rand(-8,-4.6), rand(0.9,1.4)));
+  for(let i=0;i<4;i++) decoM.add(pumpkinDeco(rand(97,112), rand(-3,-1.9), rand(0.5,0.9), rand(0,1)<0.4));
+  for(let i=0;i<4;i++) decoM.add(pumpkinDeco(rand(132,156), rand(-3,-1.9), rand(0.5,0.9), rand(0,1)<0.4));
+  for(const [sx,sz] of [[103,2.5],[133,2.6],[150,2.4]]){   // foreground sack-stack silhouettes (z>0)
+    const sk = mesh('box',[1.0,0.85,1.0], mat(0x8a7440)); sk.position.set(sx,0.42,sz); crook(sk,0.05); decoM.add(sk);
+  }
+  for(const [sx,sz] of [[116.5,-2.3],[117.6,-2.5],[124,-2.4]]){   // grain sacks piled at the mill base (deco)
+    const sk = mesh('box',[0.9,0.8,0.9], mat(0xbfa46a)); sk.position.set(sx,0.4,sz); crook(sk,0.05); decoM.add(sk);
+  }
+  const cart = new THREE.Group();   // a wooden hand-cart in the yard
+  const cbed = mesh('box',[1.8,0.3,1.0], mat(PAL.woodD)); cbed.position.y=0.7; cart.add(cbed);
+  const cwA = mesh('cyl',[0.45,0.45,0.12,10], mat(0x2c2140)); cwA.rotation.x=Math.PI/2; cwA.position.set(-0.5,0.45,0.55); cart.add(cwA);
+  const cwB = cwA.clone(); cwB.position.z=-0.55; cart.add(cwB);
+  cart.position.set(99, 0, -2.6); decoM.add(cart);
+  S.add(bakeGroup(decoM));
+
+  // ================= FINALE: the last bounce-run (x 159..172) — one clean rising line into the arch =================
+  mudPitX(G, 164, 8);
+  bigPumpkin(G, 161.5, -0.5, 0, 1.7);
+  bigPumpkin(G, 165.3, -0.3, 0, 2.1);   // rises toward the gate — the level ends going UP
+  G.ents.add(new SwoopBat(G, 166, 4.6, 0, {range:3, aggroR:4.5, phase:1.6}));   // arch harasser — patrol 163..169, clear of the rejoin
+  candyLine(G, [[159,2.0,0],[161.5,3.7,0],[163.4,4.4,0]], 4);
+  candyLine(G, [[163.4,4.4,0],[165.3,4.8,0],[168.5,2.4,0]], 4);
+  candyLine(G, [[169.2,0.9,0],[171,0.9,0]], 3);
+  G.ents.add(new Crow(167.8, 0.95, -2.6));   // one last witness on the apron fence
+  const decoF = new THREE.Group();
+  fenceRun(decoF, 158, -3.4, 172, -3.4, 7);
+  for(let i=0;i<2;i++) decoF.add(pumpkinDeco(rand(168.5,171.5), rand(-3,-1.9), rand(0.5,0.85), true));
+  for(let i=0;i<2;i++) decoF.add(deadTree(rand(159,171), rand(-7.5,-4.8), rand(0.9,1.3)));
+  S.add(bakeGroup(decoF));
+  exitGate(G, 172);
 
   // ================= deep-field deco (x 48..111) — crop rows, fences, the windmill =================
   const decoC = new THREE.Group();
   fenceRun(decoC, 48, -3.4, 74, -3.4, 12);
-  fenceRun(decoC, 78, -3.4, 108, -3.4, 14);
-  for(let i=0;i<4;i++) decoC.add(deadTree(rand(50,106), rand(-8,-4.6), rand(0.9,1.4)));
+  fenceRun(decoC, 78, -3.4, 95, -3.4, 10);   // stops at the flats' end — the mill yard has its own deco
+  for(let i=0;i<4;i++) decoC.add(deadTree(rand(50,94), rand(-8,-4.6), rand(0.9,1.4)));
   // deco pumpkins NEVER in the mud spans — a bouncy-looking gourd in a hazard would read as a false route
   for(let i=0;i<2;i++) decoC.add(pumpkinDeco(rand(48,53), rand(-3,-1.9), rand(0.5,0.9), rand(0,1)<0.35));
   for(let i=0;i<5;i++) decoC.add(pumpkinDeco(rand(77,94), rand(-3,-1.8), rand(0.5,1), rand(0,1)<0.4));
-  for(let i=0;i<2;i++) decoC.add(pumpkinDeco(rand(104.5,107.5), rand(-3,-1.9), rand(0.5,0.85), true));
   // foreground silhouettes (z>0) frame the flats — span stops short of the coffin's clear patch
   for(let i=0;i<4;i++) decoC.add(pumpkinDeco(rand(78,91), rand(2.2,3.1), rand(0.55,0.95), rand(0,1)<0.3));
   // crop rows — dry cornstalks in ranks behind and before the path
@@ -231,18 +389,20 @@ function buildW1L2(G){
 
   // ambience spans the whole course; clutter is placed manually in segments so nothing
   // bakes over mud (a prop poking through goo reads as false ground)
-  levelFinish(G, -6, 112, null);
+  levelFinish(G, -6, 176, null);
   buildClutter(G, -6, 3, 'farm');
   buildClutter(G, 10, 16, 'farm');
   buildClutter(G, 30, 54, 'farm');
   buildClutter(G, 76, 96, 'farm');
-  buildClutter(G, 104, 111, 'farm');
-  return {spawnX:0, exitX:108};
+  buildClutter(G, 96, 159, 'farm');    // the mill act — no mud span here, clutter is safe
+  buildClutter(G, 168.5, 175, 'farm'); // after the finale mud (164, spans 160..168) — never over the goo
+  return {spawnX:0, exitX:172};
 }
 function updateW1L2(G, dt){
   updateLevelCommon(G, dt);
   if(G.warpPortal) G.warpPortal.material.opacity = G._warpUsed?0.06:(0.3+Math.sin(G.time*2.6)*0.12);
   if(G._w1l2Mill) G._w1l2Mill.rotation.z = -G.time*0.55;
+  if(G._w1l2Sails) G._w1l2Sails.rotation.z = -(G.time - (G._w1l2SailT0||0))*0.5;   // the playable wheel — synced to the sail-platform movers
   if(G._w1l2Sway) G._w1l2Sway.forEach((s,i)=>{ s.rotation.z = Math.sin(G.time*0.8 + i*2.1)*0.045; });
 }
-W1_LEVELS.push({id:'w1l2', district:'w1', name:'PUMPKIN FIELD', build:buildW1L2, update:updateW1L2, parTime:110});
+W1_LEVELS.push({id:'w1l2', district:'w1', name:'PUMPKIN FIELD', build:buildW1L2, update:updateW1L2, parTime:150});

@@ -87,6 +87,7 @@ class Boo extends Enemy {
     const pl = this.G.player;
     const p = this.group.position;
     p.y = this.home.y + Math.sin(this.t*2.4)*0.18 + 0.35;
+    if(this.anchor){ p.x = this.home.x; p.z = this.home.z; }   // a fixed stepping-stone Boo: never chases or drifts off station (undoes stomp knockback)
     if(pl && !pl.dead){
       const dx = pl.pos.x-p.x, dz = pl.pos.z-p.z;
       const d = Math.hypot(dx,dz);
@@ -102,7 +103,7 @@ class Boo extends Enemy {
         const wasShy = this.shy;
         this.shy = face > 0.25;
         if(this.shy && !wasShy && d<9) AUDIO.ghostGiggle();
-        if(!this.shy && d>1.2){
+        if(!this.shy && d>1.2 && !this.anchor){
           p.x += (pl.pos.x-p.x)/d*this.speed*dt;
           p.z += (pl.pos.z-p.z)/d*this.speed*dt;
           this.group.rotation.y = Math.atan2(pl.pos.x-p.x, pl.pos.z-p.z);

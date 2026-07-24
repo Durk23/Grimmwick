@@ -1,11 +1,16 @@
-// ============ LEVEL 1-3 — THE CROOKED BARN (expanded to a full 2.5-min course) ============
+// ============ LEVEL 1-3 — THE CROOKED BARN (expanded to a full ~4-min course) ============
 // District 1's climbing showcase. Signature gimmick: BARN VERTICALITY + CLIMBING —
 // introduced (hay-stair + web-net + silo vine, Act 1), twisted (farmyard coop hops under
 // the open sky), escalated (the OLD barn: loft → branching web-net climb → rafters, with
 // a bouncy hay mountain as both safety net and express route), mastered (the hay-chute
-// slide that fires you out the far door into the moonlit run).
+// slide that fires you out the far door)... and then ONE fresh act before the finale:
+// ACT 3 — THE HAY-WAGON DASH: the level's single horizontal MOMENTUM beat (DKC-minecart
+// energy after all that climbing). Dash the threshing floor hopping deterministic ROLLING
+// BALES, take the granary web → boosted-hop onto the high BEAM CATWALK (the route choice),
+// then ride the flush HAY-WAGON FERRY across the thresher pit into the moonlit run.
 // Layout: Act 1 barn+silo x -8..30 · farmyard+coop 30..66 · gap 66..69.4 ·
-// the OLD barn 69.4..91 (+chute to 95.4) · moonlit run 94..102, arch at 100.
+// the OLD barn 69.4..94 (+chute to 95.4) · ACT 3 hay-wagon dash 94..156 (pit 118.5..127.5)
+// · moonlit run 156..164, arch at 162.
 function buildW1L3(G){
   const S = G.scene;
   levelBegin(G);
@@ -248,28 +253,171 @@ function buildW1L3(G){
     S.add(web);
   }
 
-  // ================= FINALE: the moonlit run (x 94..102) =================
-  groundX(G, 94, 102, 0x3f5c4c);
-  const decoE = new THREE.Group();
-  fenceRun(decoE, 94, -3.4, 102, -3.4, 4);
-  decoE.add(deadTree(95.8,-5.5,1.15), deadTree(100.5,-6,0.95));
-  decoE.add(pumpkinDeco(96.8,-2.4,0.7,true), pumpkinDeco(99.6,-2.1,0.55,false));
-  decoE.add(pumpkinDeco(97.6,2.6,0.8,false), pumpkinDeco(100.8,2.4,0.6,false));
-  S.add(bakeGroup(decoE));
-  candyLine(G, [[96.5,0.8,0],[98.8,0.8,0]], 4);
-  G.ents.add(new Hopper(G, 97.5, 0, 0, {aggroR:7}));   // one last bounce on the way to the arch
-  G.ents.add(new Crow(98.5, 0.95, -2.5));
+  // ================= ACT 3: THE HAY-WAGON DASH (x 94..156) — the FRESH idea =================
+  // After a whole level of climbing, one pure MOMENTUM act: threshing-floor dash + rolling
+  // bales + a high-beam catwalk route + a real moving hay-wagon ferry over the thresher pit.
+  // The chute from the old barn fires you straight in here at speed. Everything deterministic.
 
-  exitGate(G, 100);
-  levelFinish(G, -8, 102, null);                 // ambience spans the whole course...
+  // rolling-bale hazard: a hay roll that trundles a FIXED cycle across the floor. It never
+  // blocks (hazard = pass-through) — HOP it (a tap clears its 0.8 top) or eat one heart and
+  // keep flowing. Mesh is synced to the collider (and rolled) in updateW1L3.
+  G._w1l3Bales = [];
+  const rollBale = (cx, z, range, speed, phase)=>{
+    const r = 0.45;
+    const grp = new THREE.Group();
+    const barrel = mesh('cyl',[r,r,1.5,12], mat(0xc2a24f)); barrel.rotation.x=Math.PI/2;
+    const seam1 = mesh('box',[0.09,0.09,1.5], mat(0x8a6f2e)); seam1.position.set(r-0.02,0,0);
+    const seam2 = mesh('box',[0.09,0.09,1.5], mat(0x8a6f2e)); seam2.position.set(0,r-0.02,0);
+    const capL = mesh('cyl',[r+0.02,r+0.02,0.06,12], mat(0x9a7f3e)); capL.rotation.x=Math.PI/2; capL.position.z=0.75;
+    const capR = capL.clone(); capR.position.z=-0.75;
+    grp.add(barrel,seam1,seam2,capL,capR);
+    grp.position.set(cx, r, z);
+    S.add(grp);
+    const bm = G.world.addMover(1.0,0.8,1.6, t=>new THREE.Vector3(cx+Math.sin(t*speed+phase)*range, 0, z), null);
+    bm.col.type='hazard'; bm.col.damage=1;    // roll ON a fixed clock from level start — same every run
+    G._w1l3Bales.push({col:bm.col, mesh:grp, r});
+  };
+
+  // ---- Floor A: the threshing yard (INTRODUCE) x 94..118.5 ----
+  groundX(G, 94, 118.5, 0x49603f);             // moonlit stubble, tying back to Henrietta's yard
+  const decoF = new THREE.Group();
+  fenceRun(decoF, 94, -3.4, 118, -3.4, 12);
+  for(let i=0;i<3;i++) decoF.add(deadTree(rand(95,117), rand(-8,-4.8), rand(0.85,1.3)));
+  for(let i=0;i<4;i++) decoF.add(pumpkinDeco(rand(95,117), rand(-3,-1.9), rand(0.5,0.85), rand(0,1)<0.3));
+  for(let i=0;i<3;i++) decoF.add(pumpkinDeco(rand(96,116), rand(2.4,3.2), rand(0.6,0.95), false));
+  const gsilo = mesh('cyl',[1.5,1.7,5.5,12], mat(0x9aa7b8)); gsilo.position.set(100,2.75,-1.7);   // granary backing the web
+  const gcap = mesh('cone',[1.7,1.1,12], mat(0x6a3c8f)); gcap.position.set(100,6.1,-1.7);
+  decoF.add(gsilo, gcap);
+  S.add(bakeGroup(decoF));
+  signPost(G, 96.5, 1.8, 0.2, "THE THRESHING RUN. The old hay-wagon still rides the rail across the pit - hop the loose bales, and MIND YOUR HEAD on the low rafters!");
+  G.ents.add(new Checkpoint(99, 0, 1.4, 3));    // CP4 (idx 3) — safe BEFORE any dash or the ferry gap
+  candyLine(G, [[95.4,0.9,0],[97.8,0.9,0]], 4);
+
+  // HIGH ROAD (the route choice): granary web → boosted-hop onto the beam catwalk over the
+  // whole dash. Richer pickings; the low road SEES this candy overhead. Climb-then-launch toy.
+  signPost(G, 100.2, 1.8, -0.2, "Quick hands take the HIGH BEAMS: up the granary webbing, then LEAP right for the catwalk.");
+  buildWebNet(G, 100, 0.4, 1.8, 4.2);                       // climb to ~4.0
+  platform(G, 105.5, 4.8, 0, 7, 2.4, 0x54324a);            // the beam catwalk (surface 4.8) — 2u launch gap off the web
+  candyLine(G, [[100,4.4,0],[102,5.2,0],[103.8,5.3,0]], 3); // traces the boosted hop web→catwalk
+  candyLine(G, [[102.5,5.4,0],[108.5,5.4,0]], 6);           // the reward run up top
+  G.ents.add(new Heart(105.5, 5.7, 0));
+  G.ents.add(new BonkLantern(G, 108.5, 5.9, 0, 'shield'));  // armor for the ferry, high-road only
+  G.ents.add(new Spider(G, 105, 6.8, 0, {groundY:4.8}));    // barn tenant — drops onto the catwalk slab, not through it
+  candyLine(G, [[109,5.0,0],[110.5,3.0,0],[112,0.9,0]], 5); // the high road spills back down to the floor at 112
+
+  // LOW ROAD dash
+  G.ents.add(new Boo(G, 104, 0, 0, {speed:2.2, range:7}));
+  rollBale(106, 0, 2.2, 1.3, 0.0);                          // INTRODUCE the bale-hop
+  candyLine(G, [[104,0.9,0],[106,2.2,0],[108,0.9,0]], 5);   // arc telegraphs the hop
+  G.ents.add(new Hopper(G, 110, 0, 0, {aggroR:6}));
+  candyLine(G, [[110.5,0.9,0],[113,0.9,0]], 3);
+  G.ents.add(new SwoopBat(G, 115.5, 3.6, 0, {range:3.5, phase:0.7}));   // air lane over the boarding
+  candyLine(G, [[115,0.9,0],[117.6,0.9,0]], 3);            // pulls you fully onto the wagon
+
+  // ---- the HAY-WAGON FERRY (centrepiece) x 118.5..127.5 — a flush moving platform ----
+  // A shuttle on a fixed clock (like w1l4's ghost ferries): wait for it at the near dock,
+  // walk aboard, ride across the thresher pit, step off at the far dock. Surface is flush at
+  // y=0 so boarding and landing are seamless (movers land within reach). Pit is 9u — far too
+  // wide to jump, so the wagon is the only way across.
+  const decoBr = new THREE.Group();
+  for(const dx of [118.5, 127.5]){
+    const post = mesh('box',[0.4,4.2,0.4], mat(PAL.woodD)); post.position.set(dx, 2.1, -1.4);
+    const postF = mesh('box',[0.35,3.6,0.35], mat(0x3a2030)); postF.position.set(dx, 1.8, 1.5);   // fg silhouette
+    decoBr.add(post, postF);
+  }
+  for(const rx of [120.5, 123, 125.5]){                     // covered-run rafters, well above the rider (atmosphere + light pools)
+    const beam = mesh('box',[0.3,0.3,3.6], mat(PAL.woodD)); beam.position.set(rx, 3.9, -0.2);
+    const lantern = mesh('sph',[0.15,7,6], emat(PAL.window,PAL.window,1)); lantern.position.set(rx, 3.5, -0.4);
+    const lstr = mesh('cyl',[0.02,0.02,0.35,4], mat(0x2c2140)); lstr.position.set(rx, 3.72, -0.4);
+    decoBr.add(beam, lantern, lstr);
+  }
+  const ridge = mesh('box',[9.4,0.2,0.3], mat(0x54324a)); ridge.position.set(123, 4.15, -1.2);
+  decoBr.add(ridge);
+  for(const gx of [121,125]){ const gear = mesh('cyl',[1.1,1.1,0.3,10], mat(0x241a30)); gear.rotation.x=Math.PI/2; gear.position.set(gx,-4.5,-0.5); decoBr.add(gear); }  // dark thresher gears deep in the pit — reads "don't fall in"
+  S.add(bakeGroup(decoBr));
+  const wagonMesh = ()=>{
+    const g = new THREE.Group();
+    const bed = mesh('box',[4.8,0.35,2.3], mat(0x6b4a2e)); bed.position.y=0.33;      // top ~y0, flush with the collider
+    const skid = mesh('box',[4.6,0.16,2.1], mat(0x54341f)); skid.position.y=0.1;
+    const railB = mesh('box',[4.8,0.5,0.14], mat(0x54341f)); railB.position.set(0,0.72,-1.05);
+    const railF = mesh('box',[4.8,0.26,0.14], mat(0x3a2416)); railF.position.set(0,0.6,1.05);   // low front board — Pip shows above it
+    for(const sx of [-2.2,-0.8,0.8,2.2]){ const st=mesh('cyl',[0.06,0.06,0.5,5], mat(0x54341f)); st.position.set(sx,0.7,-1.05); g.add(st); }
+    const hay = mesh('box',[3.4,0.5,0.85], mat(0xc2a24f)); hay.position.set(0,0.82,-0.95);       // load rides at the back
+    const hayB = mesh('box',[3.5,0.12,0.95], mat(0x8a6f2e)); hayB.position.set(0,0.82,-0.95);
+    for(const wx of [-1.7,1.7]){
+      const wheel = mesh('cyl',[0.6,0.6,0.2,12], mat(0x2c1c28)); wheel.rotation.x=Math.PI/2; wheel.position.set(wx,-0.02,0.85);
+      const hub = mesh('cyl',[0.14,0.14,0.24,8], mat(0x9a7f3e)); hub.rotation.x=Math.PI/2; hub.position.set(wx,-0.02,0.85);
+      g.add(wheel,hub);
+    }
+    g.add(bed,skid,railB,railF,hay,hayB);
+    G.scene.add(g);
+    return g;
+  };
+  // w=5, surface flush at y=0; centre swings 120..126 (T≈7.7s) so it touches BOTH docks with ~1u overlap
+  G.world.addMover(5,0.5,2.6, t=>new THREE.Vector3(123+3*Math.sin(t*0.82), -0.5, 0), wagonMesh);
+  candyLine(G, [[120,0.7,0],[123,0.7,0],[126,0.7,0]], 5);   // collected as the wagon carries you through
+  G.ents.add(new Crow(126.5, 2.1, -2.1));                   // startles off the far dock post as you arrive
+
+  // ---- Floor C: the threshing run (ESCALATE → MASTER) x 127.5..156 ----
+  groundX(G, 127.5, 156, 0x49603f);
+  const decoG = new THREE.Group();
+  fenceRun(decoG, 128, -3.4, 155.5, -3.4, 13);
+  for(let i=0;i<3;i++) decoG.add(deadTree(rand(129,154), rand(-8,-4.8), rand(0.85,1.3)));
+  for(let i=0;i<4;i++) decoG.add(pumpkinDeco(rand(129,154), rand(-3,-1.9), rand(0.5,0.85), rand(0,1)<0.3));
+  for(let i=0;i<3;i++) decoG.add(pumpkinDeco(rand(130,153), rand(2.4,3.2), rand(0.6,0.95), false));
+  const lbeam = mesh('box',[0.35,0.35,3.4], mat(PAL.woodD)); lbeam.position.set(135, 1.62, -0.2);   // the low rafter — Pip ducks under (flavor gag, no collider)
+  const llant = mesh('sph',[0.16,7,6], emat(PAL.window,PAL.window,1)); llant.position.set(135, 1.3, -0.5);
+  const lstr2 = mesh('cyl',[0.02,0.02,0.3,4], mat(0x2c2140)); lstr2.position.set(135, 1.55, -0.5);
+  decoG.add(lbeam, llant, lstr2);
+  S.add(bakeGroup(decoG));
+  candyLine(G, [[128,0.9,0],[130,0.9,0]], 3);
+  rollBale(131, 0, 2.2, 1.5, 1.0);
+  candyLine(G, [[129,0.9,0],[131,2.2,0],[133,0.9,0]], 5);
+  G.ents.add(new Boo(G, 133, 0, 0, {speed:2.3, range:7}));
+  signPost(G, 134, 1.8, 0.2, "MIND YOUR HEAD! (Henrietta has lost three good hats to that beam.)");
+  rollBale(137, 0, 2.0, 1.7, 2.2);                          // ESCALATE — faster, tighter to the last
+  candyLine(G, [[135,0.9,0],[137,2.2,0],[139,0.9,0]], 5);
+  G.ents.add(new SwoopBat(G, 138.5, 3.7, 0, {range:4, phase:1.4}));
+  G.ents.add(new Hopper(G, 141, 0, 0, {aggroR:6}));
+  // a playful little hay-step up-and-over (this IS the climbing level) — rhythm candy on top
+  hayBale(G, 143, 0, 0, 2, 1.1, 1.5, 0.1);
+  hayBale(G, 145.2, 1.1, 0, 1.8, 1.0, 1.5, -0.1);
+  candyLine(G, [[143,1.7,0],[145.2,2.7,0],[147,0.9,0]], 5);
+  rollBale(149, 0, 2.4, 1.5, 0.5);                          // MASTER — last hop before the door
+  candyLine(G, [[147.5,0.9,0],[149,2.2,0],[150.5,0.9,0]], 5);
+  candyLine(G, [[151,0.9,0],[154,0.9,0]], 4);
+  signPost(G, 152, 1.8, -0.2, "The far door at last. Give the girls a wave - moonlight's just past it. - H.");
+
+  // ================= FINALE: the moonlit run (x 156..164) — transplanted +62, unchanged =================
+  groundX(G, 156, 164, 0x3f5c4c);
+  const decoE = new THREE.Group();
+  fenceRun(decoE, 156, -3.4, 164, -3.4, 4);
+  decoE.add(deadTree(157.8,-5.5,1.15), deadTree(162.5,-6,0.95));
+  decoE.add(pumpkinDeco(158.8,-2.4,0.7,true), pumpkinDeco(161.6,-2.1,0.55,false));
+  decoE.add(pumpkinDeco(159.6,2.6,0.8,false), pumpkinDeco(162.8,2.4,0.6,false));
+  S.add(bakeGroup(decoE));
+  candyLine(G, [[158.5,0.8,0],[160.8,0.8,0]], 4);
+  G.ents.add(new Hopper(G, 159.5, 0, 0, {aggroR:7}));   // one last bounce on the way to the arch
+  G.ents.add(new Crow(160.5, 0.95, -2.5));
+
+  exitGate(G, 162);
+  levelFinish(G, -8, 164, null);                 // ambience spans the whole course...
   buildClutter(G, -8, 66, 'farm');               // ...clutter split so nothing floats over
   buildClutter(G, 69.4, 82.8, 'farm');           // the gap or pokes through mountain/chute
-  buildClutter(G, 96, 102, 'farm');
-  return {spawnX:0, exitX:100};
+  buildClutter(G, 96.5, 118, 'farm');            // threshing floor A (clear of chute/mountain, stops before the pit)
+  buildClutter(G, 127.5, 156, 'farm');           // threshing floor C (starts past the pit)
+  buildClutter(G, 158, 164, 'farm');             // the moonlit finale
+  return {spawnX:0, exitX:162};
 }
 function updateW1L3(G, dt){
   updateLevelCommon(G, dt);
   if(G._w1l3Vane) G._w1l3Vane.rotation.y = G.time*0.35 + Math.sin(G.time*0.8)*0.5;
   if(G._w1l3Hoist) G._w1l3Hoist.rotation.z = Math.sin(G.time*0.7)*0.16;
+  // roll the hay bales to match their (mover-driven) collider positions
+  if(G._w1l3Bales) for(const b of G._w1l3Bales){
+    const cx = (b.col.min.x + b.col.max.x)/2;
+    b.mesh.position.x = cx;
+    b.mesh.rotation.z = -cx/b.r;
+  }
 }
-W1_LEVELS.push({id:'w1l3', district:'w1', name:'THE CROOKED BARN', build:buildW1L3, update:updateW1L3, parTime:105});
+W1_LEVELS.push({id:'w1l3', district:'w1', name:'THE CROOKED BARN', build:buildW1L3, update:updateW1L3, parTime:150});

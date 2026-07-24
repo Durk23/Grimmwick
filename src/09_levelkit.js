@@ -95,6 +95,7 @@ function levelBegin(G){
   G._exitHit = false;
   G.spawnPoint.set(0,0.6,0);
   G.world.killY = -14;
+  G.camMinY = 0;   // side-camera vertical floor; a level that descends underground lowers this
 }
 
 // end-of-level relight arch — the boss gate's visual language, scaled down

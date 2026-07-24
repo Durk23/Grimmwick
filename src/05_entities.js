@@ -154,13 +154,14 @@ class GoldPumpkin {
 
 // ---- checkpoint lantern ----
 class Checkpoint {
-  constructor(x,y,z,idx){
+  constructor(x,y,z,idx,opts={}){
     this.group = new THREE.Group();
     const pole = mesh('cyl',[0.09,0.12,2.6,6], mat(0x2c2140)); pole.position.y=1.3;
     const cage = mesh('box',[0.55,0.6,0.55], mat(0x2c2140)); cage.position.y=2.75;
     this.flame = mesh('sph',[0.19,8,6], emat(0x666688, 0x666688, 0.8)); this.flame.position.y=2.75;
-    this.light = new THREE.PointLight(0x9955ff, 0, 10); this.light.position.y=2.8;
-    this.group.add(pole,cage,this.flame,this.light);
+    this.group.add(pole,cage,this.flame);
+    // opts.noLight: emissive flame only, no real PointLight (keeps long levels within the ~6-light budget)
+    if(!opts.noLight){ this.light = new THREE.PointLight(0x9955ff, 0, 10); this.light.position.y=2.8; this.group.add(this.light); }
     this.group.position.set(x,y,z);
     this.idx=idx; this.lit=false; this.dead=false; this.t=0;
   }
@@ -168,7 +169,7 @@ class Checkpoint {
     this.t+=dt;
     if(this.lit){
       this.flame.scale.setScalar(1+Math.sin(this.t*7)*0.15);
-      this.light.intensity = 55+Math.sin(this.t*9)*12;
+      if(this.light) this.light.intensity = 55+Math.sin(this.t*9)*12;
     }
     const pl=G.player;
     if(!this.lit && pl && Math.hypot(pl.pos.x-this.group.position.x, pl.pos.z-this.group.position.z)<2.6){
