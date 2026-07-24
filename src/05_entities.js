@@ -263,10 +263,12 @@ class CursedCoffin {
         G.fx.spawn(new THREE.Vector3(p.x,p.y+1,p.z), 0xff3030, 20, {speed:4.5});
         AUDIO.bossRoar();
         G.camc.shake(0.4,0.45);
+        const offs = [-2.8, -1.6, 1.6, 2.6];   // fixed scatter ring — never on the player, tight enough to stay on every coffin's ground pocket
         for(let i=0;i<4;i++){
-          const sp = new Spider(G, p.x+rand(-2.5,2.5), 0.35, p.z, {groundY:0});
+          const sp = new Spider(G, p.x+offs[i], 0.35, p.z, {groundY:0});
           sp.state='chase'; sp.thread.visible=false;
           sp.group.position.y = 0.35;
+          sp.spawnGrace = 1.0;             // a breath to react before they can bite
           G.ents.add(sp);
         }
         UI.toast('⚰️🕷️ SPIDERS!! SO MANY SPIDERS!!');

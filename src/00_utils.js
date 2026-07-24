@@ -26,9 +26,15 @@ const PAL = {
   greenFx:  0x7dff9e,
 };
 
-const rand = (a=1, b) => (b===undefined ? Math.random()*a : a + Math.random()*(b-a));
+// seedable PRNG — switchArea seeds per area, so deco scatter is IDENTICAL every replay
+// (the determinism covenant, extended: a level replays the same down to the last pebble)
+let _rngS = 123456789;
+const srand = s => { _rngS = (s>>>0)||1; };
+const seedFrom = str => { let h=2166136261; for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h>>>0; };
+const _rng = () => { _rngS = (_rngS*1664525 + 1013904223)>>>0; return _rngS/4294967296; };
+const rand = (a=1, b) => (b===undefined ? _rng()*a : a + _rng()*(b-a));
 const randi = (a,b) => Math.floor(rand(a, b+0.9999));
-const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const pick = arr => arr[Math.floor(_rng()*arr.length)];
 const clamp = (v,a,b) => v<a?a:(v>b?b:v);
 const lerp = (a,b,t) => a+(b-a)*t;
 // framerate-independent damping
@@ -202,7 +208,7 @@ function buildParallax(S, x1, x2){
       const r = mesh('cone',[rand(1,1.5), rand(1.2,2), 4], mat(0x241c44));
       r.position.set(bx, b.geometry.parameters.height+1.8, -20); r.rotation.y=Math.PI/4;
       town.add(r);
-      if(Math.random()<0.8){
+      if(rand()<0.8){
         const w = mesh('box',[0.3,0.4,0.1], emat(PAL.window,PAL.window,1));
         w.position.set(bx+rand(-0.5,0.5), rand(1,2.6), -19.2);
         town.add(w);
@@ -265,7 +271,7 @@ function buildClutter(G, x1, x2, theme){
   const n = Math.floor((x2-x1)/2.2);
   for(let i=0;i<n;i++){
     const x = rand(x1,x2), z = rand(-2.8,2.8);
-    const r = Math.random();
+    const r = rand();
     if(theme==='grave'){
       if(r<0.3) { const rock = mesh('sph',[rand(0.1,0.22),6,5], mat(0x565070)); rock.position.set(x,0.08,z); rock.scale.y=0.6; g.add(rock); }
       else if(r<0.5){ const bone = mesh('cyl',[0.03,0.03,rand(0.3,0.5),4], mat(PAL.bone)); bone.rotation.z=Math.PI/2; bone.rotation.y=rand(TAU); bone.position.set(x,0.05,z); g.add(bone); }
@@ -298,7 +304,7 @@ function buildVine(G, x, z, h){
     seg.position.set(x+Math.sin(y*2.2)*0.12, y+0.25, z);
     seg.rotation.z = Math.sin(y*2.2)*0.18;
     g.add(seg);
-    if(Math.random()<0.5){
+    if(rand()<0.5){
       const leaf = mesh('sph',[0.14,6,5], mat(0x5f8a3a));
       leaf.position.set(x+Math.sin(y*2.2)*0.12+rand(-0.2,0.2), y+0.25, z+0.08);
       leaf.scale.set(1.3,0.4,0.8);

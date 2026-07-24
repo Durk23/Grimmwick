@@ -40,6 +40,7 @@ class Enemy {
     this.G.onEnemyKilled && this.G.onEnemyKilled(this);
   }
   touchPlayer(dt){
+    if(this.spawnGrace>0){ this.spawnGrace -= dt; return; }   // ambush spawns emerge harmless — opening a coffin is never a cheap hit
     const pl = this.G.player;
     if(!pl || pl.dead) return;
     const p = this.group.position;
@@ -395,6 +396,8 @@ class Rat extends Enemy {
     let target = null, bestD = 11;
     for(const e of this.G.ents.list){
       if(e.constructor.name!=='Candy' || e.dead || e.magnet) continue;
+      if(e._placed) continue;                                   // rats steal LOOSE candy only — never the level's placed trails (all-candy star must stay winnable)
+      if(Math.abs(e.group.position.y-p.y) > 1.6) continue;      // no telekinetic snacking on the high road
       const d = Math.hypot(e.group.position.x-p.x, e.group.position.z-p.z);
       if(d < bestD){ bestD = d; target = e; }
     }

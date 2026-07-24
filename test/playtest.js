@@ -68,7 +68,7 @@ const path = require('path');
     // assert MAX x reached — a fall + checkpoint respawn (by design) may reset the final position
     let maxX = 0;
     await page.keyboard.down('d');
-    for(let i=0;i<4;i++){
+    for(let i=0;i<8;i++){
       await gameWait(0.5);
       await page.keyboard.press('Space');
       s = await state();

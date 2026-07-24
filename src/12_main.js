@@ -115,6 +115,7 @@ const G = {
     this.ents = new EntityMgr(this.scene);
     this.fx = new Particles(this.scene);
     AUDIO.setMood(area==='hub' ? 'hub' : (area==='boss1' ? 'boss' : 'level'));
+    srand(seedFrom(area));   // deco scatter is seeded per area — a level replays IDENTICALLY, pebble for pebble
     if(area==='hub') buildHub(this);
     else if(area==='boss1') buildBossArena(this);
     else if(area==='tut') buildTutorial(this);
