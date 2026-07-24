@@ -32,7 +32,7 @@ class InputSys {
     addEventListener('keyup', e=>{ this.keys[e.code]=false; });
     // mouse camera drag (desktop)
     addEventListener('mousedown', e=>{
-      if(e.target.closest && e.target.closest('.ui-block')) return;
+      if(e.target.closest && (e.target.closest('.ui-block') || e.target.closest('.screen'))) return;   // don't drag the camera behind an open menu
       this._mouseDown = true; this._cam.lx=e.clientX; this._cam.ly=e.clientY;
       this.anyEdge = true;
     });
@@ -52,7 +52,8 @@ class InputSys {
       this.anyEdge = true;
       for(const t of e.changedTouches){
         const el = document.elementFromPoint(t.clientX, t.clientY);
-        if(el && el.closest && el.closest('.ui-block')) continue; // buttons handle themselves
+        // buttons handle themselves; touches inside a full-screen menu must SCROLL, not steer Pip
+        if(el && el.closest && (el.closest('.ui-block') || el.closest('.screen'))) continue;
         if(t.clientX < innerWidth*0.45 && !this._stick.active){
           this._stick.active=true; this._stick.id=t.identifier;
           this._stick.ox=t.clientX; this._stick.oy=t.clientY;

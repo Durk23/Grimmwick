@@ -302,11 +302,10 @@ const G = {
     if(this.save.pass) return;
     this.save.pass = true;
     if(!this.save.owned.includes('nightstitch')) this.save.owned.push('nightstitch');
-    this.save.equipped = 'nightstitch';
-    if(this.player) this.player.buildRig('nightstitch');
+    // grant, don't auto-equip — the player chooses when to wear it (owner call: no surprise costume swap)
     this.persist();
     AUDIO.buy(); AUDIO.goldPumpkin();
-    UI.toast('🌙 SPOOK PASS ACTIVE — NIGHTSTITCH is yours, instantly. Looking sharp, Pip!');
+    UI.toast('🌙 SPOOK PASS ACTIVE — NIGHTSTITCH unlocked! Equip it any time in the Costume Cauldron.');
   },
   toggleCozy(){
     this.save.cozy = !this.save.cozy;
