@@ -343,7 +343,10 @@ function updateHub(G, dt){
     for(const gate of G.gates){
       const d = Math.hypot(gate.x-pl.pos.x, gate.z-pl.pos.z);
       if(d<3.4){
-        prompt = gate.open ? {kind:'enter', gate, label:'🎃 Enter '+gate.w.name} : {kind:'locked', gate, label:'🔒 '+gate.w.name+' — locked'};
+        const built = (typeof LEVEL_LISTS!=='undefined') && LEVEL_LISTS.some(L=>L.some(l=>l.district===gate.w.key));
+        prompt = !gate.open ? {kind:'locked', gate, label:'🔒 '+gate.w.name+' — locked'}
+               : built ? {kind:'enter', gate, label:'🎃 Enter '+gate.w.name}
+               : {kind:'soon', gate, label:'🚧 '+gate.w.name+' — coming soon!'};
         break;
       }
     }
@@ -353,6 +356,7 @@ function updateHub(G, dt){
     if(prompt.kind==='mayor') UI.mayorDialogue();
     else if(prompt.kind==='shop') UI.openShop();
     else if(prompt.kind==='enter'){ AUDIO.portal(); G.openMap(prompt.gate.w.key||'w1'); }
-    else if(prompt.kind==='locked') UI.toast('🔒 This district is still dark... free the other guardians first! (Coming in the next update)');
+    else if(prompt.kind==='soon') UI.toast('🚧 '+prompt.gate.w.name+' is still being built — coming very soon!');
+    else if(prompt.kind==='locked') UI.toast('🔒 This district is still dark... free the other guardians first!');
   }
 }
