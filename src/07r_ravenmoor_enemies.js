@@ -60,7 +60,10 @@ class Wisp extends Enemy {
       const pfx=Math.sin(pl.facing), pfz=Math.cos(pl.facing);
       facingMe = (pfx*(dx/d)+pfz*(dz/d))>0.55 && d<5.5;
     }
-    const repelled = playerLit(this.G) || facingMe;
+    // recoil if the player is lit, is facing me, OR I myself have drifted into a light pool (the flavor: wisps shrink from light)
+    let inLight=false; const pools=this.G.lightPools;
+    if(pools) for(const L of pools){ const lx=p.x-L.x, lz=p.z-L.z, r=(L.r||5); if(lx*lx+lz*lz<r*r){ inLight=true; break; } }
+    const repelled = playerLit(this.G) || facingMe || inLight;
     if(repelled && this.state!=='dormant'){ this.state='dormant'; this.st=0; }
 
     if(this.state==='dormant'){
@@ -151,8 +154,8 @@ class Gravemite extends Enemy {
       }
     } else {
       const step = this.speed*dt*this.dir;
-      if(this.axis==='x'){ p.x+=step; this.group.rotation.y = this.dir>0?Math.PI/2:-Math.PI/2; }
-      else { p.z+=step; this.group.rotation.y = this.dir>0?0:Math.PI; }
+      if(this.axis==='x'){ p.x+=step; p.x=clamp(p.x,this.home.x-this.range,this.home.x+this.range); this.group.rotation.y = this.dir>0?Math.PI/2:-Math.PI/2; }
+      else { p.z+=step; p.z=clamp(p.z,this.home.z-this.range,this.home.z+this.range); this.group.rotation.y = this.dir>0?0:Math.PI; }
       if(this.st>0.42){ this.state='pause'; this.st=0; }
     }
     this.touchPlayer(dt);
@@ -287,6 +290,7 @@ class CoffinHopper extends Enemy {
       this.footR.rotation.x = -Math.sin(this.t*22)*1.1;
       if(this.st>1.2){ this.state='crouch'; this.st=0; this.bodyG.rotation.z=0; }
     }
+    this.group.position.x = clamp(this.group.position.x, this.home.x-this.range, this.home.x+this.range);   // never hop past the patrol footprint (off ledges / into urn clear-patch)
     this.touchPlayer(dt);
     this.updateShadow();
   }

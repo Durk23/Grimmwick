@@ -330,7 +330,7 @@ const UI = {
     }
     this.el('candyN').textContent = G.save.candy;
     this.el('emberN').textContent = G.save.embers+'/5';
-    const inLevel = !!G.levelDef || G.area==='boss1';
+    const inLevel = !!G.levelDef || G.area.startsWith('boss');
     this.el('gpPill').style.display = inLevel?'block':'none';
     this.el('livesPill').style.display = inLevel?'block':'none';
     this.el('livesN').textContent = G.save.lives??5;

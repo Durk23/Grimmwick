@@ -123,7 +123,7 @@ function buildW2L4(G){
   // ================= BEAT 4: THE RUSHING DEEP (x 104..150) — ESCALATE: river + bats + a moving barge =================
   G.ents.add(new Checkpoint(106, 0, 1.3, 2, {noLight:true}));   // CP3 — before the escalate
   signPost(G, 108, -0.3, 0.12, 'THE RUSHING DEEP. Bats roost where the water runs fast. Keep moving — they only dive when you dawdle.');
-  G.ents.add(new Gravemite(G, 109, 0, 0, {range:2.4, dir:1}));
+  G.ents.add(new Gravemite(G, 111, 0, 0, {range:2.4, dir:1}));   // leftmost reach 108.6 → ≥7u clear of the urn at x101 (clear-patch law)
   // river R3 crossed on crystals WHILE two bats dive it (same crossing skill, now under air pressure)
   undergroundRiver(G, 110, 122, {hazard:true, d:4.4, speed:3.2});
   crystalStep(112,   1.6, 0, 2.4, ROCKC, CYAN);
