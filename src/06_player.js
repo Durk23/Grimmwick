@@ -304,6 +304,8 @@ class Player {
     this.dead = false;
     this.iframes = 2;
     this.pounding = false;
+    this.captured = false;   // a death while inside a cannon barrel must never leave the next life frozen
+    this.launchT = 0;
     if(window.UI) UI.updateHUD();
   }
   bounceOff(vy=9){ this.vel.y = vy; this.grounded=false; this.canDouble=true; this.pounding=false; }
@@ -314,6 +316,10 @@ class Player {
     if(this.iframes>0) this.iframes -= dt;
     if(this.attackCD>0) this.attackCD -= dt;
     if(this.saltCD>0) this.saltCD -= dt;
+
+    // captured by a cannon barrel (DKC-style launch): the barrel holds our position and fires us on JUMP.
+    // Skip all self-control/physics while captured; the CannonBarrel (09za_w4kit) drives pos + group.position.
+    if(this.captured) return;
 
     // --- climbing (vines / web-nets — Mario-style) ---
     let onClimbable = null;
@@ -389,6 +395,7 @@ class Player {
     const speed = 7.2 * (this.moonT>0 ? 1.35 : 1);
     const accel = this.grounded ? 50 : 28;
     if(this.climbing){ /* velocities set by climb logic above */ }
+    else if(this.launchT>0 && !this.grounded){ this.launchT -= dt; }   // cannon launch: ballistic — preserve horizontal momentum (air friction would bleed the arc short)
     else if(mag>0.01 && !this.pounding && !(this.springT>0)){   // a winding spring holds its ground
       this.vel.x = damp(this.vel.x, md.x*speed, accel/speed, dt);
       if(G.mode!=='side') this.vel.z = damp(this.vel.z, md.z*speed, accel/speed, dt);
