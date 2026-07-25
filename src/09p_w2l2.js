@@ -49,6 +49,9 @@ function buildW2L2(G){
   w2Lantern(G, 30, 0, 1.5, {r:6});                              // HAVEN 2 (emissive pool — no real light, budget)
   G.ents.add(new Checkpoint(30, 0, 1.4, 1, {noLight:true}));    // CP1
   signPost(G, 34, 1.8, 0.18, "The candle on the far slab still burns for someone. Reach it, and the wisps will hide their faces. Mind the sunken row. — R. Gravely");
+  // the haven no longer flatlines: a Coffin Hopper primes the stomp-verb (its every-4th-hop TRIP is a free
+  // stomp) the instant before the sunken-row void, and re-primes momentum on the way out.
+  G.ents.add(new CoffinHopper(G, 34, 0, 0, {range:2.2}));       // patrols 31.8..36.2 (off-lane sign at z1.8 stays clear)
 
   // ================= BEAT 2: TWIST — the sunken row (void x 37..45) =================
   // A collapsed grave-row: a dark chasm with a lone stone SLAB standing in the middle, its candle
@@ -89,6 +92,25 @@ function buildW2L2(G){
   candyLine(G, [[79,0.9,0],[83,0.9,0],[87,0.9,0]], 5);         // L4 → L5
   candyLine(G, [[90,0.9,0],[94,0.9,0]], 3);                    // L5 → H4
 
+  // ---- HIGH ROAD (the level's missing second route): a stone grave-ledge chain riding OVER the dark
+  // L3–L5 corridor, launched from Haven 3's light. It crosses the low lane IN SIGHT — the low-roader
+  // threading the black sees the Heart glinting overhead (the "next run I'm going up there" itch), and
+  // the AirborneCaster@65 now arcs its bolts UP at high-road runners so the richer route is the harder one.
+  platform(G, 55, 1.6, 0, 2.4, 2.8, STONE);                   // launch step, inside H3's safe glow
+  platform(G, 61, 3.3, 0, 2.6, 2.8, STONE);                   // over L3
+  platform(G, 67, 3.4, 0, 2.6, 2.8, STONE);                   // over the caster / gravemite
+  platform(G, 73, 3.3, 0, 2.6, 2.8, STONE);
+  platform(G, 79, 3.4, 0, 2.6, 2.8, STONE);
+  platform(G, 85, 3.4, 0, 2.6, 2.8, STONE);
+  G.ents.add(new Heart(73, 4.0, 0));                          // the reward, in sight of the low road
+  candyLine(G, [[52,0.9,0],[54,1.4,0],[55.5,1.9,0]], 3);      // stair up into the light
+  candyLine(G, [[57.5,2.0,0],[59,3.0,0],[61,3.6,0]], 3);      // up onto the first ledge
+  candyLine(G, [[63.6,3.8,0],[65,4.2,0],[67,3.8,0]], 3);      // arc each high gap (D3 arc shape)
+  candyLine(G, [[69.6,3.8,0],[71,4.2,0],[73,3.8,0]], 3);
+  candyLine(G, [[75.6,3.8,0],[77,4.2,0],[79,3.8,0]], 3);
+  candyLine(G, [[81.6,3.8,0],[83,4.2,0],[85,3.8,0]], 3);
+  candyLine(G, [[85,3.6,0],[89,2.1,0],[92,0.9,0]], 4);        // descent back down into Haven 4
+
   // ================= BEAT 3½: HAVEN 4 + the RESTLESS URN (x 92..104) =================
   groundX(G, 92, 104, HAV);
   w2Lantern(G, 98, 0, 1.5, {r:6});                            // HAVEN 4 (emissive pool)
@@ -109,20 +131,27 @@ function buildW2L2(G){
   G.ents.add(new Wisp(G, 108, 1.4, 0, {speed:1.6}));         // W6 — the H4 edge → L6 dash (nudged +14% for the master run)
   candyLine(G, [[102,0.9,0],[106,0.9,0],[109,0.9,0]], 4);     // H4 → L6
 
-  // the fallen row (void 117.5..120.5) — a wisp hangs over the breach in the dark
-  G.ents.add(new Wisp(G, 118, 1.6, 0, {range:9, speed:1.6})); // W7 — over the void, the master's teeth (nudged +14%)
+  // the fallen row (void 117.5..120.5) — the MASTER's gimmick peak: escalate by ADDING A LANE. The wisp
+  // presses the APPROACH; a fixed-clock DiveCrow owns the CROSSING (a moving snapshot-dive over a gap tops
+  // the twist's two STATIC wisps). A fair 1-2 rhythm — never a simultaneous double-hit.
+  G.ents.add(new Wisp(G, 114, 1.6, 0, {range:5, speed:1.6}));  // W7 — now presses the approach to the void
+  G.ents.add(new DiveCrow(G, 119, 4.4, 0, {range:4, aggroR:6, period:4.0, phase:1.5}));  // owns the crossing
   candyLine(G, [[113,0.9,0],[116,1.7,0],[119,1.7,0],[123,0.9,0]], 6);   // arcs the void, L6 → L7
 
   groundX(G, 120.5, 134, DARK);
   w2DarkLantern(G, 126, 0, 0.8, {r:5});                       // L7
-  G.ents.add(new Skelly(G, 128, 0, 0, {px:3}));              // ground pressure in the L7→L8 thread (telegraphs)
-  candyLine(G, [[129,0.9,0],[133,0.9,0],[136,0.9,0]], 4);     // L7 → L8
+  // THE SET-PIECE (the master's memorable moment): THE LOST TOUR GROUP — six hand-holding skeletons
+  // shuffling behind a guide-wisp through the darkest thread. Thread the intact (harmless) line, or break
+  // it for a 4s scatter-chase in the black. Region-native catacomb comedy, and the last D1-reused Skelly is gone.
+  G.ents.add(new LostTourGroup(G, 131, 0, 0, {range:3.5, speed:0.9}));   // shuffles 127.5..134.5 in the dark
+  candyLine(G, [[129,0.9,0],[133,0.9,0],[136,0.9,0]], 4);     // L7 → L8 (traces the safe side past the line)
   w2DarkLantern(G, 136, 0, 0.8, {r:5});                       // L8 — the last candle before the light
 
   // ================= BEAT 5: HAVEN 5 + the gate (x 134..152) =================
   groundX(G, 134, 152, HAV);
   w2Lantern(G, 145, 0, 1.5, {r:6, light:true, lightR:12});    // HAVEN 5 — warmth returns; the relief
   candyLine(G, [[140,0.9,0],[144,0.9,0],[147,0.9,0]], 4);     // L8 → the gate
+  G.ents.add(new Gravemite(G, 146, 0, 0, {range:2, speed:3.4}));   // one last beat so the walk to the gate never flatlines (skitters 144..148)
 
   // the quiet prop (never signposted): a child's small grave in the haven's glow, a knitted scarf
   // draped over the stone and one little candle still lit beside it — someone from the Quiet Side

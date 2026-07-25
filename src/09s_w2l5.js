@@ -144,6 +144,17 @@ function buildW2L5(G){
   candyLine(G, [[17,0.8,0],[22,1.4,0]], 4);
   G.ents.add(new Gravemite(G, 27, 0, 0, {range:2.5, dir:1}));    // knee-high pest — bright eyes read low
   candyLine(G, [[25,0.8,0],[30,0.8,0]], 4);
+  // open the AIR lane for the whole finale — the district's diver, met first on flat ground (clean rep)
+  G.ents.add(new DiveCrow(G, 31, 3.2, 0, {range:5, aggroR:5, period:4.2, phase:0}));
+  candyLine(G, [[28,1.6,0],[31,1.9,0],[34,1.6,0]], 3);           // dodge-height arc under the dive
+  // ACT-1 HIGH ROAD (the opening act's missing second route): a crystal-ledge hop chain over the low walk,
+  // riding over Gravemite@27 + the diver@31 — a low-roader sees the Heart overhead ("next run I'm going up there").
+  platform(G, 23, 1.0, 0, 2.0, 3, W2PAL.caveWallL);
+  platform(G, 26.5, 1.8, 0, 2.2, 3, W2PAL.crystalV);
+  platform(G, 30, 2.2, 0, 2.2, 3, W2PAL.caveWallL);
+  platform(G, 33.5, 1.4, 0, 2.0, 3, W2PAL.caveWallL);
+  candyLine(G, [[23,1.7,0],[26.5,2.6,0],[30,3.0,0],[33.5,2.2,0]], 6);
+  G.ents.add(new Heart(30, 3.0, 0));                             // the high-road reward, in sight of the low road
   // ACT-1 low-doorway crawl (x 36..43): the recurring motif, introduced on flat safe ground
   signPost(G, 33, 1.8, -0.2, 'LOW BARROW AHEAD. Duck and walk — there is no room to jump. (The tall ones never read this sign.)');
   w2l5LowCrawl(G, 36, 43, 0, {toast:'🪦 MIND YOUR HEAD! ...*CLONK* — something tall behind you just met the ceiling.'});
@@ -170,6 +181,11 @@ function buildW2L5(G){
   // Harmless as a LINE; break it (hit any member) and all six chase furiously for ~4s, then reassemble.
   G.ents.add(new LostTourGroup(G, 74, 0, 0, {range:5, dir:1, speed:0.85}));
   candyLine(G, [[64,0.8,0],[68,0.8,0],[72,0.8,0],[76,0.8,0]], 8);   // ground candy — WALK it (no attack needed)
+  // a diver patrols over the tour corridor: threading the harmless line now also means timing a crow dive,
+  // and it gives the crystal high road (below) a real reason — the crowd-free line is the crow-shared one.
+  // Home 72 keeps its base aggro (≤x81) ~6.7u WEST of urn@90's open-zone so it never dive-bombs the opener.
+  G.ents.add(new DiveCrow(G, 72, 3.4, 0, {range:4, aggroR:5, period:4.0, phase:1.4}));
+  candyLine(G, [[68,2.0,0],[72,2.4,0],[76,2.0,0]], 4);             // dodge-height arc over the tour
 
   // HIGH ROAD over the tour (crystal ledges): the safe alternative + more candy + a Heart. Routes cross
   // in sight — a low-roader threading the crowd SEES this line and the Heart overhead.
@@ -226,8 +242,11 @@ function buildW2L5(G){
   // the warm heart of the deep: a lit lantern over the quiet shrine, a second wisp beyond it
   w2Lantern(G, 144, -2.4, -1.9, {r:5.2, light:true});         // real light #2 — lights Mossgrave's shrine
   w2l5Memorial(G, 143, -1.1, -2.4);                            // THE QUIET PROP (never signposted)
-  G.ents.add(new Heart(140, -1.5, 0));                         // the scenic route's guaranteed reward
-  G.ents.add(new Wisp(G, 148, -1.4, 0, {range:8, speed:1.6})); // repelled while you linger in the lantern pool (nudged +14%)
+  G.ents.add(new Heart(140, -1.5, 0));                         // the reward for taking the dark line
+  G.ents.add(new Checkpoint(142, -2.4, 1.2, 3, {noLight:true}));   // CP3 (NEW) — lantern-lit beacon splitting the 70u gallery gap, right before the GP climb + ascent
+  // the darkness gimmick finally BITES: move the wisp into the unlit x133..139 gap between crawl-2 and the
+  // pool, so emerging from the crawl into the dark is a genuine hunt (it was dormant inside the pool at x148).
+  G.ents.add(new Wisp(G, 136, -1.4, 0, {range:8, speed:1.6}));
 
   // SKILL-GATED GOLDEN PUMPKIN (idx 2): only reachable by CLIMBING the hanging chain and boosted-hopping
   // east onto the crystal ledge — a floor-level double-jump (apex ~-0.9) can never touch a y=2.5 ledge.
@@ -264,11 +283,15 @@ function buildW2L5(G){
 
   // ================= ACT 4 — MOSSGRAVE'S DOORSTEP (x 169..216) : the grand barrow entrance =================
   groundX(G, 169, 216, FLOOR);
-  G.ents.add(new Checkpoint(178, 0, 1.2, 3, {noLight:true}));  // lantern 4 — a fair walk-back before the tomb
+  G.ents.add(new Checkpoint(178, 0, 1.2, 4, {noLight:true}));  // lantern 5 (idx bumped 3→4 for the new gallery CP) — a fair walk-back before the tomb
   signPost(G, 172, 1.8, -0.2, 'You climbed back into the light, and yet you keep walking DOWN the hall. Brave. Or something. — The (increasingly worried) Management');
   G.ents.add(new Gravemite(G, 174, 0, 0, {range:2, dir:1, speed:3.8}));   // one low pest so the doorstep walk-in isn't empty; sits LEFT of CP4 (x178), 3.5u clear of the CoffinHopper's patrol (179.5..184.5)
   G.ents.add(new CoffinHopper(G, 182, 0, 0, {range:2.5, dir:1}));   // the doorstep medley
+  // the finale's air lane pays off: a diver over the doorstep medley = a ground+air master beat feeding
+  // straight into the bombardment (telegraphed caw→dive, so a CP4 respawn is never a cheap hit).
+  G.ents.add(new DiveCrow(G, 176, 3.2, 0, {range:5, aggroR:6, period:3.8, phase:0.7}));
   candyLine(G, [[174,0.8,0],[179,0.8,0]], 5);
+  candyLine(G, [[173,1.7,0],[176,2.0,0],[179,1.7,0]], 3);   // dodge-height arc under the doorstep diver
   G.ents.add(new BonkLantern(G, 184, 1.3, 0, 'shield'));       // last mercy before the guardian's rest
   // the FINAL low doorway — one last duck before the tomb opens
   signPost(G, 186, 1.8, 0.2, 'THE LAST LOW DOORWAY. Beyond it: the guardian rests. Duck once more, brave thing.');
@@ -313,8 +336,13 @@ function buildW2L5(G){
   // time, ~2-3 met across the crossing — SNES-Mario tension, never bullet-hell. She is INVULNERABLE set-dressing
   // (no hp / no collider): the job is to survive the tense walk to the guardian, not to fight her.
   { const nback = mesh('box',[3.4,3.8,0.5], mat(0x140f22)); nback.position.set(210, 1.4, -1.6); S.add(nback); }   // the tomb's dark mouth behind her (dresses the half-risen base)
-  G.ents.add(new WitchCannon(G, 210, -0.5, 0, {period:2.5, tele:0.8, firstCast:2.5, batSpeed:6.6, despawnX:196.5, dir:-1}));
-  candyLine(G, [[198,1.6,0],[201,1.7,0],[204,1.6,0]], 3);   // jump-height candy rewards the leaps over the bats (traces the dodge rhythm)
+  // GROUND PRESSURE so the player can't camp under the bat pattern — THE BOMBARDMENT wants ground AND sky
+  // dodged over and over (owner's archetype). Two coffin-hoppers trip the corridor; the cannon tightens to
+  // ~2 bats overlapping (denser but fair — salt@110 + shield@184 are the counters).
+  G.ents.add(new CoffinHopper(G, 199, 0, 0, {range:2, dir:1}));
+  G.ents.add(new CoffinHopper(G, 206, 0, 0, {range:2, dir:-1}));
+  G.ents.add(new WitchCannon(G, 210, -0.5, 0, {period:2.2, tele:0.8, firstCast:2.5, batSpeed:6.6, despawnX:196.5, dir:-1}));
+  candyLine(G, [[198,1.6,0],[201,1.7,0],[204,1.6,0],[208,1.6,0]], 4);   // jump-height candy traces the moving dodge rhythm through both lanes
 
   exitGate(G, 213);
 

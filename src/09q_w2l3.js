@@ -110,6 +110,11 @@ function buildW2L3(G){
   platform(G, 38, -1.8, 0, 6, 4, W2PAL.stoneD);            // mid-shaft floor A (x35..41)
   G.ents.add(new Checkpoint(39, -1.8, 0, 1, {noLight:true}));   // CP1 — before the rope-swing pit
   G.ents.add(new SwoopBat(G, 43, -0.4, 0, {range:3, period:3.2, phase:0.4}));   // owns the shaft air
+  // the ~19u descent no longer reads as a threatless elevator ride: two cheap ground pests keep the low
+  // lane alive while you weigh the GP route-choice. The Coffin Hopper's every-4th-hop TRIP is a free stomp
+  // (a beat, not a wall) — introduced here so its Act-4 bell-chamber reprise reads as a callback.
+  G.ents.add(new Gravemite(G, 30, 0.4, 0, {range:2.5, axis:'x'}));          // entrance ledge (x23.5..32.5)
+  G.ents.add(new CoffinHopper(G, 38, -1.8, 0, {range:2, hopDist:1.6}));     // mid-shaft floor A (x35..41)
 
   // GOLDEN PUMPKIN (idx 1) — "behind a secret": most players tap over the little gap; the brave
   // climber follows the candy DOWN the chain past the ledge into the hidden alcove.
@@ -128,6 +133,17 @@ function buildW2L3(G){
   candyLine(G, [[47,-0.8,0],[47.8,1.0,0],[50,0.2,0],[52.6,-1.0,0]], 6);   // the swing arc
   platform(G, 53.8, -1.6, 0, 5, 4, W2PAL.stoneD);          // far ledge of the swing (x51.3..56.3)
   G.ents.add(new Gravemite(G, 53, -1.6, 0, {range:1.8, axis:'x'}));
+  // put the AIR lane onto a CLIMB for the first time: a diver over the swing crossing = the level's first
+  // ground+air pressure. Reach kept WEST of the urn@61's open-zone (base aggro ≤x53, ~5.6u clear) so it
+  // never dive-bombs the urn-opener (CLEAR-PATCH LAW; the crow re-homes toward its dives, so it must not
+  // reach the urn approach in the first place).
+  G.ents.add(new DiveCrow(G, 46, 1.2, 0, {range:3, aggroR:4, period:4.2, phase:1.5}));
+  // CLIMB HIGH-ROAD (best-fit for a climbing showcase): chain up off the far ledge, then boosted-hop ACROSS
+  // onto a candy shelf OFFSET east of the chain (never capping it), then drop forward onto the urn ledge.
+  w2Chain(G, 55.5, -1.6, 1.0, 0);
+  platform(G, 58, 1.4, 0, 2.2, 3, W2PAL.stoneL);          // shelf offset +2.5u from the chain top — climb → hop across, not a cap
+  candyLine(G, [[55.5,-0.6,0],[55.5,0.4,0],[55.5,1.2,0]], 3);   // up the chain
+  candyLine(G, [[56.4,1.6,0],[58,1.9,0]], 3);             // the boosted-hop reward onto the shelf
 
   // the RESTLESS URN — clear pocket (no patrols within ~6u), 1s spawnGrace on the bat ambush
   platform(G, 60.5, -2, 0, 8, 5.2, W2PAL.stoneD);          // the urn ledge (x56.5..64.5)
@@ -178,6 +194,9 @@ function buildW2L3(G){
   w2Chain(G, 96.5, -3.5, -1.6, 0);                         // climb out onto the far bank
   candyLine(G, [[83.5,-1.2,0],[87,-1.8,0],[90.5,-1.8,0],[94,-1.8,0],[96.5,-2.2,0]], 7);   // rhythm across
   G.ents.add(new Wisp(G, 89, -2, 0, {range:8, speed:1.6}));   // hunts the dark middle; face it or stay lit (nudged +14%)
+  // the showcase crossing becomes THREE deterministic lanes at once — darkness (wisp) + slab-timing + a
+  // telegraphed air dive. Capped at ONE diver (w2l4 owns the full bat bombardment; one crow is a lane, not a storm).
+  G.ents.add(new DiveCrow(G, 90, -0.5, 0, {range:4, aggroR:6, period:4.6, phase:0.8}));
 
   // far bank + reward
   platform(G, 101, -2.6, 0, 8, 5, W2PAL.caveWallD);        // far bank (x97..105)
@@ -194,6 +213,9 @@ function buildW2L3(G){
   platform(G, 116, -3, 0, 9, 6, W2PAL.caveWallD);          // the bell chamber floor (x111.5..120.5)
   G.ents.add(new Checkpoint(114, -3, 0, 3));               // CP3 — before the grand climb
   G.ents.add(new BonkLantern(G, 118.5, -1.8, 0, 'shield')); // last mercy before the climb
+  // the ~20u dead breather before the grand rope now carries a beat: a Coffin Hopper (a callback to the
+  // shaft) trips through the bell tomb, re-arming momentum so the MASTER climb lands on a moving player.
+  G.ents.add(new CoffinHopper(G, 117, -3, 0, {range:2.5, hopDist:1.6}));   // bell chamber floor (x111.5..120.5)
 
   // the great fallen bell (a live group — it sways ever so slightly; micro-motion)
   const bellGrp = new THREE.Group();

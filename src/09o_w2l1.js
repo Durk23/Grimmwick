@@ -95,6 +95,7 @@ function buildW2L1(G){
   G.ents.add(new GoldPumpkin(52, 5.2, 0, 0));
   groundX(G, 67, 74, GA);
   G.ents.add(new Checkpoint(70, 0, 1.4, 1, {noLight:true}));
+  candyLine(G, [[68,0.9,0],[70.5,1.3,0],[72.5,0.9,0]], 3);     // breadcrumb out of the hollow — the landing never reads as a full stop
 
   // =============================== BEAT 4 — THE URN GARDEN (x 74..96): breather · the Restless Urn · a Skelly ===============================
   groundX(G, 74, 96, GB);
@@ -116,6 +117,15 @@ function buildW2L1(G){
   G.ents.add(new Skelly(G, 91, 0, 0, {px:2}));                 // patrols 89..93 — the district's first real bruiser (7u clear of the urn)
   candyLine(G, [[74.5,0.9,0],[76,0.9,0]], 2);
   candyLine(G, [[93.8,0.9,0],[95.2,0.9,0]], 2);
+  // HIGH ROAD — three floating grave-slabs over the garden's low walk: a SECOND visible route that
+  // crosses in sight (the Heart glints overhead as you run the garden — the "next run I'm going up there" itch)
+  // and keeps the breather ENGAGED (an optional climb) without adding intensity. Thin slabs; never block the low lane.
+  platform(G, 77, 2.8, 0, 2.4, 2.2, GST); platform(G, 80.5, 3.0, 0, 2.4, 2.2, GST); platform(G, 84, 2.8, 0, 2.4, 2.2, GST);
+  G.ents.add(new Heart(80.5, 3.7, 0));                         // the reward glinting over the low road
+  candyLine(G, [[76,1.4,0],[76.5,2.4,0],[77,3.2,0]], 3);       // traces the entry double up
+  candyLine(G, [[78.5,3.4,0],[82,3.4,0],[85.5,3.2,0]], 4);     // the high reward line + drop-off
+  // spend-the-buff rhythm: a shield to cash straight into the murder bombardment (nervous players arm up here)
+  G.ents.add(new BonkLantern(G, 94.5, 1.7, 0, 'shield'));
 
   // =============================== BEAT 5 — THE MURDER (x 96..124): ESCALATE — a crow flock over a saw-toothed crossing ===============================
   groundX(G, 96, 100, GA);
@@ -123,13 +133,20 @@ function buildW2L1(G){
   G.ents.add(new Checkpoint(99, 0, 1.4, 2, {noLight:true}));
   G.ents.add(new Gravemite(G, 97, 0, 0, {range:2, axis:'x'}));  // a low pest right before you commit to the hop
   const murd = [[102,1.5],[105.5,2.2],[109,1.4],[112.5,2.3],[116,1.6],[119,1.3]];   // up/down/up — hop AND dodge at once
-  for(const [x,ty] of murd) hopStone(x, ty, {baseY:-5});
+  for(const [x,ty] of murd) hopStone(x, ty, x===112.5?{baseY:-5,w:2.8,d:2.4}:{baseY:-5});   // widen the mid stone for a ground pest
   for(let i=0;i<murd.length-1;i++) hopCandy(murd[i][0],murd[i][1], murd[i+1][0],murd[i+1][1], 3);
+  // ESCALATE BY ADDING A LANE (not more crows): a Gravemite skitters the WIDE landing stone right where
+  // DiveCrow@113 dives — hop-timing + air-dodge + a ground pest at once, a true multi-lane pinch.
+  G.ents.add(new Gravemite(G, 112.5, 2.3, 0, {range:0.8, axis:'x', speed:3.4}));
   // the flock: two crows on the same clock, offset half a cycle (homes 6u apart) — their dives stagger
   // into a dodge rhythm as you advance through their aggro zones. Each dive: caw, pull-up, snapshot, arc.
   G.ents.add(new DiveCrow(G, 107, 5.2, 0, {phase:0.0, period:3.7, range:6, aggroR:7.0}));   // tighter dive cadence + a touch more reach (harder D2 pass)
   G.ents.add(new DiveCrow(G, 113, 4.8, 0, {phase:2.0, period:3.7, range:6, aggroR:7.0}));   // still phase-offset ~½ cycle → alternating, never simultaneous
   groundX(G, 120, 134, GA);
+  // the run-in to the master crossing no longer flatlines: a Coffin Hopper (its every-4th-hop TRIP is a
+  // telegraphed free-stomp — a DISTINCT ground rhythm, not another gravemite) re-primes momentum into the finale.
+  G.ents.add(new CoffinHopper(G, 126, 0, 0, {range:3.5, dir:1, hopDist:1.6}));   // patrols 122.5..129.5
+  candyLine(G, [[122,1.0,0],[125,1.5,0],[128,1.5,0],[131,1.0,0]], 4);            // pulls toward the master gate at x134
   G.ents.add(new Checkpoint(133, 0, 1.4, 3, {noLight:true}));
 
   // =============================== BEAT 6 — THE MASTER CROSSING & THE INNER GATE (x 134..186): MASTER + finish ===============================

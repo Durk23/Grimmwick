@@ -70,6 +70,11 @@ function buildW2L4(G){
   DECO.add(catacombArch(43, -1.2, 1.0));       // background arch framing the descent into the dark
   signPost(G, 42, -0.3, 0.14, 'Keep it in your sight, or keep to the light. The wisps hate both.');
   G.ents.add(new Gravemite(G, 48, 0, 0, {range:2.6, dir:1}));
+  // the district's CORE system finally becomes a real beat, not a walk-past: a ground hopper + a second
+  // wisp flank the approach (D2's mandated "first combos" across lanes), and a mid-pocket relight lantern
+  // (below) is the pressure valve — bloom its pool and the wisps recoil.
+  G.ents.add(new CoffinHopper(G, 44, 0, 0, {range:2.5, dir:1}));            // ground lane (patrols 41.5..46.5)
+  G.ents.add(new Wisp(G, 46, 1.4, 0, {range:8, speed:1.4, lunge:3.0}));    // flanks the approach alongside W@52
   // GP1 (SECRET): a low ledge up in the shadow, off the lit trail — easy to walk past
   crystalStep(47, 2.9, 0, 2.0, ROCKV, VIOL);
   candyLine(G, [[45,1.2,0],[46,2.2,0],[47,3.1,0]], 3);
@@ -77,6 +82,10 @@ function buildW2L4(G){
   // the Wisp hunts the dark; facing it (moving in) holds it, but once you pass it stalks from behind
   G.ents.add(new Wisp(G, 52, 1.4, 0, {range:9, speed:1.4, lunge:3.0}));
   candyLine(G, [[50,0.8,0],[54,0.8,0],[58,0.8,0]], 4);
+  // the mid-pocket RELIGHT (emissive pool — stays in the light budget): reach it to bloom a safe pool that
+  // makes both wisps recoil, turning traversal into the intended lantern-to-lantern relight rhythm. Placed
+  // PAST the GP1 secret ledge (x47) so that reward stays in the dark for the observant climber.
+  w2DarkLantern(G, 55, 0, 0.7, {r:5, relightR:2.4});
   // the safe light-pool at the pocket's mouth (emissive halo/disc; no real light — stays in the light budget)
   w2Lantern(G, 61, 0, 0.7, {r:5.6, relightR:2.4});
 
@@ -100,7 +109,15 @@ function buildW2L4(G){
   candyLine(G, [[84.4,2.2,0],[82.6,3.3,0],[81,4.4,0]], 3);
   candyLine(G, [[80.6,4.6,0],[81.4,4.7,0]], 4);   // high-shelf candy (GP collectibles are in 2-1/2-3/2-5)
   G.ents.add(new Heart(79.4, 4.7, 0));
-  G.ents.add(new SwoopBat(G, 84, 5.4, 0, {range:4.2, period:4.0, phase:0.2}));   // a high patrol foreshadowing the escalate
+  // extend the lone shelf into a real 2-hop HIGH ROAD (shelf 81 → step 87 → drop to low stone 90.6): the
+  // "next run I'm going up there" itch now has a path to reward, spicier under the two air threats below.
+  crystalStep(87, 4.3, 0, 2.4, ROCKG, GREN);
+  candyLine(G, [[81,4.6,0],[84,5.0,0],[87,4.6,0]], 4);
+  G.ents.add(new SwoopBat(G, 84, 5.4, 0, {range:4.2, period:4.0, phase:0.2}));   // HIGH air lane (y5.4)
+  // LOW air lane (y3.6): a telegraphed snapshot-diver works the crossing's MIDDLE (stones 84.4/90.6) — the
+  // D3 "add a lane" escalation, phase-staggered from the SwoopBat above. Home pulled to 86 so its base aggro
+  // (≤x93.5) stays ~5u WEST of urn@101's open-zone — the last stone + urn approach stay calm (CLEAR-PATCH).
+  G.ents.add(new DiveCrow(G, 86, 3.6, 0, {range:3, aggroR:4.5, period:4.6, phase:2.0}));
 
   // safe patch past the crossing — the Restless Urn (CLEAR-PATCH LAW) + the quiet prop
   const urn = new RestlessUrn(101, 0, -1.6, -0.2);   // no patrols within ~6u (nearest are x84 and x108)
@@ -169,7 +186,7 @@ function buildW2L4(G){
   DECO.add(catacombArch(151.5, -1.2, 1.05));
   // 3-4 ground threats so you can never camp a safe spot while the sky rains
   G.ents.add(new Gravemite(G, 160, 0, 0, {range:3, dir:1}));
-  G.ents.add(new Gravemite(G, 172, 0, 0, {range:3, dir:-1}));
+  G.ents.add(new CoffinHopper(G, 172, 0, 0, {range:3, dir:-1}));   // variety under the bat-rain: a telegraphed free-stomp beat amid 8 identical gravemites
   G.ents.add(new Boo(G, 178, 0, 0, {speed:2.0, range:8}));       // creeps while your eyes are on the ceiling
   G.ents.add(new Gravemite(G, 185, 0, 0, {range:2.5, dir:1}));
   candyLine(G, [[156,0.8,0],[170,0.8,0]], 8);    // the trail threads the safe rhythm forward
