@@ -4,7 +4,11 @@ Cute-spooky 3D platformer (Mario-64 style) for **iPhone, iPad, and Mac**.
 Free-to-play with cosmetic monetization (costumes, characters, Spook Pass).
 Built as a single-bundle Three.js web game, wrapped for the App Store with Capacitor → Xcode.
 
-**Current state: v0.2 — level-select restructure DONE** — hub town, District 1 split into Levels 1-1…1-5 (selected from a district map screen) + Pumpkin King boss node, per-level saves/stars (fast/all-candy/no-damage), 4 enemy types, 6 costumes, store UI (test mode), save system (key `grimmwick_save`, migrates old saves). iOS Capacitor project scaffolded in `ios/` (SPM, no CocoaPods). Districts 2–5 are designed but not built (see Roadmap).
+**Current state: v0.3 — Districts 1–3 BUILT** (15 levels + 3 bosses playable). Hub town + district-map level-select, per-level saves/stars (fast/all-candy/no-damage), save system (key `grimmwick_save`, migrates old saves), iOS Capacitor project in `ios/` (SPM, no CocoaPods).
+- **D1 Pumpkin Patch** (`09a…09e`) — Levels 1-1…1-5 + **Pumpkin King** (`10_boss1`). Enemies: Boo, Hopper, Skelly, Spider, Swoop Bat, Barnaby Rat.
+- **D2 Ravenmoor Cemetery** (`09o…09s` via `09n_w2kit`, enemies `07r`) — 5 levels + **Mossgrave** (`10b_boss2`, tennis-swat bat secret). Darkness/Wisp mechanic (`G.lightPools`); Salt Shaker pickup weapon; witch bat-cannon caster; glowing checkpoints.
+- **D3 Witchwood** (`09v…09z` via `09u_w3kit`, enemies `07w`) — 5 levels + **Broomhilda** (`10c_boss3`, spin-the-bristles buck-off secret). Webling/Widowmite/BroomZoomer/ToadstoolBouncer; giant climbable webs; MysteryCauldron gamble + CauldronDip vessel.
+Gate chain (`WORLDS` in `08_hub`): beating a district's guardian opens the next (`req` field); unbuilt-but-unlocked gates show "coming soon". **Districts 4–5 (Ghost Harbor, Cursed Castle) are designed but not built** (see Roadmap).
 
 ## Commands
 
