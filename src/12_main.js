@@ -121,6 +121,7 @@ const G = {
     if(area==='hub') buildHub(this);
     else if(area==='boss1') buildBossArena(this);
     else if(area==='boss2' && typeof buildBossArena2==='function') buildBossArena2(this);
+    else if(area==='boss3' && typeof buildBossArena3==='function') buildBossArena3(this);
     else if(area==='tut') buildTutorial(this);
     else if(def) def.build(this);
     // all-candy star baseline: what the build itself placed
@@ -256,7 +257,7 @@ const G = {
     }, 500);
   },
   bossAreaFor(district){ return ({w1:'boss1',w2:'boss2',w3:'boss3',w4:'boss4',w5:'boss5'})[district]; },
-  bossBuilt(area){ return area==='boss1' || (area==='boss2' && typeof buildBossArena2==='function'); },
+  bossBuilt(area){ return area==='boss1' || (area==='boss2' && typeof buildBossArena2==='function') || (area==='boss3' && typeof buildBossArena3==='function'); },
   startBoss(district){
     // district-aware boss router (the map's boss node calls this). Defers politely if a boss isn't built yet.
     district = district || 'w1';
