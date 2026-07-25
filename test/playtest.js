@@ -58,7 +58,7 @@ const path = require('path');
   check('map closes back to play', s && s.state==='play');
 
   // each level: enter, verify side-scroll movement with a real held key, screenshot
-  const levels = ['w1l1','w1l2','w1l3','w1l4','w1l5','w2l1','w2l2','w2l3','w2l4','w2l5','w3l1','w3l2','w3l3','w3l4','w3l5','w4l1','w4l2','w4l3','w4l4','w4l5'];
+  const levels = ['w1l1','w1l2','w1l3','w1l4','w1l5','w2l1','w2l2','w2l3','w2l4','w2l5','w3l1','w3l2','w3l3','w3l4','w3l5','w4l1','w4l2','w4l3','w4l4','w4l5','w5l1','w5l2','w5l3','w5l4','w5l5'];
   for(const id of levels){
     await page.evaluate((i)=>window.__game.scene(i), id);
     await page.waitForTimeout(1400);
@@ -109,7 +109,7 @@ const path = require('path');
   check('next-level into w1l2', s && s.state==='play' && s.area==='w1l2');
 
   // bosses — Pumpkin King (w1) and Mossgrave (w2)
-  for(const [dist, area] of [['w1','boss1'],['w2','boss2'],['w3','boss3'],['w4','boss4']]){
+  for(const [dist, area] of [['w1','boss1'],['w2','boss2'],['w3','boss3'],['w4','boss4'],['w5','boss5']]){
     await page.evaluate((d)=>window.G.startBoss(d), dist);
     await page.waitForTimeout(1800);
     s = await state();
