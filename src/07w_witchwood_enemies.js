@@ -193,7 +193,7 @@ class Widowmite extends Enemy {
     this.groundY=y; this.dwell=0;
     this.range = opts.range||3; this.dir=opts.dir||1; this.axis=opts.axis||'x'; this.speed=opts.speed||5.2;
     // ---- rig: a glossy little black-widow — dark body, HOT-RED eyes + a red hourglass mark ----
-    const bodyM = emat(0x3a2d55, 0x241a3e, 0.5);
+    const bodyM = emat(0x6a5896, 0x4a3a7e, 0.85);   // brighter so the tiny spider READS against dark levels (was too dark to see)
     const abd = mesh('sph',[0.26,9,8], bodyM); abd.position.set(0,0.2,-0.12); abd.scale.set(1.1,1.0,1.25);
     const ceph = mesh('sph',[0.16,8,7], bodyM); ceph.position.set(0,0.18,0.16);
     const hour = mesh('sph',[0.26,7,7], emat(0xff3020,0xff1810,1)); hour.scale.set(0.34,0.5,0.26); hour.position.set(0,0.3,-0.28);   // danger hourglass

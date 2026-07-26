@@ -84,7 +84,7 @@ function buildW4L3(G){
   G.ents.add(new BooBuccaneer(G, 10, 0, 0, {phase:0.0}));
   candyLine(G, [[5,0.9,0],[7.5,0.9,0]], 3);
   // CANNON CRAB #1 — lobs an arcing shell on a fixed clock across the tide-pool as you approach (fuse telegraph)
-  G.ents.add(new CannonCrab(G, 20, 0, 0, {phase:0.4, period:3.2, tele:0.7, range:2, aggroX:22, dir:1}));
+  G.ents.add(new CannonCrab(G, 20, 0, 0, {phase:0.4, period:3.2, tele:0.7, range:2, aggroX:12, dir:1}));   // aggroX 22→12 so it can't lob a shell onto the spawn (x0, 20u away) before you can move
   candyLine(G, [[13,0.9,0],[16,0.9,0]], 3);
   signPost(G, 25, 1.7, 0.12, "The keeper's ladder. Up you go - and mind the rigging: the ghosts on the wires only stir when you pass beneath them.");
   G.ents.add(new Crow(7, 0.95, 2.3));                                  // reactive shore critter — flaps off when neared

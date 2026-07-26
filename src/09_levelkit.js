@@ -68,14 +68,15 @@ function signPost(G,x,z,ry,text){
 }
 function thornsX(G, x, w){
   const tG = new THREE.Group();
-  for(let i=0;i<Math.floor(w*3);i++){
-    const th = mesh('cone',[0.14,rand(0.4,0.7),5], emat(0x7a3fbf,0x5b2fa0,0.5));
-    th.position.set(x+rand(-w/2,w/2), 0.25, rand(-1.6,1.6));
+  for(let i=0;i<Math.floor(w*4.5);i++){                                  // DENSER so the bed reads as filled (no misleading gaps over the hazard)
+    const th = mesh('cone',[0.15,rand(0.55,0.8),5], emat(0x8a5fd0,0x6a3fc0,0.7));   // taller + brighter so the spikes clearly match their hitbox
+    th.position.set(x+rand(-w/2,w/2), 0.25, rand(-1.2,1.2));
     th.rotation.z=rand(-0.3,0.3);
     tG.add(th);
   }
   G.scene.add(bakeGroup(tG));
-  G.world.addBox(x,0,0,w,0.7,3.6,{type:'hazard',damage:1});
+  // hazard box INSET + shorter than the visible bed: only bites where the spikes actually are (fixes "it got me and I didn't touch it"), and a jump clears 0.55 comfortably
+  G.world.addBox(x,0,0,w-0.4,0.55,2.6,{type:'hazard',damage:1});
 }
 
 // level registry — each level file self-registers: W1_LEVELS.push({id,district,name,build,update,parTime})

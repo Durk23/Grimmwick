@@ -472,7 +472,8 @@ class SwoopBat extends Enemy {
     const eR = eL.clone(); eR.position.x=0.12;
     this.wingL = mesh('box',[0.55,0.05,0.3], bodyM); this.wingL.position.set(-0.42,0.05,0);
     this.wingR = this.wingL.clone(); this.wingR.position.x=0.42;
-    this.group.add(this.body, belly, this.earL, this.earR, eL, eR, this.wingL, this.wingR);
+    const halo = new THREE.Mesh(geo('sph',0.5,10,8), new THREE.MeshBasicMaterial({color:0xffd34d, transparent:true, opacity:0.15, depthWrite:false})); halo.position.set(0,0.05,0);   // soft glow so the dive READS against dark backgrounds
+    this.group.add(this.body, belly, this.earL, this.earR, eL, eR, this.wingL, this.wingR, halo);
     G.scene.add(this.group);
   }
   update(dt){

@@ -40,10 +40,10 @@ function buildW1L2(G){
   groundX(G, -6, 176, 0x49603f);   // one continuous farm floor under the whole 4-min course (mud pits sit on top)
   signPost(G, -4.5, 1.8, -0.3, 'Giant pumpkins are EXTRA bouncy. Ground pound one for a MEGA bounce... and keep your eyes open up there.');
   G.ents.add(new BonkLantern(G, -3, 1.3, 0, 'moon'));
-  mudPitX(G, 6.5, 7); // pulled off the spawn pad (was 0..10 pre-rebase) — fair start
-  // gourds sit IN the mud as stepping-bounces — clear 3-unit runway from spawn (flow rule)
-  bigPumpkin(G, 4.8, -0.5, 0, 1.5);
-  bigPumpkin(G, 8.2, -0.5, 0, 2.0);
+  mudPitX(G, 8, 4); // FIRST mud narrowed + pushed right → ~6u clear runway from spawn, then one easy gourd-bounce (was a 3u runway straight into a 7u pit — new players waded in and lost a heart before reacting)
+  // a giant bouncy gourd sits IN the mud as the stepping-bounce; candy traces the leap so the route reads at a glance
+  bigPumpkin(G, 8, -0.5, 0, 1.8);
+  candyLine(G, [[5,0.9,0],[8,2.0,0],[11,0.9,0]], 4);   // telegraph: run up, bounce the gourd, land safe (owner rule)
   mudPitX(G, 23, 14);
   bigPumpkin(G, 19, -0.5, 0, 1.8);
   bigPumpkin(G, 25, -0.5, 0, 1.5);

@@ -174,7 +174,7 @@ class DiveCrow extends Enemy {
     this.state='patrol'; this.st=0; this.cool=0;
     this.diveFrom=new THREE.Vector3(); this.diveTo=new THREE.Vector3();
     // dark corvid body, emissive-lifted so the shape reads against the night; bright eye/beak = the tell
-    const bodyM = emat(0x343054, 0x1e1a3a, 0.5);
+    const bodyM = emat(0x4a4570, 0x6a5fb0, 0.75);   // brighter emissive so the diving crow READS against dark levels (was near-black)
     this.body = mesh('sph',[0.36,9,8], bodyM); this.body.scale.set(1,0.85,1.28);
     const head = mesh('sph',[0.23,8,7], bodyM); head.position.set(0,0.13,0.32);
     const eM = emat(0xffcf3a,0xffcf3a,1);
@@ -188,7 +188,8 @@ class DiveCrow extends Enemy {
       wg.add(w,e); return wg; };
     this.wingL = mkWing(-1); this.wingR = mkWing(1);
     const tail = mesh('box',[0.16,0.045,0.42], wingM); tail.position.set(0,0,-0.42);
-    this.group.add(this.body, head, eL, eR, beak, this.wingL, this.wingR, tail);
+    const halo = new THREE.Mesh(geo('sph',0.5,10,8), new THREE.MeshBasicMaterial({color:0xffcf3a, transparent:true, opacity:0.15, depthWrite:false}));   // soft glow so the dive READS against dark levels
+    this.group.add(this.body, head, eL, eR, beak, this.wingL, this.wingR, tail, halo);
     G.scene.add(this.group);
   }
   update(dt){

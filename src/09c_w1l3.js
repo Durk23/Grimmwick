@@ -43,7 +43,7 @@ function buildW1L3(G){
   S.add(barn);
   platform(G, 11, 3.8, 0, 14, 3.4, 0x8a3848);   // the loft
   platform(G, 11, 6.4, 0, 6, 3, 0x54324a);      // upper loft
-  G.ents.add(new Spider(G, 3, 4.6, 0, {groundY:0}));
+  G.ents.add(new Spider(G, 6, 4.6, 0, {groundY:0}));   // pushed +3u off spawn so the first drop-spider isn't right on top of you
   G.ents.add(new Spider(G, 7, 5.4, 0, {groundY:3.8}));    // these two hang over the loft — drop onto its slab, not through it
   G.ents.add(new Spider(G, 14, 5.6, 0, {groundY:3.8}));
   // rafter bats — a barn's rightful tenants, and the loft run's air lane
@@ -149,7 +149,7 @@ function buildW1L3(G){
   G.ents.add(cofB); G.coffins.push(cofB);
   G.world.addBox(58.5, 0, -1.9, 1.4, 0.9, 2.4, {});
   G.ents.add(new Checkpoint(60.5, 0, 1.4, 2));      // lantern between the barns
-  signPost(G, 61.5, 1.8, -0.2, "The OLD barn. Nobody mucks it out anymore, on account of the... everything in there. Webs make fine ladders, and the hay chute off the high beams is the fastest way out. - H.");
+  signPost(G, 64.5, 1.8, -0.2, "The OLD barn. Nobody mucks it out anymore, on account of the... everything in there. Webs make fine ladders, and the hay chute off the high beams is the fastest way out. - H.");
   candyLine(G, [[62.5,0.8,0],[64.5,0.8,0]], 3);
   G.ents.add(new Crow(65.3, 0.95, 2.3));            // startles off the gap lip as you line up the jump
 

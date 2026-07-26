@@ -98,7 +98,7 @@ function buildW3L2(G){
 
   // far bank (x66..78) — a CLEAR POCKET for the Mystery Cauldron (no patrol within ~6u), then CP-run
   candyLine(G, [[67,0.8,0],[69,0.8,0]], 3);
-  signPost(G, 68.5, 0, -0.1, 'The witch\'s brewing cauldron, unwatched. A dip is a gamble - sweets, treasure... or a nest of widows.');
+  signPost(G, 65.5, 1.7, -0.1, 'The witch\'s brewing cauldron, unwatched. A dip is a gamble - sweets, treasure... or a nest of widows.');
   { const cauldron = new MysteryCauldron(71, 0, -1.7, 0);        // the D3 gamble container (Widowmite ambush on the clear-patch ring)
     G.ents.add(cauldron); G.coffins.push(cauldron);
     G.world.addBox(71, 0, -1.7, 2.0, 1.6, 2.0, {}); }

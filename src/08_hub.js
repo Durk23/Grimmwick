@@ -278,10 +278,12 @@ function makeBats(S, n, spread){
   const bats = [];
   for(let i=0;i<n;i++){
     const g = new THREE.Group();
-    const body = mesh('sph',[0.14,6,5], mat(0x1c1428));
-    const wL = mesh('box',[0.5,0.04,0.22], mat(0x1c1428)); wL.position.x=-0.3;
+    const batM = emat(0x6a5a9e, 0x9a86d8, 0.75);   // emissive-lifted so the wheeling bats READ against dark skies (was near-black)
+    const body = mesh('sph',[0.14,6,5], batM);
+    const wL = mesh('box',[0.5,0.04,0.22], batM); wL.position.x=-0.3;
     const wR = wL.clone(); wR.position.x=0.3;
-    g.add(body,wL,wR);
+    const glow = new THREE.Mesh(geo('sph',0.28,8,7), new THREE.MeshBasicMaterial({color:0xa694e0, transparent:true, opacity:0.16, depthWrite:false}));
+    g.add(body,wL,wR,glow);
     g.userData={a:rand(TAU), r:rand(8,spread), h:rand(5,11), sp:rand(0.3,0.8), t:rand(10), wL, wR};
     S.add(g);
     bats.push(g);
@@ -344,8 +346,10 @@ function updateHub(G, dt){
       const d = Math.hypot(gate.x-pl.pos.x, gate.z-pl.pos.z);
       if(d<3.4){
         const built = (typeof LEVEL_LISTS!=='undefined') && LEVEL_LISTS.some(L=>L.some(l=>l.district===gate.w.key));
+        // WALK THROUGH the portal to auto-enter — no interact press needed when you step into an open, built gate
+        if(gate.open && built && d<1.7){ AUDIO.portal(); G.openMap(gate.w.key||'w1'); return; }
         prompt = !gate.open ? {kind:'locked', gate, label:'🔒 '+gate.w.name+' — locked'}
-               : built ? {kind:'enter', gate, label:'🎃 Enter '+gate.w.name}
+               : built ? {kind:'enter', gate, label:'🎃 Walk in — or press E to enter '+gate.w.name}
                : {kind:'soon', gate, label:'🚧 '+gate.w.name+' — coming soon!'};
         break;
       }

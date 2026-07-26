@@ -63,7 +63,7 @@ const G = {
     this.renderer.setPixelRatio(this.basePR);
     this.renderer.setSize(innerWidth, innerHeight);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.40;
+    this.renderer.toneMappingExposure = 1.62;   // brighter overall so surfaces POP (the dark sky/fog stays moody)
     document.body.appendChild(this.renderer.domElement);
     this.camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.1, 260);
     this.camc = new CamCtrl(this.camera);
@@ -77,8 +77,8 @@ const G = {
     const s = new THREE.Scene();
     s.background = new THREE.Color(PAL.night);
     s.fog = new THREE.Fog(PAL.fog, fogNear, fogFar);
-    const hemi = new THREE.HemisphereLight(0x9a8fd8, 0x453564, 1.35);
-    const moonL = new THREE.DirectionalLight(0xaab8ff, 1.25);
+    const hemi = new THREE.HemisphereLight(0xb0a6e8, 0x5f4d86, 2.0);   // stronger fill + lighter ground-bounce so FLOORS/surfaces read (was 1.35, floors went too dark)
+    const moonL = new THREE.DirectionalLight(0xbcc8ff, 1.55);          // brighter moon for surface definition
     moonL.position.set(30,50,-20);
     s.add(hemi, moonL);
     // stars

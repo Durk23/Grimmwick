@@ -36,7 +36,7 @@ const UI = {
       .bhp { width:44px; height:14px; border-radius:7px; background:#3a2a55; border:2px solid #1c1230; }
       .bhp.on { background:linear-gradient(180deg,#ff9d3e,#ff5030); box-shadow:0 0 10px #ff7030; }
       /* prompt + dialogue */
-      #prompt { position:absolute; bottom:170px; left:50%; transform:translateX(-50%); display:none; font-size:16px; padding:11px 20px; }
+      #prompt { position:absolute; bottom:150px; left:50%; transform:translateX(-50%); display:none; font-size:12px; padding:5px 13px; border-radius:13px; background:rgba(28,18,52,.5) !important; border:1px solid rgba(255,255,255,.16) !important; color:rgba(255,255,255,.9) !important; box-shadow:none !important; font-weight:600; }
       #dlg { position:absolute; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%); width:min(640px, 92vw); background:rgba(22,14,44,.94); border:2px solid #8e5bd9; border-radius:20px; padding:16px 20px; display:none; font-size:16.5px; line-height:1.45; box-shadow:0 10px 30px rgba(0,0,0,.6); }
       #dlg .ic { font-size:30px; float:left; margin-right:12px; }
       #dlg .tap { opacity:.6; font-size:12px; margin-top:8px; text-align:right; }
@@ -182,6 +182,8 @@ const UI = {
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🎵 Music</span><input type="range" id="musVol" class="ui-block" min="0" max="100" value="50" style="width:150px"></div>
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🔊 Sounds</span><input type="range" id="sfxVol" class="ui-block" min="0" max="100" value="80" style="width:150px"></div>
           <button class="btn ghost2 ui-block" id="cozyBtn">🧸 Cozy Mode: OFF</button>
+          <button class="btn ghost2 ui-block" id="pauseRestartBtn">🔁 Restart Level</button>
+          <button class="btn ghost2 ui-block" id="pauseMapBtn">🗺️ Level Select (Map)</button>
           <button class="btn ghost2 ui-block" id="townBtn">🏘️ Return to Town</button>
           <button class="btn ghost2 ui-block" id="resetBtn">🗑️ Reset Save</button>
         </div>
@@ -260,6 +262,8 @@ const UI = {
     tap('pauseBtn', ()=>this.togglePause());
     tap('resumeBtn', ()=>this.togglePause(false));
     tap('townBtn', ()=>{ this.togglePause(false); G.returnToHub(false); });
+    tap('pauseRestartBtn', ()=>{ this.togglePause(false); AUDIO.ui(); if(G.area.startsWith('boss')) G.startBoss(G.bossDistrict||'w1'); else if(G.levelDef) G.enterLevel(G.levelDef.id); });
+    tap('pauseMapBtn', ()=>{ this.togglePause(false); AUDIO.ui(); const d = G.levelDef ? G.levelDef.id.slice(0,2) : (G.bossDistrict||'w1'); G.toMap(d); });
     tap('cozyBtn', ()=>{ G.toggleCozy(); this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(G.save.cozy?'ON':'OFF'); });
     tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Tap again'; } });
     tap('shopClose', ()=>this.closeShop());
@@ -402,7 +406,10 @@ const UI = {
     const show = force!==undefined?force:(G.state!=='paused');
     if(show && G.state!=='play') return;
     this._resetArm=false; this.el('resetBtn').textContent='🗑️ Reset Save';
-    if(show){ G.state='paused'; this.el('pause-screen').style.display='flex'; this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(this.G.save.cozy?'ON':'OFF'); }
+    if(show){ G.state='paused'; this.el('pause-screen').style.display='flex'; this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(this.G.save.cozy?'ON':'OFF');
+      const inLevel = !!G.levelDef || G.area.startsWith('boss');   // Restart/Map only make sense inside a level or boss
+      this.el('pauseRestartBtn').style.display = inLevel?'block':'none';
+      this.el('pauseMapBtn').style.display = inLevel?'block':'none'; }
     else { G.state='play'; this.el('pause-screen').style.display='none'; }
     AUDIO.ui();
   },

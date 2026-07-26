@@ -54,7 +54,7 @@ function buildW4L5(G){
   groundX(G, -6, 14, DECK);
   signPost(G, 2, 1.7, -0.2, 'BELOW DECKS. The Salty Phantom groans around you. Iron rolls in the dark, the bilge is rising, and the crew never left. Up and out through the cabin — the Captain waits at the far door.');
   // FIRST BOO BUCCANEER — the re-teach: face it and it winks and only SLOWS (never freezes). A tap-stomp pops it.
-  G.ents.add(new BooBuccaneer(G, 8, 0, 0, {phase:0.0, speed:2.2, range:10}));
+  G.ents.add(new BooBuccaneer(G, 12, 0, 0, {phase:0.0, speed:2.2, range:9}));   // pushed +4u off spawn so the chaser doesn't crowd the start
   candyLine(G, [[4,0.9,0],[7,0.9,0],[10,0.9,0]], 3);
   // a warm ghost-lantern pool at the hatch (REAL light #1 of the hand-budget)
   { const l = new THREE.PointLight(W4PAL.lantern, 30, 11); l.position.set(4, 3.0, -1); S.add(l); }
@@ -130,13 +130,13 @@ function buildW4L5(G){
   // THE TREASURE CHEST — the D4 gamble, dropped in a CLEAR alcove the instant you enter the mess (CLEAR-PATCH LAW):
   // the bilge wraith is confined to its wire ending 9u back, and the nearest crewman's home (110) sits 14u off — past
   // a Boo Buccaneer's 12u chase range — so nothing patrols/aggros within 6u while you pry it open. Ambush = the crew bursts.
-  { const ch = new TreasureChest(96, 0, 1.8, -0.3);
+  { const ch = new TreasureChest(101, 0, 1.8, -0.3);   // moved 96→101: 7u clear of the sign@94 so the "Read sign" prompt never steals the chest's interact
     G.coffins.push(ch); G.ents.add(ch);
-    G.world.addBox(96, 0, 1.8, 1.5, 0.9, 1.2, {}); }                               // its solid off-lane plinth (z 1.2..2.4 — never blocks the z=0 run)
+    G.world.addBox(101, 0, 1.8, 1.5, 0.9, 1.2, {}); }                              // its solid off-lane plinth (z 1.2..2.4 — never blocks the z=0 run)
   // THE GHOST CREW — three Boo Buccaneers around the mess table; face them to slow the press and weave/stomp through.
-  G.ents.add(new BooBuccaneer(G, 110, 0, 0, {phase:0.2, speed:2.4, range:9}));
-  G.ents.add(new BooBuccaneer(G, 116, 0, 0, {phase:0.9, speed:2.4, range:9, slowMul:0.42}));
-  G.ents.add(new BooBuccaneer(G, 122, 0, 0, {phase:1.5, speed:2.4, range:9}));
+  G.ents.add(new BooBuccaneer(G, 115, 0, 0, {phase:0.2, speed:2.4, range:9}));   // crew pushed +5u so nothing aggros within ~14u of the chest@101 (clear-patch: opening is a safe deliberate act)
+  G.ents.add(new BooBuccaneer(G, 120, 0, 0, {phase:0.9, speed:2.4, range:9, slowMul:0.42}));
+  G.ents.add(new BooBuccaneer(G, 125, 0, 0, {phase:1.5, speed:2.4, range:9}));
   G.ents.add(new Heart(103, 1.2, 0));                                              // a breather heart in the clear stretch
   candyLine(G, [[100,0.9,0],[106,0.9,0]], 2);
   candyLine(G, [[113,0.9,0],[119,0.9,0],[125,0.9,0]], 3);

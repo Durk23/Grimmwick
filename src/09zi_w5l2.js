@@ -129,7 +129,7 @@ function buildW5L2(G){
   // a MIRROR BOO drifting the lane (feint it — it slides to the side you DON'T approach from); leashed well clear of the gift
   G.ents.add(new MirrorBoo(G, 48, 4.2, 0, {range:3.5, mirror:0.8, phase:0.0}));
   // the rest ledge + the GRIMM GIFT — a CLEAR pocket (nearest patrol reach ~6.5u away; the gamble is a safe choice, never a cheap hit)
-  platform(G, 58, 2.0, 0, 6, 3.4, LEDGE);                                // spans 55..61
+  platform(G, 59, 2.0, 0, 8, 3.4, LEDGE);                                // spans 55..63 — REACHES the chain@63, so you grab the vine from solid footing (no void-jump), and the low-road hop to gearPlat@66 shrinks to ~1.8u
   { const gift = new GrimmGift(58, 2.0, 1.1, -0.3); G.coffins.push(gift); G.ents.add(gift); }
   candyLine(G, [[56,2.6,0],[58,2.5,0]], 2);
 
@@ -147,9 +147,9 @@ function buildW5L2(G){
   G.ents.add(new PendulumBlade(G, 78, 4.9, {len:3.0, amp:0.85, period:2.4, phase:1.2, r:0.55}));
   G.ents.add(new PendulumBlade(G, 82, 4.9, {len:3.0, amp:0.85, period:2.4, phase:1.8, r:0.55}));
   // HIGH ROAD — an elevated cog line with the reward, crossing IN SIGHT above the low line
-  gearPlat(G, 68, 5.0, {col:W5PAL.verd}); gearPlat(G, 72, 5.0, {col:W5PAL.verd}); gearPlat(G, 76, 5.0, {col:W5PAL.verd}); gearPlat(G, 80, 5.0, {col:W5PAL.verd});
+  gearPlat(G, 66, 5.0, {col:W5PAL.verd}); gearPlat(G, 70, 5.0, {col:W5PAL.verd}); gearPlat(G, 74, 5.0, {col:W5PAL.verd}); gearPlat(G, 78, 5.0, {col:W5PAL.verd});   // high row pulled left so the leap OFF the chain@63 is ~1.8u, not 5u
   G.ents.add(new Heart(72, 5.9, 0));                                     // the high-road Heart the low road sees overhead
-  G.ents.add(new BonkLantern(G, 76, 5.7, 0, 'bat'));                     // Bat Wings tucked on the high line (route reward)
+  G.ents.add(new BonkLantern(G, 74, 5.7, 0, 'bat'));                     // Bat Wings tucked on the high line (route reward)
   G.ents.add(new PendulumBlade(G, 74, 8.3, {len:3.0, amp:0.85, period:2.6, phase:0.5, r:0.55}));  // one blade for the high road too
   candyLine(G, [[68,5.5,0],[70,5.7,0]], 2); candyLine(G, [[72,6.1,0],[74,6.1,0]], 2); candyLine(G, [[76,5.9,0],[80,5.6,0]], 3);
   gearPlat(G, 84, 3.4, {col:W5PAL.verd});                               // high-road step-down toward the rejoin

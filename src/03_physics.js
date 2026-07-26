@@ -79,8 +79,13 @@ class PhysWorld {
       if(c.type==='ghost'||c.type==='climb') continue;
       // vertical overlap of body (with small skin so standing-on doesn't count)
       if(head <= c.min.y+0.02 || feet >= c.max.y-0.02) {
-        // hazard volumes still trigger on feet graze
-        if(c.type==='hazard' && head>c.min.y && feet<c.max.y) this._touch(e,c,cb);
+        // hazard volumes still trigger on feet graze — but ONLY when actually over the box in XZ
+        // (without the XZ test, a wide dynamic hazard like the bilge flood damaged the player anywhere in the
+        //  level whenever its rising surface crossed their feet height — the "invisible damage" bug)
+        if(c.type==='hazard' && head>c.min.y && feet<c.max.y){
+          const gx = clamp(e.pos.x, c.min.x, c.max.x), gz = clamp(e.pos.z, c.min.z, c.max.z);
+          if((e.pos.x-gx)*(e.pos.x-gx) + (e.pos.z-gz)*(e.pos.z-gz) < r*r) this._touch(e,c,cb);
+        }
         continue;
       }
       // circle vs AABB in XZ

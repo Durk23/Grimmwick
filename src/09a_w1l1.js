@@ -115,9 +115,10 @@ function buildW1L1(G){
   G.ents.add(new Rat(G, 30, 0, 0));                          // hunts the candy trail; dashes never near the coffin pocket
 
   // ---- HIGH ROAD: gravestone-top hops above the lane — extra candy + the heart ----
-  hayBale(G, 13, 0, 0, 2, 1.2, 1.6);
-  platform(G, 16.5, 2.2, 0, 2.4, 3, 0x6b6580);
-  platform(G, 21, 2.9, 0, 2.4, 3, 0x6b6580);
+  hayBale(G, 13, 0, 0, 2, 1.2, 1.6);                         // the high-road ON-RAMP: hop onto the bale, then up
+  candyLine(G, [[11,1.0,0],[13,2.0,0],[15.3,2.7,0]], 4);     // trace ground → bale → first platform so the step-up reads (owner rule; mirrors the x80.5 chain)
+  platform(G, 16.5, 2.0, 0, 2.4, 3, 0x6b6580);               // first platform 2.2→2.0: a comfortable held-jump/bale-step entry (was a tap-misses 2.2)
+  platform(G, 21, 2.8, 0, 2.4, 3, 0x6b6580);
   platform(G, 25.5, 3.4, 0, 2.6, 3, 0x6b6580);
   platform(G, 30, 3.4, 0, 2.6, 3, 0x6b6580);
   platform(G, 34.5, 3.0, 0, 2.4, 3, 0x6b6580);
