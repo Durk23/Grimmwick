@@ -284,7 +284,7 @@ function w3Web(G, x, y0, y1, z=0, w=3){
     const diag = new THREE.Mesh(geo('cyl',0.02,0.02,Math.hypot(w,h),4), wm);
     diag.position.set(x, y0+h/2, z); diag.rotation.z = d*Math.atan2(h,w); g.add(diag);
   }
-  G.scene.add(g);
+  G.scene.add(mergeStrands(g, wm));   // ~15-24 transparent strand meshes → 1 draw call (w3l2 has 10 webs)
   return G.world.addBox(x, y0, z, w, h, 1.2, {type:'climb'});
 }
 
@@ -344,8 +344,9 @@ class MysteryCauldron {
     AUDIO.tone({f:170,f2:60,type:'sawtooth',t:0.7,vol:0.22});
     AUDIO.noise({t:0.5,vol:0.18,fFrom:1300,fTo:180});   // a thick glugging bubble-burst
     G.camc.shake(0.2,0.4);
+    const scene = G.scene;   // payout must land in THE SAME scene — a switchArea inside the 650ms window would spawn into the new area
     setTimeout(()=>{
-      if(!G.scene) return;
+      if(G.scene !== scene) return;
       const r = Math.random();
       if(r < 0.08){
         // GHOSTLY 1-UP — the rarest prize

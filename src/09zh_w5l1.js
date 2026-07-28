@@ -68,7 +68,6 @@ function buildW5L1(G){
   // palette handles for this course
   const STONE = W5PAL.stone;    // gunmetal masonry — the low road
   const BRASS = W5PAL.brass;    // brass rampart / high-road ledges
-  const STEEL = W5PAL.steel;    // cog-tooth steel accent ledges
 
   const deco = new THREE.Group();   // all static scenery bakes to one draw call at the tail
 

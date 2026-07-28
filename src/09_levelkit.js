@@ -116,7 +116,8 @@ function exitGate(G, x){
   S.add(doorPortal);
   G.lvlPortal = doorPortal;
   G.world.addBox(x-0.6,0,0, 1.2,3.5,4, {type:'trigger', onTouch:()=>{
-    if(!G._exitHit && G.state==='play'){ G._exitHit=true; G.completeLevel(); }
+    // a teleport-style warp (D5's midnight clock) finishes via this gate — pass {warp:true} so it grants the documented warp stars
+    if(!G._exitHit && G.state==='play'){ G._exitHit=true; G.completeLevel(G._warpUsed?{warp:true}:{}); }
   }});
   G.world.addBox(x+2.5,0,0, 3,9,12,{});
   G.world.addBox(-10.5,0,0, 3,9,12,{});

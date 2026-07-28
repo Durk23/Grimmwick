@@ -142,6 +142,8 @@ class CaptainWraith {
     this.dead = true; this.state = 'defeat'; this.stateT = 0; this.vulnerable = false;
     AUDIO.victory && AUDIO.victory();
     window.UI && UI.hideBossBar();
+    // clear the crew + in-flight shells so the sea-rushes-back cutscene can't hurt/kill the player
+    for(const e of this.G.ents.list){ if(!e.dead && ((typeof BooBuccaneer!=='undefined' && e instanceof BooBuccaneer) || (typeof CrabShell!=='undefined' && e instanceof CrabShell))){ e.dead = true; if(e.shadow) this.G.scene.remove(e.shadow); } }
     for(const l of this.lanterns) if(l.light){ this.G.scene.remove(l.light); l.light=null; }
     // THE SEA RUSHES BACK — a wall of returning glowing water sweeps the arena (the district's relight moment)
     const S = this.G.scene;
@@ -297,9 +299,8 @@ function buildBossArena4(G){
   // ---- ≤6 real lights: two rigging-lantern glows + the sky moon fill (the 4 deck lanterns light themselves in-fight) ----
   for(const [lx,col] of [[-16, W4PAL.lantern],[16, W4PAL.lantern]]){ const l=new THREE.PointLight(col, 20, 14); l.position.set(lx, 5, -2); S.add(l); }
 
-  // ---- boss lifecycle ----
+  // ---- boss lifecycle (switchArea builds the fresh Player AFTER this and spawns it at spawnPoint) ----
   G.spawnPoint.set(-16, 1, 0);
-  G.player.pos.copy(G.spawnPoint); G.player.vel.set(0,0,0); G.player.captured=false;
   G.world.killY = -12; G.camMinY = -2;   // physics reads world.killY (G.killY was a no-op → stale kill plane)
   G.bats = makeBats(S, 5, 30);
   G.amb  = w4Ambience(S, x1, x2);

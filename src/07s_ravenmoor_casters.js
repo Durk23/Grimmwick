@@ -163,8 +163,7 @@ class WitchCannon extends Enemy {
   touchPlayer(){ /* the hag herself never bites — only her conjured bats do */ }
   takeHit(player, kind){
     if(this.dead) return;
-    if(this.invuln){                          // unkillable set dressing — a flash + an occasional cackle (never a spammy toast)
-      this.hurtFlash = 0.15;
+    if(this.invuln){                          // unkillable set dressing — a stagger + an occasional cackle (never a spammy toast)
       this._stagger = 0.2;
       if(this.t - (this._lastCackle||-9) > 1.6){
         this._lastCackle = this.t;
@@ -174,7 +173,7 @@ class WitchCannon extends Enemy {
       return;
     }
     this.hp -= (kind==='pound'?2:1);
-    this.hurtFlash = 0.15; this._stagger = 0.2;
+    this._stagger = 0.2;
     if(this.hp<=0){ if(window.UI) UI.toast('🧙 The hag is banished — the barrage stops!'); this.die(); }
     else AUDIO && AUDIO.stomp && AUDIO.stomp();
   }

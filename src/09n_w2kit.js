@@ -363,8 +363,9 @@ class RestlessUrn {
     AUDIO.tone({f:150,f2:60,type:'sawtooth',t:0.7,vol:0.22});
     AUDIO.noise({t:0.5,vol:0.18,fFrom:1100,fTo:150});
     G.camc.shake(0.2,0.4);
+    const scene = G.scene;   // payout must land in THE SAME scene — a switchArea inside the 650ms window would spawn into the new area
     setTimeout(()=>{
-      if(!G.scene) return;
+      if(G.scene !== scene) return;
       const r = Math.random();
       if(r < 0.08){
         // GHOSTLY 1-UP — the rarest prize

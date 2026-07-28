@@ -130,7 +130,8 @@ function gearPlat(G, x, y, opts={}){
   const teleT = 0.5;                            // telegraph window — the spike rises into the gap
 
   const top = mesh('cyl',[w*0.5, w*0.5, 0.4, 16], mat(col)); top.rotation.x=Math.PI/2; top.position.set(x, y-0.2, 0); G.scene.add(top);
-  const gear = cogMesh(w*0.62, W5PAL.brassD); gear.position.set(x, y-0.55, 0); G.scene.add(gear);
+  // bake the ~13-mesh cog into ONE mesh (it only ever rotates as a unit) — 5-2's double cog row was 374 draw calls unbaked
+  const gear = bakeGroup(cogMesh(w*0.62, W5PAL.brassD)); gear.matrixAutoUpdate = true; gear.position.set(x, y-0.55, 0); G.scene.add(gear);
   G.world.addBox(x, y-0.4, 0, w, 0.4, d, {});
 
   // two static teeth framing the safe GAP at the top-center (so the "stand in the gap" reads at a glance)
@@ -209,7 +210,7 @@ function w5Chain(G, x, y0, y1, z=0){
   const g = new THREE.Group();
   const links = Math.floor((y1-y0)/0.3);
   for(let i=0;i<links;i++){ const lk=mesh('tor',[0.08,0.03,4,8], mat(W5PAL.chain)); lk.rotation.x=(i%2)?Math.PI/2:0; lk.position.set(x, y0+i*0.3, z); g.add(lk); }
-  G.scene.add(g);
+  G.scene.add(bakeGroup(g));   // static links → one draw call (matches w2Chain's already-baked idiom)
   return G.world.addBox(x, y0, z, 0.9, y1-y0, 1.2, {type:'climb'});
 }
 
@@ -250,8 +251,9 @@ class GrimmGift {
     AUDIO.tone && AUDIO.tone({f:180,f2:70,type:'sawtooth',t:0.5,vol:0.2});
     AUDIO.noise && AUDIO.noise({t:0.3,vol:0.16,fFrom:1200,fTo:200});
     G.camc.shake(0.2,0.4);
+    const scene = G.scene;   // payout must land in THE SAME scene — a switchArea inside the 650ms window would spawn into the new area
     setTimeout(()=>{
-      if(!G.scene) return;
+      if(G.scene !== scene) return;
       const r = Math.random();
       if(r < 0.08){
         G.save.lives = Math.min(9, (G.save.lives!==undefined?G.save.lives:5)+1); G.persist();
@@ -332,8 +334,7 @@ class MidnightClock {
     G.fx.spawn(new THREE.Vector3(this.x,this.y,0.3), W5PAL.emberL, 30, {speed:6, life:1});
     window.UI && UI.toast('🕛✨ MIDNIGHT! The clock face swings open — a shortcut through time!');
     // warp: award the level's candy bonus + teleport to the end (the level's exit run-in)
-    for(let i=0;i<this.candy;i++) G.save.candy = (G.save.candy||0)+1;
-    if(G.runCandy!==undefined) G.runCandy += this.candy;
+    G.addCandy(this.candy);   // same award idiom as the D1/D4 warps (sets _dirty + HUD refresh)
     G.persist && G.persist();
     G._warpUsed = true;
     const pl=G.player; pl.pos.set(this.warpX, 2, 0); pl.vel.set(0,0,0);

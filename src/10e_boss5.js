@@ -130,10 +130,12 @@ class GrimmCauldron {
 
   hurtPlayer(n){ const pl=this.G.player; if(pl && !pl.dead) pl.damage(n, this.pos); }
 
+  onPlayerPound(pos){}   // boss contract — player calls this on every landed pound; the cauldron ignores it (pound is even an invite button here)
+
   defeat(){
     // start the ENDING cutscene (multi-beat dialogue); onBossDefeated fires at the end
     this.dead = true; this.state = 'ending'; this.stateT = 0; this._endStage = 0; this._endT = 0;
-    for(const s of this.shadows) if(!s.dead){ s.dead=true; if(s.group) this.G.scene.remove(s.group); }
+    for(const s of this.shadows) if(!s.dead){ s.dead=true; if(s.group) this.G.scene.remove(s.group); if(s.shadow) this.G.scene.remove(s.shadow); }
     for(const b of this.burners) if(b.light) b.light.intensity = 40;
     window.UI && UI.hideBossBar();
     AUDIO.victory && AUDIO.victory();
@@ -250,12 +252,11 @@ function buildBossArena5(G){
   for(const cx of [-14,-4,10,18]){ for(let i=0;i<6;i++){ const lk=mesh('tor',[0.12,0.04,4,8], mat(W5PAL.chain)); lk.rotation.x=(i%2)?Math.PI/2:0; lk.position.set(cx, 6.5-i*0.5, 4.4); deco.add(lk); } }
   S.add(bakeGroup(deco));
 
-  // ≤6 real lights: two chandelier glows + a throne up-light (the 4 burners light themselves in-fight)
-  for(const [lx,col] of [[-8,W5PAL.ember],[8,W5PAL.ember],[0,W5PAL.shadowP]]){ const l=new THREE.PointLight(col, 20, 16); l.position.set(lx, 5, -3); S.add(l); }
+  // ≤6 real lights AT PEAK: two chandelier glows + the 4 in-fight burner lights = 6 (the throne up-light was the 7th — cut)
+  for(const [lx,col] of [[-8,W5PAL.ember],[8,W5PAL.ember]]){ const l=new THREE.PointLight(col, 20, 16); l.position.set(lx, 5, -3); S.add(l); }
 
-  // boss lifecycle
+  // boss lifecycle (switchArea builds the fresh Player AFTER this and spawns it at spawnPoint)
   G.spawnPoint.set(-16, 1, 0);
-  G.player.pos.copy(G.spawnPoint); G.player.vel.set(0,0,0); G.player.captured=false;
   G.world.killY = -12; G.camMinY = -2;
   G.bats = makeBats(S, 5, 30);
   G.amb  = w5Ambience(S, x1, x2);

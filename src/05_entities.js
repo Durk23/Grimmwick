@@ -109,8 +109,10 @@ class Heart {
     this.group.position.y = this.base+Math.sin(this.t*2)*0.15;
     this.group.rotation.y = this.t*1.8;
     const pl=G.player;
-    if(pl && !pl.dead && this.group.position.distanceTo(new THREE.Vector3(pl.pos.x,pl.pos.y+0.8,pl.pos.z))<1.1){
-      if(pl.hearts < pl.maxHearts){
+    if(pl && !pl.dead){
+      // allocation-free radius check (hot per-frame loop — matches Candy.update's component math)
+      const p=this.group.position, dx=p.x-pl.pos.x, dy=p.y-(pl.pos.y+0.8), dz=p.z-pl.pos.z;
+      if(dx*dx+dy*dy+dz*dz < 1.1*1.1 && pl.hearts < pl.maxHearts){
         this.dead=true; pl.heal(1); AUDIO.heart();
         G.fx.spawn(this.group.position, 0xff4d6d, 10, {speed:2.5});
       }
@@ -143,7 +145,8 @@ class GoldPumpkin {
     this.group.position.y=this.base+Math.sin(this.t*1.6)*0.2;
     this.group.rotation.y=this.t*1.4;
     const pl=G.player;
-    if(pl && !pl.dead && this.group.position.distanceTo(new THREE.Vector3(pl.pos.x,pl.pos.y+0.8,pl.pos.z))<1.5){
+    const gp=this.group.position;
+    if(pl && !pl.dead && (gp.x-pl.pos.x)**2+(gp.y-pl.pos.y-0.8)**2+(gp.z-pl.pos.z)**2 < 1.5*1.5){   // allocation-free
       this.dead=true;
       G.collectGoldPumpkin(this.idx);
       G.fx.spawn(this.group.position, PAL.gold, 22, {speed:4, life:1});
@@ -239,8 +242,9 @@ class CursedCoffin {
     AUDIO.tone({f:130,f2:55,type:'sawtooth',t:0.7,vol:0.22});
     AUDIO.noise({t:0.5,vol:0.18,fFrom:900,fTo:120});
     G.camc.shake(0.2,0.4);
+    const scene = G.scene;   // payout must land in THE SAME scene — a switchArea inside the 650ms window would spawn into the new area
     setTimeout(()=>{
-      if(!G.scene) return;
+      if(G.scene !== scene) return;
       const r = Math.random();
       if(r < 0.08){
         // GHOSTLY 1-UP - the rarest prize
@@ -331,7 +335,7 @@ class PowerUp {
     p.y = this.base + Math.sin(this.t*3)*0.15 + 0.1;
     this.group.rotation.y = this.t*2;
     const pl = G.player;
-    if(pl && !pl.dead && p.distanceTo(new THREE.Vector3(pl.pos.x, pl.pos.y+0.7, pl.pos.z)) < 1.1){
+    if(pl && !pl.dead && (p.x-pl.pos.x)**2+(p.y-pl.pos.y-0.7)**2+(p.z-pl.pos.z)**2 < 1.1*1.1){   // allocation-free
       this.dead = true;
       if(this.type==='shield'){
         pl.gainShield();

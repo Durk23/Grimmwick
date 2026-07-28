@@ -25,7 +25,6 @@ function buildW4L2(G){
 
   // ---- palette handles ----
   const SAND  = W4PAL.seabed;         // cracked teal-grey seabed floor
-  const SANDL = W4PAL.seabedL;
   const WOOD  = W4PAL.wood;
   const WOODD = W4PAL.woodD;
 

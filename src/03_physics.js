@@ -97,7 +97,6 @@ class PhysWorld {
         if(c.type==='hazard'||c.type==='trigger'){ this._touch(e,c,cb); if(c.type==='trigger') continue; if(c.type==='hazard') continue; }
         // step-up: low obstacle while grounded-ish
         if(c.max.y - feet <= stepH && e.vel.y<=0.01){
-          const above = this.groundHeight(e.pos.x, e.pos.z, c.max.y+0.55);
           e.pos.y = c.max.y;
           continue;
         }
@@ -108,7 +107,6 @@ class PhysWorld {
           const vn = e.vel.x*dx + e.vel.z*dz;
           if(vn<0){ e.vel.x -= vn*dx; e.vel.z -= vn*dz; }
         } else {
-          if(window.__ej) window.__ej.push({t:performance.now()|0, pos:[+e.pos.x.toFixed(2),+e.pos.y.toFixed(2),+e.pos.z.toFixed(2)], vel:[+e.vel.x.toFixed(2),+e.vel.y.toFixed(2),+e.vel.z.toFixed(2)], box:[+c.min.x.toFixed(1),+c.min.y.toFixed(1),+c.min.z.toFixed(1),+c.max.x.toFixed(1),+c.max.y.toFixed(1),+c.max.z.toFixed(1)], type:c.type});
           // near the top of a floor-like box? snap up instead of launching sideways
           const dTop = c.max.y - feet;
           if(dTop >= -0.01 && dTop <= 1.0){ e.pos.y = c.max.y; continue; }
@@ -124,7 +122,6 @@ class PhysWorld {
     const prevFeet = e.pos.y;
     e.pos.y += e.vel.y*dt;
     e.grounded = false;
-    const wasOn = e.groundCol;
     e.groundCol = null;
     for(const c of this.cols){
       if(c.type==='ghost'||c.type==='trigger'||c.type==='climb') continue;

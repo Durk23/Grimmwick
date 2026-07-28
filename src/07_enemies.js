@@ -12,14 +12,12 @@ class Enemy {
     this.touchDamage = 1;
     this.touchR = 0.75;
     this.t = rand(0,10);
-    this.hurtFlash = 0;
     this.shadow = blobShadow(0.55);
     G.scene.add(this.shadow);
   }
   takeHit(player, kind){
     if(this.dead) return;
     this.hp -= (kind==='pound'?2:1);
-    this.hurtFlash = 0.15;
     if(this.hp<=0) this.die();
     else {
       AUDIO.stomp();
@@ -57,9 +55,6 @@ class Enemy {
       this.shadow.position.set(p.x, gh+0.02, p.z);
     } else this.shadow.visible=false;
   }
-  flash(meshes){
-    if(this.hurtFlash>0){ this.hurtFlash-=0.016; }
-  }
 }
 
 // ---- Boo: shy ghost — freezes and hides when you face it ----
@@ -93,10 +88,6 @@ class Boo extends Enemy {
       const d = Math.hypot(dx,dz);
       if(d < this.range){
         // is the player facing me?
-        const fx = Math.sin(pl.facing), fz = Math.cos(pl.facing);
-        const dot = (dx*-1*fx + dz*-1*fz)/(d||1); // player-forward vs dir-from-player-to-boo... compute properly:
-        const toBooX = -dx/d, toBooZ = -dz/d;      // from boo to player is (dx,dz); player→boo is (-dx,-dz)
-        const facingDot = fx*(-toBooX*-1)+0;        // simplify below
         const pfx = Math.sin(pl.facing), pfz = Math.cos(pl.facing);
         const dirX = (p.x-pl.pos.x)/d, dirZ = (p.z-pl.pos.z)/d;
         const face = pfx*dirX + pfz*dirZ;
@@ -162,7 +153,8 @@ class Hopper extends Enemy {
       if(p.y<=this.groundY){
         p.y=this.groundY; this.vy=0;
         this.G.fx.spawn(new THREE.Vector3(p.x,p.y+0.05,p.z), 0x997755, 3, {speed:1, life:0.25, size:0.5});
-        this.hopCD = rand(0.35,0.7);
+        // deterministic cadence cycle (was rand() mid-play — the shared RNG stream is history-dependent, breaking replay determinism)
+        this.hopN = ((this.hopN||0)+1)%3; this.hopCD = [0.35,0.55,0.7][this.hopN];
       }
     } else if(pl && !pl.dead){
       const dx=pl.pos.x-p.x, dz=pl.pos.z-p.z, d=Math.hypot(dx,dz);

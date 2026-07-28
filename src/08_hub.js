@@ -291,6 +291,7 @@ function makeBats(S, n, spread){
   return bats;
 }
 function updateBats(bats, dt){
+  if(!bats) return;
   for(const b of bats){
     const u = b.userData;
     u.t += dt; u.a += u.sp*dt;

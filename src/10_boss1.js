@@ -133,6 +133,12 @@ class PumpkinKing {
     this.state='defeat'; this.stateT=0;
     AUDIO.victory();
     UI.hideBossBar();
+    // clear every live threat so the 4.2s celebration can't hurt/kill the player (matches boss 2's bat dissipate)
+    for(const e of this.G.ents.list){ if(e.isEnemy && !e.dead){ e.dead = true; if(e.shadow) this.G.scene.remove(e.shadow); } }
+    for(const sw of this.shockwaves) this.G.scene.remove(sw.mesh);
+    this.shockwaves.length = 0;
+    for(const s of this.seeds) this.G.scene.remove(s.mesh, s.shadow);
+    this.seeds.length = 0;
     const p = this.pos;
     for(let i=0;i<4;i++){
       setTimeout(()=>{
@@ -293,7 +299,9 @@ class PumpkinKing {
         this.body.rotation.z = damp(this.body.rotation.z, 0, 6, dt);
         if(this.stateT>0.8){
           this.stateT=0; this.slamCount=0;
-          if(this.phase>=2 && Math.random()<0.55){ this.state='seeds'; this.spawnSeeds(); }
+          // fixed pattern, not Math.random() — boss time feeds the leaderboard, so the fight must replay identically
+          this.seq = (this.seq||0)+1;
+          if(this.phase>=2 && (this.seq%2===1)){ this.state='seeds'; this.spawnSeeds(); }
           else this.state='hop';
         }
         break;
@@ -360,11 +368,14 @@ class PumpkinKing {
         this.seeds.splice(i,1);
       }
     }
-    // ---- minions during phase>=2 ----
+    // ---- minions during phase>=2 (fixed 4s clock — deterministic, replaces the old per-frame Math.random gate) ----
     if(this.phase>=2 && !this.dead && this.state==='hop'){
       const minions = this.G.ents.list.filter(e=>e.isEnemy && !e.dead).length;
-      if(minions<this.phase && Math.random()<dt*0.25){
-        this.G.ents.add(new Hopper(this.G, clamp(p.x+pick([-7,7]), -20, 20), 0, 0, {aggroR:40}));
+      if(this.nextMinion===undefined) this.nextMinion = this.t + 4;
+      if(minions<this.phase && this.t>=this.nextMinion){
+        this.nextMinion = this.t + 4;
+        this.minionSide = -(this.minionSide||1);   // alternate sides, learnable
+        this.G.ents.add(new Hopper(this.G, clamp(p.x+7*this.minionSide, -20, 20), 0, 0, {aggroR:40}));
       }
     }
 

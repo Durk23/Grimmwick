@@ -179,7 +179,7 @@ class Particles {
 
 // ---- side-view scenery: parallax hills, distant town, fireflies ----
 function buildParallax(S, x1, x2){
-  const cx=(x1+x2)/2, span=Math.abs(x2-x1)+80;
+  const span=Math.abs(x2-x1)+80;
   // near hills
   const hills1 = new THREE.Group();
   for(let x=x1-30; x<x2+30; x+=rand(9,14)){
@@ -314,6 +314,31 @@ function buildVine(G, x, z, h){
   G.scene.add(bakeGroup(g));
   return G.world.addBox(x, 0, z, 1.1, h, 1.2, {type:'climb'});
 }
+// merge a group of SAME-material meshes into ONE mesh that KEEPS that material — for transparent strands
+// (webs) where bakeGroup's opaque vertex-color rebuild would discard the opacity. Reads geometry attributes
+// without mutating (safe with the cached geo() factory).
+function mergeStrands(group, material){
+  group.updateMatrixWorld(true);
+  const pos=[], norm=[];
+  const v=new THREE.Vector3(), nv=new THREE.Vector3(), nm=new THREE.Matrix3();
+  group.traverse(o=>{
+    if(!o.isMesh) return;
+    const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry;
+    const p=g.attributes.position, n=g.attributes.normal;
+    nm.getNormalMatrix(o.matrixWorld);
+    for(let i=0;i<p.count;i++){
+      v.fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld);
+      nv.fromBufferAttribute(n,i).applyMatrix3(nm).normalize();
+      pos.push(v.x,v.y,v.z); norm.push(nv.x,nv.y,nv.z);
+    }
+  });
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(norm,3));
+  const m=new THREE.Mesh(g, material);
+  m.matrixAutoUpdate=false;
+  return m;
+}
 function buildWebNet(G, x, z, w, h){
   const g = new THREE.Group();
   const wm = new THREE.MeshLambertMaterial({color:0xd8d8e8, transparent:true, opacity:0.7});
@@ -328,6 +353,6 @@ function buildWebNet(G, x, z, w, h){
     hz.position.set(x, j*0.6+0.2, z);
     g.add(hz);
   }
-  G.scene.add(g);
+  G.scene.add(mergeStrands(g, wm));   // ~20 transparent strand meshes → 1 sorted+blended draw call
   return G.world.addBox(x, 0, z, w, h, 1.2, {type:'climb'});
 }

@@ -341,7 +341,6 @@ class LostTourGroup extends Enemy {
   takeHit(player, kind){
     if(this.dead) return;
     this.hp -= (kind==='pound'?2:1);
-    this.hurtFlash=0.15;
     if(this.state!=='angry' && window.UI) UI.toast('💀 You broke the line! The tour is FURIOUS.');
     this.state='angry'; this.angryT=4; this.touchDamage=1;
     AUDIO.stomp();

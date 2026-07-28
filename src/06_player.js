@@ -507,7 +507,6 @@ class Player {
 
     // --- physics ---
     const wasGrounded = this.grounded;
-    const wasVy = this.vel.y;
     G.world.step(this, dt, {
       onBounce: ()=>{ AUDIO.bounce(); this.canDouble=true; this.squashV=8; this.lastBounce=G.time; if(this.pounding){this.vel.y*=1.35; this.pounding=false;} G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y,this.pos.z), PAL.pumpkin, 8, {speed:3, life:0.4}); },
       onHardLand: ()=>{},
@@ -528,7 +527,7 @@ class Player {
           const p=e.group.position;
           if(Math.hypot(p.x-this.pos.x,p.z-this.pos.z)<2.6 && Math.abs(p.y-this.pos.y)<1.6) e.takeHit(this,'pound');
         }
-        if(G.boss && !G.boss.dead) G.boss.onPlayerPound(this.pos);
+        if(G.boss && !G.boss.dead && G.boss.onPlayerPound) G.boss.onPlayerPound(this.pos);
       } else {
         AUDIO.land();
       }

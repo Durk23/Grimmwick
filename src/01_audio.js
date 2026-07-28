@@ -85,44 +85,6 @@ class AudioSys {
     this.mood = m;
     this._step = 0;
   }
-  // ---- spooky waltz music loop ----
-  startMusicOld(){
-    if(this._musicTimer || !this.ctx) return;
-    // D minor-ish spooky waltz. step = eighth note @ ~92bpm waltz feel
-    const bass =   [147,0,0, 110,0,0, 131,0,0, 98,0,0];             // D A C G
-    const chords = [[220,262],[175,220],[196,247],[165,196]];
-    const lead = [294,0,349,330,0,294, 262,0,294,247,0,220, 294,0,349,392,0,440, 349,0,330,294,0,262];
-    const stepDur = 0.22;
-    let step = 0;
-    const tick = ()=>{
-      if(!this.musicOn){ step++; return; }
-      const c = this.ctx, now = c.currentTime;
-      const bar = Math.floor(step/6)%4;
-      const inBar = step%6;
-      // bass on beat 1
-      const b = bass[(Math.floor(step/2))%12];
-      if(inBar===0 && b){
-        this.tone({f:b, type:'triangle', t:0.5, vol:0.4, bus:this.musBus});
-      }
-      // chord plucks on 3 and 5 (waltz oom-pah-pah)
-      if(inBar===2||inBar===4){
-        for(const f of chords[bar]) this.tone({f, type:'sine', t:0.22, vol:0.1, bus:this.musBus});
-      }
-      // theremin-ish lead every other cycle
-      const L = lead[step%24];
-      if(L && Math.floor(step/24)%2===0){
-        const o = c.createOscillator(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
-        o.type='sine'; o.frequency.value = L;
-        lfo.frequency.value = 5.5; lg.gain.value = 4; lfo.connect(lg); lg.connect(o.frequency);
-        g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.13, now+0.05);
-        g.gain.exponentialRampToValueAtTime(0.001, now+stepDur*1.9);
-        o.connect(g); g.connect(this.musBus);
-        o.start(now); lfo.start(now); o.stop(now+stepDur*2); lfo.stop(now+stepDur*2);
-      }
-      step++;
-    };
-    this._musicTimer = setInterval(tick, stepDur*1000);
-  }
 }
 const AUDIO = new AudioSys();
 
@@ -146,7 +108,7 @@ AudioSys.prototype.startMusic = function(){
   };
   let step = 0;
   const tick = ()=>{
-    if(!this.musicOn || !this.ctx){ return; }
+    if(!this.musicOn || !this.ctx){ this._musicTimer = setTimeout(tick, 250); return; }   // keep the loop alive while muted — a bare return kills music forever
     const M = MOODS[this.mood] || MOODS.hub;
     const c = this.ctx, now = c.currentTime;
     const n = step;

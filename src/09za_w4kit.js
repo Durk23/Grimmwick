@@ -348,8 +348,9 @@ class TreasureChest {
     AUDIO.tone && AUDIO.tone({f:200,f2:90,type:'sawtooth',t:0.5,vol:0.2});
     AUDIO.noise && AUDIO.noise({t:0.3,vol:0.16,fFrom:1200,fTo:220});
     G.camc.shake(0.2,0.4);
+    const scene = G.scene;   // payout must land in THE SAME scene — a switchArea inside the 650ms window would spawn into the new area
     setTimeout(()=>{
-      if(!G.scene) return;
+      if(G.scene !== scene) return;
       const r = Math.random();
       if(r < 0.08){
         G.save.lives = Math.min(9, (G.save.lives!==undefined?G.save.lives:5)+1);

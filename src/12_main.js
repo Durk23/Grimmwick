@@ -1,5 +1,4 @@
 // ============ MAIN — game state, scenes, save, loop ============
-const GAME_NAME = 'Grimmwick';
 
 // ---- safe storage (works in app, browser, and sandboxed previews) ----
 const Store = {
@@ -107,6 +106,11 @@ const G = {
     this.mode = (area==='hub') ? 'free' : 'side';
     this._entering = false;
     this.boss = null;
+    if(window.UI && UI.hideBossBar) UI.hideBossBar();   // pause-menu exits skip defeat(), which was the only other hider
+    // drop refs into the outgoing scene graph — any one of these pins the WHOLE dead scene (and its GPU buffers) in memory
+    this.lvlPortal = this.warpPortal = this.tutPortal = this._gateGlow = null;
+    this.hubEmber = this.hubEmberLight = this.hubLamps = this.gates = this.mayor = this.mayorHome = this.brewMesh = this.hubBoos = null;
+    this.signs = this.coffins = this.bats = this.amb = null;
     if(this.ents) this.ents.clear();
     if(this.fx) this.fx.clear();
     const isBossArea = area.startsWith('boss');
@@ -229,8 +233,10 @@ const G = {
     const prev = this.save.gp[def.district]||[false,false,false];
     this.save.gp[def.district] = prev.map((v,i)=>v||this.runPumpkins[i]);
     this.persist();
-    const idx = W1_LEVELS.indexOf(def);
-    const nextId = (idx>=0 && idx<W1_LEVELS.length-1) ? W1_LEVELS[idx+1].id : null;
+    // next level comes from the level's OWN district registry (W1_LEVELS-only lookup left D2-5 with no NEXT button)
+    const list = (typeof LEVEL_LISTS!=='undefined') ? (LEVEL_LISTS.find(L=>L.includes(def))||W1_LEVELS) : W1_LEVELS;
+    const idx = list.indexOf(def);
+    const nextId = (idx>=0 && idx<list.length-1) ? list[idx+1].id : null;
     const fmt = t => Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
     const stats = { levelId:id, levelName:def.name, time:fmt(secs), best:fmt(rec.best||secs), isRecord,
       stars, candy:collected, candyTotal:this.levelCandyTotal, nextId, cozy:this.runCozy };
@@ -281,7 +287,6 @@ const G = {
       UI.fade(false, 450);
     }, 500);
   },
-  startBoss1(){ this.startBoss('w1'); },
   returnToHub(afterVictory){
     this.state='transition';
     UI.fade(true, 450);

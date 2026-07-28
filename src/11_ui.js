@@ -168,7 +168,7 @@ const UI = {
         <div id="logo">GRIMM<span class="v">WICK</span></div>
         <div id="tagline">🎃 Relight the Night 🎃</div>
         <div id="tap">— tap anywhere to play —</div>
-        <div style="opacity:.55;font-size:12px;margin-top:40px">v0.1 playable slice · World 1 of 5</div>
+        <div style="opacity:.55;font-size:12px;margin-top:40px">v1.0 · all 5 districts</div>
       </div>
       <div id="intro-screen" class="screen"><div class="card">
         <div style="font-size:44px" id="introIcon">🌕</div>
@@ -379,11 +379,12 @@ const UI = {
   // ---------- level card ----------
   levelIntro(name, sub){
     const c=this.el('lvlcard');
+    clearTimeout(this._lvlT1); clearTimeout(this._lvlT2);   // a re-entry within 3.5s must not have stale timers hide the new card
     this.el('lvlname').textContent=name;
     this.el('lvlsub').textContent=sub;
-    c.style.display='block'; c.style.opacity=1;
-    setTimeout(()=>{ c.style.transition='opacity 1s'; c.style.opacity=0; }, 2400);
-    setTimeout(()=>{ c.style.display='none'; c.style.transition=''; }, 3500);
+    c.style.display='block'; c.style.opacity=1; c.style.transition='';
+    this._lvlT1 = setTimeout(()=>{ c.style.transition='opacity 1s'; c.style.opacity=0; }, 2400);
+    this._lvlT2 = setTimeout(()=>{ c.style.display='none'; c.style.transition=''; }, 3500);
   },
   // ---------- boss bar ----------
   showBossBar(name, hp, max){
@@ -524,7 +525,7 @@ const UI = {
         ['🍬 350','👑 Ember crown (any costume)'],
         ['🎉 500 + fireworks','😈 GRIMM\'S HERALD — animated shadow costume + title + 🍬 1500', 1],
       ];
-      const totFree = 3250, totPrem = 8000;
+      const totPrem = 8000;
       body.innerHTML = `
         <div class="passhead">
           <h3>🌕 SEASON 1: THE EMBER MOON</h3>

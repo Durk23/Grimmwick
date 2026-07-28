@@ -30,11 +30,14 @@ class InputSys {
       if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
     });
     addEventListener('keyup', e=>{ this.keys[e.code]=false; });
+    // focus loss eats keyups — drop all held keys so Pip doesn't run forever after Cmd+Tab / dialogs
+    addEventListener('blur', ()=>{ this.keys={}; this._mouseDown=false; });
+    document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ this.keys={}; this._mouseDown=false; } });
     // mouse camera drag (desktop)
     addEventListener('mousedown', e=>{
+      this.anyEdge = true;   // set BEFORE the .screen early-return so clicking the (full-viewport .screen) title advances it, matching touchstart
       if(e.target.closest && (e.target.closest('.ui-block') || e.target.closest('.screen'))) return;   // don't drag the camera behind an open menu
       this._mouseDown = true; this._cam.lx=e.clientX; this._cam.ly=e.clientY;
-      this.anyEdge = true;
     });
     addEventListener('mousemove', e=>{
       if(this._mouseDown){

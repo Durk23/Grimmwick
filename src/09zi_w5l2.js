@@ -34,7 +34,7 @@ function w5l2MovingGear(G, opts){
   const factory = ()=>{
     const g = new THREE.Group();
     const disc = mesh('cyl',[w*0.5, w*0.5, 0.4, 16], mat(col)); disc.rotation.x=Math.PI/2; disc.position.y=0.3; g.add(disc);
-    const gear = cogMesh(w*0.62, W5PAL.brassD); gear.position.y=0.05; g.add(gear);
+    const gear = bakeGroup(cogMesh(w*0.62, W5PAL.brassD)); gear.matrixAutoUpdate = true; gear.position.y=0.05; g.add(gear);   // one draw call per cog
     G.scene.add(g); return g;
   };
   const wob = TAU/period;
