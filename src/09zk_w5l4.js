@@ -79,8 +79,8 @@ function buildW5L4(G){
   G.ents.add(new Crow(9, 0.95, 2.4));                                  // reactive courtyard critter
   candyLine(G, [[6,0.9,0],[8,0.9,0]], 3); candyLine(G, [[16,0.9,0],[18,0.9,0]], 3);
   signPost(G, 21, 1.7, 0.12, "The first clock-chain. Up you go - and mind the blades on the ramparts above.");
-  w5Chain(G, 24, 0.2, 6.5);                                           // CHAIN A — ground -> the ramparts
-  candyLine(G, [[24,2,0],[24,3.5,0],[24,5,0]], 3);                    // rhythm candy up the strand
+  w5Chain(G, 22.4, 0.2, 7.2);                                         // CHAIN A — ground -> the ramparts (sits LEFT of A1's edge with body clearance, tops ABOVE it so you climb into open air and hop right onto the deck — never under the slab)
+  candyLine(G, [[22.4,2,0],[22.4,3.5,0],[22.4,5,0]], 3);              // rhythm candy up the strand
 
   // =============================== BEAT 2 — THE FIRST STRANDS (x 24..49): INTRODUCE the blade ===============================
   platform(G, 27, 6.5, 0, 8, 3, STONEL);                             // LEDGE A1 (top 6.5, spans 23..31) — pop off CHAIN A
@@ -89,8 +89,8 @@ function buildW5L4(G){
   G.ents.add(new MirrorBoo(G, 32, 9.5, 0, {phase:0, range:3.5, mirror:0.85, candy:3}));  // air lane over the climb
   platform(G, 35, 7.2, 0, 5, 3, STONE);                             // LEDGE A2 (top 7.2, spans 32.5..37.5)
   candyLine(G, [[31,7.6,0],[33,7.8,0]], 2);                          // trace the A1->A2 hop
-  w5Chain(G, 41, 6.7, 13.2);                                         // CHAIN B — the big climb onto the ramparts (grab from A2)
-  candyLine(G, [[41,8,0],[41,9.5,0],[41,11,0],[41,12.7,0]], 4);      // rhythm candy up the strand
+  w5Chain(G, 38.7, 6.7, 14.0);                                       // CHAIN B — the big climb (grab from A2's right edge; sits just LEFT of B1 and tops ABOVE it, so you pop out onto the deck instead of stalling under the slab)
+  candyLine(G, [[38.7,8,0],[38.7,9.5,0],[38.7,11,0],[38.7,12.7,0]], 4);  // rhythm candy up the strand
   platform(G, 43.5, 13.2, 0, 8, 3.2, STONEL);                       // LEDGE B1 (top 13.2, spans 39.5..47.5)
   G.ents.add(new ClockworkKnight(G, 44, 13.2, 0, {phase:0.5, range:2, dir:1, candy:4}));  // Knight #2 on the ledge
   candyLine(G, [[45.5,14,0],[46.5,14,0]], 2);
@@ -100,8 +100,8 @@ function buildW5L4(G){
   // Its lone PURPLE lantern-glow (the district's warp language) is the only tell — never signposted. Skill gate:
   // hit the MINUTE gear (jump-spin, upper-left) THEN the HOUR gear (spin, lower-right) in order -> the face swings
   // open and warps to the keep gate with the full candy bonus. Hour-first does nothing — the two-step order is the gate.
-  w5Chain(G, 47.5, 13, 18);                                          // CHAIN E — the alcove access (grab from B1's edge)
-  candyLine(G, [[47.5,14.5,0],[47.5,16,0],[47.5,17.5,0]], 3);        // a quiet candy lure up, for the observant
+  w5Chain(G, 44.9, 13, 18.7);                                        // CHAIN E — the alcove access (grab standing on B1; sits LEFT of the ALCOVE with body clearance, tops above it -> clean pop-out)
+  candyLine(G, [[44.9,14.5,0],[44.9,16,0],[44.9,17.5,0]], 3);        // a quiet candy lure up, for the observant
   platform(G, 47.5, 18, 0, 4, 3, STONED);                           // the tucked ALCOVE ledge (dark stone = a subtle tell)
   G.ents.add(new MidnightClock(G, 47.5, 20, {warpX:155, candy:40})); // the OLD SHORTCUT warp (minute-then-hour)
 
@@ -112,8 +112,8 @@ function buildW5L4(G){
   G.ents.add(new ShadowCopy(G, 56, 13.6, 0, {phase:0, speed:2.4, candy:2}));  // Shadow-Copy chases up the strand
   gearPlat(G, 58, 15.2, {w:2.8, d:3});                              // a brass cog step (top 15.2)
   candyLine(G, [[55.5,14.6,0],[57,15.2,0]], 2);
-  w5Chain(G, 62, 14.5, 20.5);                                        // CHAIN C — up to the checkpoint terrace
-  candyLine(G, [[62,16,0],[62,17.5,0],[62,19,0]], 3);
+  w5Chain(G, 59.4, 14.5, 21.2);                                      // CHAIN C — up to the checkpoint terrace (grab from the cog@58; sits LEFT of TERRACE C1 with body clearance, tops above it -> pop out onto the terrace)
+  candyLine(G, [[59.4,16,0],[59.4,17.5,0],[59.4,19,0]], 3);
   platform(G, 64, 20.5, 0, 8, 3.4, STONE);                          // WIDE TERRACE C1 (top 20.5, spans 60..68)
   G.ents.add(new Checkpoint(64, 20.5, 1.8, 1));                      // CP1 — the one lit mid-level checkpoint
   G.ents.add(new MirrorBoo(G, 66, 22.5, 0, {phase:0.4, range:3.5, mirror:0.85, candy:3}));
@@ -132,8 +132,8 @@ function buildW5L4(G){
   G.ents.add(new ClockworkKnight(G, 82, 22, 0, {phase:0.8, range:2, dir:-1, candy:4}));  // Knight #3
   G.ents.add(new BonkLantern(G, 83, 24, 0, 'shield'));             // a Gummy Shield before the parapet gauntlet (route reward)
   candyLine(G, [[81,22.8,0],[84,22.8,0]], 2);
-  w5Chain(G, 88, 21.5, 24.5);                                       // CHAIN D — the tallest strand, up to the parapet
-  candyLine(G, [[88,23,0],[88,24,0]], 2);
+  w5Chain(G, 87.3, 21.5, 25.2);                                     // CHAIN D — the tallest strand (grab from LEDGE M; sits just LEFT of the parapet, tops above it -> pop out onto the parapet at x88, the blade's safe side)
+  candyLine(G, [[87.3,23,0],[87.3,24,0]], 2);
 
   // =============================== BEAT 5 — THE HIGH RAMPARTS (x 88..105): PEAK — the blade gauntlet ===============================
   platform(G, 93, 24.5, 0, 10, 3.4, STONE);                        // THE PARAPET (top 24.5, spans 88..98) — pop off CHAIN D at the left
