@@ -14,16 +14,16 @@ function buildHouse(x,z,rotY,w,h,c1,c2,winColor){
   const up = mesh('box',[w*1.08,h*0.6,w*0.84], mat(c2)); up.position.y=h+h*0.3; up.rotation.y=rand(-0.05,0.05); up.rotation.z=rand(-0.04,0.04);
   // roof
   const roof = mesh('cone',[w*0.95,h*0.85,4], mat(PAL.roof)); roof.position.y=h*1.6+h*0.42; roof.rotation.y=Math.PI/4; roof.rotation.z=rand(-0.06,0.06);
-  // chimney
-  const chim = mesh('box',[0.3,0.8,0.3], mat(c2)); chim.position.set(w*0.25, h*1.8, 0);
+  // chimney (tagged so the hub can hang smoke off its world position after placement)
+  const chim = mesh('box',[0.3,0.8,0.3], mat(c2)); chim.position.set(w*0.25, h*1.8, 0); chim.userData.chimTop=true;
   g.add(base,up,roof,chim);
-  // glowing windows
+  // glowing windows (tagged glow — the hub extracts them live so baking the house doesn't kill their night-glow)
   const wm = emat(winColor, winColor, 1);
   for(let i=0;i<2;i++){
-    const win = mesh('box',[0.42,0.5,0.05], wm);
+    const win = mesh('box',[0.42,0.5,0.05], wm); win.userData.glow=true;
     win.position.set(-w/4+i*w/2, h*0.55, w*0.4+0.01);
     g.add(win);
-    const win2 = mesh('box',[0.36,0.44,0.05], wm);
+    const win2 = mesh('box',[0.36,0.44,0.05], wm); win2.userData.glow=true;
     win2.position.set(-w/4+i*w/2, h*1.28, w*0.42+0.01);
     win2.rotation.copy(up.rotation);
     g.add(win2);
@@ -76,6 +76,21 @@ function pumpkinDeco(x,z,s=1,lit=false){
   return g;
 }
 
+// detach userData.glow / userData.live tagged meshes from a placed group, preserving their world
+// transforms — the remaining (non-emissive) group can then be baked without killing self-glow or animation refs
+function extractLive(group){
+  group.updateMatrixWorld(true);
+  const out=[];
+  group.traverse(o=>{ if(o.isMesh && (o.userData.glow || o.userData.live)) out.push(o); });
+  const p=new THREE.Vector3(), q=new THREE.Quaternion(), sc=new THREE.Vector3();
+  for(const o of out){
+    o.matrixWorld.decompose(p,q,sc);
+    o.parent.remove(o);
+    o.position.copy(p); o.quaternion.copy(q); o.scale.copy(sc);
+  }
+  return out;
+}
+
 function buildHub(G){
   const S = G.scene;
   const R = 26; // town radius
@@ -108,8 +123,10 @@ function buildHub(G){
   G.world.addMesh(plinth); G.world.addMesh(bowl);
   G.world.addBox(0,2.1,0, 2.4,1.8,2.4,{});
 
-  // ---- houses ring ----
+  // ---- houses ring (bodies BAKED into deco; windows extracted live so they keep their glow) ----
   const houseCols = [[0x4a3566,0x5c4380],[0x3d4a66,0x4a5c80],[0x59396b,0x6b4580],[0x445536,0x556b45]];
+  G.hubWindows = [];            // a few get a cloned material for night-flicker micro-motion
+  const chimneyTips = [];       // world positions for chimney smoke
   for(let i=0;i<9;i++){
     const a = (i/9)*TAU + 0.22;
     // leave gaps at gate angles
@@ -119,19 +136,26 @@ function buildHub(G){
     const r = R+6.5;
     const [c1,c2] = pick(houseCols);
     const h = buildHouse(Math.sin(a)*r, Math.cos(a)*r, -a+Math.PI, rand(3.2,4.4), rand(2.6,3.4), c1, c2, pick([PAL.window,0xffa04a,0x9fe0ff]));
-    S.add(h);
+    for(const wm of extractLive(h)){ S.add(wm); G.hubWindows.push(wm); }
+    h.traverse(o=>{ if(o.userData.chimTop){ const wp=new THREE.Vector3(); o.getWorldPosition(wp); wp.y+=0.5; chimneyTips.push(wp); } });
+    deco.add(h);                // body/roof/door bake to the one static mesh
   }
-  // ---- lamps ----
+  // clone materials on 3 windows so flickering them can't touch the shared emat cache
+  for(let i=0;i<Math.min(3,G.hubWindows.length);i++){ const w=G.hubWindows[i*2%G.hubWindows.length]; w.material=w.material.clone(); w.userData.flick=rand(9); }
+  // ---- lamps (pole/cage baked; bulb live for glow) ----
   G.hubLamps = [];
+  const lampPos = [];
   for(let i=0;i<5;i++){
     const a = (i/5)*TAU+0.5;
     const g = new THREE.Group();
     const pole = mesh('cyl',[0.09,0.13,3.1,6], mat(0x241c38)); pole.position.y=1.55; crook(pole,0.04);
     const lant = mesh('box',[0.5,0.55,0.5], mat(0x241c38)); lant.position.y=3.15;
-    const bulb = mesh('sph',[0.17,7,6], emat(PAL.window,PAL.window,1)); bulb.position.y=3.15;
+    const bulb = mesh('sph',[0.17,7,6], emat(PAL.window,PAL.window,1)); bulb.position.y=3.15; bulb.userData.glow=true;
     g.add(pole,lant,bulb);
     g.position.set(Math.sin(a)*12, 0, Math.cos(a)*12);
-    S.add(g);
+    for(const b of extractLive(g)) S.add(b);
+    deco.add(g);
+    lampPos.push(new THREE.Vector3(g.position.x, 3.25, g.position.z));
     G.world.addBox(g.position.x, 0, g.position.z, 0.35,3,0.35,{});
     if(i<3){
       const l = new THREE.PointLight(0xffc95e, 55, 13);
@@ -149,7 +173,7 @@ function buildHub(G){
     const a=rand(TAU), r=rand(5,R-3);
     deco.add(pumpkinDeco(Math.sin(a)*r, Math.cos(a)*r, rand(0.7,1.3), Math.random()<0.5));
   }
-  S.add(bakeGroup(deco));
+  // (deco bakes ONCE at the end of buildHub — gates + the festival dressing below join it first)
 
   // ---- the five district gates ----
   G.gates = [];
@@ -166,18 +190,18 @@ function buildHub(G){
     // lantern pair — lit if beaten (district relit!)
     for(const sx of [-1.9,1.9]){
       const litc = beaten ? w.color : 0x3a3350;
-      const lb = mesh('sph',[0.22,7,6], emat(litc, litc, beaten?1:0.35)); lb.position.set(sx,4.15,0.45);
+      const lb = mesh('sph',[0.22,7,6], emat(litc, litc, beaten?1:0.35)); lb.position.set(sx,4.15,0.45); lb.userData.glow=true;
       g.add(lb);
     }
     if(open){
       // swirling portal
       const pm = new THREE.MeshBasicMaterial({color:w.color, transparent:true, opacity:0.35, side:THREE.DoubleSide});
       const portal = new THREE.Mesh(geo('plane',3.1,3.8), pm);
-      portal.position.y=2.2;
+      portal.position.y=2.2; portal.userData.live=true;
       g.add(portal);
       w.portalMesh = portal;
       const ring = mesh('tor',[1.7,0.09,6,24], emat(w.color,w.color,0.9));
-      ring.position.y=2.2; g.add(ring);
+      ring.position.y=2.2; ring.userData.live=true; g.add(ring);
       w.ringMesh = ring;
     } else {
       // boarded up + chains
@@ -191,7 +215,8 @@ function buildHub(G){
     }
     g.position.set(x,0,z);
     g.rotation.y = w.angle+Math.PI;
-    S.add(g);
+    for(const lv of extractLive(g)) S.add(lv);   // lantern orbs + portal/ring stay live (glow + animation refs)
+    deco.add(g);                                  // arch/boards/lock bake with the rest
     // colliders: pillars, and a trigger for open gates
     const px1 = x+Math.cos(w.angle)*(-1.9), pz1 = z-Math.sin(w.angle)*(-1.9);
     const px2 = x+Math.cos(w.angle)*(1.9), pz2 = z-Math.sin(w.angle)*(1.9);
@@ -209,6 +234,191 @@ function buildHub(G){
     for(const w of WORLDS){ if(w.open && Math.abs(angleLerp(0,w.angle-a,1))<0.25) nearGate=true; }
     if(nearGate) continue;
     G.world.addBox(Math.sin(a)*(R+2.5), 0, Math.cos(a)*(R+2.5), 6,6,3, {});
+  }
+
+  // ================= FESTIVAL DRESSING (the pop pass — statics all bake into `deco`) =================
+  // ---- radiating cobble paths, plaza to each district gate ----
+  for(const w of WORLDS){
+    const dx=Math.sin(w.angle), dz=Math.cos(w.angle);
+    for(let r=4.6; r<R-1.6; r+=2.1){
+      const seg = mesh('box',[2.0,0.08,2.3], mat(0x6b5aa4));
+      seg.position.set(dx*r, 0.03, dz*r);
+      seg.rotation.y = w.angle + rand(-0.06,0.06);
+      deco.add(seg);
+    }
+  }
+  // path-edge glow dots — merged into ONE always-bright mesh
+  { const dm = new THREE.MeshBasicMaterial({color:0xffb85e}); const dots = new THREE.Group();
+    for(const w of WORLDS) for(let r=6; r<R-2; r+=3.4) for(const s of [-1,1]){
+      const d = new THREE.Mesh(geo('sph',0.07,5,4), dm);
+      d.position.set(Math.sin(w.angle)*r + Math.cos(w.angle)*1.35*s, 0.12, Math.cos(w.angle)*r - Math.sin(w.angle)*1.35*s);
+      dots.add(d);
+    }
+    S.add(mergeStrands(dots, dm)); }
+
+  // ---- festival string lights lamp-to-lamp (the town is DRESSED for the festival) ----
+  { const wires = new THREE.Group();
+    const bulbSets = [ [new THREE.Group(), new THREE.MeshBasicMaterial({color:0xffb85e})],
+                       [new THREE.Group(), new THREE.MeshBasicMaterial({color:0xff8fc8})],
+                       [new THREE.Group(), new THREE.MeshBasicMaterial({color:0x8fe0ff})] ];
+    for(let i=0;i<lampPos.length;i++){
+      const a=lampPos[i], b=lampPos[(i+1)%lampPos.length], segs=9;
+      for(let s2=0;s2<=segs;s2++){
+        const t2=s2/segs, sag=Math.sin(t2*Math.PI)*1.1;
+        const px=lerp(a.x,b.x,t2), py=lerp(a.y,b.y,t2)-sag, pz=lerp(a.z,b.z,t2);
+        if(s2<segs){
+          const t3=(s2+1)/segs, sag3=Math.sin(t3*Math.PI)*1.1;
+          const qx=lerp(a.x,b.x,t3), qy=lerp(a.y,b.y,t3)-sag3, qz=lerp(a.z,b.z,t3);
+          const len=Math.hypot(qx-px,qy-py,qz-pz);
+          const wseg=mesh('cyl',[0.015,0.015,len,3], mat(0x1c1630));
+          wseg.position.set((px+qx)/2,(py+qy)/2,(pz+qz)/2);
+          wseg.lookAt(qx,qy,qz); wseg.rotateX(Math.PI/2);
+          wires.add(wseg);
+        }
+        if(s2>0 && s2<segs){
+          const [bg,bm] = bulbSets[(i+s2)%3];
+          const bulb=new THREE.Mesh(geo('sph',0.09,5,4), bm);
+          bulb.position.set(px,py-0.12,pz); bg.add(bulb);
+        }
+      }
+    }
+    deco.add(wires);
+    for(const [bg,bm] of bulbSets) if(bg.children.length) S.add(mergeStrands(bg,bm));   // 3 candy-color bulb meshes total
+  }
+
+  // ---- EMBER BRAZIER RING around the Everflame — one per district, RELIGHTS in its color as you free its guardian ----
+  G.hubBraziers = [];
+  for(const w of WORLDS){
+    const bx=Math.sin(w.angle)*6.4, bz=Math.cos(w.angle)*6.4;
+    const bowl=mesh('cyl',[0.42,0.3,0.5,8], mat(0x3d2f5c)); bowl.position.set(bx,0.55,bz); deco.add(bowl);
+    const stem=mesh('cyl',[0.12,0.18,0.6,6], mat(0x322550)); stem.position.set(bx,0.15,bz); deco.add(stem);
+    G.world.addBox(bx,0,bz,0.7,1,0.7,{});
+    if(G.save.worlds[w.key]){
+      const flame=new THREE.Mesh(geo('cone',0.2,0.55,6), new THREE.MeshLambertMaterial({color:w.color, emissive:w.color, emissiveIntensity:1}));
+      flame.position.set(bx,1.05,bz); S.add(flame);
+      const halo=new THREE.Mesh(geo('sph',0.42,8,6), new THREE.MeshBasicMaterial({color:w.color, transparent:true, opacity:0.22, depthWrite:false}));
+      halo.position.set(bx,1.0,bz); S.add(halo);
+      G.hubBraziers.push({flame, halo, ph:rand(9)});
+    } else {
+      const coals=mesh('sph',[0.18,6,5], mat(0x241a33)); coals.position.set(bx,0.85,bz); coals.scale.y=0.5; deco.add(coals);
+    }
+  }
+
+  // ---- market corner beside the Costume Cauldron ----
+  { const stall=new THREE.Group();
+    const table=mesh('box',[2.6,0.8,1.3], mat(PAL.wood)); table.position.y=0.4; stall.add(table);
+    for(const sx of [-1.1,1.1]) for(const sz of [-0.5,0.5]){ const p=mesh('cyl',[0.05,0.05,2.2,5], mat(PAL.woodD)); p.position.set(sx,1.1,sz); stall.add(p); }
+    const canopy=mesh('cone',[2.1,0.8,4], mat(0xc2483e)); canopy.position.y=2.5; canopy.rotation.y=Math.PI/4; stall.add(canopy);
+    stall.position.set(-11.5,0,1.6); stall.rotation.y=1.05; deco.add(stall);
+    G.world.addBox(-11.5,0,1.6, 2.6,1.2,1.5,{});
+    const am=new THREE.MeshBasicMaterial({color:0xd8383e}); const apples=new THREE.Group();   // candy apples, merged = 1 call
+    for(let i=0;i<6;i++){ const ap=new THREE.Mesh(geo('sph',0.09,6,5), am); ap.position.set(-11.5+((i%3)-1)*0.5, 0.95, 1.6+(i<3?-0.3:0.3)); apples.add(ap); }
+    S.add(mergeStrands(apples, am));
+    for(const [cx,cz,ry] of [[-9.6,3.4,0.4],[-12.6,4.0,1.1],[-10.4,4.4,0.8]]){ const c=mesh('box',[0.75,0.75,0.75], mat(PAL.woodD)); c.position.set(cx,0.37,cz); c.rotation.y=ry; deco.add(c); }
+    const bar=mesh('cyl',[0.42,0.46,0.9,8], mat(0x5a4066)); bar.position.set(-13.2,0.45,2.6); deco.add(bar);
+    G.world.addBox(-11,0,3.9, 3.2,0.9,1.6,{});
+  }
+
+  // ---- the wishing well ----
+  { const wx=9.5, wz=-5.5;
+    for(let i=0;i<8;i++){ const a2=i/8*TAU; const st=mesh('box',[0.42,0.55,0.3], mat(0x4a3e6e)); st.position.set(wx+Math.cos(a2)*0.75, 0.27, wz+Math.sin(a2)*0.75); st.rotation.y=-a2; deco.add(st); }
+    for(const s of [-1,1]){ const p=mesh('box',[0.1,1.5,0.1], mat(PAL.woodD)); p.position.set(wx+s*0.75,1.2,wz); deco.add(p); }
+    const roof=mesh('cone',[1.15,0.7,4], mat(PAL.roof)); roof.position.set(wx,2.2,wz); roof.rotation.y=Math.PI/4; deco.add(roof);
+    const bar=mesh('cyl',[0.05,0.05,1.5,5], mat(PAL.wood)); bar.rotation.z=Math.PI/2; bar.position.set(wx,1.75,wz); deco.add(bar);
+    const rope=mesh('cyl',[0.02,0.02,0.8,4], mat(0xc2a24f)); rope.position.set(wx,1.35,wz); deco.add(rope);
+    const bucket=mesh('cyl',[0.14,0.11,0.2,7], mat(PAL.woodD)); bucket.position.set(wx,0.95,wz); deco.add(bucket);
+    G.hubWellGlow=new THREE.Mesh(geo('circ',0.62,10), new THREE.MeshBasicMaterial({color:0x63e6c2, transparent:true, opacity:0.4, depthWrite:false}));
+    G.hubWellGlow.rotation.x=-Math.PI/2; G.hubWellGlow.position.set(wx,0.42,wz); S.add(G.hubWellGlow);
+    G.world.addBox(wx,0,wz,1.9,0.9,1.9,{});
+  }
+
+  // ---- the QUIET PROP: the festival guest book — five lines of signatures... and one line never signed ----
+  { const lect=new THREE.Group();
+    const post=mesh('cyl',[0.09,0.13,1.1,6], mat(PAL.woodD)); post.position.y=0.55; lect.add(post);
+    const top=mesh('box',[0.85,0.07,0.62], mat(PAL.wood)); top.position.y=1.14; top.rotation.x=-0.32; lect.add(top);
+    const page=mesh('box',[0.66,0.025,0.46], mat(0xe8e4d8)); page.position.y=1.19; page.rotation.x=-0.32; lect.add(page);
+    for(let i=0;i<5;i++){ if(i===3) continue;   // the empty line is Grimm's — never signposted, story-readers gasp
+      const ln=mesh('box',[0.4,0.012,0.035], mat(0x4a3e6e));
+      ln.position.set(0, 1.20+(0.15-i*0.075)*0.95*0.31, (0.15-i*0.075)*0.95); ln.rotation.x=-0.32; lect.add(ln); }
+    const quill=mesh('cone',[0.02,0.3,4], mat(0xe8e4d8)); quill.position.set(0.28,1.3,0.08); quill.rotation.z=-0.6; lect.add(quill);
+    lect.position.set(-3.1,0,2.7); lect.rotation.y=Math.atan2(3.1,-2.7);
+    deco.add(lect);
+    G.world.addBox(-3.1,0,2.7,0.5,1.1,0.5,{});
+  }
+
+  // ---- ground clutter — every couple of units, ALL BAKED (the levels' detail law, at home) ----
+  { const excl=[[0,10,2.2],[-6.5,5.5,3],[4.2,6.5,2.4],[9.5,-5.5,2.4],[-11.5,1.6,2.8],[-3.1,2.7,1.2],[0,0,4.8]];
+    let placed=0;
+    for(let i=0;i<240 && placed<80;i++){
+      const a2=rand(TAU), r=rand(4.8,R+14);
+      const x=Math.cos(a2)*r, z=Math.sin(a2)*r;
+      let bad=false;
+      for(const [ex,ez,er] of excl) if((x-ex)*(x-ex)+(z-ez)*(z-ez)<er*er) bad=true;
+      for(const w of WORLDS){ if(Math.abs(angleLerp(0, w.angle-Math.atan2(x,z), 1))<0.13 && r>18) bad=true; }
+      if(bad) continue;
+      placed++;
+      const kind=rand();
+      if(kind<0.22){ const leaf=mesh('circ',[rand(0.3,0.55),6], mat(pick([0x8a4a2e,0x7a5a2e,0x6a3a4e]))); leaf.rotation.x=-Math.PI/2; leaf.position.set(x,0.035,z); leaf.material.side=THREE.DoubleSide; deco.add(leaf); }
+      else if(kind<0.45){ const tuft=mesh('cone',[0.09,rand(0.25,0.45),4], mat(0x3f5a4a)); tuft.position.set(x,0.18,z); crook(tuft,0.25); deco.add(tuft); }
+      else if(kind<0.62){ const peb=mesh('sph',[rand(0.08,0.18),5,4], mat(0x565070)); peb.position.set(x,0.06,z); peb.scale.y=0.55; deco.add(peb); }
+      else if(kind<0.76){ const shr=mesh('sph',[0.09,6,5], mat(0x8a5a9e)); shr.position.set(x,0.12,z); const st2=mesh('cyl',[0.03,0.04,0.12,4], mat(0xd8d4c8)); st2.position.set(x,0.05,z); deco.add(shr); deco.add(st2); }
+      else if(kind<0.9){ const hay=mesh('cyl',[0.02,0.02,rand(0.25,0.45),3], mat(0xc2a24f)); hay.rotation.z=rand(1,2); hay.rotation.y=rand(TAU); hay.position.set(x,0.05,z); deco.add(hay); }
+      else { const bone=mesh('cyl',[0.03,0.03,rand(0.3,0.5),4], mat(PAL.bone)); bone.rotation.z=Math.PI/2; bone.rotation.y=rand(TAU); bone.position.set(x,0.05,z); deco.add(bone); }
+    }
+    // a lost witch hat beside the Witchwood path (someone left in a hurry)
+    const hat=new THREE.Group();
+    const brim=mesh('cyl',[0.42,0.46,0.06,9], mat(0x3a2d55)); brim.position.y=0.04; hat.add(brim);
+    const hcone=mesh('cone',[0.26,0.6,8], mat(0x3a2d55)); hcone.position.y=0.35; hcone.rotation.z=0.35; hat.add(hcone);
+    const hband=mesh('cyl',[0.27,0.28,0.09,9], mat(PAL.pumpkin)); hband.position.y=0.12; hat.add(hband);
+    hat.position.set(Math.sin(WORLDS[2].angle)*16.5+1.2, 0, Math.cos(WORLDS[2].angle)*16.5); deco.add(hat);
+  }
+
+  // ---- outer woods thickened + a distant glowing village on the hills ----
+  for(let i=0;i<8;i++){ const a2=rand(TAU), r=rand(R+4,R+18); deco.add(deadTree(Math.sin(a2)*r, Math.cos(a2)*r, rand(0.9,1.6))); }
+  { for(let i=0;i<9;i++){ const a2=(i/9)*TAU+0.3; const h=mesh('sph',[rand(9,15),9,7], mat(0x241c44)); h.position.set(Math.sin(a2)*(R+30), rand(-4,-1), Math.cos(a2)*(R+30)); h.scale.y=rand(0.35,0.5); deco.add(h); }
+    const fm2=new THREE.MeshBasicMaterial({color:0xffc95e}); const fw=new THREE.Group();
+    for(let i=0;i<14;i++){ const a2=rand(TAU); const wpt=new THREE.Mesh(geo('box',0.22,0.3,0.22), fm2); wpt.position.set(Math.sin(a2)*(R+26+rand(0,6)), rand(1.5,4.5), Math.cos(a2)*(R+26+rand(0,6))); fw.add(wpt); }
+    S.add(mergeStrands(fw, fm2)); }   // far village windows: 1 warm mesh
+
+  // ---- fences + crows near the spawn approach (reactive critters — they flap off) ----
+  fenceRun(deco, 6.5, 11.5, 10.5, 11.5, 4);
+  fenceRun(deco, -4.5, 13.5, -0.5, 13.5, 4);
+  G.ents.add(new Crow(8.5, 0.75, 11.5));
+  G.ents.add(new Crow(-2.5, 0.75, 13.5));
+
+  // ---- MOG THE CAT — the town's reactive critter (scampers between three fixed spots) ----
+  { const cat=new THREE.Group(); const cm=mat(0x17121f);
+    const body=mesh('sph',[0.2,8,6], cm); body.scale.set(1,0.85,1.5); body.position.y=0.22; cat.add(body);
+    const head=mesh('sph',[0.14,7,6], cm); head.position.set(0,0.38,0.26); cat.add(head);
+    for(const s of [-1,1]){ const ear=mesh('cone',[0.05,0.12,4], cm); ear.position.set(0.07*s,0.52,0.24); cat.add(ear); }
+    for(const s of [-1,1]){ const eye=mesh('sph',[0.022,4,4], emat(0xffd34d,0xffd34d,1)); eye.position.set(0.05*s,0.4,0.38); cat.add(eye); }
+    const tail=mesh('cyl',[0.025,0.04,0.42,5], cm); tail.position.set(0,0.34,-0.3); tail.rotation.x=0.9; cat.add(tail);
+    cat.position.set(10.8,0,-3.9);
+    S.add(cat);
+    G.hubCat={g:cat, tail, spots:[[10.8,-3.9],[5.2,-10.6],[13.6,1.8]], i:0, moving:false, mt:0};
+  }
+
+  // ---- chimney smoke (micro-motion — nothing in Grimmwick is perfectly still) ----
+  G.hubSmoke=[];
+  for(const tip of chimneyTips.slice(0,3)){
+    for(let i=0;i<3;i++){
+      const puff=new THREE.Mesh(geo('sph',0.16,6,5), new THREE.MeshBasicMaterial({color:0x9a8fb8, transparent:true, opacity:0.22, depthWrite:false}));
+      puff.position.copy(tip); S.add(puff);
+      G.hubSmoke.push({m:puff, x:tip.x, y:tip.y, z:tip.z, ph:i/3, sp:rand(0.25,0.4)});
+    }
+  }
+
+  // ---- fireflies over the square + falling autumn leaves ----
+  { const fg=new THREE.BufferGeometry(); const fp=[];
+    for(let i=0;i<44;i++){ const a2=rand(TAU), r=rand(6,22); fp.push(Math.sin(a2)*r, rand(0.5,4), Math.cos(a2)*r); }
+    fg.setAttribute('position', new THREE.Float32BufferAttribute(fp,3));
+    G.hubFlies=new THREE.Points(fg, new THREE.PointsMaterial({color:0xffd9a0, size:0.14, transparent:true, opacity:0.8}));
+    S.add(G.hubFlies); }
+  G.hubLeaves=[];
+  for(let i=0;i<12;i++){
+    const lf=new THREE.Mesh(geo('circ',0.16,5), new THREE.MeshBasicMaterial({color:pick([0xd97a2e,0xb5522e,0x8a6f2e,0x7a4a8f]), side:THREE.DoubleSide}));
+    lf.userData={x0:rand(-20,20), z0:rand(-20,20), y0:rand(4,9), sp:rand(0.5,1.0), ph:rand(9), sw:rand(0.8,1.8)};
+    S.add(lf); G.hubLeaves.push(lf);
   }
 
   // ---- Mayor Boo NPC ----
@@ -235,7 +445,6 @@ function buildHub(G){
   // ---- Costume Cauldron shop stall ----
   const shop = new THREE.Group();
   const table = mesh('box',[3.2,0.9,1.6], mat(PAL.wood)); table.position.y=0.45;
-  const canopyPoles = [];
   for(const sx of [-1.4,1.4]) for(const sz of [-0.6,0.6]){
     const p = mesh('cyl',[0.06,0.06,2.6,5], mat(PAL.woodD)); p.position.set(sx,1.3,sz); shop.add(p);
   }
@@ -269,6 +478,8 @@ function buildHub(G){
   // ---- bats ----
   G.bats = makeBats(S, 9, 40);
   G.hubTime = 0;
+  // ---- BAKE every static in the town (houses, gates, lamps, paths, market, well, clutter, woods) → one draw call ----
+  S.add(bakeGroup(deco));
   // spawn
   G.spawnPoint.set(0,0.6,10);
   G.world.killY = -20;
@@ -326,6 +537,32 @@ function updateHub(G, dt){
     }
   }
   if(G.brewMesh) G.brewMesh.position.y = 1.55+Math.sin(t*4)*0.04;
+  // ember braziers flicker in their district colors (the relight-progress ring)
+  if(G.hubBraziers) for(const b of G.hubBraziers){ b.flame.scale.setScalar(1+Math.sin(t*7+b.ph)*0.18); b.halo.material.opacity=0.16+Math.sin(t*5+b.ph)*0.08; }
+  // chimney smoke drifts up and fades
+  if(G.hubSmoke) for(const s of G.hubSmoke){ const f=((t*s.sp)+s.ph)%1; s.m.position.set(s.x+Math.sin(t*1.6+s.ph*7)*0.25*f, s.y+f*2.6, s.z); s.m.scale.setScalar(0.6+f*1.4); s.m.material.opacity=0.26*(1-f); }
+  // fireflies + falling leaves
+  if(G.hubFlies) updateFireflies(G.hubFlies, t);
+  if(G.hubLeaves) for(const lf of G.hubLeaves){ const u=lf.userData; const fall=((t*u.sp+u.ph)%1); lf.position.set(u.x0+Math.sin(t*1.3+u.ph)*u.sw, u.y0*(1-fall), u.z0); lf.rotation.set(Math.sin(t*2+u.ph)*1.2, t*1.5+u.ph, 0); }
+  // a few windows flicker (cloned materials only — never the shared cache)
+  if(G.hubWindows) for(const w of G.hubWindows){ if(w.userData.flick!==undefined) w.material.emissiveIntensity=0.85+Math.sin(t*9+w.userData.flick)*0.25; }
+  // the wishing well breathes
+  if(G.hubWellGlow) G.hubWellGlow.material.opacity=0.3+Math.sin(t*2.2)*0.12;
+  // Mog the cat — tail sway; scampers to the next spot when approached
+  if(G.hubCat){
+    const c=G.hubCat; c.tail.rotation.z=Math.sin(t*3)*0.4;
+    const pl2=G.player;
+    if(!c.moving && pl2){
+      const dx=pl2.pos.x-c.g.position.x, dz=pl2.pos.z-c.g.position.z;
+      if(dx*dx+dz*dz<2.3*2.3){ c.moving=true; c.i=(c.i+1)%c.spots.length; c.mt=0; AUDIO.tone && AUDIO.tone({f:880,f2:1240,type:'sine',t:0.12,vol:0.07}); }
+    }
+    if(c.moving){
+      const [tx,tz]=c.spots[c.i]; c.mt+=dt;
+      const dx=tx-c.g.position.x, dz=tz-c.g.position.z, d=Math.hypot(dx,dz);
+      if(d<0.15){ c.moving=false; c.g.position.y=0; }
+      else { c.g.position.x+=dx/d*6.5*dt; c.g.position.z+=dz/d*6.5*dt; c.g.position.y=Math.abs(Math.sin(c.mt*14))*0.28; c.g.rotation.y=Math.atan2(dx,dz); }
+    }
+  }
   // ambient boos drift
   for(const b of G.hubBoos){
     const u=b.userData; u.t+=dt; u.a+=u.sp*dt;
