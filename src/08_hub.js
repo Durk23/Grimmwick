@@ -118,6 +118,16 @@ function buildHub(G){
   const jmo = mesh('box',[1.1,0.2,0.1], fm); jmo.position.set(0,2.6,1.4); plinthG.add(jmo);
   // tiny sad ember floating inside
   G.hubEmber = mesh('sph',[0.16,8,6], emat(0xff7b2e,0xff7b2e,1)); G.hubEmber.position.set(0,3.1,0); plinthG.add(G.hubEmber);
+  if(G.save.embers>=5){
+    // THE EVERFLAME WHOLE — after the finale the town's heart properly BURNS (the ending's promise, kept at home)
+    const fl = new THREE.Mesh(geo('cone',0.85,2.1,9), new THREE.MeshLambertMaterial({color:0xffa050, emissive:0xff8a3a, emissiveIntensity:1.1, transparent:true, opacity:0.94}));
+    fl.position.set(0,4.0,0); plinthG.add(fl);
+    const flIn = new THREE.Mesh(geo('cone',0.45,1.4,7), new THREE.MeshLambertMaterial({color:0xfff2c4, emissive:0xffd98a, emissiveIntensity:1.4}));
+    flIn.position.set(0,3.85,0); plinthG.add(flIn);
+    G.hubEmber = fl;                                   // the pulse target becomes the big flame
+    // and the great jack-o'-lantern's face finally lights warm (it was dark and sad all game)
+    jeL.material = emat(0xffe08a, 0xffb02e, 1); jeR.material = jeL.material; jmo.material = jeL.material;
+  }
   G.hubEmberLight = new THREE.PointLight(0xff8c3e, 45, 15); G.hubEmberLight.position.set(0,3.4,0); plinthG.add(G.hubEmberLight);
   S.add(plinthG);
   G.world.addMesh(plinth); G.world.addMesh(bowl);

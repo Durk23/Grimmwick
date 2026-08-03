@@ -133,12 +133,16 @@ class GrimmCauldron {
   onPlayerPound(pos){}   // boss contract — player calls this on every landed pound; the cauldron ignores it (pound is even an invite button here)
 
   defeat(){
-    // start the ENDING cutscene (multi-beat dialogue); onBossDefeated fires at the end
+    // THE INVITE LANDS — start the ending cutscene; onBossDefeated fires at its last beat
     this.dead = true; this.state = 'ending'; this.stateT = 0; this._endStage = 0; this._endT = 0;
     for(const s of this.shadows) if(!s.dead){ s.dead=true; if(s.group) this.G.scene.remove(s.group); if(s.shadow) this.G.scene.remove(s.shadow); }
     for(const b of this.burners) if(b.light) b.light.intensity = 40;
+    if(this._marker){ this.G.scene.remove(this._marker); this._marker=null; }
     window.UI && UI.hideBossBar();
+    window.UI && UI.closeDialogue();   // clear the flushed-state dialogue — the cinematic banners own the stage now
     AUDIO.victory && AUDIO.victory();
+    this.G.hitstop = 0.22;   // the world holds its breath
+    this.G.fx.spawn(new THREE.Vector3(0,3,0), 0xffffff, 30, {speed:6, life:0.8});
     // brew goes fully sweet
     this.brew.material.color.set(0xff9ecf); this.brew.material.emissive.set(0xffb0d8);
     this.G.camc.shake(0.4, 0.5);
@@ -155,8 +159,8 @@ class GrimmCauldron {
     const openX = 24 + this.litCount*3;   // farther out with each ember
     this.darkL.position.x = damp(this.darkL.position.x, -openX, 2, dt);
     this.darkR.position.x = damp(this.darkR.position.x, openX, 2, dt);
-    // Grimm tracks the player's side (menace)
-    this.grimm.rotation.y = (pl && pl.pos.x < p.x) ? 0.3 : -0.3;
+    // Grimm tracks the player's side (menace) — until the ending, where he turns to face you instead
+    if(this.state!=='ending') this.grimm.rotation.y = (pl && pl.pos.x < p.x) ? 0.3 : -0.3;
 
     switch(this.state){
       case 'intro': {
@@ -198,7 +202,19 @@ class GrimmCauldron {
         if(this.slam){ if(this.slam.tell) G.scene.remove(this.slam.tell); this.slam=null; }
         if(this.wave){ if(this.wave.mesh) G.scene.remove(this.wave.mesh); this.wave=null; }
         this.eyeL.scale.setScalar(0.7); this.eyeR.scale.setScalar(0.7);
-        if(!this._flushHint){ this._flushHint=true; window.UI && UI.toast('👆 Walk up to Grimm and press ANY button (JUMP / SPIN / 💥 / E) — you know what to do. (It was never a fight.)'); }
+        if(!this._flushHint){ this._flushHint=true;
+          window.UI && UI.finaleBanner('🫥 GRIMM IS FLUSHED OUT — walk up & press ANY button', 3600);
+          window.UI && UI.toast('👆 It was never a fight. Walk up to Grimm and press ANY button (JUMP / SPIN / 💥 / E).');
+          // an unmissable bouncing golden marker over his head — the "come here" every platformer kid knows
+          const mk = new THREE.Group();
+          const arrow = new THREE.Mesh(geo('cone',0.34,0.7,6), new THREE.MeshLambertMaterial({color:0xffd23f, emissive:0xffb020, emissiveIntensity:1}));
+          arrow.rotation.x = Math.PI; mk.add(arrow);
+          const mring = new THREE.Mesh(geo('tor',0.5,0.06,6,18), new THREE.MeshBasicMaterial({color:0xffd98a, transparent:true, opacity:0.8}));
+          mk.add(mring);
+          mk.position.set(0, 5.4, 0); G.scene.add(mk);
+          this._marker = mk;
+        }
+        if(this._marker){ this._marker.position.y = 5.2 + Math.abs(Math.sin(this.t*3.2))*0.5; this._marker.rotation.y = this.t*2; this._marker.children[1].scale.setScalar(1+Math.sin(this.t*6)*0.2); }
         // ACCEPT ANY ACTION PRESS as the invite — he's harmless now, and touch has no interact affordance during a
         // boss (the #prompt button is display:none'd every frame in boss areas). This keeps the finale completable on iPhone/iPad.
         if(pl && !pl.dead && Math.abs(pl.pos.x - p.x) < 3.2 && (INPUT.interactEdge || INPUT.jumpEdge || INPUT.attackEdge || INPUT.poundEdge)){
@@ -207,16 +223,72 @@ class GrimmCauldron {
         break;
       }
       case 'ending': {
-        // the wholesome close — a few timed beats, then hand off to the victory flow
+        // the wholesome close — cinematic beats with BANNERS (small dialogue read as "did I even win?")
         this._endT += dt;
         this.grimm.position.y = damp(this.grimm.position.y, 1.6, 2, dt);
-        if(this._endStage===0 && this._endT>0.6){ this._endStage=1; window.UI && UI.dialogue('🧒', '"You were never a monster, Grimm. You were just... never invited. So — come to the festival. There\'s a lantern with your name on it."'); }
-        else if(this._endStage===1 && this._endT>3.2){ this._endStage=2; window.UI && UI.dialogue('🫥', '"...a lantern. For ME? ...after everything?" *the shadow softens, warm at the edges* "...Well. I never could resist a good party."'); }
-        else if(this._endStage===2 && this._endT>6.2){ this._endStage=3;
+        this.grimm.rotation.y = damp(this.grimm.rotation.y, 0, 3, dt);   // he turns to face you
+        // Grimm's TRANSFORMATION — shadow melts to warmth over ~1.6s once the lantern is offered
+        if(this._warm !== undefined && this._warm < 1){
+          this._warm = Math.min(1, this._warm + dt/1.6);
+          this.grimmMat.color.lerpColors(new THREE.Color(0x1a1428), new THREE.Color(0x5a5578), this._warm);
+          this.grimmMat.emissive.lerpColors(new THREE.Color(W5PAL.shadowP), new THREE.Color(0xff9a50), this._warm);
+          this.grimmMat.emissiveIntensity = 0.6 - this._warm*0.3;
+          this.grimmMat.opacity = 0.9 + this._warm*0.1;
+          const es = 0.7 + this._warm*0.45;                            // eyes go from wary slits to big warm rounds
+          this.eyeL.scale.setScalar(es); this.eyeR.scale.setScalar(es);
+        }
+        if(this._lantern){ this._lantern.scale.setScalar(Math.min(1, this._lantern.scale.x + dt*2)); this._lantern.rotation.y += dt*0.8;
+          this._lantern.children[1].material.emissiveIntensity = 1 + Math.sin(this.t*6)*0.3; }
+        // the great flame column breathes; fireworks pop; snow drifts
+        if(this._flame){ const s = 1 + Math.sin(this.t*7)*0.12; this._flame.scale.set(s,1+Math.sin(this.t*5.2)*0.18,s);
+          this._flameIn.scale.set(1+Math.sin(this.t*9+1)*0.15, 1+Math.sin(this.t*6.4+2)*0.2, 1); }
+        if(this._party){
+          this._fireworkT -= dt;
+          if(this._fireworkT <= 0){ this._fireworkT = 0.55;
+            const fx = rand(-16,16), fy = rand(5,9.5);
+            G.fx.spawn(new THREE.Vector3(fx,fy,rand(-2,1)), pick([0xff5ea8,0x63e6e2,0xffd23f,0xb37dff,0xff8c2e]), 22, {speed:6, life:1.1, gravity:2});
+            AUDIO.tone && AUDIO.tone({f:rand(700,1100), f2:rand(1300,1900), type:'sine', t:0.14, vol:0.06});
+          }
+          if(this._snow) for(const fl of this._snow){ const u=fl.userData; const f=((this.t*u.sp+u.ph)%1); fl.position.set(u.x0+Math.sin(this.t+u.ph)*0.8, 11*(1-f), u.z0); }
+        }
+        if(this._endStage===0 && this._endT>0.5){ this._endStage=1;
+          window.UI && UI.finaleBanner('🧒 “You were never a monster. You were just never invited.”', 3000); }
+        else if(this._endStage===1 && this._endT>3.6){ this._endStage=2;
+          window.UI && UI.finaleBanner('🏮 “Come to the festival, Grimm. There\'s a lantern with your name on it.”', 3000);
+          // the lantern appears in his hand — the night-watchman is born
+          const lan = new THREE.Group();
+          const cage = mesh('box',[0.34,0.42,0.34], mat(0x241c38));
+          const glow = new THREE.Mesh(geo('sph',0.14,8,6), new THREE.MeshLambertMaterial({color:0xffe9b0, emissive:0xffc050, emissiveIntensity:1}));
+          lan.add(cage, glow);
+          lan.position.set(1.15, 2.6, 0.4); lan.scale.setScalar(0.01);
+          this.group.add(lan); this._lantern = lan;
+          this._warm = 0;                                             // start the transformation
+          AUDIO.heart && AUDIO.heart(); }
+        else if(this._endStage===2 && this._endT>6.8){ this._endStage=3;
+          window.UI && UI.finaleBanner('🔥 THE EVERFLAME BURNS WHOLE AGAIN', 3200);
+          // THE RELIGHT — a roaring flame column erupts from the cauldron
+          this._flame = new THREE.Mesh(geo('cone',1.8,4.6,10), new THREE.MeshLambertMaterial({color:0xff7020, emissive:0xff6a1a, emissiveIntensity:0.9, transparent:true, opacity:0.94}));
+          this._flame.position.set(0,5.0,0); this.group.add(this._flame);
+          this._flameIn = new THREE.Mesh(geo('cone',0.7,2.6,8), new THREE.MeshLambertMaterial({color:0xffd98a, emissive:0xffb050, emissiveIntensity:1.1, transparent:true, opacity:0.95}));
+          this._flameIn.position.set(0,4.3,0); this.group.add(this._flameIn);
+          // trade the two chandelier lights for the Everflame's own big warm light (stays ≤6 total)
+          if(this.arenaLights) for(const l of this.arenaLights) G.scene.remove(l);
+          const big = new THREE.PointLight(0xffa050, 95, 36); big.position.set(0,5.5,2); G.scene.add(big);
           for(const b of this.burners){ this.G.fx.spawn(new THREE.Vector3(b.x,2,-0.8), W5PAL.emberL, 20, {speed:4}); }
-          this.G.fx.spawn(new THREE.Vector3(0,3,0), 0xffffff, 40, {speed:7, life:1.2}); this.G.camc.shake(0.5,0.6);
-          window.UI && UI.dialogue('🔥', 'The Everflame roars back whole. Grimmwick glows warm to its rooftops — and the Forgotten Guest takes up the night-watch, lantern in hand, at last one of the family. Happy Halloween, Pip. (...is that snow?)'); }
-        else if(this._endStage===3 && this._endT>9.5){ this._endStage=4; G.onBossDefeated(); }
+          G.fx.spawn(new THREE.Vector3(0,4,0), 0xffffff, 50, {speed:8, life:1.3});
+          G.camc.shake(0.6,0.7);
+          AUDIO.goldPumpkin && AUDIO.goldPumpkin();
+          // candy fireworks + the first snow of Winterfest
+          this._party = true; this._fireworkT = 0.2;
+          this._snow = [];
+          for(let i=0;i<26;i++){
+            const fl = new THREE.Mesh(geo('circ',0.09,5), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.85, side:THREE.DoubleSide}));
+            fl.userData = {x0:rand(-20,20), z0:rand(-2,3), sp:rand(0.14,0.3), ph:rand(9)};
+            G.scene.add(fl); this._snow.push(fl);
+          } }
+        else if(this._endStage===3 && this._endT>10.6){ this._endStage=4;
+          window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED', 3600);
+          G.onBossDefeated(); }
         break;
       }
     }
@@ -253,7 +325,8 @@ function buildBossArena5(G){
   S.add(bakeGroup(deco));
 
   // ≤6 real lights AT PEAK: two chandelier glows + the 4 in-fight burner lights = 6 (the throne up-light was the 7th — cut)
-  for(const [lx,col] of [[-8,W5PAL.ember],[8,W5PAL.ember]]){ const l=new THREE.PointLight(col, 20, 16); l.position.set(lx, 5, -3); S.add(l); }
+  const arenaLights = [];
+  for(const [lx,col] of [[-8,W5PAL.ember],[8,W5PAL.ember]]){ const l=new THREE.PointLight(col, 20, 16); l.position.set(lx, 5, -3); S.add(l); arenaLights.push(l); }
 
   // boss lifecycle (switchArea builds the fresh Player AFTER this and spawns it at spawnPoint)
   G.spawnPoint.set(-16, 1, 0);
@@ -261,4 +334,5 @@ function buildBossArena5(G){
   G.bats = makeBats(S, 5, 30);
   G.amb  = w5Ambience(S, x1, x2);
   G.boss = new GrimmCauldron(G);
+  G.boss.arenaLights = arenaLights;   // the ending trades these for the Everflame's own light (budget stays ≤6)
 }

@@ -294,7 +294,7 @@ const G = {
       this.switchArea('hub');
       this.state='play';
       UI.fade(false, 450);
-      if(afterVictory) UI.toast('🔥 The Everflame flickers a little brighter...');
+      if(afterVictory) UI.toast(this.save.embers>=5 ? '🎆 THE EVERFLAME BURNS WHOLE — the festival is ON! Happy Halloween, Grimmwick!' : '🔥 The Everflame flickers a little brighter...');
     }, 500);
   },
   onPlayerFell(){
@@ -420,6 +420,7 @@ const G = {
     this.persist();
     const fmt = t => Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
     const stats = {
+      district,
       candy: this.save.candy-this.runCandy0+0,
       gp: this.runPumpkins.filter(Boolean).length,
       time: fmt(secs),

@@ -241,12 +241,15 @@ const UI = {
         </div>
       </div></div>
       <div id="victory-screen" class="screen"><div class="card">
-        <div style="font-size:54px">🔥</div>
-        <h2 style="margin:8px 0;color:#ffb35e">GUARDIAN FREED!</h2>
-        <p style="font-size:16px;line-height:1.5;margin-bottom:8px">The Pumpkin King is himself again — and the first ember is yours! The Harvest District glows warm tonight.<br><b>👻 A blessing from the guardian: lives refilled!</b></p>
+        <div id="vEmoji" style="font-size:54px">🔥</div>
+        <h2 id="vTitle" style="margin:8px 0;color:#ffb35e">GUARDIAN FREED!</h2>
+        <p id="vBody" style="font-size:16px;line-height:1.5;margin-bottom:8px"></p>
         <div id="vstats" style="font-size:15px;opacity:.9;margin:10px 0"></div>
         <button class="btn orange ui-block" id="vHome">🏘️ Return to Grimmwick</button>
       </div></div>
+      <div id="finaleBanner" style="display:none;position:fixed;left:0;right:0;top:26%;z-index:60;text-align:center;pointer-events:none;padding:0 6vw;
+        font-family:inherit;font-weight:900;font-size:clamp(22px,4.6vw,42px);color:#ffe9c4;
+        text-shadow:0 0 18px rgba(255,160,60,.9),0 0 60px rgba(255,120,40,.55),0 3px 0 rgba(40,10,50,.8);opacity:0;transition:opacity .45s"></div>
       <div id="vig" style="position:fixed;inset:0;pointer-events:none;z-index:5;box-shadow:inset 0 0 140px 46px rgba(8,4,20,.5)"></div>
       <div id="hurtvig"></div>
       <div id="fade"></div>
@@ -749,8 +752,33 @@ const UI = {
     const rec = stats.cozy ? `<div style="margin-top:6px;opacity:.85">🧸 Cozy run — records take a nap</div>` : stats.isRecord
       ? `<div style="margin-top:8px;font-weight:900;color:#ffd23f;font-size:18px">🏆 NEW RECORD — ${stats.time}!</div>`
       : `<div style="margin-top:6px;opacity:.85">🏆 Your best: <b>${stats.best}</b></div>`;
+    // per-guardian copy — the finale gets its own ending card, not a "guardian freed" one
+    const COPY = {
+      w1:{e:'🎃', t:'GUARDIAN FREED!', b:'The Pumpkin King is himself again — and the first ember is yours! The Harvest District glows warm tonight.'},
+      w2:{e:'🪦', t:'GUARDIAN FREED!', b:'Mossgrave settles back into his hill with a happy rumble — the second ember is yours! Ravenmoor\'s lanterns glow green tonight.'},
+      w3:{e:'🧹', t:'GUARDIAN FREED!', b:'Broomhilda cackles a THANK-you and loops the moon — the third ember is yours! Witchwood\'s cauldrons bubble bright tonight.'},
+      w4:{e:'⚓', t:'GUARDIAN FREED!', b:'Captain Wraith tips his hat as THE SEA RUSHES BACK — the fourth ember is yours! Ghost Harbor floats again tonight.'},
+      w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'Grimm said YES. The Everflame burns whole, every district glows to its rooftops, and the Forgotten Guest walks the night-watch with a lantern of his own.<br><b>You saved Grimmwick, Pip. Happy Halloween. 🏮</b>'},
+    };
+    const c = COPY[stats.district] || COPY.w1;
+    this.el('vEmoji').textContent = c.e;
+    const vt = this.el('vTitle'); vt.textContent = c.t;
+    if(stats.district==='w5'){ vt.style.color='#ffd23f'; vt.style.fontSize='26px'; vt.style.textShadow='0 0 16px rgba(255,180,60,.7)'; }
+    else { vt.style.color='#ffb35e'; vt.style.fontSize=''; vt.style.textShadow=''; }
+    this.el('vBody').innerHTML = c.b + '<br><b>👻 A blessing from the guardian: lives refilled!</b>';
     this.el('vstats').innerHTML = `🍬 Candy collected: <b>${stats.candy}</b> &nbsp;·&nbsp; 🎃 Golden Pumpkins: <b>${stats.gp}/3</b><br>⏱️ Time: <b>${stats.time}</b>${rec}`;
+    this.el('vHome').textContent = stats.district==='w5' ? '🎉 Join the festival in town!' : '🏘️ Return to Grimmwick';
     this.el('victory-screen').style.display='flex';
+  },
+  // big cinematic center-screen text for the finale beats — unmissable, unlike a toast
+  finaleBanner(text, holdMs=2600){
+    const b = this.el('finaleBanner');
+    clearTimeout(this._fbT1); clearTimeout(this._fbT2);
+    b.textContent = text;
+    b.style.display='block';
+    requestAnimationFrame(()=>{ b.style.opacity=1; });
+    this._fbT1 = setTimeout(()=>{ b.style.opacity=0; }, holdMs);
+    this._fbT2 = setTimeout(()=>{ b.style.display='none'; }, holdMs+500);
   },
   fade(toBlack, dur=500){
     const f=this.el('fade');
