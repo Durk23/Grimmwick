@@ -413,12 +413,12 @@ class Player {
     if(INPUT.jumpEdge) this.jumpBuf = 0.14; else this.jumpBuf -= dt;
     if(this.jumpBuf>0 && !this.pounding && !this.climbing){
       if(this.coyote>0){
-        this.vel.y = 10.0; this.grounded=false; this.coyote=0; this.jumpBuf=0; this.jumpT=0;
+        this.vel.y = 10.0; this.grounded=false; this.coyote=0; this.jumpBuf=0; this.jumpT=0; this._springAir=false;
         AUDIO.jump();
         this.squashV = 6;
         G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.1,this.pos.z), 0xcccccc, 5, {speed:1.5, life:0.3, gravity:2, size:0.7});
       } else if(this.canDouble){
-        this.vel.y = 9.0; this.canDouble=false; this.jumpBuf=0; this.jumpT=0;
+        this.vel.y = 9.0; this.canDouble=false; this.jumpBuf=0; this.jumpT=0; this._springAir=false;
         AUDIO.djump();
         this.squashV = 6;
         if(this.costumeKey==='skeleton') AUDIO.noise({t:0.15,vol:0.1,fFrom:3000,fTo:1000});
@@ -508,7 +508,9 @@ class Player {
     // --- physics ---
     const wasGrounded = this.grounded;
     G.world.step(this, dt, {
-      onBounce: ()=>{ AUDIO.bounce(); this.canDouble=true; this.squashV=8; this.lastBounce=G.time; if(this.pounding){this.vel.y*=1.35; this.pounding=false;} G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y,this.pos.z), PAL.pumpkin, 8, {speed:3, life:0.4}); },
+      onBounce: ()=>{ AUDIO.bounce(); this.canDouble=true; this.squashV=8; this.lastBounce=G.time; this._springAir=true; if(this.pounding){this.vel.y*=1.35; this.pounding=false;} G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y,this.pos.z), PAL.pumpkin, 8, {speed:3, life:0.4}); },
+      // ^ _springAir on bounce: the variable-jump release-cut was chopping EVERY bounce (13→6.5) for anyone not
+      //   holding jump — i.e. every touch player. Bounces are launches: uncuttable, no hold-lift, per the jump model.
       onHardLand: ()=>{},
       onHazard: (c)=>{ this.damage(1, new THREE.Vector3((c.min.x+c.max.x)/2, c.min.y, (c.min.z+c.max.z)/2)); },
       onFall: ()=>{ G.onPlayerFell(); },

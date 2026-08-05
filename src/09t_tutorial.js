@@ -55,9 +55,11 @@ function buildTutorial(G){
     'Jump, then press \ud83d\udca5 in the air \u2014 the GROUND POUND! Pound the big pumpkin for a MEGA bounce! \u2014 Gran \u2665' :
     'Jump, then press K in the air \u2014 the GROUND POUND! Pound the big pumpkin for a MEGA bounce! \u2014 Gran \u2665');
   bigPumpkin(G, 63.5, -0.5, 0, 1.8);
-  platform(G, 68.5, 5.6, 0, 3.4, 3, 0x4a3a6e);
-  candyLine(G, [[68.5,6.8,0],[68.5,6.8,0]], 3);
-  G.ents.add(new Heart(68.5, 7, 0));
+  // the mega-bounce target: wide, close to the pumpkin, and WELL under the ~7u bounce apex — a first-ever
+  // pound-bounce should land it easily (owner playtest: 5.6 @ 5u of air-steer was too hard for a tutorial)
+  platform(G, 66.5, 3.9, 0, 5, 3, 0x4a3a6e);   // under the plain-bounce apex (~4.5) with margin, above double-jump reach (3.3) — the pound-teach still matters, but a good bounce alone can make it
+  candyLine(G, [[63.5,3.2,0],[64.8,5.2,0],[66.5,4.9,0]], 4);   // the candy arc TRACES the bounce path (telegraph rule)
+  G.ents.add(new Heart(66.5, 4.9, 0));
 
   signPost(G, 71.5, 1.8, -0.2, INPUT.isTouch ?
     'One more trick! Stand still and HOLD \ud83d\udca5... squiiiish... now let go. SPROING! \u2014 Gran \u2665' :

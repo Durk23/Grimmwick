@@ -485,6 +485,17 @@ function buildHub(G){
     S.add(bg);
     G.hubBoos.push(bg);
   }
+  // ---- THE GOLDEN GUIDE ARROW (town tutorial) — hovers over your current objective: Mayor Boo first,
+  // then glides to the next district gate. Same gold-arrow language the finale uses — "go here" ----
+  { const mk = new THREE.Group();
+    const arrow = new THREE.Mesh(geo('cone',0.3,0.62,6), new THREE.MeshLambertMaterial({color:0xffd23f, emissive:0xffb020, emissiveIntensity:1}));
+    arrow.rotation.x = Math.PI; mk.add(arrow);
+    const ring = new THREE.Mesh(geo('tor',0.44,0.05,6,18), new THREE.MeshBasicMaterial({color:0xffd98a, transparent:true, opacity:0.8}));
+    mk.add(ring);
+    mk.position.set(G.mayor.position.x, 3.6, G.mayor.position.z);
+    S.add(mk);
+    G.hubGuide = mk;
+  }
   // ---- bats ----
   G.bats = makeBats(S, 9, 40);
   G.hubTime = 0;
@@ -573,6 +584,24 @@ function updateHub(G, dt){
       else { c.g.position.x+=dx/d*6.5*dt; c.g.position.z+=dz/d*6.5*dt; c.g.position.y=Math.abs(Math.sin(c.mt*14))*0.28; c.g.rotation.y=Math.atan2(dx,dz); }
     }
   }
+  // the golden guide arrow: over Mayor Boo until you've met him, then it glides to the next district gate
+  if(G.hubGuide){
+    let tx=null, ty=0, tz=0;
+    if(!G.save.metMayor && G.mayor){ tx=G.mayor.position.x; ty=3.6; tz=G.mayor.position.z; }
+    else {
+      const next = G.gates && G.gates.find(gt=>gt.open && !G.save.worlds[gt.w.key]);
+      if(next){ tx=next.x*0.9; ty=6.2; tz=next.z*0.9; }   // pulled slightly toward town so it reads from the square
+    }
+    if(tx===null){ G.hubGuide.visible=false; }
+    else {
+      G.hubGuide.visible=true;
+      G.hubGuide.position.x = damp(G.hubGuide.position.x, tx, 2.5, dt);
+      G.hubGuide.position.z = damp(G.hubGuide.position.z, tz, 2.5, dt);
+      G.hubGuide.position.y = ty + Math.abs(Math.sin(t*3))*0.45;
+      G.hubGuide.rotation.y = t*2;
+      G.hubGuide.children[1].scale.setScalar(1+Math.sin(t*6)*0.18);
+    }
+  }
   // ambient boos drift
   for(const b of G.hubBoos){
     const u=b.userData; u.t+=dt; u.a+=u.sp*dt;
@@ -605,7 +634,11 @@ function updateHub(G, dt){
   }
   UI.setPrompt(prompt);
   if(prompt && INPUT.interactEdge){
-    if(prompt.kind==='mayor') UI.mayorDialogue();
+    if(prompt.kind==='mayor'){
+      UI.mayorDialogue();
+      if(!G.save.metMayor){ G.save.metMayor=true; G.persist();
+        UI.toast('🎃 Follow the golden arrow — WALK INTO a glowing gate to pick a level!'); }
+    }
     else if(prompt.kind==='shop') UI.openShop();
     else if(prompt.kind==='enter'){ AUDIO.portal(); G.openMap(prompt.gate.w.key||'w1'); }
     else if(prompt.kind==='soon') UI.toast('🚧 '+prompt.gate.w.name+' is still being built — coming very soon!');

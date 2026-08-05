@@ -110,6 +110,7 @@ const G = {
     // drop refs into the outgoing scene graph — any one of these pins the WHOLE dead scene (and its GPU buffers) in memory
     this.lvlPortal = this.warpPortal = this.tutPortal = this._gateGlow = null;
     this.hubEmber = this.hubEmberLight = this.hubLamps = this.gates = this.mayor = this.mayorHome = this.brewMesh = this.hubBoos = null;
+    this.hubBraziers = this.hubSmoke = this.hubFlies = this.hubLeaves = this.hubCat = this.hubWindows = this.hubWellGlow = this.hubGuide = null;
     this.signs = this.coffins = this.bats = this.amb = null;
     if(this.ents) this.ents.clear();
     if(this.fx) this.fx.clear();
