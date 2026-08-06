@@ -53,11 +53,15 @@ const UI = {
       /* landscape + touch: keep dialogue/sign text clear of the right-hand action buttons (owner: horizontal is the primary orientation) */
       @media (orientation:landscape){ .touch #dlg{ left:16px; right:210px; transform:none; width:auto; max-width:600px; margin-inline:auto; } .touch #prompt{ bottom:200px; } }
       /* full screens */
-      .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; flex-direction:column; gap:18px; text-align:center; overflow-y:auto; -webkit-overflow-scrolling:touch; box-sizing:border-box; padding:calc(16px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom)); }
+      /* pointer-events:auto is LOAD-BEARING: without it an overflowing card can't be touch-scrolled in landscape,
+         stranding everything below the fold (including the close button) */
+      .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; flex-direction:column; gap:18px; text-align:center; overflow-y:auto; -webkit-overflow-scrolling:touch; box-sizing:border-box; pointer-events:auto; padding:calc(16px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-left)) calc(16px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-right)); }
+      .xClose { position:absolute; top:10px; right:10px; width:38px; height:38px; border-radius:12px; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.28); color:#fff; font-size:17px; font-weight:800; font-family:inherit; cursor:pointer; line-height:1; z-index:2; }
+      .xClose:active { background:rgba(255,255,255,.22); }
       /* auto-margin centering that degrades to a scroll when the card is taller than the viewport (landscape safe) */
       .screen:not(#map-screen)::before { content:""; margin-top:auto; flex:0 0 0; }
       .screen:not(#map-screen)::after { content:""; margin-bottom:auto; flex:0 0 0; }
-      .card { background:rgba(26,16,50,.97); border:2px solid #8e5bd9; border-radius:26px; padding:26px 30px; max-width:min(680px,94vw); flex:0 0 auto; box-shadow:0 20px 60px rgba(0,0,0,.7); }
+      .card { position:relative; background:rgba(26,16,50,.97); border:2px solid #8e5bd9; border-radius:26px; padding:26px 30px; max-width:min(680px,94vw); flex:0 0 auto; box-shadow:0 20px 60px rgba(0,0,0,.7); }
       @media (max-height:540px){ .screen{gap:8px;} .card{padding:12px 22px;border-radius:18px;} .card h2{margin:2px 0;font-size:19px;} .card>div:first-child{font-size:24px;} .btn{padding:8px 20px;font-size:15px;} .cstarRow{margin:5px 0 2px;} .cstar{padding:5px 6px 4px;} .cstar .big{font-size:22px;} .cstar .lbl{font-size:10.5px;margin-top:2px;} #clearStats{margin:4px 0 !important;} .clearBtns{flex-direction:row !important;flex-wrap:wrap;justify-content:center;} .clearBtns .btn{flex:1 1 30%;} }
       #title-screen { display:flex; background:transparent; pointer-events:auto; }
       #logo { font-size:min(13vw,84px); font-weight:900; letter-spacing:2px; color:#ffb35e; text-shadow:0 0 30px #ff8c2e88, 0 4px 0 #7a3040, 0 8px 0 #4a1f30, 0 12px 24px #000; transform:rotate(-2deg); }
@@ -171,11 +175,13 @@ const UI = {
         <div style="opacity:.55;font-size:12px;margin-top:40px">v1.0 · all 5 districts</div>
       </div>
       <div id="intro-screen" class="screen"><div class="card">
+        <button id="introSkip" class="xClose ui-block" title="Skip">✕</button>
         <div style="font-size:44px" id="introIcon">🌕</div>
         <div id="introSlide" style="margin:14px 0"></div>
         <button id="introNext" class="btn orange ui-block">Next ➜</button>
       </div></div>
       <div id="pause-screen" class="screen"><div class="card">
+        <button id="pauseX" class="xClose ui-block" title="Close">✕</button>
         <h2 style="margin-bottom:16px">⏸️ Paused</h2>
         <div style="display:flex;flex-direction:column;gap:10px">
           <button class="btn ui-block" id="resumeBtn">▶️ Resume</button>
@@ -189,6 +195,7 @@ const UI = {
         </div>
       </div></div>
       <div id="shop-screen" class="screen"><div class="card">
+        <button id="shopX" class="xClose ui-block" title="Close">✕</button>
         <h2 style="margin-bottom:4px">🎩 Costume Cauldron</h2>
         <div style="opacity:.8;font-size:14px;margin-bottom:12px">Your candy: 🍬 <span id="shopCandy">0</span></div>
         <div class="tabs">
@@ -270,6 +277,9 @@ const UI = {
     tap('cozyBtn', ()=>{ G.toggleCozy(); this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(G.save.cozy?'ON':'OFF'); });
     tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Tap again'; } });
     tap('shopClose', ()=>this.closeShop());
+    tap('shopX', ()=>this.closeShop());
+    tap('pauseX', ()=>this.togglePause(false));
+    tap('introSkip', ()=>{ AUDIO.ui(); this.el('intro-screen').style.display='none'; this._introDone && this._introDone(); });
     tap('mapClose', ()=>{ AUDIO.ui(); this.hideMap(); G.closeMap(); });
     tap('clearNext', ()=>{ const s=this._clearStats; this.el('clear-screen').style.display='none'; AUDIO.ui(); if(s&&s.nextId) G.enterLevel(s.nextId); });
     tap('clearReplay', ()=>{ const s=this._clearStats; this.el('clear-screen').style.display='none'; AUDIO.ui(); if(s) G.enterLevel(s.levelId); });
