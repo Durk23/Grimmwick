@@ -292,6 +292,9 @@ function buildW2L4(G){
   G.ents.add(new Crow(31, 0.95, -2.9));
   G.ents.add(new Crow(140, 0.95, 2.9));
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 124, 131, 'grave');   // the barge chasm
+
   exitGate(G, 195);
   // D2 ambience tail (cave motes + drifting bats + Ravenmoor backdrop) — pass null, clutter placed manually
   w2LevelFinish(G, -12, 202, 'cave', null);

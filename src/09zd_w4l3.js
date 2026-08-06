@@ -237,6 +237,9 @@ function buildW4L3(G){
   // three-depth Ghost Harbor skyline (wreck ribs / dock+galleon+lighthouse / dry-dune hills + brine glow)
   w4Parallax(S, -8, 170);
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 28, 124, 'harbor');       // the one tower void between the two shore spans — the whole climb hangs over it
+
   // exit + the D4 tail. clutter placed manually on the two GROUND spans only (the middle is all void/tower)
   w4LevelFinish(G, -8, 170, null);
   w4Clutter(G, -8, 28, 'harbor');

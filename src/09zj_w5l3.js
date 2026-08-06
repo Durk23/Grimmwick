@@ -197,6 +197,12 @@ function buildW5L3(G){
   // three-depth clockwork parallax (near cog-teeth/pendulums · rampart + Grimm's cracked clock-tower · mountain spires)
   w5Parallax(S, -8, 187);
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 66, 77, 'castle');
+  pitDressing(G, 88, 90.5, 'castle');
+  pitDressing(G, 102, 104, 'castle');
+  pitDressing(G, 110, 116, 'castle');
+
   // exit + the D5 tail. clutter placed manually on the GROUND spans only (the gauntlet is all void/cog)
   w5LevelFinish(G, -8, 187, null);
   w5Clutter(G, -8, 58, 'castle');

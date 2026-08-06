@@ -358,6 +358,9 @@ function buildW3L5(G){
   G.ents.add(new Crow(88, 0.95, 2.7));
   G.ents.add(new Crow(150, 0.95, -2.6));
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 114, 122, 'wood');   // the timed potion-pad void in Act 3
+
   // ================= tail: ambience + bats + clutter (Witchwood spore-and-potion backdrop) =================
   w3LevelFinish(G, -14, 220, null);                                  // spores/motes/fireflies + bats; clutter placed manually below
   w3Clutter(G, -8, 48, 'forest');                                    // act 1

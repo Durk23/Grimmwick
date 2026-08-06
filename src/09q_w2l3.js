@@ -269,6 +269,10 @@ function buildW2L3(G){
     const st2 = stalagmite(103, 1.6, 0); st2.position.set(103,-2.6,3.1); g.add(st2);
     const cr  = crystalCluster(89, 3.2, 1.2, W2PAL.crystalV); cr.position.y=-4.6; g.add(cr);
     return g; })()));
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 47, 51.3, 'grave');       // the stalagmite-pit rope swing (joins the baked stalagmites)
+  pitDressing(G, 120.5, 123, 'grave');     // the void beside the grand bell-rope
+
   w2LevelFinish(G, -6, 148, 'cave', null);   // bats + cave dust/mote ambience + checkpoint(=spawn); clutter done manually
 
   // baked clutter at each FLOOR height, split so nothing floats over a gap or the river void (x82..96.5)

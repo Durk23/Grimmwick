@@ -258,6 +258,9 @@ function buildW3L3(G){
   S.add(bakeGroup(DECO));
   S.add(bakeGroup(PDECO));
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 116, 124, 'wood');   // the ferry chasm — the level's one true pit
+
   exitGate(G, 194);
   // D3 ambience tail (spores/potion motes + drifting bats + Witchwood backdrop) — clutter placed manually
   w3LevelFinish(G, -12, 204, null);

@@ -235,6 +235,10 @@ function buildW4L4(G){
   // three-depth dried-harbor skyline behind everything (wreck ribs / dock cranes / the galleon looming / lighthouse)
   w4Parallax(S, -8, 183);
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 44.5, 52, 'harbor');      // the open hold under the cannon flight
+  pitDressing(G, 88, 95, 'harbor');        // the exposed hold under the rope-swing
+
   // exit + the D4 tail. clutter only the DOCK seabed (the ship's deck is up at y2 — kit clutter sits on the seabed).
   exitGate(G, 175);
   w4LevelFinish(G, -8, 183, null);

@@ -355,6 +355,13 @@ function buildW1L4(G){
   S.add(bakeGroup(decoAct));
 
   exitGate(G, 184);
+
+  // themed death-pit dressing (visual — the fall is the hazard). NEVER in Gap 1 (x 2..14):
+  // its second half is the LEAP OF FAITH — zero tells of any kind, ever (sacred). The Act 3
+  // bog voids stay undressed too: their glowing brew surface already spans them.
+  pitDressing(G, 50, 64, 'patch');    // Gap 2 — the crossing pair
+  pitDressing(G, 95, 104, 'patch');   // the ride-down gap into the clearing
+
   // clutter per solid span ONLY — never over a void, and NOTHING inside x 2..14: the leap
   // gap keeps its zero-tell rule (no clutter, no lights, no signs, no geometry hints — sacred).
   buildClutter(G, -7, 1, 'garden');     // runway clutter only — nothing may float over the gap

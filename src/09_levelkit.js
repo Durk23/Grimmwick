@@ -66,6 +66,39 @@ function signPost(G,x,z,ry,text){
   G.scene.add(g);
   G.signs.push({x,z,text});
 }
+// PIT DRESSING (owner call, Aug 2026): death pits were an invisible fall — "hard to tell and not too
+// interesting". Every true void pit now shows its DANGER: a themed bed of spikes/bones/thorns down in the
+// dark (visual only — the fall itself already costs the heart via killY, so no double-hit collider).
+// Sits at y≈-4 so it reads from the pit lip but never clips a jump path. NEVER placed on a Leap of Faith.
+function pitDressing(G, x1, x2, theme){
+  const g = new THREE.Group();
+  const w = x2-x1, cx = (x1+x2)/2, n = Math.max(4, Math.floor(w*2.6));
+  const base = mesh('box',[w+0.6, 0.5, 3.4], mat(0x120d1e)); base.position.set(cx, -4.6, 0); g.add(base);   // the dark pit floor
+  for(let i=0;i<n;i++){
+    const px = x1+0.3+rand(0, Math.max(0.1, w-0.6)), pz = rand(-1.2,1.2);
+    if(theme==='grave'){        // bone spikes + the odd skull
+      const b = mesh('cone',[0.16,rand(0.9,1.5),5], mat(PAL.bone)); b.position.set(px,-4.3,pz); b.rotation.z=rand(-0.25,0.25); g.add(b);
+      if(i%5===0){ const sk = mesh('sph',[0.22,7,6], mat(PAL.bone)); sk.position.set(px,-4.25,pz); sk.scale.y=0.85; g.add(sk); }
+    } else if(theme==='wood'){  // giant witchwood thorns + a faint glowing shroom
+      const th = mesh('cone',[0.2,rand(1.0,1.7),5], emat(0x8a5fd0,0x5a2fa0,0.55)); th.position.set(px,-4.3,pz); th.rotation.z=rand(-0.3,0.3); g.add(th);
+      if(i%6===0){ const sh = mesh('sph',[0.14,6,5], emat(0x9fe066,0x6fb040,0.8)); sh.position.set(px,-4.3,pz); g.add(sh); }
+    } else if(theme==='harbor'){ // dead coral spears + splintered ship timbers
+      const c = mesh('cone',[0.17,rand(0.8,1.4),4], mat(0x9a8f86)); c.position.set(px,-4.3,pz); c.rotation.z=rand(-0.35,0.35); g.add(c);
+      if(i%4===0){ const t = mesh('box',[0.16,rand(0.9,1.4),0.16], mat(0x4a3a30)); t.position.set(px,-4.1,pz); t.rotation.z=rand(-0.5,0.5); g.add(t); }
+    } else if(theme==='castle'){ // iron spikes + half-buried gear teeth
+      const s = mesh('cone',[0.15,rand(1.0,1.6),4], mat(0x6a6f7a)); s.position.set(px,-4.3,pz); g.add(s);
+      if(i%5===0){ const gt = mesh('box',[0.4,0.5,0.24], mat(0x5a4f20)); gt.position.set(px,-4.25,pz); gt.rotation.z=rand(-0.4,0.4); g.add(gt); }
+    } else {                    // 'patch' default: bramble thorns + broken fence pickets
+      const th = mesh('cone',[0.15,rand(0.7,1.2),5], mat(0x3a2a20)); th.position.set(px,-4.3,pz); th.rotation.z=rand(-0.3,0.3); g.add(th);
+      if(i%5===0){ const pk = mesh('box',[0.14,rand(0.7,1.1),0.1], mat(PAL.woodD)); pk.position.set(px,-4.15,pz); pk.rotation.z=rand(-0.35,0.35); g.add(pk); }
+    }
+  }
+  // a low menacing glow so the danger reads from the lip (emissive fake, no light)
+  const glowC = {grave:0x9fe066, wood:0x8a5fd0, harbor:0x63e6e2, castle:0xff8a3a, patch:0xff5030}[theme]||0xff5030;
+  const gl = new THREE.Mesh(geo('plane', Math.max(0.5,w-0.4), 1.2), new THREE.MeshBasicMaterial({color:glowC, transparent:true, opacity:0.10, depthWrite:false, side:THREE.DoubleSide}));
+  gl.rotation.x = -Math.PI/2; gl.position.set(cx, -3.7, 0); g.add(gl);
+  G.scene.add(bakeGroup(g));
+}
 function thornsX(G, x, w){
   const tG = new THREE.Group();
   for(let i=0;i<Math.floor(w*4.5);i++){                                  // DENSER so the bed reads as filled (no misleading gaps over the hazard)

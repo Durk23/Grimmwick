@@ -210,6 +210,10 @@ function buildW3L1(G){
   // three-depth braided-forest skyline behind everything
   w3Parallax(S, -8, 190);
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 38, 52, 'wood');     // beat-2 limb hops over the friendly hollow
+  pitDressing(G, 150, 164, 'wood');   // beat-5b hollow crossing under the Swoop Bat
+
   // exit + the D3 tail. clutterTheme null → placed manually below so no clutter floats over the two voids.
   exitGate(G, 184);
   w3LevelFinish(G, -8, 190, null);

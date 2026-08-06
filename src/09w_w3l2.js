@@ -233,6 +233,10 @@ function buildW3L2(G){
   // live will-o'-wisps for glow accents through the gallery (soft emissive glows, no PointLight)
   for(const [wx,wy] of [[15,2.2],[52,3.0],[85,2.4],[118,2.6],[138,3.2]]) S.add(willOWisp(wx, wy, -3.2));
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 58, 66, 'wood');     // gap A — the ravine under the web-strand traverse
+  pitDressing(G, 96, 104, 'wood');    // gap B — the thorn pit under the gallery traverse
+
   // bats + spore/mote/firefly ambience + checkpoint(=spawn); clutter done manually (split around the voids)
   w3LevelFinish(G, -8, 160, null);
   w3Clutter(G, -6, 40, 'forest');     // Act 1

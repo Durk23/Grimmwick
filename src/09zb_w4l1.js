@@ -175,6 +175,9 @@ function buildW4L1(G){
   // three-depth dried-harbor skyline (wreck ribs + dock/galleon/lighthouse + dune hills) behind everything
   w4Parallax(S, -8, 192);
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 36, 42, 'harbor');        // the dried-gap crack under the bell-rope (GAP2 at 116..119.5 keeps its tide-pool bottom)
+
   // exit + the D4 tail. clutterTheme null -> placed manually so no seabed clutter floats over the two cracks.
   exitGate(G, 186);
   w4LevelFinish(G, -8, 192, null);

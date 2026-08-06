@@ -215,6 +215,13 @@ function buildW2L1(G){
   // three-depth cold-cemetery skyline behind everything
   w2Parallax(S, -8, 190, 'surface');
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 30, 34, 'grave');       // beat-2 first gap (hopStone@32 rises from the bed)
+  pitDressing(G, 45, 67, 'grave');       // beat-3 the Hollow
+  pitDressing(G, 100, 120, 'grave');     // beat-5 the Murder crossing
+  pitDressing(G, 134, 150, 'grave');     // beat-6 master span one
+  pitDressing(G, 154, 170, 'grave');     // beat-6 master span two
+
   // exit + the D2 tail (checkpoint/bats/ambience). clutterTheme null -> placed manually, so no clutter floats over a void.
   exitGate(G, 184);
   w2LevelFinish(G, -8, 190, 'surface', null);

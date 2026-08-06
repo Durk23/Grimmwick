@@ -401,6 +401,11 @@ function buildW1L3(G){
   G.ents.add(new Crow(160.5, 0.95, -2.5));
 
   exitGate(G, 162);
+
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 66, 69.4, 'patch');       // the yard gap between the farms
+  pitDressing(G, 118.5, 127.5, 'patch');   // the thresher pit under the hay-wagon ferry
+
   levelFinish(G, -8, 164, null);                 // ambience spans the whole course...
   buildClutter(G, -8, 66, 'farm');               // ...clutter split so nothing floats over
   buildClutter(G, 69.4, 82.8, 'farm');           // the gap or pokes through mountain/chute

@@ -198,6 +198,10 @@ function buildW2L2(G){
   G.ents.add(new Crow(70, 0.95, 2.8));
   G.ents.add(new Crow(125, 0.95, -2.6));
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 37, 45, 'grave');           // the sunken row (the L2 slab rises from the bed)
+  pitDressing(G, 117.5, 120.5, 'grave');     // the fallen row
+
   // ================= tail: exit gate, ambience, bats, clutter (voids left clean) =================
   exitGate(G, 148);
   w2LevelFinish(G, -8, 152, 'surface', null);   // checkpoint/bats/cold-mist ambience; clutter placed by hand below

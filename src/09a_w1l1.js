@@ -442,6 +442,11 @@ function buildW1L1(G){
   candyLine(G, [[206.5,1.8,0],[209,0.9,0],[211,0.8,0]], 4); // glide-down trail off the last gravestone
   exitGate(G, 212);
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 68, 76, 'patch');     // friendly gap 1 — the gravestone-hop void
+  pitDressing(G, 96, 105, 'patch');    // friendly gap 2 — the escalated hops
+  pitDressing(G, 196, 206, 'patch');   // the finale bridge-trap gap (fall after the crumble)
+
   levelFinish(G, -8, 214, null);
   // clutter split around every void (gaps 68..76, 96..105; the crypt opening 137..171; the
   // bridge gap 196..206) — no props float over open graves, crypt, or the trap approach

@@ -175,6 +175,9 @@ function buildW5L5(G){
   w5Parallax(S, -8, 192);
   S.add(bakeGroup(deco));
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 120, 137, 'castle');
+
   // the D5 tail: bats + clock-soot ambience; clutter split around the void (120..142 is all gear-hops)
   w5LevelFinish(G, -8, 192, null);
   w5Clutter(G, -8, 120, 'castle');

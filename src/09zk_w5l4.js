@@ -198,6 +198,16 @@ function buildW5L4(G){
   // three-depth Cursed-Castle skyline (cog-teeth & pendulums / rampart clock-towers + Grimm's Keep / mountain spires)
   w5Parallax(S, -8, 170);
 
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 37.5, 39.5, 'castle');
+  pitDressing(G, 55, 60, 'castle');
+  pitDressing(G, 68, 70.5, 'castle');
+  pitDressing(G, 77.5, 80.5, 'castle');
+  pitDressing(G, 85.5, 88, 'castle');
+  pitDressing(G, 111.5, 119.5, 'castle');
+  pitDressing(G, 124.5, 126.5, 'castle');
+  pitDressing(G, 131.5, 133.5, 'castle');
+
   // exit + the D5 tail. clutter placed manually on the two GROUND spans only (the middle is all tower/void)
   w5LevelFinish(G, -8, 170, null);
   w5Clutter(G, -8, 32, 'castle');

@@ -397,6 +397,17 @@ function buildW1L5(G){
   S.add(fan);
 
   exitGate(G, 199);
+
+  // themed death-pit dressing (visual — the fall is the hazard)
+  pitDressing(G, 5, 9, 'patch');         // the forbidden-bounce baby gap
+  pitDressing(G, 43, 53, 'patch');       // the King's moat
+  pitDressing(G, 83, 93, 'patch');       // master crossing — void one
+  pitDressing(G, 97.5, 108, 'patch');    // master crossing — void two
+  pitDressing(G, 116, 125, 'patch');     // medley station 1: the bounce void
+  pitDressing(G, 131, 139, 'patch');     // medley station 2: the carriage void
+  pitDressing(G, 153, 157, 'patch');     // medley station 4: the ghost-step breach
+  pitDressing(G, 169, 177, 'patch');     // medley station 5: the spring gap (under the shelf)
+
   levelFinish(G, -8, 202, null);        // ambience spans the full course; clutter placed manually below
   buildClutter(G, -8, 5, 'grave');      // intro stretch (baby gap 5..9 stays clean)
   buildClutter(G, 9, 15.5, 'grave');    // graveyard, split around the royal mud (16..26)
