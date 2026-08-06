@@ -58,7 +58,8 @@ class Candy {
     if(pl && !pl.dead){
       const dx=pl.pos.x-p.x, dy=(pl.pos.y+0.8)-p.y, dz=pl.pos.z-p.z;
       const d2 = dx*dx+dy*dy+dz*dz;
-      if(d2 < 12) this.magnet = true;
+      const magR2 = G.save.upMagnet===2 ? 39 : (G.save.upMagnet===1 ? 23.5 : 12);   // Candy Magnet upgrade: ×1.4 / ×1.8 pull radius
+      if(d2 < magR2) this.magnet = true;
       if(this.magnet){
         const d = Math.sqrt(d2)||0.001;
         const sp = 14*dt/d;

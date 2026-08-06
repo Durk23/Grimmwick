@@ -200,6 +200,7 @@ const UI = {
         <div style="opacity:.8;font-size:14px;margin-bottom:12px">Your candy: 🍬 <span id="shopCandy">0</span></div>
         <div class="tabs">
           <div class="tab on ui-block" data-tab="costumes">Costumes</div>
+          <div class="tab ui-block" data-tab="ups">⬆️ Level Ups</div>
           <div class="tab ui-block" data-tab="chars">Characters</div>
           <div class="tab ui-block" data-tab="pass">Spook Pass</div>
         </div>
@@ -436,38 +437,7 @@ const UI = {
     const G=this.G, body=this.el('shopBody');
     this.el('shopCandy').textContent = G.save.candy;
     if(tab==='costumes'){
-      body.innerHTML = '<div class="ribbon">🧪 TEST MODE — real purchases arrive with the App Store version</div><div id="boostGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;text-align:left;margin-bottom:12px"></div><div id="shopGrid"></div>';
-      // ---- heart containers (buy "lives" with candy — expensive on purpose) ----
-      const BOOSTS = [
-        {need:3, price:500,  name:'Heart Container', desc:'A fourth heart, forever. Pricey — Boos drop candy for a reason!'},
-        {need:4, price:1500, name:'Heart Container II', desc:'A FIFTH heart. Only legends carry this much love.'},
-      ];
-      const bgrid = body.querySelector('#boostGrid');
-      for(const bo of BOOSTS){
-        const owned = G.save.maxHearts > bo.need;
-        const locked = G.save.maxHearts < bo.need;
-        const div = document.createElement('div');
-        div.className='item';
-        div.innerHTML = `<div class="sw" style="background:linear-gradient(135deg,#ff4d6d 60%,#8f1030);display:flex;align-items:center;justify-content:center;font-size:30px">❤️</div>
-          <h4>${bo.name}</h4><p>${bo.desc}</p>
-          <button class="btn buy ui-block ${owned?'ghost2':'orange'}">${owned?'✓ Owned':(locked?'🔒 Buy previous first':'🍬 '+bo.price)}</button>`;
-        const btn = div.querySelector('button');
-        const act = ev=>{
-          ev.stopPropagation();
-          if(owned || locked) return;
-          if(G.save.candy >= bo.price){
-            G.save.candy -= bo.price;
-            G.save.maxHearts = bo.need+1;
-            if(G.player){ G.player.maxHearts = G.save.maxHearts; G.player.hearts = G.save.maxHearts; }
-            G.persist(); AUDIO.buy();
-            this.toast('❤️ Max hearts: '+G.save.maxHearts+'!');
-          } else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
-          this.renderShop('costumes'); this.updateHUD();
-        };
-        btn.addEventListener('mousedown', act);
-        btn.addEventListener('touchstart', ev=>{ev.preventDefault();act(ev);},{passive:false});
-        bgrid.appendChild(div);
-      }
+      body.innerHTML = '<div class="ribbon">🧪 TEST MODE — real purchases arrive with the App Store version</div><div style="opacity:.75;font-size:13px;margin-bottom:10px">❤️ Hearts &amp; upgrades moved to the <b>⬆️ Level Ups</b> tab!</div><div id="shopGrid"></div>';
       const grid = body.querySelector('#shopGrid');
       for(const key in COSTUMES){
         const c = COSTUMES[key];
@@ -495,6 +465,62 @@ const UI = {
         btn.addEventListener('touchstart', ev=>{ev.preventDefault();act(ev);},{passive:false});
         grid.appendChild(div);
       }
+    } else if(tab==='ups'){
+      // ---- LEVEL UPS: earned star milestones (free) + candy-bought permanent upgrades. Never real money. ----
+      const totalStars = Object.values(G.save.levels||{}).reduce((s,l)=>s + (l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
+      const claimed = G.save.claimed || (G.save.claimed = []);
+      const wire = (btn, fn)=>{ btn.addEventListener('mousedown', ev=>{ev.stopPropagation();fn();});
+        btn.addEventListener('touchstart', ev=>{ev.preventDefault();ev.stopPropagation();fn();},{passive:false}); };
+      const grantHeart = ()=>{ if(G.save.maxHearts<5){ G.save.maxHearts++; if(G.player){ G.player.maxHearts=G.save.maxHearts+(G.save.cozy?2:0); G.player.hearts=G.player.maxHearts; } this.toast('❤️ Max hearts: '+G.save.maxHearts+'!'); return true; } return false; };
+      const MILES = [
+        {id:'s5',  at:5,  label:'🍬 200 candy',            grant:()=>{ G.addCandy(200); }},
+        {id:'s12', at:12, label:'❤️ +1 MAX HEART',          grant:()=>{ if(!grantHeart()){ G.addCandy(400); this.toast('❤️ Hearts maxed — 🍬 400 instead!'); } }},
+        {id:'s20', at:20, label:'🍬 600 + 👻 1-UP',         grant:()=>{ G.addCandy(600); G.save.lives=Math.min(9,(G.save.lives!==undefined?G.save.lives:5)+1); }},
+        {id:'s30', at:30, label:'❤️ +1 MAX HEART',          grant:()=>{ if(!grantHeart()){ G.addCandy(900); this.toast('❤️ Hearts maxed — 🍬 900 instead!'); } }},
+        {id:'s45', at:45, label:'🍬 2000 + 👻👻👻 3 1-UPs', grant:()=>{ G.addCandy(2000); G.save.lives=Math.min(9,(G.save.lives!==undefined?G.save.lives:5)+3); }},
+      ];
+      body.innerHTML = `
+        <div class="ribbon">⭐ Earn stars in levels (fast · all-candy · no-damage) to LEVEL UP — plus candy upgrades below</div>
+        <div style="font-weight:900;font-size:17px;margin-bottom:8px">⭐ Your stars: ${totalStars} / 75</div>
+        <div id="mileList" style="text-align:left;margin-bottom:14px"></div>
+        <div id="upGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;text-align:left"></div>`;
+      const ml = body.querySelector('#mileList');
+      for(const m of MILES){
+        const done = claimed.includes(m.id), ready = !done && totalStars>=m.at;
+        const row = document.createElement('div');
+        row.className='tier';
+        row.innerHTML = `<span class="n">${m.at}⭐</span><span style="flex:1">${m.label}</span>
+          <button class="btn buy ui-block ${ready?'orange':'ghost2'}" style="padding:7px 14px;font-size:13.5px">${done?'✓ Claimed':(ready?'CLAIM!':`${totalStars}/${m.at}`)}</button>`;
+        const btn = row.querySelector('button');
+        if(ready) wire(btn, ()=>{ claimed.push(m.id); m.grant(); G.persist(); AUDIO.buy(); this.renderShop('ups'); this.updateHUD(); });
+        ml.appendChild(row);
+      }
+      const ug = body.querySelector('#upGrid');
+      // heart containers (also earnable free at 12⭐/30⭐ — both roads end at 5 hearts)
+      const hPrice = {3:500, 4:1500}[G.save.maxHearts];
+      const hDiv = document.createElement('div'); hDiv.className='item';
+      hDiv.innerHTML = `<div class="sw" style="background:linear-gradient(135deg,#ff4d6d 60%,#8f1030);display:flex;align-items:center;justify-content:center;font-size:30px">❤️</div>
+        <h4>Heart Container</h4><p>${G.save.maxHearts>=5?'FIVE hearts — a true legend of Grimmwick.':'A bigger health bar, forever. Also FREE at 12⭐ and 30⭐!'}</p>
+        <button class="btn buy ui-block ${hPrice?'orange':'ghost2'}">${hPrice?('🍬 '+hPrice+' — heart #'+(G.save.maxHearts+1)):'✓ MAXED'}</button>`;
+      if(hPrice) wire(hDiv.querySelector('button'), ()=>{
+        if(G.save.candy>=hPrice){ G.save.candy-=hPrice; grantHeart(); G.persist(); AUDIO.buy(); }
+        else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
+        this.renderShop('ups'); this.updateHUD();
+      });
+      ug.appendChild(hDiv);
+      // candy magnet ranks (QoL pull radius — candy comes to you)
+      const mRank = G.save.upMagnet||0;
+      const mPrice = mRank===0?400:(mRank===1?900:null);
+      const mDiv = document.createElement('div'); mDiv.className='item';
+      mDiv.innerHTML = `<div class="sw" style="background:linear-gradient(135deg,#ffd23f 60%,#b8860b);display:flex;align-items:center;justify-content:center;font-size:30px">🧲</div>
+        <h4>Candy Magnet ${mRank>0?['','I','II'][mRank]+' owned':''}</h4><p>${mRank>=2?'Max pull — candy practically begs to be caught.':'Candy leaps to you from farther away.'+(mRank===1?' One rank left!':' Two ranks.')}</p>
+        <button class="btn buy ui-block ${mPrice?'orange':'ghost2'}">${mPrice?('🍬 '+mPrice+' — rank '+['I','II'][mRank]):'✓ MAXED'}</button>`;
+      if(mPrice) wire(mDiv.querySelector('button'), ()=>{
+        if(G.save.candy>=mPrice){ G.save.candy-=mPrice; G.save.upMagnet=(G.save.upMagnet||0)+1; G.persist(); AUDIO.buy(); this.toast('🧲 Candy Magnet rank '+['','I','II'][G.save.upMagnet]+'!'); }
+        else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
+        this.renderShop('ups'); this.updateHUD();
+      });
+      ug.appendChild(mDiv);
     } else if(tab==='chars'){
       body.innerHTML = `<div id="shopGrid">
         <div class="item"><div class="sw" style="background:linear-gradient(135deg,#f2f0ff 60%,#d8d4f0)"></div><h4>Pip</h4><p>The smallest hero in Grimmwick. Never underestimated twice.</p><button class="btn buy ghost2">✓ Playing</button></div>

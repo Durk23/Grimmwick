@@ -147,6 +147,7 @@ class Broomhilda {
   }
   buckOff(){
     this.bristleOpen = false;
+    this.bristleHits = 0;   // swats persist ACROSS cast windows (owner tuning) — reset only when a buck-off cashes them in
     this.state = 'bucked'; this.stateT = 0;
     AUDIO.bossRoar(); this.G.camc.shake(0.5, 0.5);
   }
@@ -231,7 +232,7 @@ class Broomhilda {
     for(let i=0;i<3;i++){ const b = mesh('sph',[rand(0.1,0.18),6,5], emat(0xb06bff,0x7dff9e,0.8)); b.position.set(x+rand(-0.9,0.9), 0.14, rand(-1.0,1.0)); g.add(b); }
     this.G.scene.add(g);
     const col = this.G.world.addBox(x, -0.05, 0, w, 0.4, 3.0, {type:'hazard', damage:1});
-    this.puddles.push({group:g, disc, col, t:0, life:3.6});
+    this.puddles.push({group:g, disc, col, t:0, life:2.8});   // goo clears faster — the floor stays runnable
     this.G.fx.spawn(new THREE.Vector3(x, 0.3, 0), 0xb06bff, 12, {speed:3});
     AUDIO.noise && AUDIO.noise({t:0.2, vol:0.12, fFrom:900, fTo:200});
   }
@@ -281,7 +282,7 @@ class Broomhilda {
       this.faceDir = (pl.pos.x < p.x) ? -1 : 1;
     }
     // gentle discovery hint if the fight drags at full health (mirrors boss 1/2)
-    if(!this._hint && this.t > 28 && this.hp === this.maxHp && !this.dead){
+    if(!this._hint && this.t > 16 && this.hp === this.maxHp && !this.dead){
       this._hint = true;
       window.UI && UI.toast("🧹 A hedge-witch whispers: 'a broom's pride is its bristles...'");
     }
@@ -326,13 +327,13 @@ class Broomhilda {
           if(a === 'dive'){ this.state = 'dive'; this._diveInit = false; }
           else if(a === 'potion'){ this.state = 'potion'; this._released = false; }
           else if(a === 'thorns'){ this.state = 'thorns'; this._released = false; }
-          else { this.state = 'lowcast'; this.bristleHits = 0; this.bristleOpen = false; }
+          else { this.state = 'lowcast'; this.bristleOpen = false; }   // bristleHits deliberately NOT reset — one swat per window is enough (both-in-one was the difficulty wall)
         }
         break;
       }
 
       case 'dive': {
-        const tele = this.phase>=3 ? 0.5 : (this.phase>=2 ? 0.6 : 0.7);
+        const tele = this.phase>=3 ? 0.5 : (this.phase>=2 ? 0.65 : 0.85);   // phase-1 dives announce themselves longer
         if(!this._diveInit){
           this._diveInit = true;
           this.diveFromX = p.x;
@@ -379,13 +380,13 @@ class Broomhilda {
       }
 
       case 'lowcast': {
-        const castLen = this.phase>=3 ? 1.8 : (this.phase>=2 ? 2.0 : 2.2);
+        const castLen = this.phase>=3 ? 2.0 : (this.phase>=2 ? 2.4 : 2.8);   // longer spin windows (owner: fight read as too hard)
         p.x = damp(p.x, this._castX, 5, dt);
         p.y = damp(p.y, this.lowY, 5, dt);           // DESCEND — bristles come into spin range
         this.body.rotation.x = damp(this.body.rotation.x, 0, 8, dt);
         if(!this.bristleOpen && Math.abs(p.y - this.lowY) < 0.6){
           this.bristleOpen = true;
-          if(!this._castHint){ this._castHint = true; window.UI && UI.toast('✨ Her bristles are SPARKLING — SPIN them TWICE to buck her off!'); }
+          if(!this._castHint){ this._castHint = true; window.UI && UI.toast('✨ Her bristles are SPARKLING — SPIN them TWICE to buck her off! (swats carry over)'); }
           if(!this._sneezed){ this._sneezed = true; this._sneeze(); }   // one-time flavor dodge/strike cue
         }
         if(this.bristleOpen){ this.body.rotation.z = Math.sin(this.t*6)*0.06; }   // weaving a spell
@@ -416,7 +417,7 @@ class Broomhilda {
       }
 
       case 'grounded': {
-        const stunLen = this.phase>=3 ? 2.6 : (this.phase>=2 ? 3.0 : 3.4);
+        const stunLen = this.phase>=3 ? 2.8 : (this.phase>=2 ? 3.4 : 4.0);   // more time to cash in the buck-off you earned
         this.body.rotation.z = Math.sin(this.t*2)*0.1;
         this.body.position.y = damp(this.body.position.y, -0.2, 6, dt);   // slump
         this.stars.children.forEach((st,i)=>{ const a = this.t*3 + i*(TAU/3); st.position.set(Math.cos(a)*1.0, 0, Math.sin(a)*1.0); });

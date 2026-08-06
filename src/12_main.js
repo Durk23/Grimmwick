@@ -28,6 +28,8 @@ const G = {
       this.save = { candy:0, embers:0, worlds:{}, gp:{}, owned:['kid','ghost'], equipped:'kid', seenIntro:false, maxHearts:3 };
     }
     if(!this.save.maxHearts) this.save.maxHearts = 3;
+    if(this.save.upMagnet===undefined) this.save.upMagnet = 0;
+    if(!this.save.claimed) this.save.claimed = [];
     if(this.save.lives===undefined) this.save.lives = 5;
     if(this.save.cozy===undefined) this.save.cozy = false;
     if(this.save.tutDone===undefined) this.save.tutDone = false;
