@@ -202,7 +202,6 @@ const UI = {
           <div class="tab on ui-block" data-tab="costumes">Costumes</div>
           <div class="tab ui-block" data-tab="ups">⬆️ Level Ups</div>
           <div class="tab ui-block" data-tab="chars">Characters</div>
-          <div class="tab ui-block" data-tab="pass">Spook Pass</div>
         </div>
         <div id="shopBody"></div>
         <button class="btn ui-block" id="shopClose" style="margin-top:14px">Done</button>
@@ -437,10 +436,11 @@ const UI = {
     const G=this.G, body=this.el('shopBody');
     this.el('shopCandy').textContent = G.save.candy;
     if(tab==='costumes'){
-      body.innerHTML = '<div class="ribbon">🧪 TEST MODE — real purchases arrive with the App Store version</div><div style="opacity:.75;font-size:13px;margin-bottom:10px">❤️ Hearts &amp; upgrades moved to the <b>⬆️ Level Ups</b> tab!</div><div id="shopGrid"></div>';
+      body.innerHTML = '<div style="opacity:.75;font-size:13px;margin-bottom:10px">❤️ Hearts &amp; upgrades moved to the <b>⬆️ Level Ups</b> tab!</div><div id="shopGrid"></div>';
       const grid = body.querySelector('#shopGrid');
       for(const key in COSTUMES){
         const c = COSTUMES[key];
+        if(c.pass && !G.save.owned.includes(key)) continue;   // v1.0 launch: pass-exclusive looks hidden until the Spook Pass ships (owners from testing keep theirs)
         const owned = G.save.owned.includes(key);
         const equipped = G.save.equipped===key;
         const div = document.createElement('div');

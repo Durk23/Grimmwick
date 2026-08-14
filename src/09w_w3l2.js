@@ -73,7 +73,7 @@ function buildW3L2(G){
   candyLine(G, [[53.5,4.2,0],[55.5,4.2,0]], 3);
   // LEFT branch — the "behind a secret" climb: a subtler, HIGHER web up to the Golden Pumpkin
   platform(G, 43.5, 6.6, 0, 3.5, 3, W3PAL.barkD);                 // the left nook (leap off the web to reach it)
-  w3Web(G, 42, 6.6, 11.2, 0, 2.6);                                // the brave upper climb
+  w3Web(G, 42.5, 6.6, 11.2, 0, 2.6);                              // the brave upper climb (nudged clear of the ledge lip — its centerline was wedge-blocked)
   candyLine(G, [[42,7.4,0],[42,8.8,0],[42,10.2,0]], 3);           // the quiet lure upward
   platform(G, 40, 11.2, 0, 3.5, 3, W3PAL.barkD);                  // the hidden high alcove
   G.ents.add(new GoldPumpkin(40, 12.0, 0, 1));                    // GOLDEN PUMPKIN idx 1

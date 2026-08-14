@@ -88,8 +88,9 @@ function buildW1L2(G){
   candyLine(G, [[14,6.7,0],[26,5.9,0],[32,5,0]], 6);
   G.ents.add(new Heart(8, 6.4, 0));
 
-  // climbable web-net: an honest way up to the high road
-  buildWebNet(G, -3, 0.4, 1.8, 3.4);
+  // climbable web-net: an honest way up to the high road — beside the ledge's east edge, not underneath it
+  // (at x-3 the net ran the whole climb into the high-road slab's underside and pinned you)
+  buildWebNet(G, -0.8, 0.4, 1.8, 3.4);
 
   // ===== THE OLD SHORTCUT: floating island high above the pumpkin field =====
   platform(G, 22, 6.8, 0, 4.4, 4.4, 0x4a3a6e);

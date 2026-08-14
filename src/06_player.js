@@ -358,12 +358,21 @@ class Player {
         this.vel.x = INPUT.moveX*2.2;
         this.vel.z = damp(this.vel.z, 0, 8, dt);
         this.pos.z = damp(this.pos.z, (onClimbable.min.z+onClimbable.max.z)/2, 8, dt);
+        // LEDGE ASSIST: if a ledge lip overhangs part of the strand and blocks the ascent (head bonk =
+        // no upward progress despite holding up), slide toward the strand's open center instead of pinning
+        // the player under the lip ("the rope went straight into a block" — young-tester report)
+        if(upHeld && this._climbPrevY!==undefined && (this.pos.y - this._climbPrevY) < climbSpeed*dt*0.25){
+          const ccx = (onClimbable.min.x+onClimbable.max.x)/2;
+          if(Math.abs(ccx - this.pos.x) > 0.05) this.pos.x += Math.sign(ccx - this.pos.x)*2.8*dt;
+        }
+        this._climbPrevY = this.pos.y;
         // climb wiggle
         this.body.rotation.z = Math.sin(this.animT*10)*0.08;
         this.footL.position.z = 0.05+Math.sin(this.animT*10)*0.15;
         this.footR.position.z = 0.05-Math.sin(this.animT*10)*0.15;
       }
     }
+    if(!this.climbing) this._climbPrevY = undefined;
 
     // --- input & horizontal movement ---
     let md, mag;

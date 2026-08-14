@@ -227,8 +227,8 @@ function buildW1L3(G){
   G.ents.add(new Skelly(G, 78, 3.6, 0, {px:2.6}));        // its lone patroller
   // THE GREAT WEB — climbable floor-to-rafters; at the top you CHOOSE: hop LEFT to the
   // moon shelf, or RIGHT onto the beams toward the heart and the chute
-  buildWebNet(G, 82.2, 0.4, 1.8, 7.2);
-  candyLine(G, [[82.2,1.8,0.4],[82.2,6.6,0.4]], 4);       // rhythm up the strands
+  buildWebNet(G, 82.7, 0.4, 1.8, 7.2);   // nudged clear of the loft's east lip — climbing the web's left edge wedged you under it
+  candyLine(G, [[82.7,1.8,0.4],[82.7,6.6,0.4]], 4);       // rhythm up the strands
   platform(G, 79.8, 7.4, 0, 2.2, 2.2, 0x54324a);          // branch LEFT: the moon shelf
   G.ents.add(new BonkLantern(G, 79.8, 8.6, 0, 'moon'));   // ...bonk it, then ride the chute unstoppable
   candyLine(G, [[79.4,8.2,0],[80.4,8.2,0]], 3);

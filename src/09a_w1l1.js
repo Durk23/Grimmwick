@@ -361,8 +361,10 @@ function buildW1L1(G){
 
   // ---- ASCENT (x 160..171): roots dangle into the crypt — CLIMB back to the surface (climbing is fun) ----
   w1l1Wisp(G, 165, -1.6, 0.5, true);
-  candyLine(G, [[162,-2.0,0],[166,-2.0,0],[169.5,-1.6,0]], 5);
-  w1l1CryptRoots(G, 170.5, 0, -2.4, 0.6);            // climb volume + dangling-root visual (crypt floor -> surface)
+  candyLine(G, [[162,-2.0,0],[165,-2.0,0],[167.9,-1.6,0]], 5);
+  // roots hang just WEST of the surface lip (168.7..171.1) and top out ABOVE it — climbing at 170.5 to the
+  // lip's own height ran you head-first into the slab and PINNED you (the crypt's only exit was a trap)
+  w1l1CryptRoots(G, 167.9, 0, -2.4, 1.4);            // climb volume + dangling-root visual (crypt floor -> surface)
   candyLine(G, [[170.5,-0.4,0],[170.5,0.6,0]], 2);   // a couple candies up the roots — telegraphs the climb-up
   G.world.addBox(171.6, -2.4, 0, 0.5, 2.4, 3, {});   // crypt east wall (top flush with the surface at y0): the roots are the ONLY way out — never a walk-off pit
 
