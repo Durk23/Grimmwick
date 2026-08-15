@@ -1,5 +1,9 @@
 {
   "appId": "com.nolandurkin.grimmwick",
   "appName": "Grimmwick",
-  "webDir": "dist_cap"
+  "webDir": "dist_cap",
+  "backgroundColor": "#0d0a18",
+  "ios": {
+    "backgroundColor": "#0d0a18"
+  }
 }
