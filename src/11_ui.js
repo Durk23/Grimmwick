@@ -140,6 +140,13 @@ const UI = {
       .cstar .big { font-size:28px; }
       .cstar.off .big { filter:grayscale(1); opacity:.35; }
       .cstar .lbl { font-size:11.5px; font-weight:800; opacity:.9; margin-top:4px; }
+      /* rotate-to-landscape hint (portrait + touch only; non-blocking, dismissible) */
+      #rotateHint { position:fixed; inset:0; z-index:70; background:rgba(10,6,22,.93); display:none; flex-direction:column; align-items:center; justify-content:center; gap:20px; text-align:center; pointer-events:auto; }
+      #rotPhone { width:64px; height:110px; border:5px solid #ffb35e; border-radius:14px; position:relative; animation:rotTip 2.2s ease-in-out infinite; box-shadow:0 0 24px rgba(255,140,46,.35); }
+      #rotPhone::after { content:"🎃"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:30px; }
+      @keyframes rotTip { 0%,18%{ transform:rotate(0deg);} 45%,80%{ transform:rotate(90deg);} 100%{ transform:rotate(90deg);} }
+      #rotateHint h3 { color:#ffb35e; font-size:22px; text-shadow:0 2px 8px #000; }
+      #rotateHint p { opacity:.8; font-size:14.5px; }
       #fade { position:fixed; inset:0; background:#0d0a18; opacity:1; transition:opacity .5s; pointer-events:none; z-index:50; }
       #hurtvig { position:fixed; inset:0; box-shadow:inset 0 0 120px 40px rgba(255,30,50,.55); opacity:0; transition:opacity .4s; pointer-events:none; z-index:40; }
       .heartsRow { font-size:34px; }
@@ -257,6 +264,11 @@ const UI = {
       <div id="finaleBanner" style="display:none;position:fixed;left:0;right:0;top:26%;z-index:60;text-align:center;pointer-events:none;padding:0 6vw;
         font-family:inherit;font-weight:900;font-size:clamp(22px,4.6vw,42px);color:#ffe9c4;
         text-shadow:0 0 18px rgba(255,160,60,.9),0 0 60px rgba(255,120,40,.55),0 3px 0 rgba(40,10,50,.8);opacity:0;transition:opacity .45s"></div>
+      <div id="rotateHint" class="ui-block">
+        <div id="rotPhone"></div>
+        <h3>Turn your phone sideways!</h3>
+        <p>Grimmwick plays best in landscape 🏮<br><span style="opacity:.6;font-size:12.5px">— tap anywhere to keep playing upright —</span></p>
+      </div>
       <div id="vig" style="position:fixed;inset:0;pointer-events:none;z-index:5;box-shadow:inset 0 0 140px 46px rgba(8,4,20,.5)"></div>
       <div id="hurtvig"></div>
       <div id="fade"></div>
@@ -295,6 +307,16 @@ const UI = {
     tap('continueBtn', ()=>G.candyContinue());
     tap('introNext', ()=>this.nextIntro());
     tap('prompt', ()=>INPUT.pressInteract());
+    // rotate-to-landscape hint: shown ONCE at boot when a touch device starts in portrait; gone on rotate or tap
+    tap('rotateHint', ()=>{ this._rotDone = true; this.el('rotateHint').style.display='none'; });
+    const rotCheck = ()=>{
+      if(this._rotDone) return;
+      const portrait = window.innerHeight > window.innerWidth;
+      if(!portrait){ this._rotDone = true; this.el('rotateHint').style.display='none'; return; }   // rotated — hint done for this session
+      this.el('rotateHint').style.display='flex';
+    };
+    addEventListener('resize', ()=>{ if(!this._rotDone && window.innerWidth > window.innerHeight){ this._rotDone = true; this.el('rotateHint').style.display='none'; } });
+    if(INPUT.isTouch) setTimeout(rotCheck, 600);   // at boot, after the fade begins — title is visible behind it
     this.el('dlg').addEventListener('mousedown', ()=>this.closeDialogue());
     this.el('dlg').addEventListener('touchstart', e=>{e.preventDefault();this.closeDialogue();},{passive:false});
     // touch action buttons
