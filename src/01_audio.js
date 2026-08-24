@@ -87,6 +87,7 @@ class AudioSys {
   }
 }
 const AUDIO = new AudioSys();
+window.AUDIO = AUDIO;   // exposed like window.UI — used by tooling (preview recorder) and console debugging
 
 
 // ================= richer procedural score =================
