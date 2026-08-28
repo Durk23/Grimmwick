@@ -626,7 +626,7 @@ function updateHub(G, dt){
         // WALK THROUGH the portal to auto-enter — no interact press needed when you step into an open, built gate
         if(gate.open && built && d<1.7){ AUDIO.portal(); G.openMap(gate.w.key||'w1'); return; }
         prompt = !gate.open ? {kind:'locked', gate, label:'🔒 '+gate.w.name+' — locked'}
-               : built ? {kind:'enter', gate, label:'🎃 Walk in — or press E to enter '+gate.w.name}
+               : built ? {kind:'enter', gate, label:'🎃 Walk into '+gate.w.name}
                : {kind:'soon', gate, label:'🚧 '+gate.w.name+' — coming soon!'};
         break;
       }
