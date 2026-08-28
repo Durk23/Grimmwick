@@ -144,7 +144,7 @@ const UI = {
       #rotateHint { position:fixed; inset:0; z-index:70; background:rgba(10,6,22,.93); display:none; flex-direction:column; align-items:center; justify-content:center; gap:20px; text-align:center; pointer-events:auto; }
       #rotPhone { width:64px; height:110px; border:5px solid #ffb35e; border-radius:14px; position:relative; animation:rotTip 2.2s ease-in-out infinite; box-shadow:0 0 24px rgba(255,140,46,.35); }
       #rotPhone::after { content:"🎃"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:30px; }
-      @keyframes rotTip { 0%,18%{ transform:rotate(0deg);} 45%,80%{ transform:rotate(90deg);} 100%{ transform:rotate(90deg);} }
+      @keyframes rotTip { 0%,18%{ transform:rotate(0deg);} 45%,80%{ transform:rotate(-90deg);} 100%{ transform:rotate(-90deg);} }
       #rotateHint h3 { color:#ffb35e; font-size:22px; text-shadow:0 2px 8px #000; }
       #rotateHint p { opacity:.8; font-size:14.5px; }
       #fade { position:fixed; inset:0; background:#0d0a18; opacity:1; transition:opacity .5s; pointer-events:none; z-index:50; }
@@ -473,6 +473,33 @@ const UI = {
     if(this.G.state==='play'){ this.G.state='shop'; this.el('shop-screen').style.display='flex'; this.renderShop('costumes'); AUDIO.ui(); }
   },
   closeShop(){ this.el('shop-screen').style.display='none'; this.G.state='play'; AUDIO.ui(); },
+  // real 3D portrait of Pip WEARING a costume — a tiny offscreen render of the actual rig, cached per key
+  // (owner call, Aug 2026: the cauldron sold looks blind — you never saw the outfit until you were wearing it)
+  costumePreview(key){
+    this._pvCache = this._pvCache || {};
+    if(this._pvCache[key] !== undefined) return this._pvCache[key];
+    let url = null;
+    try{
+      if(!this._pvR){
+        this._pvR = new THREE.WebGLRenderer({alpha:true, antialias:true, preserveDrawingBuffer:true});
+        this._pvR.setSize(180, 210);
+        this._pvScene = new THREE.Scene();
+        this._pvScene.add(new THREE.AmbientLight(0xbfb8e8, 1.15));
+        const dir = new THREE.DirectionalLight(0xfff2d8, 1.7); dir.position.set(1.5, 2.5, 2.5); this._pvScene.add(dir);
+        this._pvCam = new THREE.PerspectiveCamera(34, 180/210, 0.1, 20);
+        this._pvCam.position.set(0.42, 1.25, 3.2); this._pvCam.lookAt(0, 0.8, 0);
+      }
+      const fake = { group: new THREE.Group() };   // buildRig only needs .group (its G.carryWeapon read is guarded)
+      Player.prototype.buildRig.call(fake, key);
+      fake.group.rotation.y = 0.38;                // 3/4 hero pose
+      this._pvScene.add(fake.group);
+      this._pvR.render(this._pvScene, this._pvCam);
+      url = this._pvR.domElement.toDataURL();
+      this._pvScene.remove(fake.group);
+    }catch(e){ url = null; }
+    this._pvCache[key] = url;
+    return url;
+  },
   renderShop(tab){
     const G=this.G, body=this.el('shopBody');
     this.el('shopCandy').textContent = G.save.candy;
@@ -490,7 +517,9 @@ const UI = {
         const ac = '#'+c.accent.toString(16).padStart(6,'0');
         const passBadge = c.pass ? `<div style="position:absolute;top:8px;right:8px;background:linear-gradient(90deg,#8e5bd9,#ff5ea8);border-radius:8px;font-size:10.5px;font-weight:900;padding:3px 7px">🌕 PASS</div>` : '';
         div.style.position='relative';
-        div.innerHTML = `${passBadge}<div class="sw" style="background:linear-gradient(135deg,${cs} 60%,${ac})${c.glow?';box-shadow:0 0 18px '+cs+' inset, 0 0 12px '+cs:''}"></div>
+        const pv = this.costumePreview(key);
+        const swInner = pv ? `<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">` : '';
+        div.innerHTML = `${passBadge}<div class="sw" style="height:110px;background:linear-gradient(135deg,${cs}44 60%,${ac}66), radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%)${c.glow?';box-shadow:0 0 18px '+cs+' inset, 0 0 12px '+cs:''}">${swInner}</div>
           <h4>${c.name}</h4><p>${c.desc}</p>
           <button class="btn buy ui-block ${equipped?'ghost2':(owned?'':'orange')}">${equipped?'✓ Equipped':(owned?'Equip':(c.pass?'Try it (Pass)':(c.price===0?'Free':'🍬 '+c.price)))}</button>`;
         const btn = div.querySelector('button');

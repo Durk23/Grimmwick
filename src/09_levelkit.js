@@ -135,17 +135,27 @@ function pitDressing(G, x1, x2, theme, bedTop=-4.3){   // bedTop: spike-base hei
 // Leaps of Faith and mid-jump dips never trigger it.
 function pitImpactCheck(G, pl){
   const py = pl._pitPy ?? pl.pos.y; pl._pitPy = pl.pos.y;
-  if(pl.dead || pl.vel.y > -3) return;
+  G._camDip = null;
+  if(pl.dead) return;
+  // while falling into a registered pit, release the camera's vertical floor so the impact is ON SCREEN
+  // (phones crop the frame vertically — without the dip the eruption played below the bottom edge)
+  if(pl.vel.y < -1 && pl.pos.y < 1.2){
+    for(const p of (G.pits||[])){
+      if(pl.pos.x >= p.x1-0.5 && pl.pos.x <= p.x2+0.5){ G._camDip = p.bedY + 2.2; break; }
+    }
+  }
+  if(pl.vel.y > -3) return;
   for(const p of (G.pits||[])){
     if(pl.pos.x < p.x1-0.5 || pl.pos.x > p.x2+0.5) continue;
     if(!(py > p.th && pl.pos.y <= p.th)) continue;  // fire exactly as Pip crosses THIS pit's spike tips
     if(G.time - (G._pitFXT||-9) < 0.8) return;
     G._pitFXT = G.time;
     const f = PIT_FX[p.theme]||PIT_FX.patch;
-    G.fx.spawn(new THREE.Vector3(pl.pos.x, p.th+0.2, 0.3), f.burst[0], 14, {speed:5, life:0.9, gravity:7, size:1.15});
-    G.fx.spawn(new THREE.Vector3(pl.pos.x, p.th-0.2, 0.3), f.burst[1], 8,  {speed:3, life:0.7, gravity:5, size:0.8});
+    // the GEYSER: a tall themed fountain that shoots up past the pit lip into frame, plus a wide low splash
+    G.fx.spawn(new THREE.Vector3(pl.pos.x, p.th+0.2, 0.3), f.burst[0], 16, {speed:10, life:1.2, gravity:10, size:1.2});
+    G.fx.spawn(new THREE.Vector3(pl.pos.x, p.th,     0.3), f.burst[1], 12, {speed:4,  life:0.8, gravity:6,  size:0.9});
     AUDIO.poundHit();
-    G.camc.shake(0.3, 0.35);
+    G.camc.shake(0.35, 0.4);
     pl.group.visible = false;                       // swallowed by the pit — the fall handler restores him
     return;
   }

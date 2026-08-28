@@ -6,6 +6,26 @@ class AudioSys {
     this.musicOn = true; this.sfxOn = true;
     this._musicTimer = null;
     this._step = 0;
+    // iOS/WKWebView: returning from background leaves the context suspended (or 'interrupted', or silently
+    // broken). Resume on every foreground signal; if resume doesn't take, rebuild the context outright.
+    const wake = ()=>this.onForeground();
+    document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) wake(); });
+    window.addEventListener('pageshow', wake);
+    window.addEventListener('focus', wake);
+    document.addEventListener('touchstart', ()=>this.resume(), {passive:true, capture:true});   // resume inside a user gesture — the one context iOS always honors
+    document.addEventListener('pointerdown', ()=>this.resume(), {passive:true, capture:true});
+  }
+  onForeground(){
+    if(!this.ctx) return;
+    this.resume();
+    clearTimeout(this._fgT);
+    this._fgT = setTimeout(()=>{ if(this.ctx && this.ctx.state!=='running') this.reinit(); }, 800);
+  }
+  reinit(){
+    try{ const c = this.ctx; if(c && c.close){ const p = c.close(); p && p.catch(()=>{}); } }catch(e){}
+    clearTimeout(this._musicTimer); this._musicTimer = null;
+    this.ctx = null;
+    this.init();   // rebuilds the buses and restarts the music in the current mood
   }
   init(){
     if(this.ctx) return;
@@ -22,7 +42,7 @@ class AudioSys {
       this.startMusic();
     }catch(e){ console.warn('audio unavailable', e); }
   }
-  resume(){ if(this.ctx && this.ctx.state==='suspended') this.ctx.resume(); }
+  resume(){ if(this.ctx && this.ctx.state!=='running'){ try{ const p = this.ctx.resume(); p && p.catch(()=>{}); }catch(e){} } }
   setSfxVol(v){ this.sfxVol=v; if(this.sfxBus) this.sfxBus.gain.value=v; }
   setMusVol(v){ this.musVol=v; if(this.musBus) this.musBus.gain.value=v; }
 
