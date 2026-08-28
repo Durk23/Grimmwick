@@ -347,11 +347,11 @@ function buildW1L4(G){
   const lbr = mesh('cone',[0.2,0.5,7], mat(0xc2a24f)); lbr.position.set(0.36,1.4,0); lbr.rotation.z=0.5;
   leanB.add(lh, lbr); leanB.position.set(146.5, 0, 1.8); decoAct.add(leanB);
   // the hedge frames for the final walk (transplanted from the old finale, shifted right +73)
-  for(const hz of [-2.7, 2.5]){
-    const row = mesh('box',[9.6,1.7,1.1], mat(0x2e4a3d)); row.position.set(181.6,0.85,hz); decoAct.add(row);
-    for(let i=0;i<5;i++){ const puff = mesh('sph',[rand(0.5,0.75),7,6], mat(0x35543f)); puff.position.set(177.6+i*2.1+rand(-0.35,0.35), 1.65+rand(0,0.3), hz+rand(-0.3,0.3)); decoAct.add(puff); }
+  for(const hz of [-2.7, 2.5]){   // frames end BEFORE the gate — the foreground row was covering the portal's lower glow
+    const row = mesh('box',[9.6,1.7,1.1], mat(0x2e4a3d)); row.position.set(175.5,0.85,hz); decoAct.add(row);
+    for(let i=0;i<5;i++){ const puff = mesh('sph',[rand(0.5,0.75),7,6], mat(0x35543f)); puff.position.set(171.5+i*2.1+rand(-0.35,0.35), 1.65+rand(0,0.3), hz+rand(-0.3,0.3)); decoAct.add(puff); }
   }
-  decoAct.add(pumpkinDeco(177.9,-2.0,0.6,true), pumpkinDeco(183.6,1.95,0.55,true));
+  decoAct.add(pumpkinDeco(177.9,-2.0,0.6,true), pumpkinDeco(179.5,1.95,0.55,true));
   S.add(bakeGroup(decoAct));
 
   exitGate(G, 184);

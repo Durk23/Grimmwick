@@ -331,16 +331,16 @@ function buildW3L5(G){
   signPost(G, 205, 1.9, 0.2, "Broomhilda's clearing. She rides above it and will not come down. She will see you now — good luck.");
   // clearing deco (baked): witch-huts on stilts, hero-less deco cauldrons, thorn framing, mushrooms
   const decoD = new THREE.Group();
-  decoD.add(witchHut(199,-6.0,1.1), witchHut(212,-6.6,1.2), witchHut(207,5.2,1.0));
+  decoD.add(witchHut(199,-6.0,1.1), witchHut(212,-6.6,1.2), witchHut(194,5.2,1.0));   // the foreground hut looms BESIDE the doorstep, never over the door's glow
   decoD.add(cauldronDeco(198,-2.7,1.1), cauldronDeco(210,-2.8,1.0), cauldronDeco(204,2.9,0.95));
   decoD.add(braidedTree(215,-5.2,1.5), braidedTree(200,3.4,1.2));
   decoD.add(hangingWeb(214,-3.2,1.4));
-  for(let i=0;i<4;i++) decoD.add(mushroomCluster(rand(196,215), rand(-2.9,3.0), rand(0.7,1.2)));
-  for(let i=0;i<3;i++) decoD.add(potionBottle(rand(196,214), rand(-2.6,2.6)));
+  for(let i=0;i<4;i++) decoD.add(mushroomCluster(rand(196,205), rand(-2.9,3.0), rand(0.7,1.2)));   // scatter stays LEFT of the gate — random props were landing on the door
+  for(let i=0;i<3;i++) decoD.add(potionBottle(rand(196,205), rand(-2.6,2.6)));
   S.add(bakeGroup(decoD));
   // thorn silhouettes framing the very back of the clearing (deco-only bake — set off the lane)
   const thornFrame = new THREE.Group();
-  for(let i=0;i<10;i++){ const th=mesh('cone',[0.18,rand(0.6,1.3),5], emat(0x7a3fbf,0x5b2fa0,0.5)); th.position.set(rand(196,216), 0.4, rand(3.2,4.2)); th.rotation.z=rand(-0.3,0.3); thornFrame.add(th); }
+  for(let i=0;i<10;i++){ const th=mesh('cone',[0.18,rand(0.6,1.3),5], emat(0x7a3fbf,0x5b2fa0,0.5)); th.position.set(rand(196,206), 0.4, rand(3.2,4.2)); th.rotation.z=rand(-0.3,0.3); thornFrame.add(th); }
   S.add(bakeGroup(thornFrame));
 
   // exit gate at the clearing's threshold

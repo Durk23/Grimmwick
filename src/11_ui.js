@@ -126,11 +126,19 @@ const UI = {
       .mnode.mboss.avail .mlamp { animation:mpulseB 1.3s ease-in-out infinite; }
       @keyframes mpulseB { 0%,100%{ filter:drop-shadow(0 0 6px #b34aff) brightness(.85); transform:scale(1);} 50%{ filter:drop-shadow(0 0 22px #ff3a60) brightness(1.1); transform:scale(1.1);} }
       .mcrown { position:absolute; top:-16px; left:50%; transform:translateX(-50%) rotate(-8deg); font-size:20px; }
-      .mstars { font-size:12px; letter-spacing:1px; height:16px; }
-      .mstars .off { filter:grayscale(1); opacity:.32; }
+      .mstars { font-size:15px; letter-spacing:2px; height:22px; line-height:20px; }
+      .mnode.done .mstars { display:inline-block; background:rgba(12,8,26,.78); border-radius:10px; padding:0 8px; box-shadow:0 1px 6px rgba(0,0,0,.5); }
+      .mstars .off { filter:grayscale(1); opacity:.3; }
       .mname { font-size:12px; font-weight:900; line-height:1.2; text-shadow:0 2px 4px #000; margin-top:2px; }
       .mtime { font-size:10.5px; font-weight:700; opacity:.75; margin-top:2px; text-shadow:0 1px 3px #000; }
       .mnode.lock .mname, .mnode.lock .mtime { opacity:.55; }
+      .mnode.sel { z-index:4; }
+      /* short screens (landscape phones): the nodes crowd — keep lamps + STARS, hide the prose off unselected nodes */
+      @media (max-height:560px){
+        .mlamp { font-size:30px; line-height:42px; height:42px; }
+        .mnode:not(.sel):not(.mboss) .mname, .mnode:not(.sel) .mtime { display:none; }
+        .mnode.mboss:not(.sel) .mname { font-size:10.5px; }
+      }
       /* level clear */
       #clearName { font-size:15px; font-weight:800; color:#e8dcff; opacity:.9; letter-spacing:1px; }
       .cstarRow { display:flex; gap:12px; justify-content:center; margin:12px 0 2px; }
