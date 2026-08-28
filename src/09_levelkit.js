@@ -133,12 +133,36 @@ function pitDressing(G, x1, x2, theme, bedTop=-4.3){   // bedTop: spike-base hei
 // Fires once as Pip passes the spike bed: themed burst + thud + shake, and Pip vanishes INTO it
 // (visibility restored in onPlayerFell). Only fires inside a registered pit, so descending routes,
 // Leaps of Faith and mid-jump dips never trigger it.
-function pitImpactCheck(G, pl){
+function pitImpactCheck(G, pl, dt){
   const py = pl._pitPy ?? pl.pos.y; pl._pitPy = pl.pos.y;
+  // ---- THE SPIKE-HIT SEQUENCE (owner: "like in Mario") — Pip LANDS on the spikes, takes the hit
+  // visibly (squash + flash + burst), then does the classic death pop: a flip up and drop. ----
+  if(G._pitSeq){
+    const s = G._pitSeq; s.t += dt;
+    G._camDip = s.bedY + 2.2;                       // hold the camera down on the doom for the whole show
+    if(s.t < 0.55){                                 // impaled: squashed flat on the spike tips, trembling
+      pl.pos.set(s.x, s.y, 0);
+      pl.group.position.set(s.x + Math.sin(s.t*70)*0.03, s.y, 0);
+      if(pl.body){ pl.body.scale.set(1.25, 0.55, 1.25); pl.body.rotation.z = Math.sin(s.t*60)*0.06; }
+    } else {                                        // the Mario pop: leap up, tumble, fall back past the bed
+      const t2 = s.t - 0.55;
+      if(!s.popped){ s.popped = true; AUDIO.jump && AUDIO.jump(); if(pl.body) pl.body.scale.set(0.9, 1.25, 0.9); }
+      pl.pos.set(s.x, s.y + 9*t2 - 13*t2*t2, 0);
+      pl.group.position.copy(pl.pos);
+      if(pl.body) pl.body.rotation.z += dt*10;
+      if(t2 > 1.1 || pl.pos.y < s.y - 5){           // show's over — the usual fall bookkeeping (heart + lantern)
+        G._pitSeq = null;
+        if(pl.body){ pl.body.rotation.z = 0; pl.body.scale.set(1,1,1); }
+        pl.captured = false;
+        G.onPlayerFell();
+      }
+    }
+    return;
+  }
   G._camDip = null;
   if(pl.dead) return;
   // while falling into a registered pit, release the camera's vertical floor so the impact is ON SCREEN
-  // (phones crop the frame vertically — without the dip the eruption played below the bottom edge)
+  // (phones crop the frame vertically — without the dip the show plays below the bottom edge)
   if(pl.vel.y < -1 && pl.pos.y < 1.2){
     for(const p of (G.pits||[])){
       if(pl.pos.x >= p.x1-0.5 && pl.pos.x <= p.x2+0.5){ G._camDip = p.bedY + 2.2; break; }
@@ -147,16 +171,22 @@ function pitImpactCheck(G, pl){
   if(pl.vel.y > -3) return;
   for(const p of (G.pits||[])){
     if(pl.pos.x < p.x1-0.5 || pl.pos.x > p.x2+0.5) continue;
-    if(!(py > p.th && pl.pos.y <= p.th)) continue;  // fire exactly as Pip crosses THIS pit's spike tips
+    if(!(py > p.th && pl.pos.y <= p.th)) continue;  // fire exactly as Pip lands on THIS pit's spike tips
     if(G.time - (G._pitFXT||-9) < 0.8) return;
     G._pitFXT = G.time;
     const f = PIT_FX[p.theme]||PIT_FX.patch;
-    // the GEYSER: a tall themed fountain that shoots up past the pit lip into frame, plus a wide low splash
+    // LAND on the spikes (captured = we drive the show; physics + killY wait for us)
+    pl.captured = true; pl.vel.set(0,0,0);
+    G._pitSeq = {t:0, x:pl.pos.x, y:p.th-0.45, bedY:p.bedY, popped:false};
+    pl.pos.set(G._pitSeq.x, G._pitSeq.y, 0); pl.group.position.copy(pl.pos);
+    // the GEYSER + the hit: themed fountain up past the lip, red hit burst, hurt feedback
     G.fx.spawn(new THREE.Vector3(pl.pos.x, p.th+0.2, 0.3), f.burst[0], 16, {speed:10, life:1.2, gravity:10, size:1.2});
     G.fx.spawn(new THREE.Vector3(pl.pos.x, p.th,     0.3), f.burst[1], 12, {speed:4,  life:0.8, gravity:6,  size:0.9});
-    AUDIO.poundHit();
+    G.fx.spawn(new THREE.Vector3(pl.pos.x, p.th+0.6, 0.3), 0xff5555, 8, {speed:3, life:0.5});
+    AUDIO.hurt(); AUDIO.poundHit();
+    window.UI && UI.hurtFlash && UI.hurtFlash();
     G.camc.shake(0.35, 0.4);
-    pl.group.visible = false;                       // swallowed by the pit — the fall handler restores him
+    G.hitstop = 0.06;                               // the landing BITES
     return;
   }
 }
@@ -192,6 +222,8 @@ function levelBegin(G){
   G.pits = [];
   G._pitTicker = null;   // scene rebuild dropped the old ticker with the old EntityMgr
   G._pitFXT = -9;
+  G._pitSeq = null;
+  G._camDip = null;
   G.world.killY = -14;
   G.camMinY = 0;   // side-camera vertical floor; a level that descends underground lowers this
   G.lightPools = [];   // D2 darkness mechanic: lit lanterns push {x,z,r}; Wisps read this to know where it's safe
@@ -253,7 +285,7 @@ function updateLevelCommon(G, dt){
   if(G.lvlPortal) G.lvlPortal.material.opacity = 0.32+Math.sin(G.time*3)*0.12;
   const pl = G.player;
   if(!pl) return;
-  pitImpactCheck(G, pl);
+  pitImpactCheck(G, pl, dt);
   let prompt = null;
   for(const c of (G.coffins||[])){
     if(!c.opened && c.group.position.distanceTo(pl.pos)<2.8){ prompt={kind:'coffin', label:c.promptLabel||'⚰️ Open the cursed coffin...?', coffin:c}; break; }

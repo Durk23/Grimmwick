@@ -97,7 +97,7 @@ function updateTutorial(G, dt){
   if(G.tutPortal) G.tutPortal.material.opacity = 0.3+Math.sin(G.time*3)*0.1;
   const pl = G.player;
   if(!pl) return;
-  pitImpactCheck(G, pl);
+  pitImpactCheck(G, pl, dt);
   let prompt = null;
   for(const s of G.signs){
     if(Math.hypot(s.x-pl.pos.x, s.z-pl.pos.z)<2.6){ prompt={kind:'sign', label:'\ud83d\udc9c Read Gran\'s note', sign:s}; break; }
