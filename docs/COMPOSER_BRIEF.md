@@ -47,4 +47,4 @@ Later districts (cemetery/caves, witch forest, dried-up pirate harbor, clockwork
 - **Compensation:** [credit + revenue share / $___ per track — set per conversation]
 - **Timeline:** first sketch of the Waltz by [date]; final masters by **Sept 15, 2026** (two weeks before App Store submission).
 
-**Contact:** Noland — nolandurkin@gmail.com
+**Contact:** Noland — grimmwickgame@gmail.com

@@ -314,7 +314,7 @@ const UI = {
     tap('pauseMapBtn', ()=>{ this.togglePause(false); AUDIO.ui(); const d = G.levelDef ? G.levelDef.id.slice(0,2) : (G.bossDistrict||'w1'); G.toMap(d); });
     tap('cozyBtn', ()=>{ G.toggleCozy(); this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(G.save.cozy?'ON':'OFF'); });
     tap('feedbackBtn', ()=>{ AUDIO.ui();   // opens the Mail composer — a player choosing to write is not data collection
-      window.location.href = 'mailto:nolandurkin@gmail.com?subject=' + encodeURIComponent('Grimmwick Feedback')
+      window.location.href = 'mailto:grimmwickgame@gmail.com?subject=' + encodeURIComponent('Grimmwick Feedback')
         + '&body=' + encodeURIComponent('\n\n—\nGrimmwick v1.0 · from the pause menu'); });
     tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Tap again'; } });
     tap('shopClose', ()=>this.closeShop());
