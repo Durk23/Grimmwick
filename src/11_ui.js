@@ -195,6 +195,7 @@ const UI = {
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🎵 Music</span><input type="range" id="musVol" class="ui-block" min="0" max="100" value="50" style="width:150px"></div>
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🔊 Sounds</span><input type="range" id="sfxVol" class="ui-block" min="0" max="100" value="80" style="width:150px"></div>
           <button class="btn ghost2 ui-block" id="cozyBtn">🧸 Cozy Mode: OFF</button>
+          <button class="btn ghost2 ui-block" id="feedbackBtn">💬 Send Feedback</button>
           <button class="btn ghost2 ui-block" id="pauseRestartBtn">🔁 Restart Level</button>
           <button class="btn ghost2 ui-block" id="pauseMapBtn">🗺️ Level Select (Map)</button>
           <button class="btn ghost2 ui-block" id="townBtn">🏘️ Return to Town</button>
@@ -287,6 +288,9 @@ const UI = {
     tap('pauseRestartBtn', ()=>{ this.togglePause(false); AUDIO.ui(); if(G.area.startsWith('boss')) G.startBoss(G.bossDistrict||'w1'); else if(G.levelDef) G.enterLevel(G.levelDef.id); });
     tap('pauseMapBtn', ()=>{ this.togglePause(false); AUDIO.ui(); const d = G.levelDef ? G.levelDef.id.slice(0,2) : (G.bossDistrict||'w1'); G.toMap(d); });
     tap('cozyBtn', ()=>{ G.toggleCozy(); this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(G.save.cozy?'ON':'OFF'); });
+    tap('feedbackBtn', ()=>{ AUDIO.ui();   // opens the Mail composer — a player choosing to write is not data collection
+      window.location.href = 'mailto:nolandurkin@gmail.com?subject=' + encodeURIComponent('Grimmwick Feedback')
+        + '&body=' + encodeURIComponent('\n\n—\nGrimmwick v1.0 · from the pause menu'); });
     tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Tap again'; } });
     tap('shopClose', ()=>this.closeShop());
     tap('shopX', ()=>this.closeShop());

@@ -450,6 +450,9 @@ const G = {
     this.state='title';
     UI.showTitle();
     UI.fade(false, 800);
+    // try to start the title waltz immediately — native WKWebView usually allows it; browsers that
+    // refuse (suspended ctx) keep today's behavior: audio unlocks on the first tap as before
+    try { AUDIO.init(); AUDIO.resume(); } catch(e) {}
     // debug hooks
     const params = new URLSearchParams(location.search);
     window.__game = {

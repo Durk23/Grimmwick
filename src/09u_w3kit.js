@@ -360,7 +360,7 @@ class MysteryCauldron {
       } else if(r < 0.32){
         // JACKPOT — candy fountain + a heart + a random POWER-UP
         candyBurst(G, new THREE.Vector3(p.x,p.y+1.2,p.z), 25);
-        G.ents.add(new Heart(p.x-1, p.y+1.9, p.z));
+        G.ents.add(new Heart(p.x-1, p.y+1.0, 0));
         G.ents.add(new PowerUp(p.x+1.2, p.y+1.7, p.z, pick(['shield','moon','bat'])));
         G.fx.spawn(new THREE.Vector3(p.x,p.y+1.5,p.z), PAL.gold, 26, {speed:5, life:0.9});
         AUDIO.goldPumpkin();

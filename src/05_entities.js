@@ -259,7 +259,7 @@ class CursedCoffin {
       } else if(r < 0.32){
         // JACKPOT — candy fountain + a random POWER-UP + a heart
         candyBurst(G, new THREE.Vector3(p.x,p.y+0.8,p.z), 25);
-        G.ents.add(new Heart(p.x-1, p.y+1.6, p.z));
+        G.ents.add(new Heart(p.x-1, p.y+1.0, 0));
         G.ents.add(new PowerUp(p.x+1.2, p.y+1.2, p.z, pick(['shield','moon','bat'])));
         G.fx.spawn(new THREE.Vector3(p.x,p.y+1,p.z), PAL.gold, 26, {speed:5, life:0.9});
         AUDIO.goldPumpkin();
