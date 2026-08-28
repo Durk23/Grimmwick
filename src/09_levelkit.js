@@ -207,9 +207,12 @@ function exitGate(G, x){
   const crest = pumpkinDeco(0,0,1,true); crest.position.set(x,5.7,-1.2);
   gGate.add(gL,gR,gT,crest);
   S.add(gGate);
-  const doorPm = new THREE.MeshBasicMaterial({color:PAL.pumpkin, transparent:true, opacity:0.4, side:THREE.DoubleSide});
+  const doorPm = new THREE.MeshBasicMaterial({color:PAL.pumpkin, transparent:true, opacity:0.4, side:THREE.DoubleSide, depthWrite:false});
   const doorPortal = new THREE.Mesh(geo('plane',2.6,4), doorPm);
-  doorPortal.position.set(x,2.3,-1.2);
+  // in FRONT of the pillar faces (-0.8) — level backdrop geometry at the arch's depth was slicing the glow
+  // in half in some levels (w2l3's bell tower); renderOrder wins the transparent sort vs darkness/mist layers
+  doorPortal.position.set(x,2.3,-0.55);
+  doorPortal.renderOrder = 5;
   S.add(doorPortal);
   G.lvlPortal = doorPortal;
   G.world.addBox(x-0.6,0,0, 1.2,3.5,4, {type:'trigger', onTouch:()=>{
