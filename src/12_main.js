@@ -30,6 +30,8 @@ const G = {
     if(!this.save.maxHearts) this.save.maxHearts = 3;
     if(this.save.upMagnet===undefined) this.save.upMagnet = 0;
     if(!this.save.claimed) this.save.claimed = [];
+    if(this.save.candyLifetime===undefined) this.save.candyLifetime = this.save.candy||0;   // old saves: seed with the balance
+    if(this.save.playT===undefined) this.save.playT = 0;
     if(this.save.lives===undefined) this.save.lives = 5;
     if(this.save.cozy===undefined) this.save.cozy = false;
     if(this.save.tutDone===undefined) this.save.tutDone = false;
@@ -47,6 +49,7 @@ const G = {
 
   addCandy(n){
     this.save.candy += n;
+    this.save.candyLifetime = (this.save.candyLifetime||0) + n;   // total ever collected — spending never subtracts
     this._dirty = true;
     UI.updateHUD();
   },
@@ -243,7 +246,7 @@ const G = {
     const fmt = t => Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
     const stats = { levelId:id, levelName:def.name, time:fmt(secs), best:fmt(rec.best||secs), isRecord,
       stars, candy:collected, candyTotal:this.levelCandyTotal, nextId, cozy:this.runCozy };
-    setTimeout(()=>UI.levelClear(stats), 650);
+    setTimeout(()=>UI.levelClear(stats), 1500);   // let the gate celebration land before the card
   },
   openMap(district){
     if(this.state!=='play') return;
@@ -302,6 +305,8 @@ const G = {
   },
   onPlayerFell(){
     const pl = this.player;
+    pl.group.visible = true;   // the pit eruption hides him mid-fall — always restore, even into death
+    pl._pitPy = undefined;
     if(pl.dead) return;
     pl.damage(1);
     if(!pl.dead){
@@ -431,6 +436,9 @@ const G = {
       isRecord,
       dmg: this.runDamage||0,
       cozy: this.runCozy,
+      // whole-night totals for the finale card ("candy collected: 0" only counted the boss fight)
+      lifeCandy: this.save.candyLifetime||0,
+      playT: Math.floor(this.save.playT||0),
     };
     // Game Center composite (owner spec): rank by time, ties by damage taken, then by candy (more = better).
     // score int64, lower-is-better: timeCS*1e7 + min(dmg,999)*1e4 + (9999 - min(candyEarned,9999))
@@ -525,6 +533,17 @@ const G = {
     }
     else if(this.state==='play'){
       AUDIO.resume();
+      // AUDIO WATCHDOG (owner report: sound dies after minutes on device) — iOS can interrupt/suspend the
+      // context (notifications, focus changes) or starve the music timer; if the tick heartbeat goes quiet
+      // or the context leaves 'running', restart cleanly. Self-healing within ~4s, no user action needed.
+      if(AUDIO.ctx){
+        if(AUDIO.ctx.state !== 'running') AUDIO.resume();
+        if(AUDIO._lastTick && performance.now() - AUDIO._lastTick > 4000){
+          clearTimeout(AUDIO._musicTimer); AUDIO._musicTimer = null; AUDIO._lastTick = performance.now();
+          AUDIO.startMusic();
+        }
+      }
+      this.save.playT = (this.save.playT||0) + dt;   // lifetime play clock (persists with the regular save cadence)
       if(INPUT.pauseEdge){ UI.togglePause(); INPUT.endFrame(); return; }
       if(this.area!=='hub' && this.area!=='tut') this.runT = (this.runT||0)+dt;
       this.world.updateMovers(dt);
@@ -547,6 +566,9 @@ const G = {
     else if(this.state==='victory' || this.state==='paused' || this.state==='shop' || this.state==='intro' || this.state==='map' || this.state==='levelclear'){
       // idle simmer
       if(this.boss && this.state==='victory') this.boss.update(dt*0.5);
+      if(this.state==='levelclear' && this.player){   // the gate celebration: victory leap + candy pops keep simming (damage() is state-gated, so the lap is invincible)
+        this.world.updateMovers(dt); this.player.update(dt); this.ents.update(dt, this); this.camc.update(dt, this.player, this.world);
+      }
       if(this.state==='map'){
         if(UI.mapNav) UI.mapNav();   // gamepad drives the map
         if(this.mapView){ this.mapView.update(dt); UI.positionMapNodes && UI.positionMapNodes(this.mapView); }

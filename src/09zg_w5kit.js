@@ -124,54 +124,36 @@ function chandelier(x, y, z, s=1){
 function gearPlat(G, x, y, opts={}){
   const w = opts.w||2.4, d = opts.d||3, col = opts.col||W5PAL.brass;
   const spin = opts.spin!==undefined?opts.spin:1.2;
-  const grind = opts.grind!==false;
-  const slip = Math.sign(spin)||1;             // the tooth flings you the way the cog turns
-  const safeWin = opts.safeWin||1.15;          // how long you can stand in the gap before the spike comes
-  const teleT = 0.5;                            // telegraph window — the spike rises into the gap
-
-  const top = mesh('cyl',[w*0.5, w*0.5, 0.4, 16], mat(col)); top.rotation.x=Math.PI/2; top.position.set(x, y-0.2, 0); G.scene.add(top);
-  // bake the ~13-mesh cog into ONE mesh (it only ever rotates as a unit) — 5-2's double cog row was 374 draw calls unbaked
-  const gear = bakeGroup(cogMesh(w*0.62, W5PAL.brassD)); gear.matrixAutoUpdate = true; gear.position.set(x, y-0.55, 0); G.scene.add(gear);
+  const grind = opts.grind!==false;            // grind:false = a static decorative cog (no carry)
+  const R = w*0.62, rimR = R*0.8;              // cog outer teeth radius · solid rim (disc) radius
+  // THE COG IS THE PLATFORM (owner call, Aug 2026): its top rim sits exactly at the standable top y —
+  // Pip's feet on the actual wheel, teeth poking up beside him. (The old flat top-disc collider floated
+  // mid-face, reading as an invisible shelf inside the gear.)
+  const gear = bakeGroup(cogMesh(R, W5PAL.brassD)); gear.matrixAutoUpdate = true;
+  gear.position.set(x, y - rimR, 0); G.scene.add(gear);
+  const hub = mesh('cyl',[R*0.28, R*0.28, 0.55, 10], mat(col)); hub.rotation.x = Math.PI/2;
+  hub.position.set(x, y - rimR, 0.12); G.scene.add(hub);      // fixed center pin the wheel turns around
   G.world.addBox(x, y-0.4, 0, w, 0.4, d, {});
-
-  // two static teeth framing the safe GAP at the top-center (so the "stand in the gap" reads at a glance)
-  let striker=null, ring=null;
-  if(grind){
+  if(grind){                                    // two fixed teeth frame the "stand here" gap at the top
     for(const s of [-1, 1]){ const t = mesh('cone',[0.17, 0.46, 6], mat(W5PAL.brassD)); t.position.set(x + s*w*0.40, y+0.04, 0.15); G.scene.add(t); }
-    // the striker spike — retracted below the disc when safe, rises into the gap to knock you off
-    striker = mesh('cone',[0.24, 0.95, 7], emat(0x9a4638, 0x3a1610, 0.15)); striker.position.set(x, y-0.95, 0.05); G.scene.add(striker);
-    // a warning ring in the gap that flares as the spike comes
-    ring = mesh('tor',[w*0.30, 0.05, 6, 16], emat(W5PAL.ember, W5PAL.ember, 1)); ring.rotation.x=Math.PI/2; ring.position.set(x, y+0.03, 0); ring.material.transparent=true; ring.material.opacity=0; G.scene.add(ring);
   }
-
-  G.ents.add({ dead:false, cull:false, isEnemy:false, t:rand(0,3), stood:0, warned:false, group:new THREE.Group(),
+  // THE TURNING WHEEL CARRIES YOU: standing riders drift at the rim's true surface speed — stand still
+  // ~1.5s and you ride off the edge; keep moving (walk 7.2 >> carry ~1.4) and it never bites. Replaces the
+  // old delayed spike: the rotation itself is the hazard now — always visible, perfectly deterministic.
+  const carry = Math.abs(spin) * rimR;
+  const dir = -Math.sign(spin) || -1;           // positive spin = counter-clockwise = the top moves toward -x
+  G.ents.add({ dead:false, cull:false, isEnemy:false, t:rand(0,3), group:new THREE.Group(),
     update(dt){
       this.t += dt;
-      gear.rotation.z += spin*dt;              // steady — turns like a normal gear
+      gear.rotation.z += spin*dt;
       if(!grind) return;
       const pl = G.player;
-      const onIt = pl && !pl.dead && pl.grounded &&
-        Math.abs(pl.pos.x-x) < w*0.5+0.15 && Math.abs(pl.pos.z) < d*0.6 && Math.abs(pl.pos.y-y) < 0.4;  // feet rest at box top = y
-      if(onIt) this.stood += dt; else { this.stood = 0; this.warned = false; }
-      const into = this.stood - safeWin;       // <0 safe · 0..teleT the spike rises (telegraph) · >teleT strike
-      if(into <= 0){
-        striker.position.y = y-0.95; striker.material.emissiveIntensity = 0.15; ring.material.opacity = 0;
-      } else if(into < teleT){
-        if(!this.warned){ this.warned = true; AUDIO.tone && AUDIO.tone({f:340,f2:190,type:'sawtooth',t:0.2,vol:0.09}); }  // "a tooth is coming around"
-        const k = into/teleT;                  // 0..1
-        striker.position.y = (y-0.95) + k*1.2;  // climbs from under the disc to poke ~0.25 above the gap (y)
-        striker.rotation.y += spin*dt*3;        // twists up as it comes around
-        striker.material.emissiveIntensity = 0.15 + k*1.0;
-        ring.material.opacity = 0.2 + k*0.55; ring.scale.setScalar(1 + k*0.25);
-      } else {
-        striker.position.y = y+0.25; striker.material.emissiveIntensity = 1.2; ring.material.opacity = 0.75;
-        if(pl && !pl.dead && pl.iframes<=0){    // STRIKE — knock the player off the way the cog turns (i-frames stop chaining)
-          const hadShield = pl.shield;
-          pl.damage(1, new THREE.Vector3(x, y-0.6, 0));
-          if(!hadShield){ pl.vel.x = slip*8.5; pl.vel.y = 7; pl.grounded = false; }   // shield fully absorbs instead of flinging
-          AUDIO.tone && AUDIO.tone({f:200,f2:90,type:'square',t:0.14,vol:0.13});
-          if(G.fx && G.fx.spawn) G.fx.spawn(new THREE.Vector3(x, y+0.35, 0), W5PAL.ember, 10, {speed:4, life:0.5});
-          G.camc && G.camc.shake && G.camc.shake(0.22, 0.28);
+      if(pl && !pl.dead && pl.grounded && Math.abs(pl.pos.x-x) < w*0.5+0.55 && Math.abs(pl.pos.z) < d*0.6 && Math.abs(pl.pos.y-y) < 0.4){
+        pl.pos.x += dir*carry*dt;
+        // reached the rim's edge on the turning side → TIP OFF: clear the toe-hang fudge and let gravity take it
+        // (without this the edge-forgiveness margin left riders dangling half-off, looking stuck)
+        if((pl.pos.x - x)*dir > w*0.5 - 0.05){
+          pl.pos.x += dir*0.45; pl.vel.x = dir*3.0; pl.grounded = false;
         }
       }
     } });

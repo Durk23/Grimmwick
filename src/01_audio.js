@@ -109,6 +109,7 @@ AudioSys.prototype.startMusic = function(){
   };
   let step = 0;
   const tick = ()=>{
+    this._lastTick = performance.now();   // heartbeat for the main-loop watchdog — a silent death gets restarted
     if(!this.musicOn || !this.ctx){ this._musicTimer = setTimeout(tick, 250); return; }   // keep the loop alive while muted — a bare return kills music forever
     const M = MOODS[this.mood] || MOODS.hub;
     const c = this.ctx, now = c.currentTime;

@@ -272,6 +272,8 @@ function buildW2L3(G){
   // themed death-pit dressing (visual — the fall is the hazard)
   pitDressing(G, 47, 51.3, 'grave');       // the stalagmite-pit rope swing (joins the baked stalagmites)
   pitDressing(G, 120.5, 123, 'grave');     // the void beside the grand bell-rope
+  pitDressing(G, 35, 40, 'grave', -7.4);   // the drop west of the GP alcove (alcove floor y-4 → deep bed, killY -8)
+  pitDressing(G, 43.6, 47, 'grave', -7.4); // the mirror drop east of the alcove
 
   w2LevelFinish(G, -6, 148, 'cave', null);   // bats + cave dust/mote ambience + checkpoint(=spawn); clutter done manually
 

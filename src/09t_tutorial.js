@@ -89,6 +89,7 @@ function buildTutorial(G){
   G.amb = buildAmbience(S, -10, 90);
   buildClutter(G, -6, 84, 'farm');
   G.ents.add(new Crow(45, 0.9, -2.8));
+  pitDressing(G, -9, -8, 'patch');   // the 1-unit slot behind spawn — even Gran's backyard shows its danger
 }
 function updateTutorial(G, dt){
   updateBats(G.bats, dt);
@@ -96,6 +97,7 @@ function updateTutorial(G, dt){
   if(G.tutPortal) G.tutPortal.material.opacity = 0.3+Math.sin(G.time*3)*0.1;
   const pl = G.player;
   if(!pl) return;
+  pitImpactCheck(G, pl);
   let prompt = null;
   for(const s of G.signs){
     if(Math.hypot(s.x-pl.pos.x, s.z-pl.pos.z)<2.6){ prompt={kind:'sign', label:'\ud83d\udc9c Read Gran\'s note', sign:s}; break; }

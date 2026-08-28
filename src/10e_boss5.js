@@ -28,10 +28,12 @@ class GrimmCauldron {
     this.burnerX = [-11, -5.5, 5.5, 11];
     this.burners = [];
     this.litCount = 0;
-    this.attacks = ['potion','shadow','arm','goo'];  // burner i strips attacks[i]
+    // burner i strips attacks[i] — weakest first: the natural left-to-right feed keeps the potion
+    // barrage (the only area attack) alive until the LAST burner, so the fight climbs, never deflates
+    this.attacks = ['goo','arm','shadow','potion'];
     this.stripped = {potion:false, shadow:false, arm:false, goo:false};
-    // ---- attack clocks ----
-    this.nextAtk = 2.5; this.atkI = 0; this.shadows = []; this.slam = null; this.wave = null;
+    // ---- attack clocks (nextAtk set at intro exit) ----
+    this.nextAtk = 0; this.atkI = 0; this.shadows = []; this.slams = []; this.waves = [];
     // ---- flushed / invite ----
     this.flushed = false; this._endStage = -1; this._endT = 0;
     this._introDlg = false; this._hint = false; this._flushHint = false;
@@ -83,7 +85,7 @@ class GrimmCauldron {
       const flame = mesh('sph',[0.24,8,6], emat(0x2a2440, 0x2a2440, 0.4)); flame.position.y=1.5;   // dark until fed
       const halo = new THREE.Mesh(geo('sph',0.7,10,8), new THREE.MeshBasicMaterial({color:W5PAL.ember, transparent:true, opacity:0, depthWrite:false})); halo.position.y=1.5;
       g.add(post, bowl, flame, halo); g.position.set(lx, 0, -0.8); S.add(g);
-      this.burners.push({x:lx, group:g, flame, halo, lit:false, light:null, attack:this.attacks[k]});
+      this.burners.push({x:lx, group:g, flame, halo, lit:false, feedT:0, light:null, attack:this.attacks[k]});
     }
   }
   _feedBurner(b){
@@ -110,20 +112,41 @@ class GrimmCauldron {
     const a = active[this.atkI % active.length]; this.atkI++;
     const pl = this.G.player;
     if(a==='potion'){
-      for(const sx of [-9,-3,3,9]){ if(typeof CrabShell!=='undefined') this.G.ents.add(new CrabShell(this.G, sx, 11, 0, {targetX:sx, targetY:0, flight:1.2})); }
+      // rain covers the UNLIT burner lanes too — the objective is never a free camp; shrinks to 4 lanes as burners light
+      const spots = [-9,-3,3,9, ...this.burners.filter(b=>!b.lit).map(b=>b.x)];
+      for(const sx of spots){ if(typeof CrabShell!=='undefined') this.G.ents.add(new CrabShell(this.G, sx, 11, 0, {targetX:sx, targetY:0, flight:1.0})); }
       AUDIO.noise && AUDIO.noise({t:0.2,vol:0.14,fFrom:900,fTo:200});
     } else if(a==='shadow'){
-      if(typeof ShadowCopy!=='undefined' && this.shadows.filter(s=>!s.dead).length < 3){ const sx=this.pos.x+(pl&&pl.pos.x>0?-8:8); const s=new ShadowCopy(this.G, sx, 1, 0, {speed:2.6}); this.shadows.push(s); this.G.ents.add(s); }
+      const alive = this.shadows.filter(s=>!s.dead).length;
+      if(typeof ShadowCopy!=='undefined' && alive < 2 + this.litCount){
+        const sx=this.pos.x+(pl&&pl.pos.x>0?-8:8);
+        const s=new ShadowCopy(this.G, sx, 1, 0, {speed:3.2 + this.litCount*0.4});   // faster with each ember — pressure, still outrunnable (player 7.2)
+        this.shadows.push(s); this.G.ents.add(s);
+      } else if(active.length > 1){ return this._fireAttack(); }   // capped → the turn falls through to the next attack, never a free tick
     } else if(a==='arm'){
+      // slam-CHAIN: from 2 embers, three slams walk toward where you're headed (deterministic — reads your velocity at fire time)
       const sx = pl?pl.pos.x:0;
-      this.slam = {x: sx, tele:0.85, t:0, done:false};   // shadow-arm slam at your position
-      const ring = new THREE.Mesh(geo('circ',2.2,20), new THREE.MeshBasicMaterial({color:W5PAL.shadowP, transparent:true, opacity:0.5, depthWrite:false}));
-      ring.rotation.x=-Math.PI/2; ring.position.set(sx,0.06,0); this.G.scene.add(ring); this.slam.tell=ring;   // the TELEGRAPH (target ring during the 0.85s wind-up)
+      const tele = Math.max(0.55, 0.85 - this.litCount*0.1);
+      const dir = pl ? (Math.sign(pl.vel.x) || (pl.pos.x >= 0 ? -1 : 1)) : 1;
+      const count = this.litCount>=2 ? 3 : 1;
+      for(let i=0;i<count;i++){
+        const s = {x: Math.max(-21, Math.min(21, sx + dir*3.5*i)), tele, t:-0.35*i, done:false};
+        const ring = new THREE.Mesh(geo('circ',2.2,20), new THREE.MeshBasicMaterial({color:W5PAL.shadowP, transparent:true, opacity:0.5, depthWrite:false}));
+        ring.rotation.x=-Math.PI/2; ring.position.set(s.x,0.06,0); this.G.scene.add(ring); s.tell=ring;   // the TELEGRAPH ring per slam
+        this.slams.push(s);
+      }
       AUDIO.noise && AUDIO.noise({t:0.25,vol:0.12,fFrom:300,fTo:800});
     } else if(a==='goo'){
-      this.wave = {x:-22, dir:1, t:0};   // a goo sweep left→right you JUMP over
-      const goo = new THREE.Mesh(geo('box',1.3,1.7,10), new THREE.MeshBasicMaterial({color:W5PAL.shadowP, transparent:true, opacity:0.75}));
-      goo.position.set(-22,0.85,0); this.G.scene.add(goo); this.wave.mesh=goo;   // the VISIBLE wave (was an invisible hazard)
+      // sweep speeds up per ember; at 3 embers a second wave answers from the right — a converging pincer, each cleared with a normal jump
+      const sp = 9 + this.litCount*2;
+      const mk = (x0, dir, delay) => {
+        const wv = {x:x0, dir, sp, t:-delay};
+        const goo = new THREE.Mesh(geo('box',1.3,1.7,10), new THREE.MeshBasicMaterial({color:W5PAL.shadowP, transparent:true, opacity:0.75}));
+        goo.position.set(x0,0.85,0); this.G.scene.add(goo); wv.mesh=goo;
+        this.waves.push(wv);
+      };
+      mk(-22, 1, 0);
+      if(this.litCount>=3) mk(22, -1, 0.5);
       AUDIO.noise && AUDIO.noise({t:0.3,vol:0.12,fFrom:280,fTo:150});
     }
   }
@@ -166,30 +189,43 @@ class GrimmCauldron {
       case 'intro': {
         if(this.stateT>1.0 && !this._introDlg){ this._introDlg=true; G.camc.shake(0.5,0.5);
           window.UI && UI.dialogue('🫥', '"You. The little one they FORGOT to forget. You took back my embers, my districts, my SHADOWS... but you\'ll not take my brew. Come and be a copy, like all the rest."'); }
-        if(this.stateT>1.3 && !this._hint){ this._hint=true; window.UI && UI.toast('🔥 The whole night has been about relighting flames — FEED the 4 embers to the 4 burners. He hates a sweet brew.'); }
-        if(this.stateT>1.5){ this.state='fight'; this.stateT=0; this.nextAtk=this.t+2.0; }
+        if(this.stateT>1.3 && !this._hint){ this._hint=true; window.UI && UI.toast('🔥 The whole night has been about relighting flames — stand CLOSE to a burner to POUR an ember in. He hates a sweet brew.'); }
+        if(this.stateT>1.5){ this.state='fight'; this.stateT=0; this.nextAtk=this.t+1.0; }
         break;
       }
       case 'fight': {
-        // feed burners on touch
-        if(pl && !pl.dead){ for(const b of this.burners){ if(!b.lit && Math.abs(pl.pos.x-b.x)<1.7 && Math.abs(pl.pos.z-(-0.8))<2.4) this._feedBurner(b); } }
-        // fire attacks on the fixed clock (fewer as burners light → it always resolves)
-        if(this.t >= this.nextAtk){ const active = this.attacks.filter(a=>!this.stripped[a]).length; this.nextAtk += Math.max(1.6, 3.4 - this.litCount*0.4); if(active>0) this._fireAttack(); }
-        // resolve the arm-slam telegraph
-        if(this.slam){ this.slam.t += dt;
-          if(this.slam.tell) this.slam.tell.material.opacity = 0.3 + Math.abs(Math.sin(this.slam.t*12))*0.5;   // pulse the telegraph during wind-up
-          if(!this.slam.done && this.slam.t>this.slam.tele){ this.slam.done=true;
-            if(this.slam.tell){ G.scene.remove(this.slam.tell); this.slam.tell=null; }
-            G.fx.spawn(new THREE.Vector3(this.slam.x, 0.3, 0), W5PAL.shadowP, 20, {speed:5}); G.camc.shake(0.4,0.3); AUDIO.poundHit && AUDIO.poundHit();
-            if(pl && !pl.dead && Math.abs(pl.pos.x-this.slam.x)<2.2 && pl.pos.y<2.4) this.hurtPlayer(1);
+        // feed burners by CHANNELING — stand close and hold your ground under fire; later embers pour slower
+        if(pl && !pl.dead){ for(const b of this.burners){ if(b.lit) continue;
+          const need = 0.5 + this.litCount*0.35;
+          if(Math.abs(pl.pos.x-b.x)<1.7 && Math.abs(pl.pos.z-(-0.8))<2.4){
+            b.feedT += dt;
+            b.halo.material.opacity = Math.min(0.45, b.feedT/need*0.45);   // the halo fills as the ember pours
+            if(b.feedT >= need) this._feedBurner(b);
+          } else if(b.feedT){ b.feedT = 0; b.halo.material.opacity = 0; }
+        } }
+        // the attack clock ACCELERATES with each fed ember — the finale climbs as you win;
+        // from 2 embers Grimm fires TWO different attacks per tick (overlapping threats)
+        if(this.t >= this.nextAtk){ const active = this.attacks.filter(a=>!this.stripped[a]).length;
+          this.nextAtk += [2.6, 2.0, 1.5, 1.1][Math.min(3, this.litCount)];
+          if(active>0){ this._fireAttack(); if(this.litCount>=2) this._fireAttack(); } }
+        // resolve the arm-slam telegraphs (chain slams carry a start delay via negative t)
+        for(let i=this.slams.length-1;i>=0;i--){ const s = this.slams[i]; s.t += dt;
+          if(s.tell) s.tell.material.opacity = s.t<0 ? 0.18 : 0.3 + Math.abs(Math.sin(s.t*12))*0.5;
+          if(!s.done && s.t>s.tele){ s.done=true;
+            if(s.tell){ G.scene.remove(s.tell); s.tell=null; }
+            G.fx.spawn(new THREE.Vector3(s.x, 0.3, 0), W5PAL.shadowP, 20, {speed:5}); G.camc.shake(0.4,0.3); AUDIO.poundHit && AUDIO.poundHit();
+            if(pl && !pl.dead && Math.abs(pl.pos.x-s.x)<2.2 && pl.pos.y<2.4) this.hurtPlayer(1);
           }
-          if(this.slam.t>this.slam.tele+0.5){ if(this.slam.tell) G.scene.remove(this.slam.tell); this.slam=null; }
+          if(s.t>s.tele+0.5){ if(s.tell) G.scene.remove(s.tell); this.slams.splice(i,1); }
         }
-        // resolve the goo wave (a VISIBLE floor sweep you JUMP)
-        if(this.wave){ this.wave.t += dt; this.wave.x += this.wave.dir*9*dt;
-          if(this.wave.mesh) this.wave.mesh.position.x = this.wave.x;
-          if(pl && !pl.dead && Math.abs(pl.pos.x-this.wave.x)<1.0 && pl.pos.y<0.9) this.hurtPlayer(1);
-          if(Math.abs(this.wave.x)>24){ if(this.wave.mesh) G.scene.remove(this.wave.mesh); this.wave=null; }
+        // resolve the goo waves (VISIBLE floor sweeps you JUMP; the pincer's second wave waits out its delay at the wall)
+        for(let i=this.waves.length-1;i>=0;i--){ const wv = this.waves[i]; wv.t += dt;
+          if(wv.t >= 0){
+            wv.x += wv.dir*wv.sp*dt;
+            if(wv.mesh) wv.mesh.position.x = wv.x;
+            if(pl && !pl.dead && Math.abs(pl.pos.x-wv.x)<1.0 && pl.pos.y<0.9) this.hurtPlayer(1);
+          }
+          if(wv.t > 0 && Math.abs(wv.x)>24){ if(wv.mesh) G.scene.remove(wv.mesh); this.waves.splice(i,1); }
         }
         if(this.litCount>=4 && !this.flushed){ this.flushed=true; this.state='flushed'; this.stateT=0; G.camc.shake(0.6,0.5);
           this.grimmMat.emissiveIntensity = 0.2; this.grimmMat.opacity = 1;
@@ -199,8 +235,8 @@ class GrimmCauldron {
       }
       case 'flushed': {
         // Grimm sits small on the rim, startled — walk up and INVITE (interact). No more attacks.
-        if(this.slam){ if(this.slam.tell) G.scene.remove(this.slam.tell); this.slam=null; }
-        if(this.wave){ if(this.wave.mesh) G.scene.remove(this.wave.mesh); this.wave=null; }
+        for(const s of this.slams){ if(s.tell) G.scene.remove(s.tell); } this.slams.length = 0;
+        for(const wv of this.waves){ if(wv.mesh) G.scene.remove(wv.mesh); } this.waves.length = 0;
         this.eyeL.scale.setScalar(0.7); this.eyeR.scale.setScalar(0.7);
         if(!this._flushHint){ this._flushHint=true;
           window.UI && UI.finaleBanner('🫥 GRIMM IS FLUSHED OUT — walk up & press ANY button', 3600);

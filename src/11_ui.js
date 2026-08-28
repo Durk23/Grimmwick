@@ -55,7 +55,7 @@ const UI = {
       /* full screens */
       /* pointer-events:auto is LOAD-BEARING: without it an overflowing card can't be touch-scrolled in landscape,
          stranding everything below the fold (including the close button) */
-      .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; flex-direction:column; gap:18px; text-align:center; overflow-y:auto; -webkit-overflow-scrolling:touch; box-sizing:border-box; pointer-events:auto; padding:calc(16px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-left)) calc(16px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-right)); }
+      .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; flex-direction:column; gap:18px; text-align:center; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; box-sizing:border-box; pointer-events:auto; padding:calc(16px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-left)) calc(16px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-right)); }
       .xClose { position:absolute; top:10px; right:10px; width:38px; height:38px; border-radius:12px; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.28); color:#fff; font-size:17px; font-weight:800; font-family:inherit; cursor:pointer; line-height:1; z-index:2; }
       .xClose:active { background:rgba(255,255,255,.22); }
       /* auto-margin centering that degrades to a scroll when the card is taller than the viewport (landscape safe) */
@@ -277,12 +277,29 @@ const UI = {
     `;
     document.body.appendChild(ui);
     this.el = id=>document.getElementById(id);
-    // wire buttons
-    const tap = (id,fn)=>{ const e=this.el(id);
+    // wire buttons.
+    // bindTap = TAP DETECTION for buttons inside scrollable screens: touchstart no longer preventDefaults
+    // (so a thumb-drag scrolls the card instead of auto-clicking whatever it lands on); the action fires on
+    // touchend only if the finger barely moved. preventDefault there kills iOS's ghost mousedown; the
+    // lastTouch guard is belt-and-braces for the dangerous buttons (reset save, candy spends).
+    let lastTouch = 0;
+    const bindTap = (e,fn)=>{ let sx=0, sy=0, st=0, live=false;
+      e.addEventListener('touchstart', ev=>{ ev.stopPropagation(); const t=ev.changedTouches[0]; sx=t.clientX; sy=t.clientY; st=performance.now(); live=true; },{passive:true});
+      e.addEventListener('touchmove', ev=>{ if(!live) return; const t=ev.changedTouches[0]; if(Math.hypot(t.clientX-sx, t.clientY-sy) > 12) live=false; },{passive:true});
+      e.addEventListener('touchend', ev=>{ if(!live) return; live=false; const t=ev.changedTouches[0];
+        if(Math.hypot(t.clientX-sx, t.clientY-sy) <= 12 && performance.now()-st < 700){ ev.preventDefault(); ev.stopPropagation(); lastTouch=performance.now(); fn(); } },{passive:false});
+      e.addEventListener('touchcancel', ()=>{ live=false; });
+      e.addEventListener('mousedown', ev=>{ if(performance.now()-lastTouch < 800) return; ev.stopPropagation(); fn(); });
+    };
+    this.bindTap = bindTap;   // renderShop/renderMap rebuild DOM and rebind with this
+    const tap = (id,fn)=>bindTap(this.el(id), fn);
+    // instant = the old fire-on-touchstart path — ONLY for gameplay controls over the canvas where
+    // latency matters and preventDefault also keeps the touch from spawning the joystick underneath
+    const instant = (id,fn)=>{ const e=this.el(id);
       e.addEventListener('touchstart', ev=>{ev.preventDefault();ev.stopPropagation();fn();},{passive:false});
       e.addEventListener('mousedown', ev=>{ev.stopPropagation();fn();});
     };
-    tap('pauseBtn', ()=>this.togglePause());
+    instant('pauseBtn', ()=>this.togglePause());
     tap('resumeBtn', ()=>this.togglePause(false));
     tap('townBtn', ()=>{ this.togglePause(false); G.returnToHub(false); });
     tap('pauseRestartBtn', ()=>{ this.togglePause(false); AUDIO.ui(); if(G.area.startsWith('boss')) G.startBoss(G.bossDistrict||'w1'); else if(G.levelDef) G.enterLevel(G.levelDef.id); });
@@ -310,9 +327,9 @@ const UI = {
     tap('gameoverBtn', ()=>G.gameOverRestart());
     tap('continueBtn', ()=>G.candyContinue());
     tap('introNext', ()=>this.nextIntro());
-    tap('prompt', ()=>INPUT.pressInteract());
+    instant('prompt', ()=>INPUT.pressInteract());
     // rotate-to-landscape hint: shown ONCE at boot when a touch device starts in portrait; gone on rotate or tap
-    tap('rotateHint', ()=>{ this._rotDone = true; this.el('rotateHint').style.display='none'; });
+    instant('rotateHint', ()=>{ this._rotDone = true; this.el('rotateHint').style.display='none'; });
     const rotCheck = ()=>{
       if(this._rotDone) return;
       const portrait = window.innerHeight > window.innerWidth;
@@ -328,7 +345,7 @@ const UI = {
     bA.addEventListener('touchstart', e=>{e.preventDefault();e.stopPropagation();INPUT.pressJump();},{passive:false});
     bA.addEventListener('touchend', e=>{INPUT.releaseJump();});
     bA.addEventListener('touchcancel', e=>{INPUT.releaseJump();});
-    tap('btnB', ()=>INPUT.pressAttack());
+    instant('btnB', ()=>INPUT.pressAttack());
     const bC=this.el('btnC');   // pound needs press AND release — grounded hold = spring charge
     bC.addEventListener('touchstart', e=>{e.preventDefault();e.stopPropagation();INPUT.pressPound();},{passive:false});
     bC.addEventListener('touchend', e=>{INPUT.releasePound();});
@@ -338,9 +355,7 @@ const UI = {
     this.el('sfxVol').addEventListener('input', e=>AUDIO.setSfxVol(e.target.value/100));
     // shop tabs
     document.querySelectorAll('.tab').forEach(t=>{
-      const h = ev=>{ ev.stopPropagation(); document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on'); this.renderShop(t.dataset.tab); };
-      t.addEventListener('mousedown', h);
-      t.addEventListener('touchstart', ev=>{ev.preventDefault();h(ev);},{passive:false});
+      bindTap(t, ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on'); this.renderShop(t.dataset.tab); });
     });
     if(INPUT.isTouch){ this.el('touchBtns').style.display='flex'; document.documentElement.classList.add('touch'); }
   },
@@ -487,16 +502,14 @@ const UI = {
           else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
           this.renderShop('costumes'); this.updateHUD();
         };
-        btn.addEventListener('mousedown', act);
-        btn.addEventListener('touchstart', ev=>{ev.preventDefault();act(ev);},{passive:false});
+        this.bindTap(btn, ()=>act({stopPropagation(){}}));
         grid.appendChild(div);
       }
     } else if(tab==='ups'){
       // ---- LEVEL UPS: earned star milestones (free) + candy-bought permanent upgrades. Never real money. ----
       const totalStars = Object.values(G.save.levels||{}).reduce((s,l)=>s + (l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
       const claimed = G.save.claimed || (G.save.claimed = []);
-      const wire = (btn, fn)=>{ btn.addEventListener('mousedown', ev=>{ev.stopPropagation();fn();});
-        btn.addEventListener('touchstart', ev=>{ev.preventDefault();ev.stopPropagation();fn();},{passive:false}); };
+      const wire = (btn, fn)=>this.bindTap(btn, fn);
       const grantHeart = ()=>{ if(G.save.maxHearts<5){ G.save.maxHearts++; if(G.player){ G.player.maxHearts=G.save.maxHearts+(G.save.cozy?2:0); G.player.hearts=G.player.maxHearts; } this.toast('❤️ Max hearts: '+G.save.maxHearts+'!'); return true; } return false; };
       const MILES = [
         {id:'s5',  at:5,  label:'🍬 200 candy',            grant:()=>{ G.addCandy(200); }},
@@ -558,9 +571,7 @@ const UI = {
       setTimeout(()=>{
         const b=document.getElementById('buyPassBtn');
         if(b){
-          const act=ev=>{ev.stopPropagation(); G.buyPassTest(); this.renderShop('pass');};
-          b.addEventListener('mousedown',act);
-          b.addEventListener('touchstart',ev=>{ev.preventDefault();act(ev);},{passive:false});
+          this.bindTap(b, ()=>{ G.buyPassTest(); this.renderShop('pass'); });
         }
       },0);
       const T = [
@@ -726,9 +737,7 @@ const UI = {
     const wrap=this.el('mapWrap');
     wrap.innerHTML = html;
     wrap.querySelectorAll('.mnode').forEach(nd=>{
-      const act = ev=>{ ev.stopPropagation(); this._mapActivate(+nd.dataset.i); };
-      nd.addEventListener('mousedown', act);
-      nd.addEventListener('touchstart', ev=>{ev.preventDefault();act(ev);},{passive:false});
+      this.bindTap(nd, ()=>this._mapActivate(+nd.dataset.i));   // tap-detect: a drag-brush across a lantern no longer launches a level
     });
     // default selection: the pulsing node, else the furthest unlocked one
     let sel = nodes.findIndex(n=>n.st==='avail');
@@ -785,7 +794,9 @@ const UI = {
     const fmt = v => typeof v==='number' ? (Math.floor(v/60)+':'+String(Math.floor(v%60)).padStart(2,'0')) : v;
     this.el('clearName').textContent = stats.levelName || '';
     const st = stats.stars||{};
-    const slot = (on,lbl)=>`<div class="cstar${(on&&!stats.cozy)?'':' off'}"><div class="big">⭐</div><div class="lbl">${lbl}</div></div>`;
+    // missed stars must READ as missed — ✖ icon + dimmed card + "missed:" prefix (a dim ⭐ still read as earned)
+    const slot = (on,lbl)=>{ const won = on && !stats.cozy;
+      return `<div class="cstar${won?'':' off'}"${won?'':' style="opacity:.5"'}><div class="big">${won?'⭐':'✖️'}</div><div class="lbl">${won?lbl:'missed: '+lbl}</div></div>`; };
     this.el('clearStars').innerHTML =
       slot(st.time, '⏱ fast') +
       slot(st.candy, '🍬 '+(stats.candy??0)+'/'+(stats.candyTotal??0)) +
@@ -828,7 +839,13 @@ const UI = {
     if(stats.district==='w5'){ vt.style.color='#ffd23f'; vt.style.fontSize='26px'; vt.style.textShadow='0 0 16px rgba(255,180,60,.7)'; }
     else { vt.style.color='#ffb35e'; vt.style.fontSize=''; vt.style.textShadow=''; }
     this.el('vBody').innerHTML = c.b + '<br><b>👻 A blessing from the guardian: lives refilled!</b>';
-    this.el('vstats').innerHTML = `🍬 Candy collected: <b>${stats.candy}</b> &nbsp;·&nbsp; 🎃 Golden Pumpkins: <b>${stats.gp}/3</b><br>⏱️ Time: <b>${stats.time}</b>${rec}`;
+    if(stats.district==='w5'){
+      // the finale card sums the WHOLE night, not just the boss fight
+      const pt = stats.playT||0, fmtT = t => (t>=3600 ? Math.floor(t/3600)+'h ' : '') + Math.floor((t%3600)/60)+'m '+(t%60)+'s';
+      this.el('vstats').innerHTML = `🍬 Candy collected this night: <b>${(stats.lifeCandy||0).toLocaleString()}</b><br>⏱️ Your whole adventure: <b>${fmtT(pt)}</b> &nbsp;·&nbsp; 🔥 Boss fight: <b>${stats.time}</b>${rec}`;
+    } else {
+      this.el('vstats').innerHTML = `🍬 Candy collected: <b>${stats.candy}</b> &nbsp;·&nbsp; 🎃 Golden Pumpkins: <b>${stats.gp}/3</b><br>⏱️ Time: <b>${stats.time}</b>${rec}`;
+    }
     this.el('vHome').textContent = stats.district==='w5' ? '🎉 Join the festival in town!' : '🏘️ Return to Grimmwick';
     this.el('victory-screen').style.display='flex';
   },
