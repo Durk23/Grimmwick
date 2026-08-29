@@ -571,34 +571,6 @@ const UI = {
     if(tab==='costumes'){
       body.innerHTML = '<div style="opacity:.75;font-size:13px;margin-bottom:10px">❤️ Hearts &amp; upgrades moved to the <b>⬆️ Level Ups</b> tab!</div><div id="shopGrid"></div>';
       const grid = body.querySelector('#shopGrid');
-      for(const key in COSTUMES){
-        const c = COSTUMES[key];
-        if(c.pass && !G.save.owned.includes(key)) continue;   // v1.0 launch: pass-exclusive looks hidden until the Spook Pass ships (owners from testing keep theirs)
-        const owned = G.save.owned.includes(key);
-        const equipped = G.save.equipped===key;
-        const div = document.createElement('div');
-        div.className='item';
-        const cs = '#'+c.body.toString(16).padStart(6,'0');
-        const ac = '#'+c.accent.toString(16).padStart(6,'0');
-        const passBadge = c.pass ? `<div style="position:absolute;top:8px;right:8px;background:linear-gradient(90deg,#8e5bd9,#ff5ea8);border-radius:8px;font-size:10.5px;font-weight:900;padding:3px 7px">🌕 PASS</div>` : '';
-        div.style.position='relative';
-        const pv = this.costumePreview(key);
-        const swInner = pv ? `<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">` : '';
-        div.innerHTML = `${passBadge}<div class="sw" style="height:110px;background:linear-gradient(135deg,${cs}44 60%,${ac}66), radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%)${c.glow?';box-shadow:0 0 18px '+cs+' inset, 0 0 12px '+cs:''}">${swInner}</div>
-          <h4>${c.name}</h4><p>${c.desc}</p>
-          <button class="btn buy ui-block ${equipped?'ghost2':(owned?'':'orange')}">${equipped?'✓ Equipped':(owned?'Equip':(c.pass?'Try it (Pass)':(c.price===0?'Free':'🍬 '+c.price)))}</button>`;
-        const btn = div.querySelector('button');
-        const act = ev=>{
-          ev.stopPropagation();
-          if(equipped) return;
-          if(owned || c.price===0){ G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy(); }
-          else if(G.save.candy>=c.price){ G.save.candy-=c.price; G.save.owned.push(key); G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy(); this.toast('🎉 New costume: '+c.name+'!'); }
-          else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
-          this.renderShop('costumes'); this.updateHUD();
-        };
-        this.bindTap(btn, ()=>act({stopPropagation(){}}));
-        grid.appendChild(div);
-      }
       // ---- THE MASK RACK — one accessory slot, any mask over any costume ----
       const mh = document.createElement('div');
       mh.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';
@@ -625,6 +597,38 @@ const UI = {
           G.persist(); AUDIO.buy();
           this.renderShop('costumes'); this.updateHUD();
         });
+        grid.appendChild(div);
+      }
+      const ch = document.createElement('div');
+      ch.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';
+      ch.textContent = '🎩 COSTUMES — whole new looks';
+      grid.appendChild(ch);
+      for(const key in COSTUMES){
+        const c = COSTUMES[key];
+        if(c.pass && !G.save.owned.includes(key)) continue;   // v1.0 launch: pass-exclusive looks hidden until the Spook Pass ships (owners from testing keep theirs)
+        const owned = G.save.owned.includes(key);
+        const equipped = G.save.equipped===key;
+        const div = document.createElement('div');
+        div.className='item';
+        const cs = '#'+c.body.toString(16).padStart(6,'0');
+        const ac = '#'+c.accent.toString(16).padStart(6,'0');
+        const passBadge = c.pass ? `<div style="position:absolute;top:8px;right:8px;background:linear-gradient(90deg,#8e5bd9,#ff5ea8);border-radius:8px;font-size:10.5px;font-weight:900;padding:3px 7px">🌕 PASS</div>` : '';
+        div.style.position='relative';
+        const pv = this.costumePreview(key);
+        const swInner = pv ? `<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">` : '';
+        div.innerHTML = `${passBadge}<div class="sw" style="height:110px;background:linear-gradient(135deg,${cs}44 60%,${ac}66), radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%)${c.glow?';box-shadow:0 0 18px '+cs+' inset, 0 0 12px '+cs:''}">${swInner}</div>
+          <h4>${c.name}</h4><p>${c.desc}</p>
+          <button class="btn buy ui-block ${equipped?'ghost2':(owned?'':'orange')}">${equipped?'✓ Equipped':(owned?'Equip':(c.pass?'Try it (Pass)':(c.price===0?'Free':'🍬 '+c.price)))}</button>`;
+        const btn = div.querySelector('button');
+        const act = ev=>{
+          ev.stopPropagation();
+          if(equipped) return;
+          if(owned || c.price===0){ G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy(); }
+          else if(G.save.candy>=c.price){ G.save.candy-=c.price; G.save.owned.push(key); G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy(); this.toast('🎉 New costume: '+c.name+'!'); }
+          else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
+          this.renderShop('costumes'); this.updateHUD();
+        };
+        this.bindTap(btn, ()=>act({stopPropagation(){}}));
         grid.appendChild(div);
       }
     } else if(tab==='ups'){
