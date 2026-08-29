@@ -17,8 +17,14 @@ Add ideas any time (or tell Claude "add to the idea vault"). We triage into: **N
 - Wardrobe slots (tops/bottoms/shoes/accessories) + $0.49 starter accessories
 - Madame Webweaver mini-boss season
 
+## THE ARC (owner's vision, Aug 2026)
+1. **Grimmwick 1.0 live** → 1.1 leaderboards → the 50 expansion levels (Winterfest, then Sunken Isles)
+2. **A Pip ADVENTURE game** — the next full title: Pip in a bigger adventure (natural fit: the Metroidvania-style exploration structure we deliberately saved for a spin-off — Hollow Knight bones, Grimmwick heart; same engine, evolved)
+3. **Branch out** — other types of mobile games (new genres, same pipeline)
+4. **The studio** — slowly build a real developer/production company. When this step gets close: form the LLC, get the D-U-N-S number, migrate the Apple Developer account from individual → organization so the App Store "Seller" shows the studio name (candidates on file: Little Lantern Games, Night Candy Studios, Ember Moon Games), studio-wide email/brand.
+
 ## New game ideas (untriaged)
-- (empty — braindump here)
+- Pip adventure game (see The Arc, step 2)
 
 ## Someday / wild
 - (empty)
