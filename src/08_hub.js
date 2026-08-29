@@ -141,7 +141,7 @@ function buildHub(G){
     const lamp = mesh('box',[0.22,0.3,0.22], mat(0x2a2438)); lamp.position.set(0.82,0.85,0); lampArm.add(lamp);
     const lampGlow = mesh('sph',[0.09,7,6], emat(0xffd98a,0xffb02e,1.3)); lampGlow.position.copy(lamp.position); lampArm.add(lampGlow);
     grimm.add(lampArm);
-    grimm.position.set(-4.6, 0.1, 6.2); grimm.rotation.y = 0.7;   // across the square from the Mayor, lantern toward the flame
+    grimm.position.set(-1.5, 0.1, -6.2); grimm.rotation.y = 2.9;   // north of the Everflame on his watch rounds, well clear of the Cauldron's interact zone
     S.add(grimm);
     G.hubGrimm = grimm;
     G.ents.add({ dead:false, cull:false, group:new THREE.Group(), t:rand(0,9), update(dt){

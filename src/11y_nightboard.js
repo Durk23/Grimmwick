@@ -119,7 +119,7 @@ const Night = {
     const sv = G.save;
     if(sv.flawlessT || sv.nightCozy) return;
     if(!sv.nightDone || this.totalStars(G) < 75) return;
-    sv.flawlessT = sv.playT||0;
+    sv.flawlessT = sv._finishT !== undefined ? sv._finishT : (sv.playT||0);   // finale-path completions use the invite-moment stamp
     sv.flawlessDeaths = sv.dmgUntracked ? 99 : Math.min(sv.deathsLifetime||0, 99);
     sv.flawlessDmg = sv.dmgUntracked ? 999 : (sv.damageLifetime||0);
     sv.flawlessCandy = sv.candyLifetime||0;

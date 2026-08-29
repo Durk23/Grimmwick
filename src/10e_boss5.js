@@ -156,7 +156,10 @@ class GrimmCauldron {
   onPlayerPound(pos){}   // boss contract — player calls this on every landed pound; the cauldron ignores it (pound is even an invite button here)
 
   defeat(){
-    // THE INVITE LANDS — start the ending cutscene; onBossDefeated fires at its last beat
+    // THE INVITE LANDS — start the ending cutscene; onBossDefeated fires at its last beat.
+    // The speedrun clock stops HERE (the invite press is the finish line) — the tap-through
+    // banners after this moment must never count against the recorded time.
+    if(this.G.save && !this.G.save.nightDone) this.G.save._finishT = this.G.save.playT||0;
     this.dead = true; this.state = 'ending'; this.stateT = 0; this._endStage = 0; this._endT = 0;
     for(const s of this.shadows) if(!s.dead){ s.dead=true; if(s.group) this.G.scene.remove(s.group); if(s.shadow) this.G.scene.remove(s.shadow); }
     for(const b of this.burners) if(b.light) b.light.intensity = 40;

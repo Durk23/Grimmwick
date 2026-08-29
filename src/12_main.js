@@ -44,7 +44,7 @@ const G = {
     // stats take worst-case tiebreaks, so the entry can never rank unfairly high. A fresh run replaces it.
     if(this.save.nightDone===undefined) this.save.nightDone = (this.save.embers||0) >= 5;
     if(this.save.nightDone && this.save.nightT===undefined){
-      this.save.nightT = this.save.playT||0;
+      this.save.nightT = this.save._finishT !== undefined ? this.save._finishT : (this.save.playT||0);
       this.save.nightDmg = 999; this.save.nightDeaths = 99;
       this.save.nightCandy = this.save.candyLifetime||0;
       this.save.nightEligible = (this.save.playT||0) > 60;
@@ -521,13 +521,14 @@ const G = {
     if(district==='w5' && !this.save.nightDone){
       this.save.nightDone = true;
       this.save.nightEligible = !this.save.nightCozy;   // ANY cozy time during the night = no board entry (Pip still wins his party)
-      this.save.nightT = this.save.playT||0;
+      this.save.nightT = this.save._finishT !== undefined ? this.save._finishT : (this.save.playT||0);
       this.save.nightDmg = this.save.dmgUntracked ? 999 : (this.save.damageLifetime||0);   // untracked saves take the worst tiebreak, honestly
       this.save.nightDeaths = this.save.dmgUntracked ? 99 : Math.min(this.save.deathsLifetime||0, 99);
       this.save.nightCandy = this.save.candyLifetime||0;
       this.persist();
     }
     window.NightBoard && NightBoard.onBossDefeated(this, district);
+    if(this.save._finishT !== undefined){ delete this.save._finishT; this.persist(); }
     setTimeout(()=>{ this.state='victory'; UI.victoryScreen(stats); }, 4200);
   },
   onEnemyKilled(){},
@@ -626,7 +627,9 @@ const G = {
           AUDIO.startMusic();
         }
       }
-      this.save.playT = (this.save.playT||0) + dt;   // lifetime play clock (persists with the regular save cadence)
+      this.save.playT = (this.save.playT||0) + dt;
+      this._ptAcc = (this._ptAcc||0) + dt;   // flush the clock every few seconds — force-quitting must never refund run time
+      if(this._ptAcc > 4){ this._ptAcc = 0; this.persist(); }
       if(this.save.cozy && !this.save.nightDone && !this.save.nightCozy) this.save.nightCozy = true;   // any cozy minute taints the night's board eligibility
       if(INPUT.pauseEdge){ UI.togglePause(); INPUT.endFrame(); return; }
       if(this.area!=='hub' && this.area!=='tut') this.runT = (this.runT||0)+dt;
