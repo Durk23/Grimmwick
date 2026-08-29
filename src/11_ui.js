@@ -933,11 +933,23 @@ const UI = {
     const vt = this.el('vTitle'); vt.textContent = c.t;
     if(stats.district==='w5'){ vt.style.color='#ffd23f'; vt.style.fontSize='26px'; vt.style.textShadow='0 0 16px rgba(255,180,60,.7)'; }
     else { vt.style.color='#ffb35e'; vt.style.fontSize=''; vt.style.textShadow=''; }
-    this.el('vBody').innerHTML = c.b + '<br><b>👻 A blessing from the guardian: lives refilled!</b>';
+    this.el('vBody').innerHTML = c.b + (stats.district==='w5' ? '' : '<br><b>👻 A blessing from the guardian: lives refilled!</b>');
     if(stats.district==='w5'){
-      // the finale card sums the WHOLE night, not just the boss fight
-      const pt = stats.playT||0, fmtT = t => (t>=3600 ? Math.floor(t/3600)+'h ' : '') + Math.floor((t%3600)/60)+'m '+(t%60)+'s';
-      this.el('vstats').innerHTML = `🍬 Candy collected this night: <b>${(stats.lifeCandy||0).toLocaleString()}</b><br>⏱️ Your whole adventure: <b>${fmtT(pt)}</b> &nbsp;·&nbsp; 🔥 Boss fight: <b>${stats.time}</b>${rec}`;
+      // THE END card — the whole night in a clean keepsake grid, and the door to what's next
+      const sv = G.save;
+      const pt = stats.playT||0, fmtT = t => (t>=3600 ? Math.floor(t/3600)+'h ' : '') + Math.floor((t%3600)/60)+'m '+(Math.floor(t)%60)+'s';
+      const starsEarned = Object.values(sv.levels||{}).reduce((s,l)=>s+(l.stars?(l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0):0),0);
+      const gpFound = Object.values(sv.gp||{}).reduce((s,a)=>s+(a||[]).filter(Boolean).length,0);
+      const box = (e,v,l)=>`<div style="flex:1 1 96px;max-width:130px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.16);border-radius:14px;padding:8px 4px"><div style="font-size:20px">${e}</div><div style="font-weight:900;font-size:15.5px">${v}</div><div style="font-size:10.5px;opacity:.75;margin-top:1px">${l}</div></div>`;
+      const dmgBox = sv.dmgUntracked ? '' : box('💜', (sv.nightDmg??0), 'hearts lost');
+      this.el('vstats').innerHTML =
+        `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0 10px">
+          ${box('⏱️', fmtT(pt), 'the whole night')}${box('🍬', (stats.lifeCandy||0).toLocaleString(), 'candy collected')}${dmgBox}${box('⭐', starsEarned+'/75', 'stars earned')}${box('🎃', gpFound+'/15', 'golden pumpkins')}
+        </div>
+        <div style="opacity:.85;font-size:13.5px;line-height:1.5">The night isn't over — every district still glows.<br>Hunt the stars, find the Old Shortcuts... and race the night itself. 🏮</div>
+        <button id="vNight" class="btn ghost2 ui-block" style="margin-top:10px">🏮 See the Night Board</button>${rec}`;
+      const vb = document.getElementById('vNight');
+      if(vb) this.bindTap(vb, ()=>window.NightBoard && NightBoard.open());
     } else {
       this.el('vstats').innerHTML = `🍬 Candy collected: <b>${stats.candy}</b> &nbsp;·&nbsp; 🎃 Golden Pumpkins: <b>${stats.gp}/3</b><br>⏱️ Time: <b>${stats.time}</b>${rec}`;
     }

@@ -127,6 +127,34 @@ function buildHub(G){
     G.hubEmber = fl;                                   // the pulse target becomes the big flame
     // and the great jack-o'-lantern's face finally lights warm (it was dark and sad all game)
     jeL.material = emat(0xffe08a, 0xffb02e, 1); jeR.material = jeL.material; jmo.material = jeL.material;
+
+    // ---- GRIMM, THE NIGHT-WATCHMAN — the ending's promise, standing right there by the flame ----
+    const grimm = new THREE.Group();
+    const gm = new THREE.MeshLambertMaterial({color:0x5a5578, emissive:0xff9a50, emissiveIntensity:0.28});
+    const hood = new THREE.Mesh(geo('sph',0.52,11,9), gm); hood.scale.set(1,1.25,0.9); hood.position.y=1.05; grimm.add(hood);
+    const cowl = new THREE.Mesh(geo('cone',0.56,0.9,9), gm); cowl.position.y=1.45; grimm.add(cowl);
+    const robe = new THREE.Mesh(geo('cone',0.62,1.3,9), gm); robe.position.y=0.55; grimm.add(robe);
+    const geL = mesh('sph',[0.09,7,6], emat(0xffb46a,0xff9a3a,1)); geL.position.set(-0.17,1.12,0.42);
+    const geR = geL.clone(); geR.position.x=0.17; grimm.add(geL,geR);
+    const lampArm = new THREE.Group();
+    const pole = mesh('cyl',[0.03,0.03,0.7,5], mat(0x3a3448)); pole.rotation.z=0.9; pole.position.set(0.5,1.05,0); lampArm.add(pole);
+    const lamp = mesh('box',[0.22,0.3,0.22], mat(0x2a2438)); lamp.position.set(0.82,0.85,0); lampArm.add(lamp);
+    const lampGlow = mesh('sph',[0.09,7,6], emat(0xffd98a,0xffb02e,1.3)); lampGlow.position.copy(lamp.position); lampArm.add(lampGlow);
+    grimm.add(lampArm);
+    grimm.position.set(-4.6, 0.1, 6.2); grimm.rotation.y = 0.7;   // across the square from the Mayor, lantern toward the flame
+    S.add(grimm);
+    G.hubGrimm = grimm;
+    G.ents.add({ dead:false, cull:false, group:new THREE.Group(), t:rand(0,9), update(dt){
+      this.t += dt;
+      grimm.position.y = 0.1 + Math.sin(this.t*1.1)*0.05;       // the gentle watchman sway
+      lampArm.rotation.z = Math.sin(this.t*1.4)*0.08;           // lantern swings softly
+      // FESTIVAL FIREWORKS — bursts over the rooftops all night long
+      if(!this._fw || this.t > this._fw){
+        this._fw = this.t + rand(1.8, 3.2);
+        G.fx.spawn(new THREE.Vector3(rand(-18,18), rand(13,19), rand(-16,-6)),
+          pick([0xff5ea8,0x63e6e2,0xffd23f,0xff8c2e,0xb37dff,0x9fe066]), 22, {speed:5.5, life:1.1, gravity:2.5, size:1.1});
+      }
+    }});
   }
   G.hubEmberLight = new THREE.PointLight(0xff8c3e, 45, 15); G.hubEmberLight.position.set(0,3.4,0); plinthG.add(G.hubEmberLight);
   S.add(plinthG);
@@ -616,6 +644,8 @@ function updateHub(G, dt){
   let prompt = null;
   // mayor
   if(G.mayor.position.distanceTo(pl.pos)<3.2) prompt = {kind:'mayor', label:'💬 Talk to Mayor Boo'};
+  // Grimm the night-watchman (post-festival only)
+  else if(G.hubGrimm && G.hubGrimm.position.distanceTo(pl.pos)<3.2) prompt = {kind:'grimm', label:'🏮 Talk to Grimm'};
   // shop
   else if(G.shopPos.distanceTo(pl.pos)<3.6) prompt = {kind:'shop', label:'🎩 Costume Cauldron'};
   else {
@@ -638,6 +668,17 @@ function updateHub(G, dt){
       UI.mayorDialogue();
       if(!G.save.metMayor){ G.save.metMayor=true; G.persist();
         UI.toast('🎃 Follow the golden arrow — WALK INTO a glowing gate to pick a level!'); }
+    }
+    else if(prompt.kind==='grimm'){
+      const lines = [
+        '"Night-watchman Grimm, at your service. First shift in four hundred years... I brought snacks."',
+        '"The lanterns stay lit better when someone WANTS them lit. Who knew."',
+        '"They put my name in the festival guest book. In INK, Pip. In ink."',
+        '"The other spirits race each other through the districts now — the 🏮 Night Board, they call it. Loud. Wonderful."',
+        '"You can always visit. That is the strangest, warmest thing anyone has ever told me."',
+      ];
+      G._grimmLine = ((G._grimmLine??-1)+1) % lines.length;
+      UI.dialogue('🫥', lines[G._grimmLine]);
     }
     else if(prompt.kind==='shop') UI.openShop();
     else if(prompt.kind==='enter'){ AUDIO.portal(); G.openMap(prompt.gate.w.key||'w1'); }
