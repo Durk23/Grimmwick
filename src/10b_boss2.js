@@ -205,7 +205,7 @@ class Mossgrave {
     AUDIO.bossRoar(); this.G.camc.shake(0.6, 0.5);
     // knock the in-flight (non-reversed) bats out of the sky so the player gets a clean window
     for(const e of this.G.ents.list) if(e instanceof MossBat && !e.dead && !e.reversed) e.dissipate();
-    window.UI && UI.toast('💥 TIMBER! Mossgrave topples — SMASH the glowing moss runes on his back!');
+    window.UI && UI.toast('💥 TIMBER! Mossgrave topples! SMASH the glowing moss runes on his back!');
   }
   runeHit(kind){
     if(this.dead || this.state!=='toppled' || this.runeDone) return;
@@ -219,7 +219,7 @@ class Mossgrave {
     if(this.runeHp <= 0){ this.defeat(); return; }
     this.phase = this.runeMax - this.runeHp + 1;
     this.batCap = this.phase>=3 ? 4 : 3;
-    window.UI && UI.toast(['', '"You... you CRACKED me! You little WEED!"', '"MMPH! The MOSS — hide the MOSS!"'][this.runeHp] || '');
+    window.UI && UI.toast(['', '"You... you CRACKED me! You little WEED!"', '"MMPH! The MOSS... hide the MOSS!"'][this.runeHp] || '');
     this.state = 'enrage'; this.stateT = 0; this._enrShot = false;
   }
   onPlayerPound(pos){
@@ -297,7 +297,7 @@ class Mossgrave {
         if(this.stateT < 0.06) G.fx.spawn(new THREE.Vector3(p.x, 0.2, p.z), 0x6b5a4e, 14, {speed:4, life:0.6});
         if(this.stateT > 1.0){ this.state='taunt'; this.stateT=0; this.body.position.y=0;
           G.camc.shake(0.6, 0.4);
-          window.UI && UI.dialogue('🪦', '"Who rattles the stones of Ravenmoor? Turn back, little sprout — my roots run DEEP, and my hide is STONE."');
+          window.UI && UI.dialogue('🪦', '"Who rattles the stones of Ravenmoor? Turn back, little sprout. My roots run DEEP, and my hide is STONE."');
         }
         break;
       case 'taunt':
@@ -381,7 +381,7 @@ class Mossgrave {
         if(!this._enrShot && this.stateT > 0.5){ this._enrShot = true; this.spawnShockwave(); this.spawnBatSwarm(1); }
         if(this.stateT > 1.5){
           this.state='idle'; this.stateT=0;
-          window.UI && UI.toast(this.phase>=3 ? '🔥 He\'s cracked and RAGING — one more!' : '⚡ Phase '+this.phase+'!');
+          window.UI && UI.toast(this.phase>=3 ? '🔥 He\'s cracked and RAGING. One more!' : '⚡ Phase '+this.phase+'!');
         }
         break;
       }
@@ -391,7 +391,7 @@ class Mossgrave {
         for(const rm of this.runeMats) rm.emissiveIntensity = 0.35 + Math.sin(this.t*4)*0.2;
         if(this.stateT > 2.6 && !this._farewell){
           this._farewell = true;
-          window.UI && UI.dialogue('🪦', '"...the moss. Someone tended the moss on my back, once. My roots remember warm hands. Take the ember, child — and tell your Gran her Mossgrave is himself again." 💚');
+          window.UI && UI.dialogue('🪦', '"...the moss. Someone tended the moss on my back, once. My roots remember warm hands. Take the ember, child, and tell your Gran her Mossgrave is himself again." 💚');
         }
         break;
       }

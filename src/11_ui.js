@@ -1,14 +1,14 @@
 // ============ UI — HUD, title, dialogue, store, pause, boss bar, touch ============
 const STORY_SLIDES = [
-  {icon:'🌕', text:'Welcome to GRIMMWICK — the town where Halloween never ends. Every 100 years, the Ember Moon rises to recharge the Everflame... the magical bonfire that keeps every ghost friendly and every candy sweet.\n\n(Nobody remembers why the town is called Grimmwick. Not even the Mayor.)'},
-  {icon:'🌑', text:'But tonight, moments before the ceremony, a jealous shadow named GRIMM swallowed the flame and shattered it into five embers — scattering them across the five districts. The beloved guardians who found them have been corrupted by ember-fire!'},
+  {icon:'🌕', text:'Welcome to GRIMMWICK, the town where Halloween never ends. Every 100 years, the Ember Moon rises to recharge the Everflame... the magical bonfire that keeps every ghost friendly and every candy sweet.\n\n(Nobody remembers why the town is called Grimmwick. Not even the Mayor.)'},
+  {icon:'🌑', text:'But tonight, moments before the ceremony, a jealous shadow named GRIMM swallowed the flame and shattered it into five embers, scattering them across the five districts. The beloved guardians who found them have been corrupted by ember-fire!'},
   {icon:'🍬', text:'Everyone always says Pip is too small for adventures.\n\nEveryone is about to be wrong.\n\nGrab your candy bag. Free the guardians. RELIGHT THE NIGHT!'},
 ];
 const MAYOR_LINES = [
-  '"Pip! Thank goodness you\'re here. Grimm\'s shadow put every grown-up spirit into a gloomy sleepwalk — you\'re the only one he overlooked. Being small has its perks!"',
-  '"Each guardian clutches a stolen ember. Start with the PUMPKIN KING — the Pumpkin Patch gate is the only one still open. He was the kindest of them all... bring him back to us."',
-  '"Collect candy 🍬 and trade it at the Costume Cauldron! And keep an eye out — 3 GOLDEN PUMPKINS are hidden in every district. They say golden pumpkins sweeten the Everflame."',
-  '"Boos are terribly shy — stare right at them and they freeze! The Pumpkin King, though... he\'s not shy. Bring your bouncing shoes, little one."',
+  '"Pip! Thank goodness you\'re here. Grimm\'s shadow put every grown-up spirit into a gloomy sleepwalk. You\'re the only one he overlooked. Being small has its perks!"',
+  '"Each guardian clutches a stolen ember. Start with the PUMPKIN KING: the Pumpkin Patch gate is the only one still open. He was the kindest of them all... bring him back to us."',
+  '"Collect candy 🍬 and trade it at the Costume Cauldron! Keep an eye out: 3 GOLDEN PUMPKINS are hidden in every district. They say golden pumpkins sweeten the Everflame."',
+  '"Boos are terribly shy: stare right at them and they freeze! The Pumpkin King, though... he\'s not shy. Bring your bouncing shoes, little one."',
 ];
 
 const UI = {
@@ -186,7 +186,7 @@ const UI = {
       <div id="title-screen" class="screen">
         <div id="logo">GRIMM<span class="v">WICK</span></div>
         <div id="tagline">🎃 Relight the Night 🎃</div>
-        <div id="tap">— tap anywhere to play —</div>
+        <div id="tap">– tap anywhere to play –</div>
         <div style="display:flex;gap:10px;margin-top:26px">
           <button id="nightBtnTitle" class="btn ghost2 ui-block">🏮 The Night Board</button>
           <button id="howBtnTitle" class="btn ghost2 ui-block">📖 How to Play</button>
@@ -233,7 +233,7 @@ const UI = {
         <div id="mapHead">
           <div id="mapTitle"></div>
           <div id="mapEmber"></div>
-          <div id="mapCozy" style="display:none">🧸 cozy night — records asleep</div>
+          <div id="mapCozy" style="display:none">🧸 cozy night, records asleep</div>
           <div id="mapHint">← → choose &nbsp;·&nbsp; Enter start &nbsp;·&nbsp; Esc town</div>
         </div>
         <div id="mapWrap"></div>
@@ -254,9 +254,9 @@ const UI = {
       <div id="death-screen" class="screen"><div class="card">
         <div style="font-size:50px">👻</div>
         <h2 style="margin:10px 0">The night got you!</h2>
-        <p style="opacity:.8;margin-bottom:16px">Don't worry — Grimmwick believes in you.</p>
+        <p style="opacity:.8;margin-bottom:16px">Don't worry. Grimmwick believes in you.</p>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="btn ui-block" id="reviveBtn" style="display:none">🍬 Second Wind — revive here (200 candy)</button>
+          <button class="btn ui-block" id="reviveBtn" style="display:none">🍬 Second Wind: revive here (200 candy)</button>
           <button class="btn orange ui-block" id="respawnBtn">🕯️ Back to the lantern</button>
         </div>
       </div></div>
@@ -265,7 +265,7 @@ const UI = {
         <h2 style="margin:10px 0;color:#ff5e7a">OUT OF LIVES!</h2>
         <p style="opacity:.85;margin-bottom:14px">The night got the better of you this time...</p>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="btn ui-block" id="continueBtn" style="display:none">🍬 Keep going from the lantern — 3 lives (500 candy)</button>
+          <button class="btn ui-block" id="continueBtn" style="display:none">🍬 Keep going from the lantern: 3 lives (500 candy)</button>
           <button class="btn orange ui-block" id="gameoverBtn">🔁 Restart the level (5 fresh lives)</button>
         </div>
       </div></div>
@@ -282,7 +282,7 @@ const UI = {
       <div id="rotateHint" class="ui-block">
         <div id="rotPhone"></div>
         <h3>Turn your phone sideways!</h3>
-        <p>Grimmwick plays best in landscape 🏮<br><span style="opacity:.6;font-size:12.5px">— tap anywhere to keep playing upright —</span></p>
+        <p>Grimmwick plays best in landscape 🏮<br><span style="opacity:.6;font-size:12.5px">– tap anywhere to keep playing upright –</span></p>
       </div>
       <div id="vig" style="position:fixed;inset:0;pointer-events:none;z-index:5;box-shadow:inset 0 0 140px 46px rgba(8,4,20,.5)"></div>
       <div id="hurtvig"></div>
@@ -326,7 +326,7 @@ const UI = {
     tap('cozyBtn', ()=>{ G.toggleCozy(); this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(G.save.cozy?'ON':'OFF'); });
     tap('feedbackBtn', ()=>{ AUDIO.ui();   // opens the Mail composer — a player choosing to write is not data collection
       window.location.href = 'mailto:grimmwickgame@gmail.com?subject=' + encodeURIComponent('Grimmwick Feedback')
-        + '&body=' + encodeURIComponent('\n\n—\nGrimmwick v1.0 · from the pause menu'); });
+        + '&body=' + encodeURIComponent('\n\n--\nGrimmwick v1.0 · from the pause menu'); });
     tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Tap again'; } });
     tap('shopClose', ()=>this.closeShop());
     tap('shopX', ()=>this.closeShop());
@@ -474,7 +474,7 @@ const UI = {
     ] : [
       ['🕹️','WASD / arrows','walk & run'],
       ['⬜','SPACE','jump · press AGAIN in the air = DOUBLE-JUMP · HOLD = higher'],
-      ['🅹','J','spin — bonk enemies & lanterns'],
+      ['🅹','J','spin: bonk enemies & lanterns'],
       ['🅺','K','ground-pound · HOLD standing still, release = SPRING JUMP'],
       ['🅴','E','talk, read & open things'],
     ];
@@ -487,7 +487,7 @@ const UI = {
           <b>🎩 Tricks of the night</b>
           <div style="opacity:.85;margin-top:5px">👟 Bounce off enemies' heads · 🕸️ press UP on webs, vines &amp; chains to CLIMB · 👀 STARE at a Boo and it freezes · 🎃 ground-pound a giant pumpkin for a MEGA-BOUNCE · 🏮 checkpoint lanterns remember your place</div>
         </div>
-        <div style="margin-top:8px;opacity:.6;font-size:12.5px">🎮 Controllers work too — stick to move, A jump, X spin, B pound.</div>
+        <div style="margin-top:8px;opacity:.6;font-size:12.5px">🎮 Controllers work too: stick to move, A jump, X spin, B pound.</div>
       </div>
     </div>`;
     this.bindTap(el.querySelector('#howX'), ()=>{ el.style.display='none'; this._ovCloseT = performance.now(); AUDIO.ui(); });
@@ -534,7 +534,9 @@ const UI = {
   },
   // ---------- shop ----------
   openShop(){
-    if(this.G.state==='play'){ this.G.state='shop'; this.el('shop-screen').style.display='flex'; this.renderShop('costumes'); AUDIO.ui(); }
+    if(this.G.state==='play'){ this.G.state='shop'; this.el('shop-screen').style.display='flex'; this.renderShop('costumes'); AUDIO.ui();
+      if(!this.G.save.seenShop){ this.G.save.seenShop = true; this.G.persist(); }   // first-visit tour complete — the arrow moves on to the gates
+    }
   },
   closeShop(){ this.el('shop-screen').style.display='none'; this.G.state='play'; AUDIO.ui(); },
   // real 3D portrait of Pip WEARING a costume — a tiny offscreen render of the actual rig, cached per key
@@ -574,7 +576,7 @@ const UI = {
       // ---- THE MASK RACK — one accessory slot, any mask over any costume ----
       const mh = document.createElement('div');
       mh.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';
-      mh.textContent = '🎭 MASKS — wear one over ANY costume';
+      mh.textContent = '🎭 MASKS: wear one over ANY costume';
       grid.appendChild(mh);
       const wornCostume = G.save.equipped || 'kid';
       for(const mkey in MASKS){
@@ -586,12 +588,12 @@ const UI = {
         const pv = this.costumePreview(wornCostume, mkey);
         div.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%), linear-gradient(135deg,#3a2f5a66 60%,#5a3f7a66)">${pv?`<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">`:`<div style="font-size:52px;line-height:110px">${m.icon}</div>`}</div>
           <h4>${m.icon} ${m.name}</h4><p>${m.desc}</p>
-          <button class="btn buy ui-block ${wearing?'ghost2':(ownedM?'':(m.earned?'ghost2':'orange'))}">${wearing?'✓ On — tap to take off':(ownedM?'Wear it':(m.earned?'⭐ Earn all '+m.earned+' stars':'🍬 '+m.price))}</button>`;
+          <button class="btn buy ui-block ${wearing?'ghost2':(ownedM?'':(m.earned?'ghost2':'orange'))}">${wearing?'✓ On · tap to take off':(ownedM?'Wear it':(m.earned?'⭐ Earn all '+m.earned+' stars':'🍬 '+m.price))}</button>`;
         const btn = div.querySelector('button');
         this.bindTap(btn, ()=>{
           if(wearing){ G.save.mask = null; }
           else if(ownedM){ G.save.mask = mkey; }
-          else if(m.earned){ AUDIO.ui(); this.toast('👑 The Star Crown can\'t be bought — earn all '+m.earned+' stars! (Check ⬆️ Level Ups)'); return; }
+          else if(m.earned){ AUDIO.ui(); this.toast('👑 The Star Crown can\'t be bought. Earn all '+m.earned+' stars! (Check ⬆️ Level Ups)'); return; }
           else if(G.save.candy >= m.price){ G.save.candy -= m.price; G.save.ownedMasks.push(mkey); G.save.mask = mkey; AUDIO.buy(); this.toast('🎭 New mask: '+m.name+'!'); }
           else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); return; }
           G.player && G.player.buildRig(G.save.equipped||'kid');
@@ -602,7 +604,7 @@ const UI = {
       }
       const ch = document.createElement('div');
       ch.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';
-      ch.textContent = '🎩 COSTUMES — whole new looks';
+      ch.textContent = '🎩 COSTUMES: whole new looks';
       grid.appendChild(ch);
       for(const key in COSTUMES){
         const c = COSTUMES[key];
@@ -641,18 +643,18 @@ const UI = {
       const grantHeart = ()=>{ if(G.save.maxHearts<5){ G.save.maxHearts++; if(G.player){ G.player.maxHearts=G.save.maxHearts+(G.save.cozy?2:0); G.player.hearts=G.player.maxHearts; } this.toast('❤️ Max hearts: '+G.save.maxHearts+'!'); return true; } return false; };
       const MILES = [
         {id:'s5',  at:5,  label:'🍬 200 candy',            grant:()=>{ G.addCandy(200); }},
-        {id:'s12', at:12, label:'❤️ +1 MAX HEART',          grant:()=>{ if(!grantHeart()){ G.addCandy(400); this.toast('❤️ Hearts maxed — 🍬 400 instead!'); } }},
+        {id:'s12', at:12, label:'❤️ +1 MAX HEART',          grant:()=>{ if(!grantHeart()){ G.addCandy(400); this.toast('❤️ Hearts maxed: 🍬 400 instead!'); } }},
         {id:'s20', at:20, label:'🍬 600 + 👻 1-UP',         grant:()=>{ G.addCandy(600); G.save.lives=Math.min(9,(G.save.lives!==undefined?G.save.lives:5)+1); }},
-        {id:'s30', at:30, label:'❤️ +1 MAX HEART',          grant:()=>{ if(!grantHeart()){ G.addCandy(900); this.toast('❤️ Hearts maxed — 🍬 900 instead!'); } }},
+        {id:'s30', at:30, label:'❤️ +1 MAX HEART',          grant:()=>{ if(!grantHeart()){ G.addCandy(900); this.toast('❤️ Hearts maxed: 🍬 900 instead!'); } }},
         {id:'s45', at:45, label:'🍬 2000 + 👻👻👻 3 1-UPs', grant:()=>{ G.addCandy(2000); G.save.lives=Math.min(9,(G.save.lives!==undefined?G.save.lives:5)+3); }},
-        {id:'s75', at:75, label:'👑 THE STAR CROWN + 🍬 3000 — the FLAWLESS reward', grant:()=>{
+        {id:'s75', at:75, label:'👑 THE STAR CROWN + 🍬 3000: the FLAWLESS reward', grant:()=>{
           G.addCandy(3000);
           if(!G.save.ownedMasks.includes('starcrown')) G.save.ownedMasks.push('starcrown');
           G.save.mask='starcrown'; G.player && G.player.buildRig(G.save.equipped||'kid');
-          AUDIO.goldPumpkin(); this.toast('👑 THE STAR CROWN — all 75 stars. You ARE the night, Pip.', 5200); }},
+          AUDIO.goldPumpkin(); this.toast('👑 THE STAR CROWN! All 75 stars. You ARE the night, Pip.', 5200); }},
       ];
       body.innerHTML = `
-        <div class="ribbon">⭐ Earn stars in levels (fast · all-candy · no-damage) to LEVEL UP — plus candy upgrades below</div>
+        <div class="ribbon">⭐ Earn stars in levels (fast · all-candy · no-damage) to LEVEL UP, plus candy upgrades below</div>
         <div style="font-weight:900;font-size:17px;margin-bottom:8px">⭐ Your stars: ${totalStars} / 75</div>
         <div id="mileList" style="text-align:left;margin-bottom:14px"></div>
         <div id="upGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;text-align:left"></div>`;
@@ -672,8 +674,8 @@ const UI = {
       const hPrice = {3:500, 4:1500}[G.save.maxHearts];
       const hDiv = document.createElement('div'); hDiv.className='item';
       hDiv.innerHTML = `<div class="sw" style="background:linear-gradient(135deg,#ff4d6d 60%,#8f1030);display:flex;align-items:center;justify-content:center;font-size:30px">❤️</div>
-        <h4>Heart Container</h4><p>${G.save.maxHearts>=5?'FIVE hearts — a true legend of Grimmwick.':'One more heart, forever. Also FREE at 12⭐ and 30⭐!'}</p>
-        <button class="btn buy ui-block ${hPrice?'orange':'ghost2'}">${hPrice?('🍬 '+hPrice+' — heart #'+(G.save.maxHearts+1)):'✓ MAXED'}</button>`;
+        <h4>Heart Container</h4><p>${G.save.maxHearts>=5?'FIVE hearts. A true legend of Grimmwick.':'One more heart, forever. Also FREE at 12⭐ and 30⭐!'}</p>
+        <button class="btn buy ui-block ${hPrice?'orange':'ghost2'}">${hPrice?('🍬 '+hPrice+' · heart #'+(G.save.maxHearts+1)):'✓ MAXED'}</button>`;
       if(hPrice) wire(hDiv.querySelector('button'), ()=>{
         if(G.save.candy>=hPrice){ G.save.candy-=hPrice; grantHeart(); G.persist(); AUDIO.buy(); }
         else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
@@ -685,8 +687,8 @@ const UI = {
       const mPrice = mRank===0?400:(mRank===1?900:null);
       const mDiv = document.createElement('div'); mDiv.className='item';
       mDiv.innerHTML = `<div class="sw" style="background:linear-gradient(135deg,#ffd23f 60%,#b8860b);display:flex;align-items:center;justify-content:center;font-size:30px">🧲</div>
-        <h4>Candy Magnet ${mRank>0?['','I','II'][mRank]+' owned':''}</h4><p>${mRank>=2?'Max pull — candy practically begs to be caught.':'Candy leaps to you from farther away.'+(mRank===1?' One rank left!':' Two ranks.')}</p>
-        <button class="btn buy ui-block ${mPrice?'orange':'ghost2'}">${mPrice?('🍬 '+mPrice+' — rank '+['I','II'][mRank]):'✓ MAXED'}</button>`;
+        <h4>Candy Magnet ${mRank>0?['','I','II'][mRank]+' owned':''}</h4><p>${mRank>=2?'Max pull. Candy practically begs to be caught.':'Candy leaps to you from farther away.'+(mRank===1?' One rank left!':' Two ranks.')}</p>
+        <button class="btn buy ui-block ${mPrice?'orange':'ghost2'}">${mPrice?('🍬 '+mPrice+' · rank '+['I','II'][mRank]):'✓ MAXED'}</button>`;
       if(mPrice) wire(mDiv.querySelector('button'), ()=>{
         if(G.save.candy>=mPrice){ G.save.candy-=mPrice; G.save.upMagnet=(G.save.upMagnet||0)+1; G.persist(); AUDIO.buy(); this.toast('🧲 Candy Magnet rank '+['','I','II'][G.save.upMagnet]+'!'); }
         else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
@@ -708,11 +710,11 @@ const UI = {
         }
       },0);
       const T = [
-        ['🍬 50','🍬 500 + 🔥 EMBERLING — a pet wisp that orbits you', 1],
+        ['🍬 50','🍬 500 + 🔥 EMBERLING: a pet wisp that orbits you', 1],
         ['🍬 50','🎨 Ember-orange bag skin'],
         ['🍭 Candy-swirl trail (3 uses)','🍬 300'],
         ['🍬 75','💫 Sparkle jump-puffs'],
-        ['🍬 75','👻 EMBER SPIRIT costume — glows + fire run-trail', 1],
+        ['🍬 75','👻 EMBER SPIRIT costume: glows + fire run-trail', 1],
         ['🍬 100','🍬 400'],
         ['🎨 Rusty bag skin','🦴 Bone-rattle footsteps'],
         ['🍬 100','🎩 Tiny top hat (any costume)'],
@@ -722,7 +724,7 @@ const UI = {
         ['🍬 150','🍬 600'],
         ['✨ Purple jump-puffs','🕸️ Cobweb cape'],
         ['🍬 150','🍬 600'],
-        ['🍬 200','🧙 ZOE THE WITCHLING — playable character', 1],
+        ['🍬 200','🧙 ZOE THE WITCHLING: playable character', 1],
         ['🍬 200','🎨 Harbor-teal bag skin'],
         ['🍬 200','🍬 800'],
         ['🌙 Moon-white bag skin','⚓ Ghost-anchor backbling'],
@@ -732,22 +734,22 @@ const UI = {
         ['🎨 Midnight bag skin','🌫️ Fog-walker aura'],
         ['🍬 300','🍬 1000'],
         ['🍬 350','👑 Ember crown (any costume)'],
-        ['🎉 500 + fireworks','😈 GRIMM\'S HERALD — animated shadow costume + title + 🍬 1500', 1],
+        ['🎉 500 + fireworks','😈 GRIMM\'S HERALD: animated shadow costume + title + 🍬 1500', 1],
       ];
       const totPrem = 8000;
       body.innerHTML = `
         <div class="passhead">
           <h3>🌕 SEASON 1: THE EMBER MOON</h3>
           ${G.save.pass
-            ? '<p style="font-weight:900;font-size:15px;margin-top:8px">✅ PASS ACTIVE — Nightstitch unlocked instantly. Climb those tiers!</p>'
-            : '<button id="buyPassBtn" class="btn orange ui-block" style="margin-top:10px;font-size:16px">🌙 GET THE PASS — $4.99 · NIGHTSTITCH outfit INSTANTLY (test: free)</button>'}
-          <p>25 tiers — climb one for every level you complete. Free track for everyone. Spook Pass unlocks the right column. <b>${totPrem.toLocaleString()}+ candy</b> in the premium track alone — enough for every Heart Container and half the store.</p>
+            ? '<p style="font-weight:900;font-size:15px;margin-top:8px">✅ PASS ACTIVE: Nightstitch unlocked instantly. Climb those tiers!</p>'
+            : '<button id="buyPassBtn" class="btn orange ui-block" style="margin-top:10px;font-size:16px">🌙 GET THE PASS · $4.99 · NIGHTSTITCH outfit INSTANTLY (test: free)</button>'}
+          <p>25 tiers: climb one for every level you complete. Free track for everyone. Spook Pass unlocks the right column. <b>${totPrem.toLocaleString()}+ candy</b> in the premium track alone, enough for every Heart Container and half the store.</p>
           <p style="margin-top:6px;font-weight:800">Arrives with the App Store release · nothing here is pay-to-win, it's pay-to-SPARKLE ✨</p>
         </div>
         <div style="display:grid;grid-template-columns:40px 1fr 1.2fr;gap:7px;margin-bottom:6px;text-align:left">
           <div class="tn">⚡</div>
-          <div class="tcell">—</div>
-          <div class="tcell marquee">🌙 NIGHTSTITCH outfit — yours the INSTANT you buy</div>
+          <div class="tcell">–</div>
+          <div class="tcell marquee">🌙 NIGHTSTITCH outfit: yours the INSTANT you buy</div>
         </div>
         <div class="trackhead"><span></span><span>FREE</span><span>🎃 SPOOK PASS</span></div>
         ${T.map((t,i)=>`<div class="tierrow">
@@ -776,8 +778,8 @@ const UI = {
     const world = (typeof WORLDS!=='undefined' && WORLDS.find(w=>w.key===this._mapDistrict)) || {name:'Pumpkin Patch', guardian:'The Guardian'};
     const dNum = parseInt(this._mapDistrict.slice(1),10)||1;
     const beaten = !!(G.save.worlds && G.save.worlds[this._mapDistrict]);
-    this.el('mapTitle').textContent = world.name.toUpperCase()+' — District '+dNum;
-    this.el('mapEmber').textContent = beaten ? '🔥 Ember recovered — the district burns warm again!' : '🌑 Ember stolen — '+world.guardian+' still holds it';
+    this.el('mapTitle').textContent = world.name.toUpperCase()+' · District '+dNum;
+    this.el('mapEmber').textContent = beaten ? '🔥 Ember recovered! The district burns warm again!' : '🌑 Ember stolen. '+world.guardian+' still holds it';
     this.el('mapCozy').style.display = G.save.cozy ? 'block' : 'none';
     this.el('mapHint').style.display = INPUT.isTouch ? 'none' : 'block';
     this.renderMap(world, dNum, beaten);
@@ -852,7 +854,7 @@ const UI = {
         : '&nbsp;';
       const label = n.boss ? n.name : dNum+'-'+(i+1)+' · '+n.name;
       let sub;
-      if(n.boss) sub = n.st==='done' ? '🔥 relit — fight again?' : (n.st==='avail' ? 'the guardian stirs…' : '🔒 clear '+dNum+'-'+levels.length);
+      if(n.boss) sub = n.st==='done' ? '🔥 relit · fight again?' : (n.st==='avail' ? 'the guardian stirs…' : '🔒 clear '+dNum+'-'+levels.length);
       else {
         const bits=[];
         if(n.par) bits.push('par '+fmt(n.par));
@@ -936,8 +938,8 @@ const UI = {
       slot(st.time, '⏱ fast') +
       slot(st.candy, '🍬 '+(stats.candy??0)+'/'+(stats.candyTotal??0)) +
       slot(st.clean, '💜 no damage');
-    const rec = stats.cozy ? `<div style="margin-top:8px;padding:7px 12px;background:rgba(255,180,90,.14);border:1px solid rgba(255,180,90,.35);border-radius:12px;font-weight:800">🧸 Cozy Mode is ON — stars &amp; best times are asleep.<br><span style="font-weight:600;opacity:.85">Turn Cozy off in the ⚙️ pause menu to earn them!</span></div>`
-      : stats.isRecord ? `<div style="margin-top:8px;font-weight:900;color:#ffd23f;font-size:18px">🏆 NEW RECORD — ${fmt(stats.time)}!</div>`
+    const rec = stats.cozy ? `<div style="margin-top:8px;padding:7px 12px;background:rgba(255,180,90,.14);border:1px solid rgba(255,180,90,.35);border-radius:12px;font-weight:800">🧸 Cozy Mode is ON: stars &amp; best times are asleep.<br><span style="font-weight:600;opacity:.85">Turn Cozy off in the ⚙️ pause menu to earn them!</span></div>`
+      : stats.isRecord ? `<div style="margin-top:8px;font-weight:900;color:#ffd23f;font-size:18px">🏆 NEW RECORD: ${fmt(stats.time)}!</div>`
       : (stats.best!=null ? `<div style="margin-top:6px;opacity:.85">🏆 Your best: <b>${fmt(stats.best)}</b></div>` : '');
     this.el('clearStats').innerHTML = `⏱️ Time: <b>${fmt(stats.time)}</b>${rec}`;
     this.el('clearNext').style.display = stats.nextId ? 'block' : 'none';
@@ -949,7 +951,7 @@ const UI = {
     this.el('death-screen').style.display='flex';
     this.el('reviveBtn').style.display = this.G.save.candy>=200 ? 'block' : 'none';
     const p = this.el('death-screen').querySelector('p');
-    p.innerHTML = 'Don\'t worry — Grimmwick believes in you.<br><b style="font-size:18px">👻 Lives left: '+this.G.save.lives+'</b>';
+    p.innerHTML = 'Don\'t worry. Grimmwick believes in you.<br><b style="font-size:18px">👻 Lives left: '+this.G.save.lives+'</b>';
   },
   gameOverScreen(){
     this.el('gameover-screen').style.display='flex';
@@ -957,16 +959,16 @@ const UI = {
     AUDIO.gameover();
   },
   victoryScreen(stats){
-    const rec = stats.cozy ? `<div style="margin-top:6px;opacity:.85">🧸 Cozy run — records take a nap</div>` : stats.isRecord
-      ? `<div style="margin-top:8px;font-weight:900;color:#ffd23f;font-size:18px">🏆 NEW RECORD — ${stats.time}!</div>`
+    const rec = stats.cozy ? `<div style="margin-top:6px;opacity:.85">🧸 Cozy run, records take a nap</div>` : stats.isRecord
+      ? `<div style="margin-top:8px;font-weight:900;color:#ffd23f;font-size:18px">🏆 NEW RECORD: ${stats.time}!</div>`
       : `<div style="margin-top:6px;opacity:.85">🏆 Your best: <b>${stats.best}</b></div>`;
     // per-guardian copy — the finale gets its own ending card, not a "guardian freed" one
     const COPY = {
-      w1:{e:'🎃', t:'GUARDIAN FREED!', b:'The Pumpkin King is himself again — and the first ember is yours! The Harvest District glows warm tonight.'},
-      w2:{e:'🪦', t:'GUARDIAN FREED!', b:'Mossgrave settles back into his hill with a happy rumble — the second ember is yours! Ravenmoor\'s lanterns glow green tonight.'},
-      w3:{e:'🧹', t:'GUARDIAN FREED!', b:'Broomhilda cackles a THANK-you and loops the moon — the third ember is yours! Witchwood\'s cauldrons bubble bright tonight.'},
-      w4:{e:'⚓', t:'GUARDIAN FREED!', b:'Captain Wraith tips his hat as THE SEA RUSHES BACK — the fourth ember is yours! Ghost Harbor floats again tonight.'},
-      w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'Grimm said yes.<br>The Everflame burns whole again. Every district is safe and bright. And Grimm — the spirit no one ever invited — is now the town\'s night-watchman, keeping every lantern lit.<br><b>You saved Grimmwick, Pip. Happy Halloween. 🏮</b><br><span style="opacity:.8;font-size:13px">He\'s waiting by the Everflame in town — go say hello.</span>'},
+      w1:{e:'🎃', t:'GUARDIAN FREED!', b:'The Pumpkin King is himself again, and the first ember is yours! The Harvest District glows warm tonight.'},
+      w2:{e:'🪦', t:'GUARDIAN FREED!', b:'Mossgrave settles back into his hill with a happy rumble. The second ember is yours! Ravenmoor\'s lanterns glow green tonight.'},
+      w3:{e:'🧹', t:'GUARDIAN FREED!', b:'Broomhilda cackles a THANK-you and loops the moon. The third ember is yours! Witchwood\'s cauldrons bubble bright tonight.'},
+      w4:{e:'⚓', t:'GUARDIAN FREED!', b:'Captain Wraith tips his hat as THE SEA RUSHES BACK. The fourth ember is yours! Ghost Harbor floats again tonight.'},
+      w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'Grimm said yes.<br>The Everflame burns whole again. Every district is safe and bright. Grimm, the spirit no one ever invited, is now the town\'s night-watchman, keeping every lantern lit.<br><b>You saved Grimmwick, Pip. Happy Halloween. 🏮</b><br><span style="opacity:.8;font-size:13px">He\'s waiting by the Everflame in town. Go say hello.</span>'},
     };
     const c = COPY[stats.district] || COPY.w1;
     this.el('vEmoji').textContent = c.e;
@@ -986,7 +988,7 @@ const UI = {
         `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0 10px">
           ${box('⏱️', fmtT(pt), 'the whole night')}${box('🍬', (stats.lifeCandy||0).toLocaleString(), 'candy collected')}${dmgBox}${box('⭐', starsEarned+'/75', 'stars earned')}${box('🎃', gpFound+'/15', 'golden pumpkins')}
         </div>
-        <div style="opacity:.85;font-size:13.5px;line-height:1.5">The night isn't over — every district still glows.<br>Hunt the stars, find the Old Shortcuts... and race the night itself. 🏮</div>
+        <div style="opacity:.85;font-size:13.5px;line-height:1.5">The night isn't over. Every district still glows.<br>Hunt the stars, find the Old Shortcuts... and race the night itself. 🏮</div>
         <button id="vNight" class="btn ghost2 ui-block" style="margin-top:10px">🏮 See the Night Board</button>${rec}`;
       const vb = document.getElementById('vNight');
       if(vb) this.bindTap(vb, ()=>window.NightBoard && NightBoard.open());

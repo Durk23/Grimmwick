@@ -321,7 +321,7 @@ class PumpkinKing {
         if(this.stateT>2.1){
           this.state='hop'; this.stateT=0; this.slamCount=0;
           this.body.rotation.y=0; this.armL.scale.x=1; this.armR.scale.x=1;
-          UI.toast(this.phase>=3 ? '🔥 Final phase — he\'s furious!' : '⚡ Phase '+this.phase+'!');
+          UI.toast(this.phase>=3 ? '🔥 Final phase! He\'s furious!' : '⚡ Phase '+this.phase+'!');
         }
         break;
       }
@@ -331,7 +331,7 @@ class PumpkinKing {
         this.ember.scale.setScalar(1+this.stateT*0.8);
         if(this.stateT>2.6 && !this._farewell){
           this._farewell = true;
-          UI.dialogue('🎃', '"...oh my gourd. What have I done? Take the ember, little Pip. And... that shadow. I KNOW that shadow. He helped me plant the very first pumpkin, back before the first festival. Why did I ever forget him?" 🧡');
+          UI.dialogue('🎃', '"...oh my gourd. What have I done? Take the ember, little Pip. That shadow... I KNOW that shadow. He helped me plant the very first pumpkin, back before the first festival. Why did I ever forget him?" 🧡');
         }
         break;
       }

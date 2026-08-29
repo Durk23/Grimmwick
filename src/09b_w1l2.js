@@ -117,7 +117,7 @@ function buildW1L2(G){
   // ================= TRANSITION: the field gate (x 38..53) — breather before the deep field =================
   candyLine(G, [[40,0.8,0],[44,0.8,0]], 4);
   G.ents.add(new Rat(G, 42, 0, 0)); // candy-thief on the old victory lap — keep it lively
-  signPost(G, 49.2, 1.8, -0.3, 'THE DEEP FIELD. The gourds grow wild out here — bounce the chain, never wade. Mud ruins sneakers AND evenings. — Farmhand Maud');
+  signPost(G, 49.2, 1.8, -0.3, 'THE DEEP FIELD. The gourds grow wild out here: bounce the chain, never wade. Mud ruins sneakers AND evenings. - Farmhand Maud');
   candyLine(G, [[47,0.8,0],[51,0.8,0]], 4);
   G.ents.add(new Checkpoint(51.5, 0, 1.6, 2));   // the lake lantern — death in the deep field never re-runs Act 1
   G.ents.add(new BonkLantern(G, 52.7, 1.3, 0, 'shield'));   // armor up before the crossing
@@ -159,7 +159,7 @@ function buildW1L2(G){
   G.ents.add(new Hopper(G, 77.5, 0, 0, {aggroR:5.5}));   // times its hop against your final chain landing
   G.ents.add(new Crow(79.5, 0.95, -2.6));                // flaps off as you pass — the detail players FEEL
   candyLine(G, [[79,0.8,0],[84,0.8,0]], 4);
-  signPost(G, 84.3, 1.8, 0.25, 'SCARECROW UNION LOCAL 13 — NIGHT MEETING IN PROGRESS. Please scream quietly.');
+  signPost(G, 84.3, 1.8, 0.25, 'SCARECROW UNION LOCAL 13: NIGHT MEETING IN PROGRESS. Please scream quietly.');
   // the meeting: two delegates sway in the night wind, out of phase (motion, not threats —
   // owner call: chaos is overlapping SYSTEMS, never enemy gangs)
   const swayA = scarecrowAt(82.5, -2.4, 0.3);
@@ -192,7 +192,7 @@ function buildW1L2(G){
   };
 
   // ---- MILL YARD APPROACH (x 96..110) ----
-  signPost(G, 100.5, 1.8, -0.3, 'THE OLD MILL still turns on the night wind. Ride the sails up to the loft for the good stuff — or take the low road round the back if you value your sneakers. — Farmhand Maud');
+  signPost(G, 100.5, 1.8, -0.3, 'THE OLD MILL still turns on the night wind. Ride the sails up to the loft for the good stuff, or take the low road round the back if you value your sneakers. - Farmhand Maud');
   G.ents.add(new Rat(G, 103, 0, 0));                    // a grain-mill rat — thematic thief; steals loose candy only
   candyLine(G, [[97,0.8,0],[99,0.8,0]], 3);
   grainSack(G, 106, 0);                                 // springy sack — bounce for the overhead candy (teaches the bounce, safely)

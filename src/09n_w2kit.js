@@ -383,7 +383,7 @@ class RestlessUrn {
         G.ents.add(new PowerUp(p.x+1.2, p.y+1.4, p.z, pick(['shield','moon','bat'])));
         G.fx.spawn(new THREE.Vector3(p.x,p.y+1.2,p.z), PAL.gold, 26, {speed:5, life:0.9});
         AUDIO.goldPumpkin();
-        UI.toast('⚱️✨ JACKPOT! The urn was some old miser\'s hoard — candy, a heart, AND a treasure!');
+        UI.toast('⚱️✨ JACKPOT! The urn was some old miser\'s hoard: candy, a heart, AND a treasure!');
       } else if(r < 0.7){
         // modest treats
         candyBurst(G, new THREE.Vector3(p.x,p.y+0.8,p.z), 8);
@@ -447,7 +447,7 @@ function _w2lantern(G, x, y, z, startLit, opts){
       if(!silent){
         AUDIO.checkpoint && AUDIO.checkpoint();
         G2.fx && G2.fx.spawn(new THREE.Vector3(x+0.44, gy+2.6, z), 0xffcf87, 14, {speed:2.4, gravity:1});
-        window.UI && UI.toast('🕯️ Lantern relit — the wisps shrink from the light!');
+        window.UI && UI.toast('🕯️ Lantern relit! The wisps shrink from the light!');
       }
     },
     update(dt, G2){

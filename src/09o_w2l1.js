@@ -50,7 +50,7 @@ function buildW2L1(G){
 
   // =============================== BEAT 1 — THE GATE (x -8..22): introduce the hop, safe over ground ===============================
   groundX(G, -8, 22, GA);
-  signPost(G, 1.5, 1.6, -0.2, 'RAVENMOOR CEMETERY. Mind the crows — they remember faces. And mind your step: some of the stones mind you back.');
+  signPost(G, 1.5, 1.6, -0.2, 'RAVENMOOR CEMETERY. Mind the crows: they remember faces. Mind your step: some of the stones mind you back.');
   w2Lantern(G, 3, 0, -1.8, {light:true, lightR:12});          // the gate's one warm glow — hero light #1
   G.ents.add(new BonkLantern(G, 6, 1.4, 0, 'shield'));         // a gentle gift for the cold welcome
   // THE SALT CRYPT — the district's armoury: a glowing ward-crypt in a clear FOREGROUND pocket just off
@@ -150,7 +150,7 @@ function buildW2L1(G){
   G.ents.add(new Checkpoint(133, 0, 1.4, 3, {noLight:true}));
 
   // =============================== BEAT 6 — THE MASTER CROSSING & THE INNER GATE (x 134..186): MASTER + finish ===============================
-  signPost(G, 129, 1.6, 0.2, 'THE INNER GATE — beyond here the graves go DOWN. Watch the ghost on the last span: shy, but he shoves.');
+  signPost(G, 129, 1.6, 0.2, 'THE INNER GATE: beyond here the graves go DOWN. Watch the ghost on the last span: shy, but he shoves.');
   w2Lantern(G, 133, 0, -1.8);
   // span one — tombstones under a diving crow
   const sp1 = [[137,1.6],[140.5,2.1],[144,1.5],[147.5,2.2]];

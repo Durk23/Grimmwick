@@ -343,11 +343,11 @@ class PowerUp {
         UI.toast('🛡️ GUMMY SHIELD! Absorbs one hit.');
       } else if(this.type==='bat'){
         pl.gainBat();
-        UI.toast('🦇 BAT WINGS! Jump again in the air to flutter — 4 wing-beats per flight!');
+        UI.toast('🦇 BAT WINGS! Jump again in the air to flutter: 4 wing-beats per flight!');
         AUDIO.ghostGiggle();
       } else if(this.type==='salt'){
         pl.armWeapon('salt');   // persistent weapon — keeps until a death or a different weapon replaces it
-        UI.toast('🧂 SALT SHAKER! SPIN to fling salt — ghosts HATE it. (Yours until the night gets you.)');
+        UI.toast('🧂 SALT SHAKER! SPIN to fling salt. Ghosts HATE it. (Yours until the night gets you.)');
         AUDIO.goldPumpkin();
       } else {
         pl.moonT = 10;
@@ -503,6 +503,6 @@ class SaltCrypt {
     AUDIO.goldPumpkin();
     G.fx.spawn(new THREE.Vector3(p.x,p.y+1.3,p.z), 0xffffff, 20, {speed:3.5, life:0.7, gravity:4, size:0.6});
     if(G.player) G.player.armWeapon('salt');
-    if(window.UI) UI.toast('🧂 SALT SHAKER! SPIN to fling salt — ghosts HATE it. (Yours until the night gets you.)');
+    if(window.UI) UI.toast('🧂 SALT SHAKER! SPIN to fling salt. Ghosts HATE it. (Yours until the night gets you.)');
   }
 }

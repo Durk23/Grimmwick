@@ -22,7 +22,7 @@ const MASKS = {
   pumpkinhead: {name:'Pumpkin Head', price:400, icon:'🎃', desc:'The classic. Nobody will know it\'s you. (Everybody will know it\'s you.)'},
   hockey:      {name:'Hockey Mask',  price:250, icon:'🏒', desc:'Straight from the equipment shed. The scuffs are all original.'},
   witchhat:    {name:'Witch\'s Hat', price:300, icon:'🧙', desc:'Properly crooked, personally enchanted. Fits over anything.'},
-  starcrown:   {name:'THE STAR CROWN', price:0, earned:75, icon:'👑', desc:'All 75 stars. Every level, every challenge. Cannot be bought — only EARNED.'},
+  starcrown:   {name:'THE STAR CROWN', price:0, earned:75, icon:'👑', desc:'All 75 stars. Every level, every challenge. Cannot be bought, only EARNED.'},
 };
 function buildMask(key){
   const g = new THREE.Group();

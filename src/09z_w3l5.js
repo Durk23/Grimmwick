@@ -194,16 +194,16 @@ function buildW3L5(G){
 
   // ================= ACT 1 — THE CROOKED THRESHOLD (x -8..48) : INTRODUCE each verb =================
   groundX(G, -8, 48, GRND);
-  signPost(G, 2, 1.9, -0.2, "BROOMHILDA'S HOLLOW — the deepest Witchwood, where the paths were once kept clean and safe. They are... not anymore. Mind the brooms.");
+  signPost(G, 2, 1.9, -0.2, "BROOMHILDA'S HOLLOW: the deepest Witchwood, where the paths were once kept clean and safe. They are... not anymore. Mind the brooms.");
   G.ents.add(new BonkLantern(G, 4, 1.3, 0, 'shield'));                 // opening mercy vessel
   G.ents.add(new Checkpoint(8, 0, 1.4, 0, {noLight:true}));            // lantern 1 (emissive only — save the light budget)
   candyLine(G, [[0,0.9,0],[4.5,0.9,0]], 3);
   // INTRODUCE the BROOM ZOOMER — one lone slow sweep on flat ground, a candy arc teaching the leap
-  signPost(G, 11, 1.9, 0.2, "BROOM ZOOMERS: riderless brooms that sweep low along the ground. They do not turn to chase — just LEAP them as they pass.");
+  signPost(G, 11, 1.9, 0.2, "BROOM ZOOMERS: riderless brooms that sweep low along the ground. They do not turn to chase. Just LEAP them as they pass.");
   G.ents.add(new BroomZoomer(G, 17, 0.3, 0, {phase:0, baseY:0.25, range:4, dir:-1, speed:5.0, candy:2}));   // patrol 13..21
   candyLine(G, [[13.5,1.0,0],[17,2.4,0],[20.5,1.0,0]], 5);            // arc over the sweep — jump to collect = jump to clear
   // INTRODUCE the TOADSTOOL bounce — a friendly springy mushroom up to a candy ledge + an early Heart
-  signPost(G, 25, 1.9, -0.2, "TOADSTOOLS are soft and friendly — they never hurt you, they BOUNCE you. Hop on the cap to spring up high.");
+  signPost(G, 25, 1.9, -0.2, "TOADSTOOLS are soft and friendly: they never hurt you, they BOUNCE you. Hop on the cap to spring up high.");
   G.ents.add(new ToadstoolBouncer(G, 29, 0, 0, {}));
   platform(G, 33, 3.6, 0, 2.6, 3, W3PAL.canopyL);                     // bounce-reachable ledge (apex clears it comfortably)
   candyLine(G, [[29,1.6,0],[31,3.0,0],[33,3.9,0]], 4);               // the trail teaches the bounce
@@ -267,7 +267,7 @@ function buildW3L5(G){
   groundX(G, 98, 114, GRND);
   groundX(G, 122, 152, GRND);                                        // the void 114..122 is the timed-platform crossing
   G.ents.add(new Checkpoint(102, 0, 1.4, 2, {noLight:true}));         // lantern 3
-  signPost(G, 100, 1.9, 0.2, "THE POTION CLEARING. The paths braid and split here. Brooms AND mites at once now — leap the one, stomp the others. Then a hop across the brew on a floating pad.");
+  signPost(G, 100, 1.9, 0.2, "THE POTION CLEARING. The paths braid and split here. Brooms AND mites at once now: leap the one, stomp the others. Then a hop across the brew on a floating pad.");
   // COMBINE: a faster broom sweep with two widowmites skittering beneath it
   G.ents.add(new BroomZoomer(G, 108, 0.3, 0, {phase:0, baseY:0.25, range:5, dir:1, speed:6.5, candy:2}));   // patrol 103..113
   G.ents.add(new Widowmite(G,105.5, 0, 0, {phase:0, range:2, dir:1, speed:5.0, candy:2}));
@@ -297,7 +297,7 @@ function buildW3L5(G){
   G.ents.add(new Spider(G, 145, 4.0, 0, {groundY:0}));
   candyLine(G, [[135,0.9,0],[138,0.9,0]], 2);
   candyLine(G, [[147,0.9,0],[150,0.9,0]], 2);
-  signPost(G, 149, 1.9, -0.2, "Her clearing is just ahead — and so are her brooms. Arm up at the cauldron, then run the gauntlet. Do NOT stop moving.");
+  signPost(G, 149, 1.9, -0.2, "Her clearing is just ahead, and so are her brooms. Arm up at the cauldron, then run the gauntlet. Do NOT stop moving.");
   // Act-3 deco (baked): a bubbling deco-cauldron cluster, braided trees, mushrooms, potion bottles (void 114..122 kept clear)
   const decoC = new THREE.Group();
   decoC.add(cauldronDeco(99,-2.6,1.0), cauldronDeco(136,-2.7,1.1), cauldronDeco(112,2.8,0.9));
@@ -328,7 +328,7 @@ function buildW3L5(G){
   w3l5BroomhildaLoom(G, 206);                                        // Broomhilda on her broom, on the horizon
   w3l5TravelersRest(G, 201, -2.7);                                   // THE QUIET PROP (never signposted)
   G.ents.add(new Widowmite(G,203, 0, 0, {phase:0, range:2, dir:1, speed:4.6, candy:2}));   // one low pest so the doorstep isn't empty
-  signPost(G, 205, 1.9, 0.2, "Broomhilda's clearing. She rides above it and will not come down. She will see you now — good luck.");
+  signPost(G, 205, 1.9, 0.2, "Broomhilda's clearing. She rides above it and will not come down. She will see you now. Good luck.");
   // clearing deco (baked): witch-huts on stilts, hero-less deco cauldrons, thorn framing, mushrooms
   const decoD = new THREE.Group();
   decoD.add(witchHut(199,-6.0,1.1), witchHut(212,-6.6,1.2), witchHut(194,5.2,1.0));   // the foreground hut looms BESIDE the doorstep, never over the door's glow

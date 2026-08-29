@@ -360,16 +360,16 @@ function coachCheck(G, pl, dt){
   if(!G.levelDef || G.levelDef.district !== 'w1') return;   // District 1 is the teacher; later districts trust you
   const J = INPUT.isTouch ? 'JUMP' : 'SPACE';
   if(G.levelDef.id === 'w1l1'){
-    if(!pl.grounded){ pl._airT = (pl._airT||0) + dt; if(pl._airT > 0.35) hintOnce(G, 'dbl', '👟 Press '+J+' again IN THE AIR — Pip can DOUBLE-JUMP!'); }
+    if(!pl.grounded){ pl._airT = (pl._airT||0) + dt; if(pl._airT > 0.35) hintOnce(G, 'dbl', '👟 Press '+J+' again IN THE AIR: Pip can DOUBLE-JUMP!'); }
     else pl._airT = 0;
     if(!G.save.hints || !G.save.hints.bonk){
       for(const e of G.ents.list){ if(e.isEnemy && !e.dead && e.group && Math.abs(e.group.position.x - pl.pos.x) < 6){
-        hintOnce(G, 'bonk', '🎃 Jump ON enemies to bonk them — or press '+(INPUT.isTouch?'SPIN':'J')+' to whack!'); break; } }
+        hintOnce(G, 'bonk', '🎃 Jump ON enemies to bonk them, or press '+(INPUT.isTouch?'SPIN':'J')+' to whack!'); break; } }
     }
   }
   if(!G.save.hints || !G.save.hints.gap){
     for(const p of (G.pits||[])){ const d = p.x1 - pl.pos.x; if(d > 0 && d < 4){
-      hintOnce(G, 'gap', '🕳️ A gap! HOLD '+J+' for a big hop — and you can jump AGAIN mid-air.'); break; } }
+      hintOnce(G, 'gap', '🕳️ A gap! HOLD '+J+' for a big hop, and you can jump AGAIN mid-air.'); break; } }
   }
 }
 function updateLevelCommon(G, dt){

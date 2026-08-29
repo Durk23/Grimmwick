@@ -18,7 +18,7 @@ function buildW1L5(G){
   // ================= BEAT 1: The forbidden bounce (x -8..13) =================
   groundX(G, -8, 5, 0x3f5c4c);
   groundX(G, 9, 43, 0x49603f);
-  signPost(G, 1.5, 1.8, -0.25, 'His Majesty is NOT receiving visitors. Absolutely NO bouncing on the royal gourds. — The Management');
+  signPost(G, 1.5, 1.8, -0.25, 'His Majesty is NOT receiving visitors. Absolutely NO bouncing on the royal gourds. - The Management');
   G.ents.add(new BonkLantern(G, 3, 1.3, 0, 'shield'));
   bigPumpkin(G, 7, -0.6, 0, 1.6);   // the baby gap below is double-jumpable — the gourd just makes it FUN
   candyLine(G, [[0.5,0.8,0],[3.2,0.8,0]], 4);
@@ -70,7 +70,7 @@ function buildW1L5(G){
   // the chaos here is motion (arcs, mud shimmer, the bat's loop), not bodies.
   groundX(G, 53, 83, 0x49603f);
   G.ents.add(new Checkpoint(55.2, 0, 1.4, 1));   // lantern before the rhythm begins
-  signPost(G, 54.4, 1.8, -0.2, "The King's processional route. The gourds are CEREMONIAL. They are not a rhythm game. Do NOT bounce them in sequence. — The Management");
+  signPost(G, 54.4, 1.8, -0.2, "The King's processional route. The gourds are CEREMONIAL. They are not a rhythm game. Do NOT bounce them in sequence. - The Management");
   // pool one — low gourd into raised gourd
   mudPitX(G, 60.5, 6);                            // mud x 57.5..63.5
   bigPumpkin(G, 59, -0.5, 0, 1.7);                // top ~0.89
@@ -103,7 +103,7 @@ function buildW1L5(G){
 
   // ================= BEAT 6: The master crossing (x 83..108) — TWO voids, one refuge =================
   G.ents.add(new Checkpoint(81.5, 0, 1.4, 2));   // lantern before the grand crossing — clear of pool three (ends x80.7)
-  signPost(G, 82.4, 1.8, 0.22, 'BRIDGE OUT. (His Majesty ate it.) Gourd crossing only. Mind the ghost over the second span — he is bolder than he looks. — The Management');
+  signPost(G, 82.4, 1.8, 0.22, 'BRIDGE OUT. (His Majesty ate it.) Gourd crossing only. Mind the ghost over the second span: he is bolder than he looks. - The Management');
   // void one (x 83..93): two pillared gourds, no enemies — the void IS the test
   bigPumpkin(G, 86, 0.4, 0, 1.6);                 // top ~1.71
   bigPumpkin(G, 89.8, 1.1, 0, 1.4);               // top ~2.25
@@ -144,7 +144,7 @@ function buildW1L5(G){
   // rampart. The master crossing's void-two lands you here.
   groundX(G, 108, 116, 0x4c3f5e);
   G.ents.add(new Checkpoint(109.5, 0, 1.4, 3));   // THE ONE mercy before the exam (checkpoint #4)
-  signPost(G, 110.6, -0.25, 0.2, 'THE ROYAL EXAMINATION. Five stations, one of each, in order. Show His Majesty what the Patch taught you. Do NOT show off. — The Management');
+  signPost(G, 110.6, -0.25, 0.2, 'THE ROYAL EXAMINATION. Five stations, one of each, in order. Show His Majesty what the Patch taught you. Do NOT show off. - The Management');
   signPost(G, 114, 0.25, -0.15, 'Station the First: THE BOUNCE.');
   candyLine(G, [[110,1,0],[112,1,0],[114.5,1.1,0]], 3);
 
@@ -163,7 +163,7 @@ function buildW1L5(G){
 
   // --- G1 + Station 2: THE CARRIAGE (moving platform, void 131..139) ---
   groundX(G, 125, 131, 0x4c3f5e);
-  signPost(G, 127, -0.2, 0.15, "Station the Second: THE MOVING PLATFORM. (A ceremonial carriage. Do NOT enjoy the ride.) — The Management");
+  signPost(G, 127, -0.2, 0.15, "Station the Second: THE MOVING PLATFORM. (A ceremonial carriage. Do NOT enjoy the ride.) - The Management");
   const carriage = ()=>{
     const g = new THREE.Group();
     const deck = mesh('box',[3.2,0.5,2.6], mat(0x6a4a86)); deck.position.y=0.25;   // local 0..0.5 = collider top
@@ -181,7 +181,7 @@ function buildW1L5(G){
 
   // --- G2 + Station 3: THE CLIMB (the King's rampart wall + a vine) ---
   groundX(G, 139, 145, 0x4c3f5e);
-  signPost(G, 140.5, 0.25, -0.15, 'Station the Third: THE CLIMB. Up the rampart, if you please. — The Management');
+  signPost(G, 140.5, 0.25, -0.15, 'Station the Third: THE CLIMB. Up the rampart, if you please. - The Management');
   const rampart = mesh('box',[8,3.6,3], mat(0x4a4160)); rampart.position.set(149,1.8,0); S.add(rampart);   // axis-aligned to its collider
   G.world.addBox(149, 0, 0, 8, 3.6, 3, {});     // solid; top y3.6 = G3 walkway, x145..153
   const cren = new THREE.Group();               // crenellations (deco only)
@@ -201,7 +201,7 @@ function buildW1L5(G){
     const pole = mesh('cyl',[0.07,0.09,1.4,5], mat(PAL.woodD)); pole.position.y=0.7;
     const board = mesh('box',[1.5,0.8,0.1], mat(PAL.wood)); board.position.y=1.5; crook(board,0.04);
     sg.add(pole,board); sg.position.set(151.2, 3.6, 0.35); sg.rotation.y=-0.15; S.add(sg);
-    G.signs.push({x:151.2, z:0.35, text:'Station the Fourth: THE GHOST STEP. Look him dead in the eye, then step across his head. — The Management'});
+    G.signs.push({x:151.2, z:0.35, text:'Station the Fourth: THE GHOST STEP. Look him dead in the eye, then step across his head. - The Management'});
   }
   const stepBoo = new Boo(G, 155, 3.2, 0, {speed:2.0, range:8});   // hover ~3.55, head-top ~4.65
   stepBoo.hp = 99;   // a stepping stone, never a kill
@@ -219,8 +219,8 @@ function buildW1L5(G){
   // --- G5 + Station 5: THE SPRING (void 169..177; only a wound spring reaches the shelf) ---
   groundX(G, 164, 169, 0x4c3f5e);
   signPost(G, 165, 0.25, 0.15, INPUT.isTouch ?
-    'Station the Fifth and Final: THE SPRING. Hold 💥 to wind, let go to fly. Mind the gap. — The (nervous) Management' :
-    'Station the Fifth and Final: THE SPRING. Hold K to wind, let go to fly. Mind the gap. — The (nervous) Management');
+    'Station the Fifth and Final: THE SPRING. Hold 💥 to wind, let go to fly. Mind the gap. - The (nervous) Management' :
+    'Station the Fifth and Final: THE SPRING. Hold K to wind, let go to fly. Mind the gap. - The (nervous) Management');
   const springboard = mesh('box',[1.4,0.18,2.2], emat(0xffd34d,0x7a5a10,0.4)); springboard.position.set(166.5,0.09,0); S.add(springboard);
   platform(G, 172.5, 3.7, 0, 9, 3, 0x5a4066);    // the spring shelf: top y3.7 (above double's 3.3, under spring's 4.4), x168..177
   candyLine(G, [[166.5,1.1,0],[166.9,3.5,0],[168.2,3.9,0]], 3);   // wind → launch → steer → land
@@ -230,13 +230,13 @@ function buildW1L5(G){
   // The owner's intense-fight archetype: ground enemies to weave while the sky rains fixed,
   // telegraphed artillery. Impacts land ≥4u from the void edge so knockback can never chain a fall.
   groundX(G, 177, 201.5, 0x4c3f68);
-  signPost(G, 178.3, 1.8, 0.25, 'TURN BACK. The King is in a MOOD tonight, and he has SEEDS. Management accepts no responsibility for squashings. — The Management');
+  signPost(G, 178.3, 1.8, 0.25, 'TURN BACK. The King is in a MOOD tonight, and he has SEEDS. Management accepts no responsibility for squashings. - The Management');
   G.ents.add(new Hopper(G, 181.5, 0, 0, {aggroR:4.5}));    // the gauntlet's doorman — aggro reach ends AT the void lip, never hops out over it
   G.ents.add(new Skelly(G, 185, 0, 0, {px:2}));            // patrols the middle of the rain
   G.ents.add(new Boo(G, 188.5, 0, 0, {speed:2.2, range:7}));  // creeps while your eyes are on the sky
   candyLine(G, [[181.8,0.8,0],[191.2,0.8,0]], 7);          // the trail threads the safe rhythm
   candyLine(G, [[194.2,0.8,0],[197.6,0.8,0]], 3);          // ...and the quiet walk to the gate
-  signPost(G, 194.5, 1.8, -0.2, 'His Majesty will see you now. RUN. — The (former) Management');
+  signPost(G, 194.5, 1.8, -0.2, 'His Majesty will see you now. RUN. - The (former) Management');
 
   // ---- THE KING'S SEED BOMBARDMENT (x ~181..192) — a fixed clock from level start ----
   // Two 3-shot sweeps per 7.2s cycle, offset by 2 units — the safe spots of one sweep are

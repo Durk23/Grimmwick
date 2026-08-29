@@ -49,7 +49,7 @@ function w2l5LowCrawl(G, x1, x2, floorTop, opts={}){
     AUDIO.poundHit && AUDIO.poundHit();
     G.fx.spawn(new THREE.Vector3(x1-0.5, uy+0.1, 0), 0xffe14d, 12, {speed:3, life:0.5});   // little "seeing stars"
     G.camc.shake(0.12,0.16);
-    if(window.UI) UI.toast(opts.toast || '🪦 MIND YOUR HEAD! ...*CLONK* — the tall one behind you did not.');
+    if(window.UI) UI.toast(opts.toast || '🪦 MIND YOUR HEAD! ...*CLONK!* The tall one behind you did not.');
   }});
 }
 
@@ -134,12 +134,12 @@ function buildW2L5(G){
   // ================= ACT 1 — THE BARROW MOUTH (x -8..50) : learn the tools =================
   groundX(G, -8, 50, FLOOR);
   signPost(G, 3, 1.8, -0.2, INPUT.isTouch ?
-    'THE LONG BARROW — the deepest deep, where Grimmwick lays its guardians to rest. The locals are... characterful. Golden rule down here: MIND YOUR HEAD.' :
-    'THE LONG BARROW — the deepest deep, where Grimmwick lays its guardians to rest. The locals are... characterful. Golden rule down here: MIND YOUR HEAD.');
+    'THE LONG BARROW: the deepest deep, where Grimmwick lays its guardians to rest. The locals are... characterful. Golden rule down here: MIND YOUR HEAD.' :
+    'THE LONG BARROW: the deepest deep, where Grimmwick lays its guardians to rest. The locals are... characterful. Golden rule down here: MIND YOUR HEAD.');
   w2Lantern(G, 6, 0, -1.6, {r:5.5, light:true});          // the barrow-mouth hero pool (real light #1)
   G.ents.add(new Checkpoint(11, 0, 1.2, 0, {noLight:true}));   // lantern 1 (emissive only — save the light budget)
   candyLine(G, [[3,0.8,0],[8,0.8,0],[12,1.4,0]], 5);
-  signPost(G, 14, 1.8, 0.25, 'COFFIN HOPPER: hops about on little bare feet, and every fourth hop it TRIPS flat on its face. THAT is your moment — hop on the lid while it is down.');
+  signPost(G, 14, 1.8, 0.25, 'COFFIN HOPPER: hops about on little bare feet, and every fourth hop it TRIPS flat on its face. THAT is your moment: hop on the lid while it is down.');
   G.ents.add(new CoffinHopper(G, 19, 0, 0, {range:3, dir:1}));   // the district's comedy star, taught safely
   candyLine(G, [[17,0.8,0],[22,1.4,0]], 4);
   G.ents.add(new Gravemite(G, 27, 0, 0, {range:2.5, dir:1}));    // knee-high pest — bright eyes read low
@@ -156,8 +156,8 @@ function buildW2L5(G){
   candyLine(G, [[23,1.7,0],[26.5,2.6,0],[30,3.0,0],[33.5,2.2,0]], 6);
   G.ents.add(new Heart(30, 3.0, 0));                             // the high-road reward, in sight of the low road
   // ACT-1 low-doorway crawl (x 36..43): the recurring motif, introduced on flat safe ground
-  signPost(G, 33, 1.8, -0.2, 'LOW BARROW AHEAD. Walk on through — NO JUMPING, there is no room. (The tall ones never read this sign.)');
-  w2l5LowCrawl(G, 36, 43, 0, {toast:'🪦 MIND YOUR HEAD! ...*CLONK* — something tall behind you just met the ceiling.'});
+  signPost(G, 33, 1.8, -0.2, 'LOW BARROW AHEAD. Walk on through: NO JUMPING, there is no room. (The tall ones never read this sign.)');
+  w2l5LowCrawl(G, 36, 43, 0, {toast:'🪦 MIND YOUR HEAD! ...*CLONK!* Something tall behind you just met the ceiling.'});
   candyLine(G, [[37.2,0.9,0],[39.5,0.9,0],[41.8,0.9,0]], 4);      // head-height candy through the tunnel
   G.ents.add(new CoffinHopper(G, 46, 0, 0, {range:2.5, dir:-1})); // waits just past the crawl — it could not follow through
   // Act-1 deco (baked): background arches, mausolea, crystal light, bones
@@ -175,7 +175,7 @@ function buildW2L5(G){
   G.ents.add(new Checkpoint(52, 0, 1.2, 1, {noLight:true}));   // lantern 2
   G.ents.add(new BonkLantern(G, 54, 1.3, 0, 'shield'));        // mercy vessel before the crowd
   G.ents.add(new Gravemite(G, 58, 0, 0, {range:2, dir:1, speed:4.0}));    // bag OUT here — then you must holster it (nudged +11%)
-  signPost(G, 61, 1.8, -0.2, 'GUIDED TOUR IN PROGRESS. The guests are perfectly harmless — SO LONG AS you do not poke them. No candy-bag swinging, please. — Barrow Historical Society');
+  signPost(G, 61, 1.8, -0.2, 'GUIDED TOUR IN PROGRESS. The guests are perfectly harmless, SO LONG AS you do not poke them. No candy-bag swinging, please. - Barrow Historical Society');
 
   // THE LOST TOUR GROUP — six hand-holding skeletons behind a bored guide (footprint ~x 62.7..79).
   // Harmless as a LINE; break it (hit any member) and all six chase furiously for ~4s, then reassemble.
@@ -198,7 +198,7 @@ function buildW2L5(G){
   candyLine(G, [[60,1.6,0],[63,2.9,0],[67,3.3,0]], 5);
   candyLine(G, [[71,3.3,0],[75,3.1,0],[79,2.9,0]], 5);
   G.ents.add(new Heart(71, 3.5, 0));                          // the high-road reward, floating above the crowd
-  signPost(G, 83, 1.8, 0.25, 'Thank you for not disturbing the tour. The Society notes your excellent manners. — B.H.S.');
+  signPost(G, 83, 1.8, 0.25, 'Thank you for not disturbing the tour. The Society notes your excellent manners. - B.H.S.');
 
   // THE RESTLESS URN — D2 gamble container, in a CLEAR POCKET (no patrol routes within ~6u of x=90).
   const urn = new RestlessUrn(90, 0, -1.5, -0.2);
@@ -223,7 +223,7 @@ function buildW2L5(G){
   // the source). Arms you for the Sunken-Gallery wisps (x124, x148) AND the Witch Cannon's bats on the
   // doorstep (spin/salt pops them mid-air). Clear pocket: nearest patrol (CoffinHopper@100, edge 102.5) is >7u off.
   G.ents.add(new BonkLantern(G, 110, 1.4, 0, 'salt'));
-  signPost(G, 111, 1.8, -0.2, 'THE BARROW GOES DEEPER. Down into the dark the guardian sleeps. Relight a lantern to hold the wisps at bay — and MIND YOUR HEAD.');
+  signPost(G, 111, 1.8, -0.2, 'THE BARROW GOES DEEPER. Down into the dark the guardian sleeps. Relight a lantern to hold the wisps at bay, and MIND YOUR HEAD.');
   // DESCENT steps down off the y=0 lip onto the -2.4 floor (drops of 0.6 — a gentle, telegraphed climb-down)
   platform(G, 113.5, -0.6, 0, 1.7, 4, W2PAL.caveWallL);
   platform(G, 114.7, -1.2, 0, 1.7, 4, 0x2c2742);
@@ -236,7 +236,7 @@ function buildW2L5(G){
   G.ents.add(new Wisp(G, 124, -1.4, 0, {range:8, speed:1.6})); // hunts in the dark; face it (or the pool) to repel it (nudged +14%)
   // (crawl 2 is telegraphed by the descent sign's "MIND YOUR HEAD", the bright DUCK stripe, and the entry gag —
   //  no signPost down here: signPost has no y-arg and would float at y=0 above the -2.4 gallery)
-  w2l5LowCrawl(G, 126, 133, -2.4, {toast:'🪦 DUCK! ...*CLONK-clatter* — a wisp just face-planted the barrow ceiling. Serves it right.'});
+  w2l5LowCrawl(G, 126, 133, -2.4, {toast:'🪦 DUCK! ...*CLONK-clatter!* A wisp just face-planted the barrow ceiling. Serves it right.'});
   candyLine(G, [[127.2,-1.5,0],[129.5,-1.5,0],[131.8,-1.5,0]], 4);
 
   // the warm heart of the deep: a lit lantern over the quiet shrine, a second wisp beyond it
@@ -284,7 +284,7 @@ function buildW2L5(G){
   // ================= ACT 4 — MOSSGRAVE'S DOORSTEP (x 169..216) : the grand barrow entrance =================
   groundX(G, 169, 216, FLOOR);
   G.ents.add(new Checkpoint(178, 0, 1.2, 4, {noLight:true}));  // lantern 5 (idx bumped 3→4 for the new gallery CP) — a fair walk-back before the tomb
-  signPost(G, 172, 1.8, -0.2, 'You climbed back into the light — and now you walk straight toward a tomb. The Society salutes your spirit. — B.H.S. (increasingly worried)');
+  signPost(G, 172, 1.8, -0.2, 'You climbed back into the light, and now you walk straight toward a tomb. The Society salutes your spirit. - B.H.S. (increasingly worried)');
   G.ents.add(new Gravemite(G, 174, 0, 0, {range:2, dir:1, speed:3.8}));   // one low pest so the doorstep walk-in isn't empty; sits LEFT of CP4 (x178), 3.5u clear of the CoffinHopper's patrol (179.5..184.5)
   G.ents.add(new CoffinHopper(G, 182, 0, 0, {range:2.5, dir:1}));   // the doorstep medley
   // the finale's air lane pays off: a diver over the doorstep medley = a ground+air master beat feeding
@@ -295,10 +295,10 @@ function buildW2L5(G){
   G.ents.add(new BonkLantern(G, 184, 1.3, 0, 'shield'));       // last mercy before the guardian's rest
   // the FINAL low doorway — one last duck before the tomb opens
   signPost(G, 186, 1.8, 0.2, 'THE LAST LOW DOORWAY. Beyond it: the guardian rests. Mind your head once more, brave thing.');
-  w2l5LowCrawl(G, 189, 195, 0, {toast:'🪦 DUCK — one last time. ...*CLONK.* Whatever that was, it will not be joining you inside.'});
+  w2l5LowCrawl(G, 189, 195, 0, {toast:'🪦 DUCK, one last time. ...*CLONK.* Whatever that was, it will not be joining you inside.'});
   candyLine(G, [[190.2,0.9,0],[192.5,0.9,0],[194.2,0.9,0]], 4);
   candyLine(G, [[197,0.8,0],[202,0.8,0],[207,0.9,0]], 6);
-  signPost(G, 200, 1.8, 0.25, 'BEYOND LIES MOSSGRAVE, the Tombstone Titan. He does NOT do guided tours. Turn back... or do not. — B.H.S.');
+  signPost(G, 200, 1.8, 0.25, 'BEYOND LIES MOSSGRAVE, the Tombstone Titan. He does NOT do guided tours. Turn back... or do not. - B.H.S.');
 
   // THE GRAND DOORSTEP DECO — an ornate barrow arch under the looming guardian
   w2l5MossgraveLoom(G, 210);                                   // Mossgrave himself, felt on the horizon
@@ -323,7 +323,7 @@ function buildW2L5(G){
   // emissive torch-lanterns lining the final approach (fakes — no real lights; but they DO pool light for the wisps' rule)
   w2Lantern(G, 196, 0, -1.9, {r:4.5, light:false});
   w2Lantern(G, 205, 0, 1.9, {r:4.5, light:false});
-  signPost(G, 207, 1.8, -0.2, 'You came all this way. Of course you are not turning back. Deep breath, then. — R. Gravely');
+  signPost(G, 207, 1.8, -0.2, 'You came all this way. Of course you are not turning back. Deep breath, then. - R. Gravely');
 
   // ===== THE WITCH CANNON — the pre-boss BULLET-BAT gauntlet (D2's BOMBARDMENT, on Mossgrave's doorstep) =====
   // A spectral graveyard-hag half-risen from the tomb threshold, planted just inside the exit, casts big

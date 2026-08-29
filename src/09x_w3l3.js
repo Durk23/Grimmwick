@@ -158,7 +158,7 @@ function buildW3L3(G){
   G.ents.add(new Checkpoint(40, 0, 1.3, 0, {noLight:true}));   // CP1 — clear of the spider
 
   // ================= BEAT 2: BREW-POWERED (x 44..96) — TWIST: spend the brew =================
-  signPost(G, 46, 1.5, -0.1, 'A witch\'s brew is for spending. Dip, then leap — the wings won\'t wait.');
+  signPost(G, 46, 1.5, -0.1, 'A witch\'s brew is for spending. Dip, then leap: the wings won\'t wait.');
   DECO.add(witchHut(46, -4.4, 1.0));
   // WINGS dip in a clear pocket right before the goo span (dip → flutter/glide the whole crossing)
   G.ents.add(new CauldronDip(49, 0, 0, {cycle:['bat']}));
@@ -186,7 +186,7 @@ function buildW3L3(G){
   DECO.add(braidedTree(90, -4.4, 1.15)); DECO.add(braidedTree(72, -4.6, 0.95));
 
   // ================= BEAT 3: THE BOILING CROSSING (x 96..130) — ESCALATE: first lob + gamble + the ferry =================
-  signPost(G, 100, 1.5, 0.1, 'The pots here spit their brew. It lands where the ring glows — read the mark, take the open ground.');
+  signPost(G, 100, 1.5, 0.1, 'The pots here spit their brew. It lands where the ring glows. Read the mark, take the open ground.');
   DECO.add(witchHut(103, -4.6, 1.05));
   // THE FIRST POTION-LOB — gentle: two marks, a long 4.5s period, wide safe lanes (teaches the read before the gauntlet)
   G.ents.add(makePotionLob(G, { marks:[[0.8,105],[2.5,113]], period:4.5, tel:0.7, flight:0.6, puddle:0.9, cen:109, presR:20 }));
@@ -220,7 +220,7 @@ function buildW3L3(G){
   // a MOON/WINGS dip offered before the storm (help, in a clear pocket) + a heart
   G.ents.add(new CauldronDip(133, 0, 0, {cycle:['moon','bat'], light:true}));
   G.ents.add(new Heart(136, 1.0, 0));
-  signPost(G, 138, 1.5, -0.1, 'THE CAULDRON GAUNTLET. When the pots boil over, the floor between the marks is yours — take it and don\'t stop.');
+  signPost(G, 138, 1.5, -0.1, 'THE CAULDRON GAUNTLET. When the pots boil over, the floor between the marks is yours. Take it and don\'t stop.');
   // background spitter cauldrons on ledges (deco justifying the overhead lobs)
   DECO.add(cauldronDeco(146, -3.6, 1.4)); DECO.add(cauldronDeco(164, -3.7, 1.4)); DECO.add(cauldronDeco(182, -3.6, 1.4));
   DECO.add(witchHut(158, -5.0, 1.1));

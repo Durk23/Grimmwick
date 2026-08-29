@@ -616,6 +616,7 @@ function updateHub(G, dt){
   if(G.hubGuide){
     let tx=null, ty=0, tz=0;
     if(!G.save.metMayor && G.mayor){ tx=G.mayor.position.x; ty=3.6; tz=G.mayor.position.z; }
+    else if(!G.save.seenShop && G.shopPos){ tx=G.shopPos.x; ty=4.0; tz=G.shopPos.z; }   // next stop: the Costume Cauldron (once, ever)
     else {
       const next = G.gates && G.gates.find(gt=>gt.open && !G.save.worlds[gt.w.key]);
       if(next){ tx=next.x*0.9; ty=6.2; tz=next.z*0.9; }   // pulled slightly toward town so it reads from the square
@@ -655,9 +656,9 @@ function updateHub(G, dt){
         const built = (typeof LEVEL_LISTS!=='undefined') && LEVEL_LISTS.some(L=>L.some(l=>l.district===gate.w.key));
         // WALK THROUGH the portal to auto-enter — no interact press needed when you step into an open, built gate
         if(gate.open && built && d<1.7){ AUDIO.portal(); G.openMap(gate.w.key||'w1'); return; }
-        prompt = !gate.open ? {kind:'locked', gate, label:'🔒 '+gate.w.name+' — locked'}
+        prompt = !gate.open ? {kind:'locked', gate, label:'🔒 '+gate.w.name+': locked'}
                : built ? {kind:'enter', gate, label:'🎃 Walk into '+gate.w.name}
-               : {kind:'soon', gate, label:'🚧 '+gate.w.name+' — coming soon!'};
+               : {kind:'soon', gate, label:'🚧 '+gate.w.name+': coming soon!'};
         break;
       }
     }
@@ -667,14 +668,17 @@ function updateHub(G, dt){
     if(prompt.kind==='mayor'){
       UI.mayorDialogue();
       if(!G.save.metMayor){ G.save.metMayor=true; G.persist();
-        UI.toast('🎃 Follow the golden arrow — WALK INTO a glowing gate to pick a level!'); }
+        if(!G.save.seenShop){
+          setTimeout(()=>{ if(window.UI) UI.dialogue('🎩', '"One more thing, Pip! Visit the COSTUME CAULDRON before you go. Masks, costumes... and they say a golden CROWN waits for whoever earns all 75 stars. Follow the arrow!"'); }, 600);
+          UI.toast('🎩 Follow the golden arrow to the Costume Cauldron!');
+        } else UI.toast('🎃 Follow the golden arrow. WALK INTO a glowing gate to pick a level!'); }
     }
     else if(prompt.kind==='grimm'){
       const lines = [
         '"Night-watchman Grimm, at your service. First shift in four hundred years... I brought snacks."',
         '"The lanterns stay lit better when someone WANTS them lit. Who knew."',
         '"They put my name in the festival guest book. In INK, Pip. In ink."',
-        '"The other spirits race each other through the districts now — the 🏮 Night Board, they call it. Loud. Wonderful."',
+        '"The other spirits race each other through the districts now: the 🏮 Night Board, they call it. Loud. Wonderful."',
         '"You can always visit. That is the strangest, warmest thing anyone has ever told me."',
       ];
       G._grimmLine = ((G._grimmLine??-1)+1) % lines.length;
@@ -682,7 +686,7 @@ function updateHub(G, dt){
     }
     else if(prompt.kind==='shop') UI.openShop();
     else if(prompt.kind==='enter'){ AUDIO.portal(); G.openMap(prompt.gate.w.key||'w1'); }
-    else if(prompt.kind==='soon') UI.toast('🚧 '+prompt.gate.w.name+' is still being built — coming very soon!');
+    else if(prompt.kind==='soon') UI.toast('🚧 '+prompt.gate.w.name+' is still being built. Coming very soon!');
     else if(prompt.kind==='locked') UI.toast('🔒 This district is still dark... free the other guardians first!');
   }
 }

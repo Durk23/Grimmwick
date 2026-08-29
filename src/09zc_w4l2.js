@@ -49,7 +49,7 @@ function buildW4L2(G){
 
   // =============================== BEAT: THE DRIED SHALLOWS (A, x -8..30) — INTRODUCE ===============================
   groundX(G, -8, 30, SAND);
-  signPost(G, 2, 1.7, -0.2, "THE DRY TIDE — the sea's gone, but the old stones still remember it. They rise and sink on a tide that isn't there. Cross when they lift.");
+  signPost(G, 2, 1.7, -0.2, "THE DRY TIDE: the sea's gone, but the old stones still remember it. They rise and sink on a tide that isn't there. Cross when they lift.");
   candyLine(G, [[3,0.9,0],[6,0.9,0],[9,0.9,0]], 3);
   // BOO BUCCANEER — the stare-slow re-teach on flat ground (face it and it winks + creeps slower)
   G.ents.add(new BooBuccaneer(G, 14, 0, 0, {phase:0.0, speed:2.2, range:10}));
@@ -68,7 +68,7 @@ function buildW4L2(G){
 
   // =============================== BEAT: THE DOCK FLATS + RIGGING HIGH ROAD (B, 44..78) — TWIST-2 ===============================
   groundX(G, 44, 78, SAND);
-  signPost(G, 45.5, 1.7, 0.2, "Rigging still hangs from the dead cranes. Grab it (UP) and climb — leap off the top for the high catch.");
+  signPost(G, 45.5, 1.7, 0.2, "Rigging still hangs from the dead cranes. Grab it (UP) and climb. Leap off the top for the high catch.");
   // --- HIGH ROAD: a rope of ship rigging (climb volume — never walls the lane) up to a driftwood catwalk of
   // dock crates & planks carrying a HEART and a fat candy trail. The Heart glows OVER the low road (routes cross
   // in sight — the classic "next run I'm going up there" itch). Reconverges by a drop back to the seabed. ---
@@ -111,7 +111,7 @@ function buildW4L2(G){
 
   // =============================== BEAT: THE DRYING FLATS (C, 92..124) — BREATHE ===============================
   groundX(G, 92, 124, SAND);
-  signPost(G, 94, 1.7, -0.15, "Cannon Crabs lob from the tide-pools — watch the fuse-spark, then step out of the shell's shadow.");
+  signPost(G, 94, 1.7, -0.15, "Cannon Crabs lob from the tide-pools. Watch the fuse-spark, then step out of the shell's shadow.");
   // the crab that bombarded GAP2 patrols the near flat (armored hp2 — a pound one-shots it)
   G.ents.add(new CannonCrab(G, 96, 0, 0, {phase:0.4, range:2.6, period:3.2, tele:0.75, firstFire:1.4, aggroX:9}));   // aggroX 22→9 so its shells can't reach the TreasureChest@108 (CLEAR-PATCH)
   candyLine(G, [[100,0.9,0],[103,0.9,0]], 2);

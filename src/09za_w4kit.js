@@ -238,7 +238,7 @@ class CannonBarrel {
       if(Math.hypot(pl.pos.x-p.x, pl.pos.z-p.z) < this.r && Math.abs(pl.pos.y-p.y) < 1.8){
         this.captured = true; pl.captured = true; pl.vel.set(0,0,0);
         AUDIO.tone && AUDIO.tone({f:220,f2:330,type:'square',t:0.12,vol:0.12});
-        if(window.UI) UI.toast('💣 In the cannon! Time your JUMP — you fire where it points.');
+        if(window.UI) UI.toast('💣 In the cannon! Time your JUMP: you fire where it points.');
       }
     }
     if(this.captured){
@@ -366,7 +366,7 @@ class TreasureChest {
         G.ents.add(new PowerUp(p.x+1.2, p.y+1.4, p.z, pick(['shield','moon','bat'])));
         G.fx.spawn(new THREE.Vector3(p.x,p.y+1.3,p.z), W4PAL.gold, 26, {speed:5, life:0.9});
         AUDIO.goldPumpkin && AUDIO.goldPumpkin();
-        window.UI && UI.toast('🗝️✨ JACKPOT! A pirate\'s hoard — candy, a heart, AND a treasure!');
+        window.UI && UI.toast('🗝️✨ JACKPOT! A pirate\'s hoard: candy, a heart, AND a treasure!');
       } else if(r < 0.7){
         candyBurst(G, new THREE.Vector3(p.x,p.y+1.0,p.z), 8);
         G.fx.spawn(new THREE.Vector3(p.x,p.y+1.3,p.z), PAL.candy1, 10, {speed:3});

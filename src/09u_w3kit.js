@@ -366,7 +366,7 @@ class MysteryCauldron {
         G.ents.add(new PowerUp(p.x+1.2, p.y+1.7, p.z, pick(['shield','moon','bat'])));
         G.fx.spawn(new THREE.Vector3(p.x,p.y+1.5,p.z), PAL.gold, 26, {speed:5, life:0.9});
         AUDIO.goldPumpkin();
-        UI.toast('🫧✨ JACKPOT! The witch\'s good brew — candy, a heart, AND a treasure!');
+        UI.toast('🫧✨ JACKPOT! The witch\'s good brew: candy, a heart, AND a treasure!');
       } else if(r < 0.7){
         // modest treats
         candyBurst(G, new THREE.Vector3(p.x,p.y+1.2,p.z), 8);
@@ -462,9 +462,9 @@ class CauldronDip {
     G.camc.shake(0.1,0.2);
     AUDIO.goldPumpkin();
     AUDIO.noise({t:0.25,vol:0.14,fFrom:1400,fTo:300});
-    if(brew==='shield'){ pl.gainShield(); UI.toast('🫧🛡️ BUBBLE BREW! A gummy shield — absorbs one hit.'); }
-    else if(brew==='bat'){ pl.gainBat(); UI.toast('🫧🦇 SWOOP BREW! Bat Wings — jump again in the air to flutter!'); AUDIO.ghostGiggle(); }
-    else if(brew==='salt'){ pl.armWeapon('salt'); UI.toast('🫧🧂 SOUR BREW! Salt Shaker armed — SPIN to fling it!'); }
+    if(brew==='shield'){ pl.gainShield(); UI.toast('🫧🛡️ BUBBLE BREW! A gummy shield: absorbs one hit.'); }
+    else if(brew==='bat'){ pl.gainBat(); UI.toast('🫧🦇 SWOOP BREW! Bat Wings: jump again in the air to flutter!'); AUDIO.ghostGiggle(); }
+    else if(brew==='salt'){ pl.armWeapon('salt'); UI.toast('🫧🧂 SOUR BREW! Salt Shaker armed: SPIN to fling it!'); }
     else { pl.moonT = 10; UI.toast('🫧🌙 MOON BREW! Unstoppable for 10 seconds!'); }
   }
 }

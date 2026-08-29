@@ -52,6 +52,7 @@ const G = {
     if(this.save.mask && typeof MASKS!=='undefined' && !MASKS[this.save.mask]) this.save.mask = null;              // curated away
     if(this.save.equipped && typeof COSTUMES!=='undefined' && !COSTUMES[this.save.equipped]) this.save.equipped = 'kid';
     if(this.save.pass===undefined) this.save.pass = false;
+    if(this.save.seenShop===undefined) this.save.seenShop = !!this.save.metMayor;   // the cauldron tour is for brand-new players only
     if(!this.save.levels) this.save.levels = {};
     if(!this.save.best) this.save.best = {};
     // pre-level-select saves: a beaten World 1 counts as all five levels cleared
@@ -216,7 +217,7 @@ const G = {
       this.switchArea('hub');
       this.state='play';
       UI.fade(false, 450);
-      UI.toast("🧵 \"That's my little hero.\" — Find Mayor Boo by the Everflame 👻");
+      UI.toast("🧵 \"That's my little hero.\" Find Mayor Boo by the Everflame 👻");
     }, 500);
   },
   enterLevel(id){
@@ -324,7 +325,7 @@ const G = {
     // district-aware boss router (the map's boss node calls this). Defers politely if a boss isn't built yet.
     district = district || 'w1';
     const area = this.bossAreaFor(district);
-    if(!area || !this.bossBuilt(area)){ UI.toast('🔒 That guardian is not ready yet — coming soon!'); return; }
+    if(!area || !this.bossBuilt(area)){ UI.toast('🔒 That guardian is not ready yet. Coming soon!'); return; }
     this.bossDistrict = district;
     if(UI.hideMap) UI.hideMap();
     if(this.mapView){ this.mapView.dispose && this.mapView.dispose(); this.mapView = null; }
@@ -348,7 +349,7 @@ const G = {
       this.switchArea('hub');
       this.state='play';
       UI.fade(false, 450);
-      if(afterVictory) UI.toast(this.save.embers>=5 ? '🎆 THE EVERFLAME BURNS WHOLE — the festival is ON! Happy Halloween, Grimmwick!' : '🔥 The Everflame flickers a little brighter...');
+      if(afterVictory) UI.toast(this.save.embers>=5 ? '🎆 THE EVERFLAME BURNS WHOLE! The festival is ON! Happy Halloween, Grimmwick!' : '🔥 The Everflame flickers a little brighter...');
     }, 500);
   },
   onPlayerFell(){
@@ -384,7 +385,7 @@ const G = {
     // grant, don't auto-equip — the player chooses when to wear it (owner call: no surprise costume swap)
     this.persist();
     AUDIO.buy(); AUDIO.goldPumpkin();
-    UI.toast('🌙 SPOOK PASS ACTIVE — NIGHTSTITCH unlocked! Equip it any time in the Costume Cauldron.');
+    UI.toast('🌙 SPOOK PASS ACTIVE: NIGHTSTITCH unlocked! Equip it any time in the Costume Cauldron.');
   },
   toggleCozy(){
     this.save.cozy = !this.save.cozy;
@@ -396,7 +397,7 @@ const G = {
       else this.player.hearts = Math.min(this.player.hearts, this.player.maxHearts);
     }
     UI.updateHUD();
-    UI.toast(this.save.cozy ? '🧸 Cozy Mode ON — extra hearts, gentler enemies. Records paused.' : '🔥 Cozy Mode OFF — full challenge, records live!');
+    UI.toast(this.save.cozy ? '🧸 Cozy Mode ON: extra hearts, gentler enemies. Records paused.' : '🔥 Cozy Mode OFF: full challenge, records live!');
   },
   gameOverRestart(){
     this.save.lives = 5;

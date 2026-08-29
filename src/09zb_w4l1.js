@@ -45,7 +45,7 @@ function buildW4L1(G){
 
   // =============================== BEAT 1 — THE MISTY DOCKS (x -8..36): INTRODUCE the Boo Buccaneer ===============================
   groundX(G, -8, 36, SEABED);
-  signPost(G, 2, 1.7, -0.2, 'THE MISTY DOCKS — the sea went out with the flame. Mind the ghost crew: a pirate Boo winks and slows when you FACE it, but the bold ones never quite stop. Watch their feet.');
+  signPost(G, 2, 1.7, -0.2, 'THE MISTY DOCKS. The sea went out with the flame. Mind the ghost crew: a pirate Boo winks and slows when you FACE it, but the bold ones never quite stop. Watch their feet.');
   // BOO BUCCANEER #1 — the headline enemy in isolation on flat, safe ground. Slow + short range so the player
   // has room to FACE it and read the stare->SLOW twist (it keeps creeping, just at 0.42x). A tap-stomp pops it.
   G.ents.add(new BooBuccaneer(G, 16, 0.2, 0, {phase:0.0, speed:2.1, range:9, candy:3}));
@@ -59,7 +59,7 @@ function buildW4L1(G){
   // boosted-hop to the far dock. Near-edge->rope 2u (an easy grab), rope->far 4u (a boosted climb-hop clears it).
   // Falling into the crack costs a heart + the lantern walk-back — never an instant loss (the dried seabed floor
   // with its half-buried wreck ribs is menace, not death).
-  signPost(G, 34, 1.6, 0.15, 'The dock gives out here. Grab the bell-rope, climb, and leap for the far planks — a rope is a rope.');
+  signPost(G, 34, 1.6, 0.15, 'The dock gives out here. Grab the bell-rope, climb, and leap for the far planks. A rope is a rope.');
   w2BellRope(G, 38, 0, 3.8, 0, {bell:true});
   candyLine(G, [[36.5,0.6,0],[38,2.4,0],[40,1.6,0],[41.8,0.6,0]], 5);   // the swing arc, start to landing
   { const rib1 = shipwreckRib(38, 0, 1.0); rib1.position.y=-2.2; deco.add(rib1);     // wreck ribs deep in the crack (the menace tell)

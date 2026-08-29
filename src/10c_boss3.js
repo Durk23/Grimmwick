@@ -165,7 +165,7 @@ class Broomhilda {
     this.G.fx.spawn(new THREE.Vector3(this.pos.x, this.pos.y+1.5, 0), 0xb37dff, 24, {speed:6});
     this.G.fx.spawn(new THREE.Vector3(this.pos.x, this.pos.y+1.5, 0), 0xffffff, 12, {speed:4});
     window.UI && UI.updateBossBar(this.hp);
-    window.UI && UI.toast(this.hp>0 ? ['', '"My BRISTLES! You horrid little TOAD!"', '"Not my broom — NOT MY BROOM!"'][this.hp] : '');
+    window.UI && UI.toast(this.hp>0 ? ['', '"My BRISTLES! You horrid little TOAD!"', '"Not my broom... NOT MY BROOM!"'][this.hp] : '');
     if(this.hp<=0){ this.defeat(); return; }
     this.phase = this.maxHp - this.hp + 1;
     this.vulnerable = false; this.stars.visible = false;
@@ -266,7 +266,7 @@ class Broomhilda {
   _clearDiveWarn(){ if(this.diveWarn){ this.G.scene.remove(this.diveWarn); this.diveWarn = null; } }
 
   _sneeze(){
-    window.UI && UI.toast('🤧 Cauldron fumes make Broomhilda SNEEZE — now\'s your chance!');
+    window.UI && UI.toast('🤧 Cauldron fumes make Broomhilda SNEEZE. Now\'s your chance!');
     const p = this.pos;
     this.G.fx.spawn(new THREE.Vector3(p.x, p.y+0.4, 0.5), 0x9dffe0, 8, {speed:3, life:0.4});
     AUDIO.noise && AUDIO.noise({t:0.15, vol:0.14, fFrom:1200, fTo:400});
@@ -305,7 +305,7 @@ class Broomhilda {
         this.body.rotation.z = Math.sin(this.t*3)*0.1;
         if(this.stateT > 1.4 && !this._introDlg){
           this._introDlg = true; G.camc.shake(0.5, 0.4);
-          window.UI && UI.dialogue('🧹', '"Heeheehee! A little TRICK-OR-TREATER, this far into MY wood? You\'ll make a lovely newt, dearie — my broom and I have places to BE!"');
+          window.UI && UI.dialogue('🧹', '"Heeheehee! A little TRICK-OR-TREATER, this far into MY wood? You\'ll make a lovely newt, dearie. My broom and I have places to BE!"');
         }
         if(this.stateT > 1.5){ this.state = 'taunt'; this.stateT = 0; }
         break;
@@ -373,7 +373,7 @@ class Broomhilda {
         this.body.rotation.z = Math.sin(this.t*8)*0.08;   // she gestures the hedge up
         if(!this._released && this.stateT > 0.6){
           this._released = true; this.spawnThorns();
-          window.UI && UI.toast('🌿 Thorn hedges — MOVE to the gap!');
+          window.UI && UI.toast('🌿 Thorn hedges! MOVE to the gap!');
         }
         if(this.stateT > 1.2){ this.body.rotation.z = 0; this.state = 'hover'; this.stateT = 0; }
         break;
@@ -386,7 +386,7 @@ class Broomhilda {
         this.body.rotation.x = damp(this.body.rotation.x, 0, 8, dt);
         if(!this.bristleOpen && Math.abs(p.y - this.lowY) < 0.6){
           this.bristleOpen = true;
-          if(!this._castHint){ this._castHint = true; window.UI && UI.toast('✨ Her bristles are SPARKLING — SPIN them TWICE to buck her off! One swat now still counts next time!'); }
+          if(!this._castHint){ this._castHint = true; window.UI && UI.toast('✨ Her bristles are SPARKLING! SPIN them TWICE to buck her off! One swat now still counts next time!'); }
           if(!this._sneezed){ this._sneezed = true; this._sneeze(); }   // one-time flavor dodge/strike cue
         }
         if(this.bristleOpen){ this.body.rotation.z = Math.sin(this.t*6)*0.06; }   // weaving a spell
@@ -411,7 +411,7 @@ class Broomhilda {
           this.stars.visible = true;
           AUDIO.poundHit(); G.camc.shake(0.6, 0.4);
           this.G.fx.spawn(new THREE.Vector3(p.x, 0.3, 0), 0xb37dff, 20, {speed:5});
-          window.UI && UI.toast('⭐ She\'s down and DIZZY — HIT her! (stomp / spin / 💥)');
+          window.UI && UI.toast('⭐ She\'s down and DIZZY! HIT her! (stomp / spin / 💥)');
         }
         break;
       }
@@ -452,7 +452,7 @@ class Broomhilda {
         if(!this._enrShot && this.stateT > 0.5){ this._enrShot = true; this.spawnPotionVolley(this.phase>=3 ? 3 : 2); AUDIO.bossRoar(); }
         if(this.stateT > 1.5){
           this.state = 'hover'; this.stateT = 0;
-          window.UI && UI.toast(this.phase>=3 ? '🔥 Final phase — she\'s SHRIEKING!' : '⚡ Phase '+this.phase+'!');
+          window.UI && UI.toast(this.phase>=3 ? '🔥 Final phase! She\'s SHRIEKING!' : '⚡ Phase '+this.phase+'!');
         }
         break;
 
@@ -463,7 +463,7 @@ class Broomhilda {
         this.broom.rotation.z += dt*4;
         if(this.stateT > 2.6 && !this._farewell){
           this._farewell = true;
-          window.UI && UI.dialogue('🧹', '"...my broom. She hasn\'t bucked me like that since I was a GIRL. Oh... I remember now. Take your ember, child — and take the old girl too. She likes you. Just mind her bristles. 💜"');
+          window.UI && UI.dialogue('🧹', '"...my broom. She hasn\'t bucked me like that since I was a GIRL. Oh... I remember now. Take your ember, child, and take the old girl too. She likes you. Just mind her bristles. 💜"');
         }
         break;
     }

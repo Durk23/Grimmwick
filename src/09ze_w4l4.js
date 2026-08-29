@@ -52,7 +52,7 @@ function buildW4L4(G){
 
   // =============================== BEAT 1 — THE MISTY DOCKS & THE GANGPLANK (x -8..44) ===============================
   groundX(G, -8, 31, W4PAL.seabed);
-  signPost(G, 2, 1.7, -0.2, 'BOARDING THE SALTY PHANTOM. The tide went out with the Everflame and left her beached. Board her where she lies — mind her crew, and mind her rolling deck.');
+  signPost(G, 2, 1.7, -0.2, 'BOARDING THE SALTY PHANTOM. The tide went out with the Everflame and left her beached. Board her where she lies. Mind her crew, and mind her rolling deck.');
   // re-teach the stare->slow read on flat, safe dock ground (the harbor ghosts never freeze — they wink and creep on)
   G.ents.add(new BooBuccaneer(G, 11, 0, 0, {phase:0.0, range:9, speed:2.2}));
   G.ents.add(new BooBuccaneer(G, 22, 0, 0, {phase:0.6, range:9, speed:2.2}));
@@ -73,7 +73,7 @@ function buildW4L4(G){
   platform(G, 31.5, 0.6, 0, 3.4, 4.2, W4PAL.wood);           // step up off the dock (top 0.6 — a tap)
   platform(G, 38, 1.2, 0, 13, 4.2, W4PAL.woodL);            // the gangplank landing (top 1.2, x31.5..44.5) — carries the cannon
   arc(29,0.0, 31.5,0.6, 2); arc(31.5,0.6, 34,1.2, 2);
-  signPost(G, 34, 1.6, 0.12, "The plank's too short and the gap too wide to jump. Climb into the cannon — read the aim-arc, and let her fling you aboard.");
+  signPost(G, 34, 1.6, 0.12, "The plank's too short and the gap too wide to jump. Climb into the cannon. Read the aim-arc, and let her fling you aboard.");
   // THE CROW'S-NEST WARP (Old Shortcut) — the tell is a lone PURPLE lantern where no dock-lantern should burn.
   // Skill gate: freeze-stare the plank crew-ghost (a stare only SLOWS a Buccaneer), stomp-bounce off his head, and
   // air-steer up into the nest. Non-bounce double from the plank tops out ~4.5u; the nest sits at 5.0 (gated), the
@@ -117,7 +117,7 @@ function buildW4L4(G){
   G.ents.add(new Checkpoint(55, DECK_Y, 1.5, 1, {noLight:true}));   // CP1 — you land right on it; deck deaths never re-run the cannon
   { const dl = new THREE.PointLight(W4PAL.lantern, 34, 9); dl.position.set(56, DECK_Y+2.6, 0.5); S.add(dl); }   // a ghost-lantern deck pool (real light)
   G.ents.add(new BonkLantern(G, 60, DECK_Y+1.2, 0, 'shield'));      // arm up for the gauntlet (a wobbly gummy shield)
-  signPost(G, 58, 1.5, -0.15, "Her deck never stops rolling. Leap the loose cannonballs before they roll you flat — and trust no barrel aboard.");
+  signPost(G, 58, 1.5, -0.15, "Her deck never stops rolling. Leap the loose cannonballs before they roll you flat. Trust no barrel aboard.");
   // ROLLING SHOT #1 — a fixed-clock cannonball down the boards; you JUMP it (iron — not stompable)
   G.ents.add(new RollingBall(G, 56, 86, DECK_Y, {speed:5.0, phase:0.0, r:0.45}));
   arc(62,DECK_Y, 65,DECK_Y, 2);

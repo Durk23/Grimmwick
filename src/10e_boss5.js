@@ -102,7 +102,7 @@ class GrimmCauldron {
     this.brew.material.color.lerpColors(new THREE.Color(0x1a0e22), new THREE.Color(0xff9ecf), litFrac);
     this.brew.material.emissive.lerpColors(new THREE.Color(W5PAL.shadowP), new THREE.Color(0xffb0d8), litFrac);
     window.UI && UI.updateBossBar(4 - this.litCount);
-    window.UI && UI.toast(this.litCount>=4 ? '🔥 The brew is SWEET — Grimm is flushed out!' : `🔥 Ember ${this.litCount}/4 fed — one of Grimm's tricks fizzles out, and the dark shrinks back!`);
+    window.UI && UI.toast(this.litCount>=4 ? '🔥 The brew is SWEET! Grimm is flushed out!' : `🔥 Ember ${this.litCount}/4 fed: one of Grimm's tricks fizzles out, and the dark shrinks back!`);
   }
 
   // ---- attacks (each fixed-clock; stripped ones are skipped) ----
@@ -189,7 +189,7 @@ class GrimmCauldron {
       case 'intro': {
         if(this.stateT>1.0 && !this._introDlg){ this._introDlg=true; G.camc.shake(0.5,0.5);
           window.UI && UI.dialogue('🫥', '"You. The little one even I forgot. You took back my embers, my districts, my SHADOWS... but you\'ll not take my brew. Come and be a copy, like all the rest."'); }
-        if(this.stateT>1.3 && !this._hint){ this._hint=true; window.UI && UI.toast('🔥 STAND CLOSE to a burner to pour an ember in — the whole night has led to this. He HATES a sweet brew.'); }
+        if(this.stateT>1.3 && !this._hint){ this._hint=true; window.UI && UI.toast('🔥 STAND CLOSE to a burner to pour an ember in. The whole night has led to this. He HATES a sweet brew.'); }
         if(this.stateT>1.5){ this.state='fight'; this.stateT=0; this.nextAtk=this.t+1.0; }
         break;
       }
@@ -230,7 +230,7 @@ class GrimmCauldron {
         if(this.litCount>=4 && !this.flushed){ this.flushed=true; this.state='flushed'; this.stateT=0; G.camc.shake(0.6,0.5);
           this.grimmMat.emissiveIntensity = 0.2; this.grimmMat.opacity = 1;
           G.fx.spawn(new THREE.Vector3(0,2.2,0), W5PAL.emberL, 30, {speed:6, life:1});
-          window.UI && UI.dialogue('🫥', '"...no. NO! The sweetness — it BURNS! What have you— what did you—"'); }
+          window.UI && UI.dialogue('🫥', '"...no. NO! The sweetness... it BURNS! What have you... what did you..."'); }
         break;
       }
       case 'flushed': {
@@ -239,8 +239,8 @@ class GrimmCauldron {
         for(const wv of this.waves){ if(wv.mesh) G.scene.remove(wv.mesh); } this.waves.length = 0;
         this.eyeL.scale.setScalar(0.7); this.eyeR.scale.setScalar(0.7);
         if(!this._flushHint){ this._flushHint=true;
-          window.UI && UI.finaleBanner('🫥 GRIMM IS FLUSHED OUT — walk up & press ANY button', 3600);
-          window.UI && UI.toast('👆 It was never a fight. Walk up to Grimm and press ANY button — jump, spin, anything.');
+          window.UI && UI.finaleBanner('🫥 GRIMM IS FLUSHED OUT: walk up & press ANY button', 3600);
+          window.UI && UI.toast('👆 It was never a fight. Walk up to Grimm and press ANY button: jump, spin, anything.');
           // an unmissable bouncing golden marker over his head — the "come here" every platformer kid knows
           const mk = new THREE.Group();
           const arrow = new THREE.Mesh(geo('cone',0.34,0.7,6), new THREE.MeshLambertMaterial({color:0xffd23f, emissive:0xffb020, emissiveIntensity:1}));
@@ -314,7 +314,7 @@ class GrimmCauldron {
           this._warm = 0;                                             // the transformation begins with the yes
           AUDIO.heart && AUDIO.heart(); }
         else if(this._endStage===25 && adv()){ this._endStage=3;
-          window.UI && UI.finaleBanner('🔥 GRIMM SAID YES — AND THE EVERFLAME BURNS WHOLE AGAIN  ▸', 15000);
+          window.UI && UI.finaleBanner('🔥 GRIMM SAID YES. THE EVERFLAME BURNS WHOLE AGAIN  ▸', 15000);
           // THE RELIGHT — a roaring flame column erupts from the cauldron
           this._flame = new THREE.Mesh(geo('cone',1.8,4.6,10), new THREE.MeshLambertMaterial({color:0xff7020, emissive:0xff6a1a, emissiveIntensity:0.9, transparent:true, opacity:0.94}));
           this._flame.position.set(0,5.0,0); this.group.add(this._flame);
@@ -336,7 +336,7 @@ class GrimmCauldron {
             G.scene.add(fl); this._snow.push(fl);
           } }
         else if(this._endStage===3 && adv()){ this._endStage=4;
-          window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED — HAPPY HALLOWEEN!', 3600);
+          window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED! HAPPY HALLOWEEN!', 3600);
           G.onBossDefeated(); }
         break;
       }

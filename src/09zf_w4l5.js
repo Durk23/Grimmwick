@@ -52,7 +52,7 @@ function buildW4L5(G){
 
   // =============================== BEAT 0 — THE HATCH (x -6..14): INTRODUCE — into the belly ===============================
   groundX(G, -6, 14, DECK);
-  signPost(G, 2, 1.7, -0.2, 'BELOW DECKS. The Salty Phantom groans around you. Iron rolls in the dark, the bilge is rising, and the crew never left. Up and out through the cabin — the Captain waits at the far door.');
+  signPost(G, 2, 1.7, -0.2, 'BELOW DECKS. The Salty Phantom groans around you. Iron rolls in the dark, the bilge is rising, and the crew never left. Up and out through the cabin. The Captain waits at the far door.');
   // FIRST BOO BUCCANEER — the re-teach: face it and it winks and only SLOWS (never freezes). A tap-stomp pops it.
   G.ents.add(new BooBuccaneer(G, 12, 0, 0, {phase:0.0, speed:2.2, range:9}));   // pushed +4u off spawn so the chaser doesn't crowd the start
   candyLine(G, [[4,0.9,0],[7,0.9,0],[10,0.9,0]], 3);
@@ -62,7 +62,7 @@ function buildW4L5(G){
 
   // =============================== BEAT 1 — THE GUN DECK (x 14..50): the ROLLING CANNONBALLS + a trust-no-prop mimic ===============================
   groundX(G, 14, 50, DECK);
-  signPost(G, 16, 1.7, 0.15, 'THE GUN DECK. Loose cannonballs roll the boards — solid iron, a stomp won\'t dent them. JUMP them, and mind the barrels: not all of them are just barrels.');
+  signPost(G, 16, 1.7, 0.15, 'THE GUN DECK. Loose cannonballs roll the boards: solid iron, a stomp won\'t dent them. JUMP them, and mind the barrels: not all of them are just barrels.');
   // TWO rolling cannonballs on FIXED clocks, staggered speed/phase so the deck is never safe for long — you JUMP each
   // as it overtakes you (a tap clears the ~0.8u ball with room). Deterministic (x is a pure fn of the clock).
   G.ents.add(new RollingBall(G, 16, 42, 0, {speed:5.0, phase:0.0, r:0.42}));
@@ -83,7 +83,7 @@ function buildW4L5(G){
 
   // =============================== BEAT 2 — THE BILGE (x 50..92): the FLOOD RHYTHM + a Rigging Wraith on its wire ===============================
   groundX(G, 50, 92, DECK);
-  signPost(G, 52, 1.7, -0.15, 'THE BILGE. The sea remembers this hold. It climbs, it falls — ride the low water, and take the crates when it swells. Watch the rigging: something rides the ropes above.');
+  signPost(G, 52, 1.7, -0.15, 'THE BILGE. The sea remembers this hold. It climbs, it falls. Ride the low water, and take the crates when it swells. Watch the rigging: something rides the ropes above.');
   G.ents.add(new Checkpoint(52, 0, 1.6, 0, {noLight:true}));                        // the level's ONE mid-course checkpoint
 
   // --- THE BILGE FLOOD: an emissive teal water plane + a 'hazard' collider whose top rises/falls on a FIXED sine.
@@ -126,7 +126,7 @@ function buildW4L5(G){
 
   // =============================== BEAT 3 — THE MESS HALL (x 92..128): BREATHE — the ghost crew, the gamble, the quiet prop ===============================
   groundX(G, 92, 128, DECK);
-  signPost(G, 94, 1.7, 0.2, "THE CREW'S MESS. They still take their supper. Slip past, or knock them off their stools — and mind the hold: the rest of the crew is hiding somewhere.");
+  signPost(G, 94, 1.7, 0.2, "THE CREW'S MESS. They still take their supper. Slip past, or knock them off their stools, and mind the hold: the rest of the crew is hiding somewhere.");
   // THE TREASURE CHEST — the D4 gamble, dropped in a CLEAR alcove the instant you enter the mess (CLEAR-PATCH LAW):
   // the bilge wraith is confined to its wire ending 9u back, and the nearest crewman's home (110) sits 14u off — past
   // a Boo Buccaneer's 12u chase range — so nothing patrols/aggros within 6u while you pry it open. Ambush = the crew bursts.
@@ -161,7 +161,7 @@ function buildW4L5(G){
 
   // =============================== BEAT 4 — THE CAPTAIN'S CABIN (x 128..162): ESCALATE — climb up & over, GP up the rigging ===============================
   groundX(G, 128, 162, DECK);
-  signPost(G, 128.5, 1.7, -0.2, "THE AFT BULKHEAD. No way through — only up. Take the rigging over the cabin. The old rope still holds a foot... and there's gold in the top-rigging for the one who climbs highest.");
+  signPost(G, 128.5, 1.7, -0.2, "THE AFT BULKHEAD. No way through, only up. Take the rigging over the cabin. The old rope still holds a foot... and there's gold in the top-rigging for the one who climbs highest.");
   // THE AFT-BULKHEAD WALL — a solid hull wall (top y4.2) barring the floor. A double-jump (3.3) can't clear it: you
   // CLIMB. (An expert spring-jump ~4.4 can top it — a legit skip; the intended route is the rigging.)
   { const wall = mesh('box',[1.2,4.2,4], mat(BULK)); wall.position.set(130,2.1,0);
@@ -190,7 +190,7 @@ function buildW4L5(G){
 
   // =============================== BEAT 5 — THE BOMBARDMENT (x 162..200): MASTER — a Cannon Crab volley over a Boo gauntlet ===============================
   groundX(G, 162, 200, DECK);
-  signPost(G, 163, 1.7, 0.15, "THE OPEN GUN-DECK. The crew mans the ports. Keep moving — they fire where you WERE, not where you're going. The Captain's door is dead ahead.");
+  signPost(G, 163, 1.7, 0.15, "THE OPEN GUN-DECK. The crew mans the ports. Keep moving: they fire where you WERE, not where you're going. The Captain's door is dead ahead.");
   // THREE CANNON CRABS in the gun-ports (background z=-2.7) — they DON'T block the lane; their shells arc onto z=0 on a
   // fixed, staggered clock (0.7s fuse telegraph, impact snapshots your x). Keep moving forward and every shell lands behind.
   G.ents.add(new CannonCrab(G, 170, 0, -2.7, {phase:0.0, firstFire:1.2, period:3.0, tele:0.7, range:1.4, aggroX:26}));

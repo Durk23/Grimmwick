@@ -33,7 +33,7 @@ function buildW2L2(G){
   groundX(G, -8, 9, HAV);
   w2Lantern(G, 2, 0, 1.5, {r:6, light:true, lightR:12});          // HAVEN 1 — lit from the start
   G.ents.add(new Checkpoint(2, 0, 1.4, 0, {noLight:true}));       // CP0 sits inside H1's pool
-  signPost(G, 5, 1.8, -0.2, "THE WEEPING ROWS. Keep to the lanternlight, little one. What waits between the stones does not like to be seen. — R. Gravely, Sexton");
+  signPost(G, 5, 1.8, -0.2, "THE WEEPING ROWS. Keep to the lanternlight, little one. What waits between the stones does not like to be seen. Signed, R. Gravely, Sexton");
   candyLine(G, [[6,0.9,0],[10.5,0.9,0],[14.5,0.9,0]], 5);         // breadcrumb into the first dark
 
   // ================= BEAT 1: INTRODUCE — one wisp, one candle (x 9..24) =================
@@ -48,7 +48,7 @@ function buildW2L2(G){
   groundX(G, 24, 37, HAV);
   w2Lantern(G, 30, 0, 1.5, {r:6});                              // HAVEN 2 (emissive pool — no real light, budget)
   G.ents.add(new Checkpoint(30, 0, 1.4, 1, {noLight:true}));    // CP1
-  signPost(G, 34, 1.8, 0.18, "The candle on the far slab still burns for someone. Reach it, and the wisps will hide their faces. Mind the sunken row. — R. Gravely");
+  signPost(G, 34, 1.8, 0.18, "The candle on the far slab still burns for someone. Reach it, and the wisps will hide their faces. Mind the sunken row. Signed, R. Gravely");
   // the haven no longer flatlines: a Coffin Hopper primes the stomp-verb (its every-4th-hop TRIP is a free
   // stomp) the instant before the sunken-row void, and re-primes momentum on the way out.
   G.ents.add(new CoffinHopper(G, 34, 0, 0, {range:2.2}));       // patrols 31.8..36.2 (off-lane sign at z1.8 stays clear)
@@ -126,7 +126,7 @@ function buildW2L2(G){
   // then a Skelly patrols the last dark thread to L8. Deterministic to the step — the "I know this
   // walk by heart" climax, right where Ravenmoor starts to slope down toward the catacombs.
   groundX(G, 104, 117.5, DARK);
-  signPost(G, 101, 1.8, 0.2, "The long dark has but a few candles left. Watch your footing over the fallen row — and never, ever stop moving.");
+  signPost(G, 101, 1.8, 0.2, "The long dark has but a few candles left. Watch your footing over the fallen row, and never, ever stop moving.");
   w2DarkLantern(G, 110, 0, 0.8, {r:5});                       // L6
   G.ents.add(new Wisp(G, 108, 1.4, 0, {speed:1.6}));         // W6 — the H4 edge → L6 dash (nudged +14% for the master run)
   candyLine(G, [[102,0.9,0],[106,0.9,0],[109,0.9,0]], 4);     // H4 → L6

@@ -248,7 +248,7 @@ class GrimmGift {
         G.ents.add(new Heart(p.x-1, p.y+1.0, 0)); G.ents.add(new PowerUp(p.x+1.2, p.y+1.2, 0, pick(['shield','moon','bat'])));
         G.fx.spawn(new THREE.Vector3(p.x,p.y+1.3,p.z), W5PAL.emberL, 26, {speed:5, life:0.9});
         AUDIO.goldPumpkin && AUDIO.goldPumpkin();
-        window.UI && UI.toast('🎁✨ JACKPOT! Candy, a heart, AND a treasure — the good kind of surprise!');
+        window.UI && UI.toast('🎁✨ JACKPOT! Candy, a heart, AND a treasure. The good kind of surprise!');
       } else if(r < 0.7){
         candyBurst(G, new THREE.Vector3(p.x,p.y+1.0,p.z), 8);
         G.fx.spawn(new THREE.Vector3(p.x,p.y+1.3,p.z), PAL.candy1, 10, {speed:3});
@@ -314,7 +314,7 @@ class MidnightClock {
     this.used=true;
     AUDIO.goldPumpkin && AUDIO.goldPumpkin(); G.camc.shake(0.5,0.5);
     G.fx.spawn(new THREE.Vector3(this.x,this.y,0.3), W5PAL.emberL, 30, {speed:6, life:1});
-    window.UI && UI.toast('🕛✨ MIDNIGHT! The clock face swings open — a shortcut through time!');
+    window.UI && UI.toast('🕛✨ MIDNIGHT! The clock face swings open: a shortcut through time!');
     // warp: award the level's candy bonus + teleport to the end (the level's exit run-in)
     G.addCandy(this.candy);   // same award idiom as the D1/D4 warps (sets _dirty + HUD refresh)
     G.persist && G.persist();

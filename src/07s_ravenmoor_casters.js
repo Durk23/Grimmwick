@@ -168,13 +168,13 @@ class WitchCannon extends Enemy {
       if(this.t - (this._lastCackle||-9) > 1.6){
         this._lastCackle = this.t;
         AUDIO && AUDIO.ghostGiggle && AUDIO.ghostGiggle();
-        if(window.UI) UI.toast('🧙 The hag cackles — she shrugs it right off!');
+        if(window.UI) UI.toast('🧙 The hag cackles! She shrugs it right off!');
       }
       return;
     }
     this.hp -= (kind==='pound'?2:1);
     this._stagger = 0.2;
-    if(this.hp<=0){ if(window.UI) UI.toast('🧙 The hag is banished — the barrage stops!'); this.die(); }
+    if(this.hp<=0){ if(window.UI) UI.toast('🧙 The hag is banished! The barrage stops!'); this.die(); }
     else AUDIO && AUDIO.stomp && AUDIO.stomp();
   }
   fire(){

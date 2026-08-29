@@ -82,12 +82,12 @@ function buildW3L4(G){
   // ============== ACT 1 — THE LANE BELOW THE HUTS (x -8..56) : learn the tools, ground-level ==============
   groundX(G, -8, 48, GND);
   groundX(G, 48, 56, GND);          // act-2 staging, continuous with act 1 (solid -8..56)
-  signPost(G, 2, 1.8, -0.2, 'WITCH-HUT ROW. Riderless brooms sweep the lane and the gaps between the huts — leap them, or time your crossing. And mind the eaves: spiders drop. Up onto the porches you go!');
+  signPost(G, 2, 1.8, -0.2, 'WITCH-HUT ROW. Riderless brooms sweep the lane and the gaps between the huts. Leap them, or time your crossing. Mind the eaves: spiders drop. Up onto the porches you go!');
   G.ents.add(new Checkpoint(4, 0, 1.4, 0));                       // CP0 (real light #1 — a warm welcome)
   candyLine(G, [[6,0.9,0],[9,0.9,0],[12,1.4,0]], 5);
 
   // BROOM — introduced on flat, safe ground: it sweeps low and never turns; hop over as it passes.
-  signPost(G, 12, 1.8, 0.2, 'Enchanted brooms! They sweep low and never turn back — a little hop clears one. Watch the rhythm, then go.');
+  signPost(G, 12, 1.8, 0.2, 'Enchanted brooms! They sweep low and never turn back. A little hop clears one. Watch the rhythm, then go.');
   G.ents.add(new BroomZoomer(G, 18, 0.15, 0, {baseY:0.15, range:5, speed:5.4, phase:0}));   // ground sweep 13..23 — leap it
   candyLine(G, [[15,0.9,0],[18,2.0,0],[21,0.9,0]], 5);           // the arc teaches the leap height
 
@@ -114,7 +114,7 @@ function buildW3L4(G){
 
   // =================== ACT 2 — UP ONTO THE ROW (x 56..112) : TWIST — hop the gaps ===================
   G.ents.add(new Checkpoint(50, 0, 1.4, 1, {noLight:true}));      // CP1 (emissive only) — on solid ground before the void
-  signPost(G, 54, 1.8, 0.2, 'Onto the porches now — hop up, then cross plank to plank. A broom sweeps the first gap: cross when it has swept aside.');
+  signPost(G, 54, 1.8, 0.2, 'Onto the porches now: hop up, then cross plank to plank. A broom sweeps the first gap. Cross when it has swept aside.');
   w3l4Bog(G, 56, 77);                                            // the potion-bog void beneath the porch chain (deco only)
 
   // step UP onto the row (ground→P1, rise 2.2 held-jump; P1's left lip overlaps the ground for a clean step)
@@ -171,7 +171,7 @@ function buildW3L4(G){
 
   // =================== ACT 3 — THE HIGH ROOFS (x 112..140) : ESCALATE — the ferry-plank ===================
   G.ents.add(new Checkpoint(110, 0, 1.4, 2, {noLight:true}));    // CP2 — solid ground, immediately before the mover void
-  signPost(G, 105, 1.8, -0.2, 'THE HIGH ROOFS. A witch\'s ferry-plank drifts between the huts — board it when it comes to you, ride across, and mind the sweepers. Dip in the cauldron first for a lucky brew.');
+  signPost(G, 105, 1.8, -0.2, 'THE HIGH ROOFS. A witch\'s ferry-plank drifts between the huts. Board it when it comes to you, ride across, and mind the sweepers. Dip in the cauldron first for a lucky brew.');
   w3l4Bog(G, 112, 140);                                         // the wide void the ferry crosses (deco only)
 
   // climb up onto the roofs: ground→P4 (rise 2.2 held) → R2 (rise 1.8 tap)
@@ -210,7 +210,7 @@ function buildW3L4(G){
   G.ents.add(new BroomZoomer(G, 147, 0.15, 0, {baseY:0.15, range:3, speed:6.0, phase:0}));   // ground sweep 144..150 — a leap to shake off the roofs
   candyLine(G, [[141,1.0,0],[144,0.9,0],[150,0.9,0]], 5);
   G.ents.add(new Checkpoint(155, 0, 1.4, 3, {noLight:true}));   // CP3 — solid ground before the web-climb + void + final mover
-  signPost(G, 154, 1.8, -0.2, 'The tall gable-hut. Climb the web to its high porch, then ride the last ferry to the way out — everything you learned, all at once now.');
+  signPost(G, 154, 1.8, -0.2, 'The tall gable-hut. Climb the web to its high porch, then ride the last ferry to the way out: everything you learned, all at once now.');
   w3l4Bog(G, 158, 178);                                        // void beneath the climb + the last ferry
 
   // THE WEB CLIMB (climbing is FUN): grab the giant web (press up), climb, boosted-hop east onto the HIGH
@@ -232,7 +232,7 @@ function buildW3L4(G){
   groundX(G, 178, 200, GND);
   G.ents.add(new BroomZoomer(G, 187, 0.15, 0, {baseY:0.15, range:4, speed:6.0, phase:1.0}));   // final ground sweep 183..191
   candyLine(G, [[180,3.4,0],[182,1.0,0],[186,1.6,0],[190,0.9,0]], 6);
-  signPost(G, 193, 1.8, 0.2, 'The way out. One last hop — then go relight the night, Pip.');
+  signPost(G, 193, 1.8, 0.2, 'The way out. One last hop, then go relight the night, Pip.');
 
   // Act-4 deco (baked): the tall gable-hut over the climb, huts down the exit lane, foreground jewels
   const decoD = new THREE.Group();

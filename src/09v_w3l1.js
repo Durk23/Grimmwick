@@ -64,7 +64,7 @@ function buildW3L1(G){
 
   // =============================== BEAT 1 — THE TRAILHEAD (x -8..30): INTRODUCE the broom leap ===============================
   groundX(G, -8, 30, FLOOR);
-  signPost(G, 2, 1.7, -0.2, 'THE CROOKED PATH — the trees lean where no wind blows. Leap the wandering brooms, and watch the branches above: spiders nest up there.');
+  signPost(G, 2, 1.7, -0.2, 'THE CROOKED PATH. The trees lean where no wind blows. Leap the wandering brooms, and watch the branches above: spiders nest up there.');
   // a Widowmite SWARM (3) — knee-high, an easy tap-stomp each; teaches the tap-jump before anything bites hard
   G.ents.add(new Widowmite(G, 8,  0, 0, {phase:0.0, range:2, axis:'x', speed:4.4}));
   G.ents.add(new Widowmite(G, 10, 0, 0, {phase:0.5, range:2, axis:'x', speed:4.4, dir:-1}));
@@ -77,7 +77,7 @@ function buildW3L1(G){
 
   // =============================== BEAT 2 — INTO THE CROOKED WOOD (x 30..52): TWIST — braided-limb hops + first drop-spider ===============================
   groundX(G, 30, 38, FLOOR);
-  signPost(G, 33, 1.6, 0.15, 'Beyond here the ground gives out. The old branches remember how to hold a foot — if you trust them.');
+  signPost(G, 33, 1.6, 0.15, 'Beyond here the ground gives out. The old branches remember how to hold a foot, if you trust them.');
   // three braided limbs over a FRIENDLY void (short hops, gentle rise/fall) → land on the clearing
   treeLimb(41, 1.2, {baseY:-4});
   treeLimb(45, 1.6, {baseY:-4});
@@ -89,7 +89,7 @@ function buildW3L1(G){
   G.ents.add(new Checkpoint(60, 0, 1.5, 1, {noLight:true}));
 
   // =============================== BEAT 3 — THE TOADSTOOL LAUNCH & THE GOLD (x 52..88): ESCALATE-1 — bounce up to GP idx0, a broom below ===============================
-  signPost(G, 61, 1.6, -0.15, 'A polite mushroom will spring you skyward. Aim before you leap — it bounces the greedy just as high.');
+  signPost(G, 61, 1.6, -0.15, 'A polite mushroom will spring you skyward. Aim before you leap: it bounces the greedy just as high.');
   // TOADSTOOL BOUNCER #1 — helpful traversal: run onto it and the ~3.5u bounce carries you up onto the canopy shelf
   G.ents.add(new ToadstoolBouncer(G, 64, 0, 0, {}));
   // the canopy shelf, set FORWARD of the pad so the bounce column stays clear (no head-bonk) — you carry right onto it

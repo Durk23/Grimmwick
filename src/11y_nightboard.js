@@ -61,7 +61,7 @@ function decodeNight(v){
 
 const NIGHT_BOARDS = [
   { key:'flawless', id:'grimmwick.flawless', icon:'🏆', name:'FLAWLESS NIGHT',
-    sub:'ALL 75 stars — every level, every challenge — fastest total clock wins. The mastery board.' },
+    sub:'ALL 75 stars: every level, every challenge. Fastest total clock wins. The mastery board.' },
   { key:'night', id:'grimmwick.night', icon:'🌙', name:'THE NIGHT',
     sub:'Everyone who saved Grimmwick. Time first; fewest deaths, least damage, most candy break ties.' },
 ];
@@ -108,7 +108,7 @@ const Night = {
     sv.flawlessDmg = sv.dmgUntracked ? 999 : (sv.damageLifetime||0);
     sv.flawlessCandy = sv.candyLifetime||0;
     G.persist();
-    UI.toast('🏆 FLAWLESS NIGHT — all 75 stars! Your time is on the board: '+fmtCS(Math.round(sv.flawlessT*100)), 5200);
+    UI.toast('🏆 FLAWLESS NIGHT! All 75 stars! Your time is on the board: '+fmtCS(Math.round(sv.flawlessT*100)), 5200);
     GC.submit('grimmwick.flawless', encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths, sv.flawlessDmg, sv.flawlessCandy), 75);
   },
   onLevelClear(G, levelId){
@@ -195,8 +195,8 @@ const Night = {
       <div class="nb-time">${fmtCS(d.timeCS)}</div>
       <div class="nb-st">⭐${stars!=null?stars:'–'}</div>
       <div class="nb-cd">🍬${d.candy>=9999?'9999+':d.candy}</div>
-      <div class="nb-dm">💜${d.dmg>=999?'—':d.dmg}</div>
-      <div class="nb-dt">☠️${d.deaths>=99?'—':d.deaths}</div>
+      <div class="nb-dm">💜${d.dmg>=999?'–':d.dmg}</div>
+      <div class="nb-dt">☠️${d.deaths>=99?'–':d.deaths}</div>
     </div>`;
   },
   async render(){
@@ -207,16 +207,16 @@ const Night = {
     const list = el.querySelector('#nb-list');
     const mine = this.localValue(G, b.key);
     el.querySelector('#nb-you').textContent = mine != null ? ('Your best: '+fmtCS(decodeNight(mine).timeCS))
-      : (b.key==='flawless' ? `Stars: ${this.totalStars(G)}/75 — earn them ALL to enter!` : 'Finish the night to enter!');
+      : (b.key==='flawless' ? `Stars: ${this.totalStars(G)}/75. Earn them ALL to enter!` : 'Finish the night to enter!');
     const hdr = `<div class="nb-row hdr"><div class="nb-rank"></div><div class="nb-name">PLAYER</div><div class="nb-time">TIME</div><div class="nb-st">STARS</div><div class="nb-cd">CANDY</div><div class="nb-dm">DMG</div><div class="nb-dt">DEATHS</div></div>`;
     if(!GC.native()){
       list.innerHTML = hdr + (mine!=null
-        ? this._row('—', 'You (local)', mine, b.key==='flawless'?75:this.totalStars(G), true)
+        ? this._row('–', 'You (local)', mine, b.key==='flawless'?75:this.totalStars(G), true)
         : `<div class="nb-note">🕯️ The spirits post scores from the App Store version.<br>${b.key==='flawless' ? 'All 75 stars + the fastest clock = the top of this board.' : 'Finish the night to set your mark!'}</div>`);
       return;
     }
     if(!GC.authed){
-      list.innerHTML = `<div class="nb-note">👻 Sign in to Game Center to join the board.<br><span style="opacity:.7">(Settings → Game Center — then reopen the Night Board)</span></div>`;
+      list.innerHTML = `<div class="nb-note">👻 Sign in to Game Center to join the board.<br><span style="opacity:.7">(Settings → Game Center, then reopen the Night Board)</span></div>`;
       return;
     }
     list.innerHTML = `<div class="nb-note">🔮 Consulting the spirits…</div>`;
@@ -224,11 +224,11 @@ const Night = {
     const r = await GC.load(b.id, this._friends, 25);
     if(this._sel + ':' + this._friends !== want) return;   // switched tab or scope mid-load
     if(r && r.error){
-      list.innerHTML = `<div class="nb-note">🌫️ The spirits can't reach Game Center right now — try again in a moment.</div>`;
+      list.innerHTML = `<div class="nb-note">🌫️ The spirits can't reach Game Center right now. Try again in a moment.</div>`;
       return;
     }
     if(!r || !r.entries || !r.entries.length){
-      list.innerHTML = `<div class="nb-note">${this._friends ? 'No friends on this board yet — recruit some rivals! 👥' : 'The board is empty — be the FIRST name on it. 🏮'}</div>`;
+      list.innerHTML = `<div class="nb-note">${this._friends ? 'No friends on this board yet. Recruit some rivals! 👥' : 'The board is empty. Be the FIRST name on it. 🏮'}</div>`;
       return;
     }
     list.innerHTML = hdr + r.entries.map(e => this._row(e.rank, e.name, e.value, e.context, e.me)).join('');

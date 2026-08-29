@@ -48,7 +48,7 @@ function buildW2L4(G){
   groundX(G, 131, 197, FLOOR);    // past the chasm through the Roost to the gate
 
   // ================= BEAT 1: THE DESCENT MOUTH (x -8..40) — introduce crystals + the river =================
-  signPost(G, 2.5, 1.5, 0.12, 'THE GLITTERING DEEP. Mind the water — step crystal to crystal. It runs cold, and it runs deep.');
+  signPost(G, 2.5, 1.5, 0.12, 'THE GLITTERING DEEP. Mind the water: step crystal to crystal. It runs cold, and it runs deep.');
   // hero cluster with the one real budgeted light — the landmark that pulls you in
   xtal(7, 0, -0.6, 1.7, CYAN);
   const heroLight = new THREE.PointLight(0x63e6e2, 34, 12); heroLight.position.set(7, 1.7, -0.2); S.add(heroLight);
@@ -68,7 +68,7 @@ function buildW2L4(G){
 
   // ================= BEAT 2: THE DARK POCKET (x 40..64) — the Wisp + the light =================
   DECO.add(catacombArch(43, -1.2, 1.0));       // background arch framing the descent into the dark
-  signPost(G, 42, -0.3, 0.14, 'Wisps hate two things: being LOOKED at, and lantern light. Face them — or keep to the light.');
+  signPost(G, 42, -0.3, 0.14, 'Wisps hate two things: being LOOKED at, and lantern light. Face them, or keep to the light.');
   G.ents.add(new Gravemite(G, 48, 0, 0, {range:2.6, dir:1}));
   // the district's CORE system finally becomes a real beat, not a walk-past: a ground hopper + a second
   // wisp flank the approach (D2's mandated "first combos" across lanes), and a mid-pocket relight lantern
@@ -91,7 +91,7 @@ function buildW2L4(G){
 
   // ================= BEAT 3: THE CROSSING (x 64..104) — TWIST: the river at its widest =================
   G.ents.add(new Checkpoint(66, 0, 1.3, 1, {noLight:true}));   // CP2 — before the crossing
-  signPost(G, 68, 1.4, -0.1, "THE CROSSING. The river's widest here. Crystals are your only road. Don't look down — there's nothing but cold.");
+  signPost(G, 68, 1.4, -0.1, "THE CROSSING. The river's widest here. Crystals are your only road. Don't look down. There's nothing but cold.");
   undergroundRiver(G, 70, 98, {hazard:true, d:4.6, speed:2.4});
   // the road of crystal platforms — gaps ~3.4..3.8 (comfortable tap), rises <=0.7 (comparable heights)
   crystalStep(72,   1.5, 0, 2.4, ROCKC, CYAN);
@@ -139,7 +139,7 @@ function buildW2L4(G){
 
   // ================= BEAT 4: THE RUSHING DEEP (x 104..150) — ESCALATE: river + bats + a moving barge =================
   G.ents.add(new Checkpoint(106, 0, 1.3, 2, {noLight:true}));   // CP3 — before the escalate
-  signPost(G, 108, -0.3, 0.12, 'THE RUSHING DEEP. Bats roost where the water runs fast. Keep moving — they only dive when you dawdle.');
+  signPost(G, 108, -0.3, 0.12, 'THE RUSHING DEEP. Bats roost where the water runs fast. Keep moving. They only dive when you dawdle.');
   G.ents.add(new Gravemite(G, 111, 0, 0, {range:2.4, dir:1, speed:4.0}));   // leftmost reach 108.6 → ≥7u clear of the urn at x101 (clear-patch law); nudged +11%
   // river R3 crossed on crystals WHILE two bats dive it (same crossing skill, now under air pressure)
   undergroundRiver(G, 110, 122, {hazard:true, d:4.4, speed:3.2});
@@ -182,7 +182,7 @@ function buildW2L4(G){
   G.ents.add(new Checkpoint(150, 0, 1.3, 3));   // CP4 — before the gauntlet (this one keeps its real light: a beacon)
   G.ents.add(new BonkLantern(G, 146, 1.5, 0, 'shield'));   // a shield offered before the storm
   G.ents.add(new Heart(148, 1.0, 0));
-  signPost(G, 152, 1.5, -0.1, 'THE ROOST. When the ceiling shudders, MOVE. The floor between the marks is yours — take it and don\'t stop.');
+  signPost(G, 152, 1.5, -0.1, 'THE ROOST. When the ceiling shudders, MOVE. The floor between the marks is yours. Take it and don\'t stop.');
   DECO.add(catacombArch(151.5, -1.2, 1.05));
   // 3-4 ground threats so you can never camp a safe spot while the sky rains
   G.ents.add(new Gravemite(G, 160, 0, 0, {range:3, dir:1}));
