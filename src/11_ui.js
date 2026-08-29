@@ -284,7 +284,7 @@ const UI = {
         text-shadow:0 0 18px rgba(255,160,60,.9),0 0 60px rgba(255,120,40,.55),0 3px 0 rgba(40,10,50,.8);opacity:0;transition:opacity .45s"></div>
       <div id="rotateHint" class="ui-block">
         <div id="rotPhone"></div>
-        <h3>Turn your phone sideways!</h3>
+        <h3>Turn sideways to play!</h3>
         <p>Grimmwick plays best in landscape 🏮<br><span style="opacity:.6;font-size:12.5px">– tap anywhere to keep playing upright –</span></p>
       </div>
       <div id="vig" style="position:fixed;inset:0;pointer-events:none;z-index:5;box-shadow:inset 0 0 140px 46px rgba(8,4,20,.5)"></div>
