@@ -18,8 +18,13 @@ class AudioSys {
   onForeground(){
     if(!this.ctx) return;
     this.resume();
+    const t0 = this.ctx.currentTime;   // WKWebView zombie contexts REPORT 'running' but their clock freezes — that's the tell
     clearTimeout(this._fgT);
-    this._fgT = setTimeout(()=>{ if(this.ctx && this.ctx.state!=='running') this.reinit(); }, 800);
+    this._fgT = setTimeout(()=>{
+      const c = this.ctx;
+      if(!c) return;
+      if(c.state !== 'running' || c.currentTime === t0) this.reinit();   // suspended OR frozen-clock zombie → full rebuild
+    }, 500);
   }
   reinit(){
     try{ const c = this.ctx; if(c && c.close){ const p = c.close(); p && p.catch(()=>{}); } }catch(e){}

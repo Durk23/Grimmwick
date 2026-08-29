@@ -36,8 +36,9 @@ const G = {
       this.save.damageLifetime = 0;
       // a save with real progress predates damage tracking — its counter starts false-zero. Fastest Night
       // stays fair (playT is honest) but the damage tiebreak goes worst-case and Pure Night is off-limits.
-      if(Object.keys(this.save.levels||{}).length > 0 || (this.save.playT||0) > 60) this.save.dmgUntracked = true;
+      if(Object.keys(this.save.levels||{}).length > 0 || (this.save.playT||0) > 60) this.save.dmgUntracked = true;   // damage AND deaths both started false-zero on these saves
     }
+    if(this.save.deathsLifetime===undefined) this.save.deathsLifetime = 0;
     // legacy saves that already beat Grimm: the night is done but board-ineligible — their playT
     // includes post-game wandering, so a Fastest Night submit would be unfair either way
     if(this.save.nightDone===undefined) this.save.nightDone = (this.save.embers||0) >= 5;
@@ -289,6 +290,20 @@ const G = {
     if(UI.hideMap) UI.hideMap();
     if(this.mapView){ this.mapView.dispose && this.mapView.dispose(); this.mapView = null; }
     if(this.state==='map') this.state='play';
+    // step BACK OUT of the gate: closing while standing in the portal's auto-enter radius
+    // instantly re-opened the map (the first-visit exit trap) — nudge Pip toward town
+    if(this.area==='hub' && this.player && this.gates){
+      for(const gate of this.gates){
+        const dx=this.player.pos.x-gate.x, dz=this.player.pos.z-gate.z, d=Math.hypot(dx,dz);
+        if(d<2.4){
+          let ux=dx/(d||1), uz=dz/(d||1);
+          if(d<0.1){ const gm=Math.hypot(gate.x,gate.z)||1; ux=-gate.x/gm; uz=-gate.z/gm; }   // standing dead-center: step toward town
+          this.player.pos.x = gate.x+ux*3.2; this.player.pos.z = gate.z+uz*3.2;
+          this.camc.snapBehind && this.camc.snapBehind(this.player.pos);
+          break;
+        }
+      }
+    }
   },
   toMap(district){
     this.state='transition';
@@ -349,6 +364,7 @@ const G = {
     }
   },
   onPlayerDeath(){
+    this.save.deathsLifetime = (this.save.deathsLifetime||0) + 1;   // Night Board tiebreaker
     this.save.lives = Math.max(0, (this.save.lives??5)-1);
     this.persist();
     this.state='dead';
@@ -480,6 +496,7 @@ const G = {
       this.save.nightEligible = !this.save.nightCozy;   // ANY cozy time during the night = no board entry (Pip still wins his party)
       this.save.nightT = this.save.playT||0;
       this.save.nightDmg = this.save.dmgUntracked ? 999 : (this.save.damageLifetime||0);   // untracked saves take the worst tiebreak, honestly
+      this.save.nightDeaths = this.save.dmgUntracked ? 99 : Math.min(this.save.deathsLifetime||0, 99);
       this.save.nightCandy = this.save.candyLifetime||0;
       this.persist();
     }

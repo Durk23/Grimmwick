@@ -461,7 +461,7 @@ const UI = {
     if(!el){
       el = document.createElement('div');
       el.id='how-screen'; el.className='screen ui-block';
-      el.style.cssText = "position:fixed;z-index:65;background:rgba(10,6,22,.94);font-family:-apple-system,'SF Pro Rounded','Segoe UI',system-ui,sans-serif";   // lives on body: needs its own stacking + font (the game font is scoped to #ui)
+      el.style.cssText = "position:fixed;z-index:65;background:rgba(10,6,22,.94);color:#fff;font-family:-apple-system,'SF Pro Rounded','Segoe UI',system-ui,sans-serif";   // lives on body: needs its own stacking + font + WHITE text (body styles don't apply)
       document.body.appendChild(el);
     }
     const touch = INPUT.isTouch;
@@ -606,6 +606,7 @@ const UI = {
       for(const key in COSTUMES){
         const c = COSTUMES[key];
         if(c.pass && !G.save.owned.includes(key)) continue;   // v1.0 launch: pass-exclusive looks hidden until the Spook Pass ships (owners from testing keep theirs)
+        if(c.retired && !G.save.owned.includes(key)) continue;   // retired from the rack — anyone who owns it keeps it forever
         const owned = G.save.owned.includes(key);
         const equipped = G.save.equipped===key;
         const div = document.createElement('div');

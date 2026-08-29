@@ -1,11 +1,13 @@
 // ============ THE NIGHT BOARD — leaderboards (Game Center) ============
-// The competitive layer for a short game: "beat it" is night one, "beat it in 41 minutes untouched"
-// is the next three months. Boards (owner spec): FASTEST NIGHT — time to beat the whole game, ties
-// broken by least damage, then most candy (one lower-is-better int64 composite) · PURE NIGHT —
-// no-damage full runs, fastest wins · CANDY HOARD — most candy ever collected · one district board
-// per district (sum of your best level times + boss best). Native bridge: GameCenterPlugin.swift
-// (Capacitor 8, registered in MyViewController). Web/test builds run fully local — the Night Board
-// then shows YOUR numbers and invites you to the App Store version to compete.
+// TWO boards, owner spec (Aug 2026 — "just those 2 tabs"):
+//   🏆 FLAWLESS NIGHT — the mastery board: finish the game with ALL 75 STARS (3 per level);
+//      rank = your total play-clock from New Game to the moment the last requirement lands.
+//   🌙 THE NIGHT — everyone who beats the game, with the full stat line per row:
+//      time · ⭐ stars · 🍬 candy · 💜 damage · ☠️ deaths.
+// One int64 score ranks (time → deaths → damage → candy, all within JS-safe 2^53):
+//   score = timeCS*1e9 + min(deaths,99)*1e7 + min(dmg,999)*1e4 + (9999 - min(candy,9999))
+// The star count rides Game Center's per-entry CONTEXT field. Cozy-tainted nights never submit.
+// Native bridge: GameCenterPlugin.swift (Capacitor 8, registered in MyViewController).
 
 const GC = {
   authed: false, alias: null, _authing: null,
@@ -14,7 +16,7 @@ const GC = {
   signIn(){
     const p = this.plugin(); if(!p) return Promise.resolve(false);
     if(this.authed) return Promise.resolve(true);
-    if(this._authing) return this._authing;   // one in-flight auth at a time — a second call would orphan the first native promise
+    if(this._authing) return this._authing;   // one in-flight auth — a second call would orphan the first native promise
     this._authing = (async () => {
       try{ const r = await p.signIn(); this.authed = !!(r && r.authenticated); this.alias = (r && r.alias) || null; }
       catch(e){ this.authed = false; }
@@ -24,10 +26,11 @@ const GC = {
     })();
     return this._authing;
   },
-  async submit(board, value){
+  async submit(board, value, context){
     const p = this.plugin();
-    if(!p || !this.authed){ Night.queuePending(board, value); return; }
-    try{ await p.submit({ board, value: Math.round(value) }); }catch(e){ Night.queuePending(board, value); }
+    if(!p || !this.authed){ Night.queuePending(board, value, context); return; }
+    try{ await p.submit({ board, value: Math.round(value), context: Math.round(context||0) }); }
+    catch(e){ Night.queuePending(board, value, context); }
   },
   async load(board, friends, count=25){
     const p = this.plugin(); if(!p || !this.authed) return null;
@@ -44,88 +47,87 @@ function fmtCS(cs){
   if(h) return h+'h '+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
   return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0');
 }
-// the FASTEST NIGHT composite (owner spec) — decode shows the time; damage/candy break ties invisibly
-function encodeNight(timeCS, dmg, candy){ return timeCS*1e7 + Math.min(dmg,999)*1e4 + (9999 - Math.min(candy,9999)); }
+// the composite: rank by time, ties by deaths, then damage, then candy. Fits in 2^53 (timeCS ≤ 3.6e6 → 3.6e15).
+function encodeNight(timeCS, deaths, dmg, candy){
+  return timeCS*1e9 + Math.min(Math.max(deaths,0),99)*1e7 + Math.min(Math.max(dmg,0),999)*1e4 + (9999 - Math.min(Math.max(candy,0),9999));
+}
+function decodeNight(v){
+  const timeCS = Math.floor(v/1e9);
+  const deaths = Math.floor(v/1e7) % 100;
+  const dmg = Math.floor(v/1e4) % 1000;
+  const candy = 9999 - (v % 1e4);
+  return { timeCS, deaths, dmg, candy };
+}
 
 const NIGHT_BOARDS = [
-  { key:'fastest', id:'grimmwick.fastestnight', icon:'🏆', name:'FASTEST NIGHT', sub:'Beat the whole game. Ties: least damage, then most candy.', lower:true,
-    fmt: v => fmtCS(Math.floor(v/1e7)) },
-  { key:'pure', id:'grimmwick.purenight', icon:'💜', name:'PURE NIGHT', sub:'Untouched full runs — not one heart lost. Fastest wins.', lower:true, fmt: fmtCS },
-  { key:'candy', id:'grimmwick.candyhoard', icon:'🍬', name:'CANDY HOARD', sub:'Most candy ever collected, across all your nights.', lower:false, fmt: v => (+v).toLocaleString() },
-  { key:'w1', id:'grimmwick.w1.night', icon:'🎃', name:'PUMPKIN PATCH', sub:'Your best level times + boss, added up.', lower:true, fmt: fmtCS },
-  { key:'w2', id:'grimmwick.w2.night', icon:'🪦', name:'RAVENMOOR', sub:'Your best level times + boss, added up.', lower:true, fmt: fmtCS },
-  { key:'w3', id:'grimmwick.w3.night', icon:'🕷️', name:'WITCHWOOD', sub:'Your best level times + boss, added up.', lower:true, fmt: fmtCS },
-  { key:'w4', id:'grimmwick.w4.night', icon:'⚓', name:'GHOST HARBOR', sub:'Your best level times + boss, added up.', lower:true, fmt: fmtCS },
-  { key:'w5', id:'grimmwick.w5.night', icon:'🕰️', name:'CURSED CASTLE', sub:'Your best level times + boss, added up.', lower:true, fmt: fmtCS },
+  { key:'flawless', id:'grimmwick.flawless', icon:'🏆', name:'FLAWLESS NIGHT',
+    sub:'ALL 75 stars — every level, every challenge — fastest total clock wins. The mastery board.' },
+  { key:'night', id:'grimmwick.night', icon:'🌙', name:'THE NIGHT',
+    sub:'Everyone who saved Grimmwick. Time first; fewest deaths, least damage, most candy break ties.' },
 ];
 
 const Night = {
-  // ---- district sum-of-bests: all 5 level bests + the boss best must exist ----
-  districtCS(G, w){
-    const sv = G.save; let sum = 0;
-    if(typeof LEVEL_LISTS === 'undefined') return null;
-    let n = 0;
-    for(const list of LEVEL_LISTS) for(const l of list){
-      if(l.district !== w) continue; n++;
-      const rec = sv.levels && sv.levels[l.id];
-      if(!rec || rec.best == null) return null;
-      sum += rec.best;
-    }
-    if(!n) return null;
-    const boss = sv.best && sv.best[w+'boss'];
-    if(boss == null) return null;
-    return Math.round((sum + boss) * 100);
+  totalStars(G){
+    return Object.values(G.save.levels||{}).reduce((s,l)=>s + (l.stars ? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
   },
-  // ---- your local values per board (the web fallback + the "you" row) ----
+  // ---- local values (the web fallback + your-best row) ----
   localValue(G, key){
     const sv = G.save;
-    if(key === 'fastest') return sv.nightDone && sv.nightT ? encodeNight(Math.round(sv.nightT*100), sv.nightDmg||0, Math.min(sv.nightCandy||0,9999)) : null;
-    if(key === 'pure')    return sv.nightDone && sv.nightT && (sv.nightDmg||0) === 0 ? Math.round(sv.nightT*100) : null;
-    if(key === 'candy')   return sv.candyLifetime || null;
-    return this.districtCS(G, key);
+    if(key==='night') return sv.nightDone && sv.nightT && sv.nightEligible!==false
+      ? encodeNight(Math.round(sv.nightT*100), sv.nightDeaths||0, sv.nightDmg||0, sv.nightCandy||0) : null;
+    if(key==='flawless') return sv.flawlessT
+      ? encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths||0, sv.flawlessDmg||0, sv.flawlessCandy||0) : null;
+    return null;
   },
   // ---- submissions (queued while signed out; Game Center keeps each player's best) ----
-  queuePending(board, value){
+  queuePending(board, value, context){
     const G = window.G; if(!G || !G.save) return;
     const q = G.save.pendingScores || (G.save.pendingScores = {});
-    const b = NIGHT_BOARDS.find(x => x.id === board);
-    if(q[board] == null || (b && !b.lower ? value > q[board] : value < q[board])) q[board] = value;
+    if(q[board] == null || value < q[board].v) q[board] = { v: value, c: context||0 };   // both boards are lower-is-better
     G.persist && G.persist();
   },
   flushPending(){
     const G = window.G; if(!G || !G.save || !G.save.pendingScores) return;
     const q = G.save.pendingScores; G.save.pendingScores = {};
-    for(const board in q) GC.submit(board, q[board]);
+    const known = NIGHT_BOARDS.map(b=>b.id);
+    for(const board in q){
+      if(!known.includes(board)) continue;                          // purge queue entries from retired board ids
+      const e = q[board];
+      GC.submit(board, typeof e==='object' ? e.v : e, typeof e==='object' ? e.c : 0);
+    }
     G.persist && G.persist();
   },
-  submitDistrict(G, w){
-    const cs = this.districtCS(G, w);
-    if(cs != null) GC.submit('grimmwick.'+w+'.night', cs);
+  // THE FLAWLESS CHECK — fires on every clear/boss: the moment a save has the finished game AND all 75
+  // stars (in any order, across any number of nights), the clock stops and the run is banked. Cozy taints it.
+  checkFlawless(G){
+    const sv = G.save;
+    if(sv.flawlessT || sv.nightCozy) return;
+    if(!sv.nightDone || this.totalStars(G) < 75) return;
+    sv.flawlessT = sv.playT||0;
+    sv.flawlessDeaths = sv.dmgUntracked ? 99 : Math.min(sv.deathsLifetime||0, 99);
+    sv.flawlessDmg = sv.dmgUntracked ? 999 : (sv.damageLifetime||0);
+    sv.flawlessCandy = sv.candyLifetime||0;
+    G.persist();
+    UI.toast('🏆 FLAWLESS NIGHT — all 75 stars! Your time is on the board: '+fmtCS(Math.round(sv.flawlessT*100)), 5200);
+    GC.submit('grimmwick.flawless', encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths, sv.flawlessDmg, sv.flawlessCandy), 75);
   },
   onLevelClear(G, levelId){
-    // CANDY HOARD is a lifetime collection stat, not a skill record — cozy candy counts, by design
-    if(G.save.candyLifetime) GC.submit('grimmwick.candyhoard', G.save.candyLifetime);
-    if(G.save.cozy || G.runCozy) return;             // cozy runs never touch the TIME boards
-    this.submitDistrict(G, levelId.slice(0,2));
+    if(!(G.save.cozy || G.runCozy)) this.checkFlawless(G);
   },
   onBossDefeated(G, w){
-    if(G.save.candyLifetime) GC.submit('grimmwick.candyhoard', G.save.candyLifetime);
-    if(!(G.save.cozy || G.runCozy)) this.submitDistrict(G, w);
-    // the whole-night boards check ELIGIBILITY, not the live toggle — a night with any cozy minute
-    // in it (nightEligible false) never submits, and a cozy first-clear can't sneak in via a re-fight
     if(w === 'w5' && G.save.nightDone && !G.save.nightSubmitted){
       G.save.nightSubmitted = true;
       const timeCS = Math.round((G.save.nightT||0)*100);
       if(timeCS > 0 && G.save.nightEligible !== false){
-        GC.submit('grimmwick.fastestnight', encodeNight(timeCS, G.save.nightDmg||0, Math.min(G.save.nightCandy||0, 9999)));
-        if((G.save.nightDmg||0) === 0 && !G.save.dmgUntracked) GC.submit('grimmwick.purenight', timeCS);
+        GC.submit('grimmwick.night', encodeNight(timeCS, G.save.nightDeaths||0, G.save.nightDmg||0, G.save.nightCandy||0), this.totalStars(G));
       }
       G.persist();
     }
+    if(!(G.save.cozy || G.runCozy)) this.checkFlawless(G);
   },
 
-  // ================= THE NIGHT BOARD UI (jewel, not menu) =================
-  _built: false, _sel: 'fastest', _friends: false,
+  // ================= THE NIGHT BOARD UI (two tabs, jewel not menu) =================
+  _built: false, _sel: 'flawless', _friends: false,
   build(){
     if(this._built) return; this._built = true;
     const css = document.createElement('style');
@@ -135,17 +137,21 @@ const Night = {
       #nb-head { display:flex; align-items:center; gap:10px; }
       #nb-head h2 { font-size:20px; letter-spacing:2px; color:#ffd98a; text-shadow:0 0 18px rgba(255,180,60,.45), 0 2px 6px #000; margin:0; flex:1; }
       #nb-x { width:38px; height:38px; border-radius:12px; background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.2); color:#fff; font-size:17px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-      #nb-tabs { display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; touch-action:pan-x; padding:8px 0 6px; scrollbar-width:none; }
-      #nb-tabs::-webkit-scrollbar { display:none; }
-      .nb-tab { flex:0 0 auto; padding:7px 12px; border-radius:14px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.14); font-size:12.5px; font-weight:800; cursor:pointer; white-space:nowrap; }
+      #nb-tabs { display:flex; gap:8px; padding:8px 0 6px; }
+      .nb-tab { flex:1; text-align:center; padding:9px 12px; border-radius:14px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.14); font-size:13.5px; font-weight:800; cursor:pointer; white-space:nowrap; }
       .nb-tab.on { background:rgba(255,170,60,.18); border-color:#ffb35e; color:#ffd98a; box-shadow:0 0 14px rgba(255,170,60,.25); }
-      #nb-sub { font-size:12px; opacity:.75; margin:2px 2px 6px; }
+      #nb-sub { font-size:12px; opacity:.75; margin:2px 2px 6px; text-align:center; }
       #nb-list { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; border-radius:16px; background:rgba(255,255,255,.045); border:1.5px solid rgba(255,255,255,.1); padding:6px; }
-      .nb-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:12px; font-size:14.5px; }
+      .nb-row { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; font-size:13.5px; font-variant-numeric:tabular-nums; }
+      .nb-row.hdr { font-size:10.5px; opacity:.6; font-weight:800; letter-spacing:1px; padding:4px 10px 2px; }
       .nb-row.me { background:rgba(255,170,60,.14); border:1.5px solid rgba(255,180,90,.4); font-weight:800; }
-      .nb-rank { width:44px; font-weight:900; color:#ffd98a; }
-      .nb-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-      .nb-score { font-weight:900; font-variant-numeric:tabular-nums; }
+      .nb-rank { width:42px; font-weight:900; color:#ffd98a; flex:0 0 auto; }
+      .nb-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:60px; }
+      .nb-time { width:76px; font-weight:900; text-align:right; flex:0 0 auto; }
+      .nb-st { width:44px; text-align:right; flex:0 0 auto; opacity:.95; }
+      .nb-cd { width:52px; text-align:right; flex:0 0 auto; opacity:.8; }
+      .nb-dm { width:40px; text-align:right; flex:0 0 auto; opacity:.8; }
+      .nb-dt { width:40px; text-align:right; flex:0 0 auto; opacity:.8; }
       .nb-note { padding:20px 16px; text-align:center; opacity:.8; font-size:13.5px; line-height:1.55; }
       #nb-foot { display:flex; gap:8px; align-items:center; padding-top:8px; }
       #nb-friends { padding:7px 13px; border-radius:14px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.16); font-size:12.5px; font-weight:800; cursor:pointer; }
@@ -178,9 +184,21 @@ const Night = {
     el.querySelectorAll('.nb-tab').forEach(x=>x.classList.toggle('on', x.dataset.k===this._sel));
     AUDIO.ui && AUDIO.ui();
     this.render();                                    // paint your local numbers immediately…
-    if(GC.native() && !GC.authed){ await GC.signIn(); this.render(); }   // …then retry auth on every open (Settings round-trips included)
+    if(GC.native() && !GC.authed){ await GC.signIn(); this.render(); }   // …then retry auth on every open
   },
   close(){ const el = document.getElementById('nb-screen'); if(el) el.style.display='none'; if(window.UI) UI._ovCloseT = performance.now(); AUDIO.ui && AUDIO.ui(); },
+  _row(rank, name, v, stars, me){
+    const d = decodeNight(v);
+    return `<div class="nb-row${me?' me':''}">
+      <div class="nb-rank">${me?'⭐':''}#${rank}</div>
+      <div class="nb-name">${String(name||'???').replace(/[<>&"]/g,'')}</div>
+      <div class="nb-time">${fmtCS(d.timeCS)}</div>
+      <div class="nb-st">⭐${stars!=null?stars:'–'}</div>
+      <div class="nb-cd">🍬${d.candy>=9999?'9999+':d.candy}</div>
+      <div class="nb-dm">💜${d.dmg>=999?'—':d.dmg}</div>
+      <div class="nb-dt">☠️${d.deaths>=99?'—':d.deaths}</div>
+    </div>`;
+  },
   async render(){
     const G = window.G, el = document.getElementById('nb-screen');
     if(!el || el.style.display==='none') return;
@@ -188,9 +206,13 @@ const Night = {
     el.querySelector('#nb-sub').textContent = b.sub;
     const list = el.querySelector('#nb-list');
     const mine = this.localValue(G, b.key);
-    el.querySelector('#nb-you').textContent = mine != null ? ('Your best: '+b.fmt(mine)) : 'No entry yet — go earn one!';
+    el.querySelector('#nb-you').textContent = mine != null ? ('Your best: '+fmtCS(decodeNight(mine).timeCS))
+      : (b.key==='flawless' ? `Stars: ${this.totalStars(G)}/75 — earn them ALL to enter!` : 'Finish the night to enter!');
+    const hdr = `<div class="nb-row hdr"><div class="nb-rank"></div><div class="nb-name">PLAYER</div><div class="nb-time">TIME</div><div class="nb-st">STARS</div><div class="nb-cd">CANDY</div><div class="nb-dm">DMG</div><div class="nb-dt">DEATHS</div></div>`;
     if(!GC.native()){
-      list.innerHTML = `<div class="nb-note">🕯️ The spirits post scores from the App Store version.<br>${mine!=null ? 'Your local best here: <b>'+b.fmt(mine)+'</b>' : 'Finish the night to set your first mark!'}</div>`;
+      list.innerHTML = hdr + (mine!=null
+        ? this._row('—', 'You (local)', mine, b.key==='flawless'?75:this.totalStars(G), true)
+        : `<div class="nb-note">🕯️ The spirits post scores from the App Store version.<br>${b.key==='flawless' ? 'All 75 stars + the fastest clock = the top of this board.' : 'Finish the night to set your mark!'}</div>`);
       return;
     }
     if(!GC.authed){
@@ -200,7 +222,7 @@ const Night = {
     list.innerHTML = `<div class="nb-note">🔮 Consulting the spirits…</div>`;
     const want = this._sel + ':' + this._friends;
     const r = await GC.load(b.id, this._friends, 25);
-    if(this._sel + ':' + this._friends !== want) return;   // switched tab or scope while loading
+    if(this._sel + ':' + this._friends !== want) return;   // switched tab or scope mid-load
     if(r && r.error){
       list.innerHTML = `<div class="nb-note">🌫️ The spirits can't reach Game Center right now — try again in a moment.</div>`;
       return;
@@ -209,11 +231,9 @@ const Night = {
       list.innerHTML = `<div class="nb-note">${this._friends ? 'No friends on this board yet — recruit some rivals! 👥' : 'The board is empty — be the FIRST name on it. 🏮'}</div>`;
       return;
     }
-    list.innerHTML = r.entries.map(e =>
-      `<div class="nb-row${e.me?' me':''}"><div class="nb-rank">${e.me?'⭐':''}#${e.rank}</div><div class="nb-name">${String(e.name||'???').replace(/[<>&]/g,'')}</div><div class="nb-score">${b.fmt(e.value)}</div></div>`
-    ).join('');
+    list.innerHTML = hdr + r.entries.map(e => this._row(e.rank, e.name, e.value, e.context, e.me)).join('');
     if(r.localRank && !r.entries.some(e=>e.me)){
-      list.innerHTML += `<div class="nb-row me"><div class="nb-rank">⭐#${r.localRank}</div><div class="nb-name">${String(GC.alias||'You').replace(/[<>&]/g,'')}</div><div class="nb-score">${r.localValue!=null?b.fmt(r.localValue):''}</div></div>`;
+      list.innerHTML += this._row(r.localRank, GC.alias||'You', r.localValue!=null?r.localValue:0, null, true);
     }
   },
 };

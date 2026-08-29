@@ -42,7 +42,8 @@ public class GameCenterPlugin: CAPPlugin, CAPBridgedPlugin {
         guard let board = call.getString("board") else { call.reject("board required"); return }
         guard GKLocalPlayer.local.isAuthenticated else { call.reject("not authenticated"); return }
         let value = call.getInt("value") ?? 0
-        GKLeaderboard.submitScore(value, context: 0, player: GKLocalPlayer.local, leaderboardIDs: [board]) { error in
+        let context = call.getInt("context") ?? 0
+        GKLeaderboard.submitScore(value, context: context, player: GKLocalPlayer.local, leaderboardIDs: [board]) { error in
             if let e = error { call.reject(e.localizedDescription) } else { call.resolve() }
         }
     }
@@ -71,6 +72,7 @@ public class GameCenterPlugin: CAPPlugin, CAPBridgedPlugin {
                         "rank": e.rank,
                         "name": e.player.alias,
                         "value": e.score,
+                        "context": e.context,
                         "me": e.player.gamePlayerID == meID,
                     ])
                 }
