@@ -62,7 +62,7 @@ function buildW4L5(G){
 
   // =============================== BEAT 1 — THE GUN DECK (x 14..50): the ROLLING CANNONBALLS + a trust-no-prop mimic ===============================
   groundX(G, 14, 50, DECK);
-  signPost(G, 16, 1.7, 0.15, 'THE GUN DECK. Loose shot rolls the boards — iron, and it will not stomp. JUMP it, and mind the barrels: not all of them are just barrels.');
+  signPost(G, 16, 1.7, 0.15, 'THE GUN DECK. Loose cannonballs roll the boards — solid iron, a stomp won\'t dent them. JUMP them, and mind the barrels: not all of them are just barrels.');
   // TWO rolling cannonballs on FIXED clocks, staggered speed/phase so the deck is never safe for long — you JUMP each
   // as it overtakes you (a tap clears the ~0.8u ball with room). Deterministic (x is a pure fn of the clock).
   G.ents.add(new RollingBall(G, 16, 42, 0, {speed:5.0, phase:0.0, r:0.42}));
@@ -126,7 +126,7 @@ function buildW4L5(G){
 
   // =============================== BEAT 3 — THE MESS HALL (x 92..128): BREATHE — the ghost crew, the gamble, the quiet prop ===============================
   groundX(G, 92, 128, DECK);
-  signPost(G, 94, 1.7, 0.2, "THE CREW'S MESS. They still take their supper. Slip past, or knock them off their stools — but the whole hold was hiding somewhere.");
+  signPost(G, 94, 1.7, 0.2, "THE CREW'S MESS. They still take their supper. Slip past, or knock them off their stools — and mind the hold: the rest of the crew is hiding somewhere.");
   // THE TREASURE CHEST — the D4 gamble, dropped in a CLEAR alcove the instant you enter the mess (CLEAR-PATCH LAW):
   // the bilge wraith is confined to its wire ending 9u back, and the nearest crewman's home (110) sits 14u off — past
   // a Boo Buccaneer's 12u chase range — so nothing patrols/aggros within 6u while you pry it open. Ambush = the crew bursts.

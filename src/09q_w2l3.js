@@ -82,7 +82,7 @@ function buildW2L3(G){
   // left back-wall so you never walk off the belfry behind spawn
   G.world.addBox(-3.8, -8, 0, 1.5, 22, 12, {});
   signPost(G, 1.2, 5.6, -0.15, INPUT.isTouch ?
-    'THE BELL TOWER fell into the earth. Follow it DOWN: touch a chain or rope and hold DOWN to climb down, UP to climb, JUMP to leap off.' :
+    'THE BELL TOWER fell into the earth. Follow it DOWN! Push UP at a chain or rope to GRAB ON — then hold DOWN to climb down, UP to climb up, JUMP to leap off.' :
     'THE BELL TOWER fell into the earth. Follow it DOWN: grab a chain/rope (UP) and hold DOWN to descend - hold UP to climb - SPACE to leap off.');
   G.ents.add(new Checkpoint(7, 5, 0, 0, {noLight:true}));   // CP0 — before the first chain
   G.ents.add(new Gravemite(G, 5.5, 5, 0, {range:2.2, axis:'x'}));
@@ -105,7 +105,7 @@ function buildW2L3(G){
   // a bell-rope SWING carries you over a stalagmite pit; a Restless Urn tempts from a clear pocket.
 
   platform(G, 28, 0.4, 0, 9, 4, W2PAL.stoneD);             // shaft entrance ledge (x23.5..32.5)
-  signPost(G, 26.5, 1.0, 0.12, 'The shaft drops away. That candy trailing DOWNWARD leads somewhere the careful climber goes... and the ropes carry you over what you should not stand on.');
+  signPost(G, 26.5, 1.0, 0.12, 'The shaft drops away. Follow the candy DOWN for a secret, if you dare... and let the ropes swing you OVER the spikes.');
   platform(G, 34.5, -0.8, 0, 3.5, 3.5, W2PAL.stoneL);      // step-down ledge (drop 1.2)
   platform(G, 38, -1.8, 0, 6, 4, W2PAL.stoneD);            // mid-shaft floor A (x35..41)
   G.ents.add(new Checkpoint(39, -1.8, 0, 1, {noLight:true}));   // CP1 — before the rope-swing pit

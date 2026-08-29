@@ -3,7 +3,7 @@ const WORLDS = [
   {key:'w1', name:'Pumpkin Patch',  sub:'The Harvest District', guardian:'The Pumpkin King', angle: -0.62, color:PAL.pumpkin, open:true},
   {key:'w2', name:'Ravenmoor Cemetery', sub:'The Silent District', guardian:'Mossgrave, the Tombstone Titan', angle: -1.42, color:0x9fe066, open:false, req:'w1'},
   {key:'w3', name:'Witchwood',      sub:'The Wild District',    guardian:'Broomhilda the Broom Witch', angle: Math.PI+1.42, color:0xb37dff, open:false, req:'w2'},
-  {key:'w4', name:'Ghost Harbor',   sub:'The Misty District',   guardian:'Captain Wraith',   angle: Math.PI+0.62, color:0x63e6e2, open:false, req:'w3'},
+  {key:'w4', name:'Ghost Harbor',   sub:'The Dried-Up District',   guardian:'Captain Wraith',   angle: Math.PI+0.62, color:0x63e6e2, open:false, req:'w3'},
   {key:'w5', name:'Cursed Castle',  sub:'Grimm\'s Keep',        guardian:'Grimm, the Forgotten Guest', angle: Math.PI, color:0xff5e7a, open:false, req:'w4'},
 ];
 

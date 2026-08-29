@@ -95,7 +95,7 @@ function buildW3L4(G){
   candyLine(G, [[6,0.9,0],[9,0.9,0],[12,1.4,0]], 5);
 
   // BROOM — introduced on flat, safe ground: it sweeps low and never turns; hop over as it passes.
-  signPost(G, 12, 1.8, 0.2, 'Enchanted brooms! They sweep low and never turn back — a little hop clears one. Watch its rhythm, then go.');
+  signPost(G, 12, 1.8, 0.2, 'Enchanted brooms! They sweep low and never turn back — a little hop clears one. Watch the rhythm, then go.');
   G.ents.add(new BroomZoomer(G, 18, 0.15, 0, {baseY:0.15, range:5, speed:5.4, phase:0}));   // ground sweep 13..23 — leap it
   candyLine(G, [[15,0.9,0],[18,2.0,0],[21,0.9,0]], 5);           // the arc teaches the leap height
 
@@ -179,7 +179,7 @@ function buildW3L4(G){
 
   // =================== ACT 3 — THE HIGH ROOFS (x 112..140) : ESCALATE — the ferry-plank ===================
   G.ents.add(new Checkpoint(110, 0, 1.4, 2, {noLight:true}));    // CP2 — solid ground, immediately before the mover void
-  signPost(G, 105, 1.8, -0.2, 'THE HIGH ROOFS. A witch\'s ferry-plank drifts between the huts — board it when it comes to you, ride across, and mind the sweepers. Dip the cauldron first for a boon.');
+  signPost(G, 105, 1.8, -0.2, 'THE HIGH ROOFS. A witch\'s ferry-plank drifts between the huts — board it when it comes to you, ride across, and mind the sweepers. Dip in the cauldron first for a lucky brew.');
   w3l4Bog(G, 112, 140);                                         // the wide void the ferry crosses (deco only)
 
   // climb up onto the roofs: ground→P4 (rise 2.2 held) → R2 (rise 1.8 tap)

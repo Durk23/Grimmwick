@@ -101,7 +101,7 @@ function buildW1L1(G){
   for(let i=0;i<4;i++) decoA.add(pumpkinDeco(rand(2,44), rand(2.4,3.2), rand(0.6,1), false));
   S.add(bakeGroup(decoA));
   signPost(G, 3, 1.8, -0.25, INPUT.isTouch ?
-    'Welcome to the Pumpkin Patch! Joystick: run left/right. A: jump (tap twice to double jump!). B: spin your candy bag.' :
+    'Welcome to the Pumpkin Patch! Joystick: run left/right. JUMP: jump (tap twice to double jump!). SPIN: spin your candy bag. 💥: ground pound.' :
     'Welcome to the Pumpkin Patch! A/D or arrows run - SPACE jump (twice = double jump!) - J spin attack - K ground pound.');
   signPost(G, 22, 1.8, 0.2, 'Boos are shy - face them and they freeze! Turn your back... and they creep. Bonk or stomp them for candy.');
   G.ents.add(new BonkLantern(G, 8, 1.3, 0, 'shield'));
@@ -270,7 +270,7 @@ function buildW1L1(G){
   groundX(G, 132, 137, 0x3f5c4c);
   signPost(G, 134, 1.8, -0.2, INPUT.isTouch ?
     'THE SUNKEN CRYPT. Step DOWN into the dark for richer pickings (hold UP on the roots to climb back out) - or keep to the BOARDS up top if you like your head where it is.' :
-    'THE SUNKEN CRYPT. Step DOWN into the dark for richer pickings - or keep to the BOARDS up top if you like your head where it is.');
+    'THE SUNKEN CRYPT. Step DOWN into the dark for richer pickings (hold UP on the roots to climb back out) - or keep to the BOARDS up top if you like your head where it is.');
   candyLine(G, [[133,0.8,0],[135.5,0.8,0]], 3);
   G.ents.add(new Crow(136, 0.72, -3.1)); // startles as you reach the fork
 

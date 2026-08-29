@@ -135,7 +135,7 @@ function buildW5L3(G){
   // =============================== BEAT 5 — THE HALL OF FAKES (x 116..164): MASTER — everything at once ===============================
   groundX(G, 116, 187, STONE);                                       // solid ground through the finish
   candyLine(G, [[114,0.9,0],[117,0.9,0],[120,0.9,0]], 3);
-  signPost(G, 122, 1.7, 0.1, "THE HALL OF FAKES. Every glass down here breeds another copy. Past this hall, the last stair to Grimm's throne. Steady now.");
+  signPost(G, 122, 1.7, 0.1, "THE HALL OF FAKES. Every mirror down here breeds another copy. Past this hall, the last stair to Grimm's throne. Steady now.");
   // CLOCKWORK KNIGHT #2 — a wider patrol; bow-telegraph, pound-through
   G.ents.add(new ClockworkKnight(G, 132, 0, 0, {phase:0.3, range:2.6, dir:1, speed:1.4}));
   // a chasing SHADOW COPY overlapping the knight = the mastery pinch (deal with the fake while the knight bows)

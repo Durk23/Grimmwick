@@ -33,7 +33,7 @@ function buildW3L2(G){
   groundX(G, -6, 40, W3PAL.ground);
   signPost(G, 2, 0, -0.12, INPUT.isTouch ?
     'THE WEB GALLERY. Touch a giant web and hold UP to climb - hold a direction to crawl across - JUMP to leap off. SPIN tears a WEBLING\'s wall.' :
-    'THE WEB GALLERY. Grab a giant web (UP) and climb - hold a direction to crawl across - SPACE to leap off. A SPIN tears down a WEBLING\'s wall (or climb over it).');
+    'THE WEB GALLERY. Grab a giant web (UP) and climb - hold a direction to crawl across - SPACE to leap off. SPIN (J) tears down a WEBLING\'s wall (or climb over it).');
   G.ents.add(new Checkpoint(4, 0, 0, 0, {noLight:true}));            // CP0 — start, before the first web
   // a telegraphed Widowmite swarm of 3 — easy 1-hit stomps to learn the district's pest
   G.ents.add(new Widowmite(G, 9,  0, 0, {range:2.0, phase:0.0}));
@@ -98,7 +98,7 @@ function buildW3L2(G){
 
   // far bank (x66..78) — a CLEAR POCKET for the Mystery Cauldron (no patrol within ~6u), then CP-run
   candyLine(G, [[67,0.8,0],[69,0.8,0]], 3);
-  signPost(G, 65.5, 1.7, -0.1, 'The witch\'s brewing cauldron, unwatched. A dip is a gamble - sweets, treasure... or a nest of widows.');
+  signPost(G, 65.5, 1.7, -0.1, 'The witch\'s brewing cauldron, unwatched. A dip is a gamble - sweets, treasure... or a nest of Widowmites.');
   { const cauldron = new MysteryCauldron(71, 0, -1.7, 0);        // the D3 gamble container (Widowmite ambush on the clear-patch ring)
     G.ents.add(cauldron); G.coffins.push(cauldron);
     G.world.addBox(71, 0, -1.7, 2.0, 1.6, 2.0, {}); }
@@ -161,7 +161,7 @@ function buildW3L2(G){
   // ================= ACT 4 — THE GRAND WEB (MASTER) x 120..158 =================
   groundX(G, 120, 158, W3PAL.ground);
   G.ents.add(new Checkpoint(120, 0, 1.6, 3));                     // CP3 — lit, before the grand master climb
-  signPost(G, 121, 0, 0.1, 'THE GRAND WEB. One last climb - mind the widows on the strands and the wall between them. Bat wings wait at the top.');
+  signPost(G, 121, 0, 0.1, 'THE GRAND WEB. One last climb - mind the spiders on the strands and the wall between them. BAT WINGS wait at the top.');
 
   // the grand climb: web -> mid-ledge (a Webling walls it MID-CLIMB) -> web -> summit + BAT WINGS
   w3Web(G, 124, 0, 6.0, 0, 3.4);

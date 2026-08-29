@@ -117,7 +117,7 @@ function buildW4L4(G){
   G.ents.add(new Checkpoint(55, DECK_Y, 1.5, 1, {noLight:true}));   // CP1 — you land right on it; deck deaths never re-run the cannon
   { const dl = new THREE.PointLight(W4PAL.lantern, 34, 9); dl.position.set(56, DECK_Y+2.6, 0.5); S.add(dl); }   // a ghost-lantern deck pool (real light)
   G.ents.add(new BonkLantern(G, 60, DECK_Y+1.2, 0, 'shield'));      // arm up for the gauntlet (a wobbly gummy shield)
-  signPost(G, 58, 1.5, -0.15, "Her deck never stops rolling. Leap the loose shot before it rolls you flat — and trust no barrel aboard.");
+  signPost(G, 58, 1.5, -0.15, "Her deck never stops rolling. Leap the loose cannonballs before they roll you flat — and trust no barrel aboard.");
   // ROLLING SHOT #1 — a fixed-clock cannonball down the boards; you JUMP it (iron — not stompable)
   G.ents.add(new RollingBall(G, 56, 86, DECK_Y, {speed:5.0, phase:0.0, r:0.45}));
   arc(62,DECK_Y, 65,DECK_Y, 2);
@@ -190,7 +190,7 @@ function buildW4L4(G){
     m.position.set(156, DECK_Y, 1.9); m.rotation.y=-0.35; S.add(m); }
   { const al = new THREE.PointLight(W4PAL.lantern, 30, 9); al.position.set(168, DECK_Y+2.6, 0.5); S.add(al); }   // aft ghost-lantern pool
   candyLine(G, [[164,2.9,0],[168,2.9,0]], 2);
-  signPost(G, 170, 1.5, -0.2, "THE CAPTAIN'S CABIN. He's beyond that door, waiting on a tide that never turned. Almost aboard, little one.");
+  signPost(G, 170, 1.5, -0.2, "THE CAPTAIN'S CABIN. He's beyond that door, waiting on a tide that never turned. Almost there, little one.");
 
   // =============================== SHIP DECO · MOON · WISPS · PARALLAX ===============================
   // masts, tattered sails, rigging lines and hanging ghost-lanterns strung down the hull (baked, z<0 behind the lane)

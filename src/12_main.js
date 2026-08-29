@@ -508,7 +508,7 @@ const G = {
       console.error(e);
       if(window.__game) __game.errors.push('LOOP: '+String(e).slice(0,200));
       this._loopErrs = (this._loopErrs||0)+1;
-      if(this._loopErrs===1 && window.UI && UI.toast) try{ UI.toast('⚠️ hiccup — recovering'); }catch(_){}
+      if(this._loopErrs===1 && window.UI && UI.toast) try{ UI.toast('⚠️ A little hiccup! The night is fixing itself…'); }catch(_){}
       try{ this.renderer.render(this.scene, this.camera); }catch(_){}
     }
   },

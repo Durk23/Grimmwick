@@ -7,7 +7,7 @@ const COSTUMES = {
   witch:    {name:'Witchling',     price:250,  body:0x8e5bd9, accent:0x5b3a8e, hat:'witch', cape:null,     desc:'Comes with a very pointy hat.'},
   vampire:  {name:'Count Pip',     price:250,  body:0xe8e4f0, accent:0x1a1128, hat:'none',  cape:0x8f1030, desc:'Vants to collect your candy.'},
   mummy:    {name:'Wrap Star',     price:350,  body:0xd9d2b8, accent:0xb8b096, hat:'none',  cape:null,     desc:'It took forever to get dressed.'},
-  skeleton: {name:'Mr. Bones',     price:500,  body:0x2a2438, accent:0xe8e4d8, hat:'none',  cape:null,     desc:'Rattles when he double jumps.'},
+  skeleton: {name:'Mr. Bones',     price:500,  body:0x2a2438, accent:0xe8e4d8, hat:'none',  cape:null,     desc:'Rattles when he double-jumps.'},
   ember:    {name:'Ember Spirit',  price:0, pass:'Tier 5', body:0xff5ea8, accent:0xffd166, glow:0xff2e10, trail:0xff8c2e, hat:'none', cape:0xff8c2e, desc:'Season 1 Pass · Tier 5. Burns bright. Never burns out.'},
   nightstitch: {name:'NIGHTSTITCH', price:0, pass:'Instant', body:0x2c2a6e, accent:0x63e6e2, glow:0x2a3fd0, trail:0x63e6e2, stitched:true, hat:'none', cape:0x1c1a4e, desc:'Stitched from the night sky itself. Yours the INSTANT you get the Pass.'},
 };

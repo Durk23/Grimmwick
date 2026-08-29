@@ -219,7 +219,7 @@ class Mossgrave {
     if(this.runeHp <= 0){ this.defeat(); return; }
     this.phase = this.runeMax - this.runeHp + 1;
     this.batCap = this.phase>=3 ? 4 : 3;
-    window.UI && UI.toast(['', '"You... you CRACKED me! You little WEED!"', '"MMH! The MOSS — hide the MOSS!"'][this.runeHp] || '');
+    window.UI && UI.toast(['', '"You... you CRACKED me! You little WEED!"', '"MMPH! The MOSS — hide the MOSS!"'][this.runeHp] || '');
     this.state = 'enrage'; this.stateT = 0; this._enrShot = false;
   }
   onPlayerPound(pos){

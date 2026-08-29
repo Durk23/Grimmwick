@@ -135,7 +135,7 @@ function buildW5L5(G){
   G.ents.add(new MirrorBoo(G, 176, 2.6, 0, {phase:0.5, range:3.5, mirror:0.8}));
   G.ents.add(new SwoopBat(G, 182, 4.2, 0, {phase:0.6, range:3.5, period:3.4, aggroR:5}));
   candyLine(G, [[164,0.95,0],[167,0.95,0]], 3); candyLine(G, [[172,1.5,0],[175,1.5,0]], 3);
-  signPost(G, 168, 1.7, -0.1, "THE THRONE STEPS. One last gauntlet, and the door beyond. He's been waiting for you a very long time, Pip - since long before you were born.");
+  signPost(G, 168, 1.7, -0.1, "THE THRONE STEPS. One last gauntlet, and the door beyond. He's been waiting a very long time, Pip - for anyone at all to come.");
   exitGate(G, 186);   // -> the throne room / the Grimm boss door
 
   // =============================== DECO · QUIET PROP · MOON · PARALLAX ===============================

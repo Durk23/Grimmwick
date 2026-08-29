@@ -68,7 +68,7 @@ function buildW2L4(G){
 
   // ================= BEAT 2: THE DARK POCKET (x 40..64) — the Wisp + the light =================
   DECO.add(catacombArch(43, -1.2, 1.0));       // background arch framing the descent into the dark
-  signPost(G, 42, -0.3, 0.14, 'Keep it in your sight, or keep to the light. The wisps hate both.');
+  signPost(G, 42, -0.3, 0.14, 'Wisps hate two things: being LOOKED at, and lantern light. Face them — or keep to the light.');
   G.ents.add(new Gravemite(G, 48, 0, 0, {range:2.6, dir:1}));
   // the district's CORE system finally becomes a real beat, not a walk-past: a ground hopper + a second
   // wisp flank the approach (D2's mandated "first combos" across lanes), and a mid-pocket relight lantern

@@ -199,7 +199,7 @@ function buildW4L3(G){
 
   // =============================== BEAT 7 — THE KEEPER'S DOOR (x 124..168): finish ===============================
   groundX(G, 124, 168, SEA);
-  signPost(G, 128, 1.7, -0.1, "THE KEEPER'S DOOR. You climbed to the lamp and read its rhythm - the Captain out on the water fears exactly that light. Through here.");
+  signPost(G, 128, 1.7, -0.1, "THE KEEPER'S DOOR. You climbed to the lamp and read its rhythm - the Captain out where the sea used to be fears exactly that light. Through here.");
   G.ents.add(new BooBuccaneer(G, 134, 0, 0, {phase:0.2}));           // one last ground ghost on the run-out
   candyLine(G, [[126,0.9,0],[129,0.9,0]], 3);
   candyLine(G, [[144,0.9,0],[147,0.9,0],[150,0.9,0]], 3);

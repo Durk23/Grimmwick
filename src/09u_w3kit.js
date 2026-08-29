@@ -282,7 +282,9 @@ function w3Web(G, x, y0, y1, z=0, w=3){
   // a couple of diagonal guy-strands for that hand-spun look
   for(let d=-1;d<=1;d+=2){
     const diag = new THREE.Mesh(geo('cyl',0.02,0.02,Math.hypot(w,h),4), wm);
-    diag.position.set(x, y0+h/2, z); diag.rotation.z = d*Math.atan2(h,w); g.add(diag);
+    // a cylinder's axis is VERTICAL — lean it by the COMPLEMENT so it lies corner-to-corner
+    // (atan2(h,w) left wide webs with near-upright strands stabbing past the top and bottom)
+    diag.position.set(x, y0+h/2, z); diag.rotation.z = d*(Math.PI/2 - Math.atan2(h,w)); g.add(diag);
   }
   G.scene.add(mergeStrands(g, wm));   // ~15-24 transparent strand meshes → 1 draw call (w3l2 has 10 webs)
   return G.world.addBox(x, y0, z, w, h, 1.2, {type:'climb'});
@@ -461,8 +463,8 @@ class CauldronDip {
     AUDIO.goldPumpkin();
     AUDIO.noise({t:0.25,vol:0.14,fFrom:1400,fTo:300});
     if(brew==='shield'){ pl.gainShield(); UI.toast('🫧🛡️ BUBBLE BREW! A gummy shield — absorbs one hit.'); }
-    else if(brew==='bat'){ pl.gainBat(); UI.toast('🫧🦇 SWOOP BREW! Bat wings — tap jump to flutter!'); AUDIO.ghostGiggle(); }
-    else if(brew==='salt'){ pl.armWeapon('salt'); UI.toast('🫧🧂 SOUR BREW! Salt shaker armed — spin to fling it.'); }
+    else if(brew==='bat'){ pl.gainBat(); UI.toast('🫧🦇 SWOOP BREW! Bat Wings — jump again in the air to flutter!'); AUDIO.ghostGiggle(); }
+    else if(brew==='salt'){ pl.armWeapon('salt'); UI.toast('🫧🧂 SOUR BREW! Salt Shaker armed — SPIN to fling it!'); }
     else { pl.moonT = 10; UI.toast('🫧🌙 MOON BREW! Unstoppable for 10 seconds!'); }
   }
 }

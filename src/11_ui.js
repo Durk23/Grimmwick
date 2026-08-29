@@ -7,7 +7,7 @@ const STORY_SLIDES = [
 const MAYOR_LINES = [
   '"Pip! Thank goodness you\'re here. Grimm\'s shadow put every grown-up spirit into a gloomy sleepwalk — you\'re the only one he overlooked. Being small has its perks!"',
   '"Each guardian clutches a stolen ember. Start with the PUMPKIN KING — the Pumpkin Patch gate is the only one still open. He was the kindest of them all... bring him back to us."',
-  '"Collect candy 🍬 and trade it at the Costume Cauldron! And keep an eye out — 3 GOLDEN PUMPKINS are hidden in every district. They say gold pumpkins sweeten the Everflame."',
+  '"Collect candy 🍬 and trade it at the Costume Cauldron! And keep an eye out — 3 GOLDEN PUMPKINS are hidden in every district. They say golden pumpkins sweeten the Everflame."',
   '"Boos are terribly shy — stare right at them and they freeze! The Pumpkin King, though... he\'s not shy. Bring your bouncing shoes, little one."',
 ];
 
@@ -632,7 +632,7 @@ const UI = {
       const hPrice = {3:500, 4:1500}[G.save.maxHearts];
       const hDiv = document.createElement('div'); hDiv.className='item';
       hDiv.innerHTML = `<div class="sw" style="background:linear-gradient(135deg,#ff4d6d 60%,#8f1030);display:flex;align-items:center;justify-content:center;font-size:30px">❤️</div>
-        <h4>Heart Container</h4><p>${G.save.maxHearts>=5?'FIVE hearts — a true legend of Grimmwick.':'A bigger health bar, forever. Also FREE at 12⭐ and 30⭐!'}</p>
+        <h4>Heart Container</h4><p>${G.save.maxHearts>=5?'FIVE hearts — a true legend of Grimmwick.':'One more heart, forever. Also FREE at 12⭐ and 30⭐!'}</p>
         <button class="btn buy ui-block ${hPrice?'orange':'ghost2'}">${hPrice?('🍬 '+hPrice+' — heart #'+(G.save.maxHearts+1)):'✓ MAXED'}</button>`;
       if(hPrice) wire(hDiv.querySelector('button'), ()=>{
         if(G.save.candy>=hPrice){ G.save.candy-=hPrice; grantHeart(); G.persist(); AUDIO.buy(); }
@@ -843,7 +843,7 @@ const UI = {
   },
   _mapActivate(i){
     const n=(this._mapNodes||[])[i]; if(!n) return;
-    if(n.st==='lock'){ this.toast(n.boss ? '🔒 Light every lantern on the path first!' : '🔒 Beat the level before it first'); return; }
+    if(n.st==='lock'){ this.toast(n.boss ? '🔒 Light every lantern on the path first!' : '🔒 Beat the lantern before this one first!'); return; }
     this._mapSetSel(i);
     AUDIO.ui();
     this.hideMap();

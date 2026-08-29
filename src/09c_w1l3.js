@@ -60,12 +60,13 @@ function buildW1L3(G){
   buildWebNet(G, 18.6, 0.4, 1.8, 3.6);
   G.ents.add(new Checkpoint(16, 0, 1.4, 0));
   G.ents.add(new BonkLantern(G, 20, 1.4, 0, 'bat'));
-  signPost(G, 18, 1.8, 0.25, 'Something shiny sits on the silo... bat wings sure would help. Webs above - watch your head!');
+  signPost(G, 18, 1.8, 0.25, 'Something shiny sits on the silo... BAT WINGS sure would help. Webs above - watch your head!');
 
   // ---- the silo + its gold ----
   const silo = mesh('cyl',[1.8,2,7.5,12], mat(0x9aa7b8)); silo.position.set(25,3.75,0); S.add(silo);
   const siloCap = mesh('cone',[2,1.4,12], mat(0x6a3c8f)); siloCap.position.set(25,8.2,0); S.add(siloCap);
   G.world.addBox(25,0,0, 3.7,7.5,3.7,{});
+  G.world.addBox(25,7.5,0, 2.4,0.85,2.4,{});   // the cone cap gets a stand-on top — Pip perches ON the roof, not inside it
   buildVine(G, 22.6, 0.4, 7.8);   // climb the silo vine — the honest route to the gold
   G.ents.add(new GoldPumpkin(25, 9.3, 0, 1));
   G.ents.add(new Boo(G, 28, 0, 0, {speed:2.3}));

@@ -74,7 +74,7 @@ function buildW5L1(G){
   // =============================== BEAT 1 — THE GATEHOUSE (x -8..30): INTRODUCE the bow ===============================
   groundX(G, -8, 118, STONE);                                          // the low road runs unbroken to the chasm at 118
   G.ents.add(new Checkpoint(2, 0, 1.6, 0, {noLight:true}));            // CP0 — start
-  signPost(G, 5, 1.7, -0.12, "GRIMM'S KEEP. Every clock here stopped the night the flame went out. Mind the brass knights - they BOW before they strike, so the bow is your cue to step aside and answer. Ride the cogs high for the treasure.");
+  signPost(G, 5, 1.7, -0.12, "GRIMM'S KEEP. Every clock here stopped the night the flame went out. Mind the brass knights - they BOW before they strike, so when you see the bow, step aside — then bonk them back! Ride the cogs high for the treasure.");
   // CLOCKWORK KNIGHT #1 — alone on wide safe stone. Watch it bow (~0.6s), sidestep the lunge, then punish (a pound one-shots).
   G.ents.add(new ClockworkKnight(G, 16, 0, 0, {phase:0.0, range:2.4, dir:-1, speed:1.3}));
   candyLine(G, [[6,0.9,0],[10,0.9,0],[13,0.9,0]], 3);
@@ -128,7 +128,7 @@ function buildW5L1(G){
   G.ents.add(new MirrorBoo(G, 110, 3.0, 0, {range:4.5, mirror:0.85}));  // disorienting air floater by the clocks
   candyLine(G, [[101,0.9,0],[106,0.9,0],[110,0.9,0],[114,0.9,0]], 4);
   G.ents.add(new Crow(106, 0.95, 2.6));                             // foreground critter
-  signPost(G, 116, 1.7, 0.1, "THE FROZEN GEARS. The floor gives out ahead - the great cogs stalled mid-turn make the only crossing. Read their rhythm and hop tooth to tooth.");
+  signPost(G, 116, 1.7, 0.1, "THE FROZEN GEARS. The floor gives out ahead - the turning cogs are the only crossing. Don't stand still — a turning wheel carries you right off its edge! Hop tooth to tooth.");
 
   // =============================== BEAT 5 — THE GEAR BRIDGE (x 118..150): ESCALATE — cross the chasm on cogs ===============================
   // the low road ENDS at 118; a frozen-gear chasm to 150 (a miss = a heart + the walk back to CP1). Static standable cogs

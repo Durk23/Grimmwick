@@ -102,7 +102,7 @@ class GrimmCauldron {
     this.brew.material.color.lerpColors(new THREE.Color(0x1a0e22), new THREE.Color(0xff9ecf), litFrac);
     this.brew.material.emissive.lerpColors(new THREE.Color(W5PAL.shadowP), new THREE.Color(0xffb0d8), litFrac);
     window.UI && UI.updateBossBar(4 - this.litCount);
-    window.UI && UI.toast(this.litCount>=4 ? '🔥 The brew is SWEET — Grimm is flushed out!' : `🔥 Ember ${this.litCount}/4 fed — an attack fades, the dark recoils! (${b.attack} stripped)`);
+    window.UI && UI.toast(this.litCount>=4 ? '🔥 The brew is SWEET — Grimm is flushed out!' : `🔥 Ember ${this.litCount}/4 fed — one of Grimm's tricks fizzles out, and the dark shrinks back!`);
   }
 
   // ---- attacks (each fixed-clock; stripped ones are skipped) ----
@@ -188,8 +188,8 @@ class GrimmCauldron {
     switch(this.state){
       case 'intro': {
         if(this.stateT>1.0 && !this._introDlg){ this._introDlg=true; G.camc.shake(0.5,0.5);
-          window.UI && UI.dialogue('🫥', '"You. The little one they FORGOT to forget. You took back my embers, my districts, my SHADOWS... but you\'ll not take my brew. Come and be a copy, like all the rest."'); }
-        if(this.stateT>1.3 && !this._hint){ this._hint=true; window.UI && UI.toast('🔥 The whole night has been about relighting flames — stand CLOSE to a burner to POUR an ember in. He hates a sweet brew.'); }
+          window.UI && UI.dialogue('🫥', '"You. The little one even I forgot. You took back my embers, my districts, my SHADOWS... but you\'ll not take my brew. Come and be a copy, like all the rest."'); }
+        if(this.stateT>1.3 && !this._hint){ this._hint=true; window.UI && UI.toast('🔥 STAND CLOSE to a burner to pour an ember in — the whole night has led to this. He HATES a sweet brew.'); }
         if(this.stateT>1.5){ this.state='fight'; this.stateT=0; this.nextAtk=this.t+1.0; }
         break;
       }
@@ -240,7 +240,7 @@ class GrimmCauldron {
         this.eyeL.scale.setScalar(0.7); this.eyeR.scale.setScalar(0.7);
         if(!this._flushHint){ this._flushHint=true;
           window.UI && UI.finaleBanner('🫥 GRIMM IS FLUSHED OUT — walk up & press ANY button', 3600);
-          window.UI && UI.toast('👆 It was never a fight. Walk up to Grimm and press ANY button (JUMP / SPIN / 💥 / E).');
+          window.UI && UI.toast('👆 It was never a fight. Walk up to Grimm and press ANY button — jump, spin, anything.');
           // an unmissable bouncing golden marker over his head — the "come here" every platformer kid knows
           const mk = new THREE.Group();
           const arrow = new THREE.Mesh(geo('cone',0.34,0.7,6), new THREE.MeshLambertMaterial({color:0xffd23f, emissive:0xffb020, emissiveIntensity:1}));

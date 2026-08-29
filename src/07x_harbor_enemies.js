@@ -17,6 +17,7 @@ class BooBuccaneer extends Enemy {
     this.speed = opts.speed||2.4;
     this.slowMul = opts.slowMul!==undefined?opts.slowMul:0.42;   // still creeps when stared at (not 0 like a shy Boo)
     this.range = opts.range||12;
+    this.leash = opts.leash||7;   // holds his post: chases only this far from home, drifts back when you're gone (determinism — the gauntlet stays a gauntlet)
     this.hitR=0.55; this.headH=1.1; this.hitY=0.5; this.touchR=0.72; this.candyDrop=opts.candy!==undefined?opts.candy:3;
     const bodyM = new THREE.MeshLambertMaterial({color:0x8fd8c0, emissive:0x2c6a58, emissiveIntensity:0.55, transparent:true, opacity:0.9});
     this.bodyMesh = new THREE.Mesh(geo('sph',0.5,10,9), bodyM); this.bodyMesh.position.y=0.75; this.bodyMesh.scale.set(1,1.1,1);
@@ -37,9 +38,11 @@ class BooBuccaneer extends Enemy {
     this.t += dt;
     const pl = this.G.player, p = this.group.position;
     p.y = this.home.y + Math.sin(this.t*2.4)*0.16 + 0.35;
+    let chasing = false;
     if(pl && !pl.dead){
       const dx = pl.pos.x-p.x, dz = pl.pos.z-p.z, d = Math.hypot(dx,dz)||1;
       if(d < this.range){
+        chasing = true;
         const pfx = Math.sin(pl.facing), pfz = Math.cos(pl.facing);
         const dirX = (p.x-pl.pos.x)/d, dirZ = (p.z-pl.pos.z)/d;
         const face = pfx*dirX + pfz*dirZ;
@@ -53,7 +56,14 @@ class BooBuccaneer extends Enemy {
           p.z += dirZ*-1*this.speed*mul*dt;
           this.group.rotation.y = Math.atan2(pl.pos.x-p.x, pl.pos.z-p.z);
         }
+        // the leash: he defends his stretch of deck, he doesn't follow you across the ship
+        const hx = p.x-this.home.x, hz = p.z-this.home.z, hd = Math.hypot(hx,hz);
+        if(hd > this.leash){ p.x = this.home.x + hx/hd*this.leash; p.z = this.home.z + hz/hd*this.leash; }
       } else this.stared=false;
+    }
+    if(!chasing){   // off-duty: drift back to his post so the gauntlet resets like everything else
+      p.x = damp(p.x, this.home.x, 1.4, dt);
+      p.z = damp(p.z, this.home.z, 1.4, dt);
     }
     // wink: one eye squints when stared at; cutlass raises when charging free
     this.eyeL.scale.y = damp(this.eyeL.scale.y, this.stared?0.3:1, 12, dt);

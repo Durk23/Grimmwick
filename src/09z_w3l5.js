@@ -194,7 +194,7 @@ function buildW3L5(G){
 
   // ================= ACT 1 — THE CROOKED THRESHOLD (x -8..48) : INTRODUCE each verb =================
   groundX(G, -8, 48, GRND);
-  signPost(G, 2, 1.9, -0.2, "BROOMHILDA'S HOLLOW — the deepest Witchwood, where the paths were once kept clean and safe. They are... not, anymore. Mind the brooms.");
+  signPost(G, 2, 1.9, -0.2, "BROOMHILDA'S HOLLOW — the deepest Witchwood, where the paths were once kept clean and safe. They are... not anymore. Mind the brooms.");
   G.ents.add(new BonkLantern(G, 4, 1.3, 0, 'shield'));                 // opening mercy vessel
   G.ents.add(new Checkpoint(8, 0, 1.4, 0, {noLight:true}));            // lantern 1 (emissive only — save the light budget)
   candyLine(G, [[0,0.9,0],[4.5,0.9,0]], 3);
@@ -228,7 +228,7 @@ function buildW3L5(G){
   // ================= ACT 2 — THE WEB GALLERY (x 48..98) : TWIST — climb + weblings + the gamble =================
   groundX(G, 48, 98, GRND);
   G.ents.add(new Checkpoint(52, 0, 1.4, 1, {noLight:true}));          // lantern 2
-  signPost(G, 50, 1.9, -0.2, "WEBLINGS spin walls across the path. Break one with a swing (or a stomp on the spider), or take the GIANT WEB up and over. The high road pays better.");
+  signPost(G, 50, 1.9, -0.2, "WEBLINGS spin walls across the path. Break one with a SPIN (or a stomp on the spider), or take the GIANT WEB up and over. The high road pays better.");
   candyLine(G, [[54,0.9,0],[57,0.9,0]], 3);
   // the Webling weaves a breakable wall across the low lane
   G.ents.add(new Webling(G, 58, 0, 0, {phase:0, period:5.5, firstWeb:2.6, webW:2.6, wallH:3.0, webLife:4, candy:4}));
@@ -312,7 +312,7 @@ function buildW3L5(G){
   groundX(G, 152, 216, GRND);                                        // one flat run — the gauntlet stays clean for a readable rhythm
   G.ents.add(new Checkpoint(154, 0, 1.4, 3, {noLight:true}));         // lantern 4 — the mercy right BEFORE the gauntlet
   G.ents.add(new CauldronDip(156.5, 0, 0, {light:true}));            // ARM UP — a random brew (shield/moon/wings/salt) for the run
-  signPost(G, 158, 1.9, 0.2, "THE BROOM PROCESSIONAL. Her brooms sweep the whole approach on a fixed rhythm. Time your leaps, use the stumps to catch a breath. Reach her clearing.");
+  signPost(G, 158, 1.9, 0.2, "THE BROOM PROCESSIONAL. Her brooms sweep the whole approach in a steady rhythm. Time your leaps, use the stumps to catch a breath. Reach her clearing.");
   // THE BROOM-SWEEP GAUNTLET: the rack at the finish end casts brooms LEFT down the corridor 159..194, on a fixed clock
   w3l5BroomRack(G, 194, {period:2.7, tele:0.8, firstCast:2.6, speed:7.0, despawnX:159, rackY:4.4});
   // two safe stumps to perch on above a sweep (a broom passes harmlessly under a y1.2 perch) — the "generous safe lanes"

@@ -45,7 +45,7 @@ function buildW4L1(G){
 
   // =============================== BEAT 1 — THE MISTY DOCKS (x -8..36): INTRODUCE the Boo Buccaneer ===============================
   groundX(G, -8, 36, SEABED);
-  signPost(G, 2, 1.7, -0.2, 'THE MISTY DOCKS — the sea went out with the flame. Mind the ghost crew: a pirate Boo winks and slows when you FACE it, but the bold ones never quite stop. Watch its feet.');
+  signPost(G, 2, 1.7, -0.2, 'THE MISTY DOCKS — the sea went out with the flame. Mind the ghost crew: a pirate Boo winks and slows when you FACE it, but the bold ones never quite stop. Watch their feet.');
   // BOO BUCCANEER #1 — the headline enemy in isolation on flat, safe ground. Slow + short range so the player
   // has room to FACE it and read the stare->SLOW twist (it keeps creeping, just at 0.42x). A tap-stomp pops it.
   G.ents.add(new BooBuccaneer(G, 16, 0.2, 0, {phase:0.0, speed:2.1, range:9, candy:3}));

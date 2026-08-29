@@ -27,22 +27,24 @@ function buildTutorial(G){
 
   // 2) jump + double jump (hay steps, no pits — nothing here can hurt you)
   signPost(G, 19, 1.8, 0.2, INPUT.isTouch ?
-    'Tap A to JUMP... and tap it AGAIN in the air. My double-boo bounce! \u2014 Gran \u2665' :
+    'Tap JUMP... then tap it AGAIN in the air. My double-boo bounce! \u2014 Gran \u2665' :
     'SPACE to JUMP... and press it AGAIN in the air. My double-boo bounce! \u2014 Gran \u2665');
   hayBale(G, 24, 0, 0, 2.2, 1.2, 1.6);
   hayBale(G, 28, 0, 0, 2.2, 2.4, 1.6);
   candyLine(G, [[24,2,0],[28,3.6,0]], 4);
 
   // 3) climb the web-net
-  signPost(G, 34, 1.8, -0.25, 'See the practice web? Hold UP to climb it. The spiders lent it to me. \u2014 Gran \u2665');
+  signPost(G, 34, 1.8, -0.25, INPUT.isTouch ?
+    'See the practice web? Push the stick UP to CLIMB it. The spiders lent it to me. \u2014 Gran \u2665' :
+    'See the practice web? Hold UP (or W) to CLIMB it. The spiders lent it to me. \u2014 Gran \u2665');
   buildWebNet(G, 38, 0.4, 1.8, 3.6);
   platform(G, 41.5, 3.4, 0, 3, 3, 0x5a4066);
   candyLine(G, [[38,2,0],[41.5,4.6,0]], 4);
 
   // 4) spin attack targets
   signPost(G, 47, 1.8, 0.2, INPUT.isTouch ?
-    'SPIN your candy bag (B) at the practice pumpkins! Or bop them from above. \u2014 Gran \u2665' :
-    'SPIN your candy bag (J) at the practice pumpkins! Or bop them from above. \u2014 Gran \u2665');
+    'Tap SPIN to swing your candy bag at the practice lanterns! Or BONK them from above. \u2014 Gran \u2665' :
+    'SPIN your candy bag (J) at the practice lanterns! Or BONK them from above. \u2014 Gran \u2665');
   G.ents.add(new BonkLantern(G, 51, 1.3, 0, 'candy'));
   G.ents.add(new BonkLantern(G, 54, 1.3, 0, 'candy'));
 

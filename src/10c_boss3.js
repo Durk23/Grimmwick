@@ -266,7 +266,7 @@ class Broomhilda {
   _clearDiveWarn(){ if(this.diveWarn){ this.G.scene.remove(this.diveWarn); this.diveWarn = null; } }
 
   _sneeze(){
-    window.UI && UI.toast('🤧 Cauldron fumes make Broomhilda SNEEZE — a breath to strike!');
+    window.UI && UI.toast('🤧 Cauldron fumes make Broomhilda SNEEZE — now\'s your chance!');
     const p = this.pos;
     this.G.fx.spawn(new THREE.Vector3(p.x, p.y+0.4, 0.5), 0x9dffe0, 8, {speed:3, life:0.4});
     AUDIO.noise && AUDIO.noise({t:0.15, vol:0.14, fFrom:1200, fTo:400});
@@ -386,7 +386,7 @@ class Broomhilda {
         this.body.rotation.x = damp(this.body.rotation.x, 0, 8, dt);
         if(!this.bristleOpen && Math.abs(p.y - this.lowY) < 0.6){
           this.bristleOpen = true;
-          if(!this._castHint){ this._castHint = true; window.UI && UI.toast('✨ Her bristles are SPARKLING — SPIN them TWICE to buck her off! (swats carry over)'); }
+          if(!this._castHint){ this._castHint = true; window.UI && UI.toast('✨ Her bristles are SPARKLING — SPIN them TWICE to buck her off! One swat now still counts next time!'); }
           if(!this._sneezed){ this._sneezed = true; this._sneeze(); }   // one-time flavor dodge/strike cue
         }
         if(this.bristleOpen){ this.body.rotation.z = Math.sin(this.t*6)*0.06; }   // weaving a spell

@@ -93,7 +93,7 @@ class CaptainWraith {
     AUDIO.checkpoint && AUDIO.checkpoint();
     this.G.fx.spawn(new THREE.Vector3(l.x, 1.8, -0.6), W4PAL.lantern, 14, {speed:2.5, gravity:1});
     this.G.camc.shake(0.15, 0.2);
-    if(window.UI) UI.toast(this.litCount>=4 ? '🔦 All four lit — his mist BURNS away!' : `🔦 Lantern ${this.litCount}/4 — keep him STARED down and light the rest!`);
+    if(window.UI) UI.toast(this.litCount>=4 ? '🔦 All four lit — his mist BURNS away!' : `🔦 Lantern ${this.litCount}/4 — keep STARING him down and light the rest!`);
   }
   _darkenLanterns(){
     for(const l of this.lanterns){
@@ -113,7 +113,7 @@ class CaptainWraith {
     this.G.fx.spawn(new THREE.Vector3(this.pos.x, this.pos.y+1.2, 0), W4PAL.lantern, 24, {speed:6});
     this.G.fx.spawn(new THREE.Vector3(this.pos.x, this.pos.y+1.2, 0), 0xffffff, 12, {speed:4});
     window.UI && UI.updateBossBar(this.hp);
-    window.UI && UI.toast(this.hp>0 ? ['', '"My SHIP... my CREW...!"', '"You cannot LIGHT what the sea DROWNED!"'][this.hp] : '');
+    window.UI && UI.toast(this.hp>0 ? ['', '"My SHIP... my CREW...!"', '"LIGHT? The light went out when the SEA did, little spark!"'][this.hp] : '');
     if(this.hp<=0){ this.defeat(); return; }
     this.phase = this.maxHp - this.hp + 1;
     this.vulnerable = false; this.state = 'enrage'; this.stateT = 0;
@@ -174,7 +174,7 @@ class CaptainWraith {
       case 'intro': {
         p.x = damp(p.x, 6, 3, dt); p.y = damp(p.y, this.driftY, 3, dt);
         if(this.stateT>1.2 && !this._introDlg){ this._introDlg=true; G.camc.shake(0.5,0.4);
-          window.UI && UI.dialogue('🏴‍☠️', '"Har! Another little tide-treader for my crew? The sea took my ship, boy — and I\'ll take YOU before I let a spark near my deck!"'); }
+          window.UI && UI.dialogue('🏴‍☠️', '"Har! Another little tide-treader for my crew? The sea went out with the flame, child — and I\'ll take YOU before I let a single spark near my deck!"'); }
         if(this.stateT>1.4 && !this._pollyHint){ this._pollyHint=true; window.UI && UI.toast('🦜 Peg-Leg Polly squawks: "He HATES the light! Stare him down, light the four! SQUAWK!"'); }
         if(this.stateT>1.6){ this.state='hunt'; this.stateT=0; }
         break;
@@ -204,7 +204,7 @@ class CaptainWraith {
         if(this.litCount>=4){ this.state='exposed'; this.stateT=0; this.vulnerable=true; this.hitDone=false; this.exposeT=(this.phase>=3?3.0:3.6);
           p.y=0.9; G.camc.shake(0.5,0.4); AUDIO.poundHit && AUDIO.poundHit();
           this.G.fx.spawn(new THREE.Vector3(p.x,1.2,0), W4PAL.lantern, 22, {speed:5});
-          if(!this._exposeHint){ this._exposeHint=true; window.UI && UI.toast('⭐ SOLID and reeling — HIT him! (stomp / spin / 💥)'); } }
+          if(!this._exposeHint){ this._exposeHint=true; window.UI && UI.toast('⭐ He\'s SOLID and DIZZY — HIT him! (stomp / spin / 💥)'); } }
         break;
       }
       case 'exposed': {
@@ -223,7 +223,7 @@ class CaptainWraith {
         if(this.stateT > this.exposeT){   // window survived — he re-forms as mist and it starts over
           this.vulnerable=false; this.body.rotation.z=0; this._darkenLanterns();
           this.state='hunt'; this.stateT=0;
-          window.UI && UI.toast('👻 ...his mist reknits. Light them again!');
+          window.UI && UI.toast('👻 His mist swirls back together — light the lanterns again!');
         }
         break;
       }

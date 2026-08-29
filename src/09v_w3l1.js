@@ -64,7 +64,7 @@ function buildW3L1(G){
 
   // =============================== BEAT 1 — THE TRAILHEAD (x -8..30): INTRODUCE the broom leap ===============================
   groundX(G, -8, 30, FLOOR);
-  signPost(G, 2, 1.7, -0.2, 'THE CROOKED PATH — the trees lean where no wind blows. Leap the wandering brooms, and watch the crooks: spiders nest up there.');
+  signPost(G, 2, 1.7, -0.2, 'THE CROOKED PATH — the trees lean where no wind blows. Leap the wandering brooms, and watch the branches above: spiders nest up there.');
   // a Widowmite SWARM (3) — knee-high, an easy tap-stomp each; teaches the tap-jump before anything bites hard
   G.ents.add(new Widowmite(G, 8,  0, 0, {phase:0.0, range:2, axis:'x', speed:4.4}));
   G.ents.add(new Widowmite(G, 10, 0, 0, {phase:0.5, range:2, axis:'x', speed:4.4, dir:-1}));
@@ -117,7 +117,7 @@ function buildW3L1(G){
 
   // =============================== BEAT 4 — THE CAULDRON CLEARING (x 88..118): BREATHE — the Mystery Cauldron + a Cauldron Dip ===============================
   groundX(G, 88, 118, GLADE);
-  signPost(G, 90, 1.6, 0.2, "Broomhilda's clearing. Mind what bubbles... and mind what bubbles back.");
+  signPost(G, 90, 1.6, 0.2, "A witch's clearing. Mind what bubbles... and mind what bubbles back.");
   // THE MYSTERY CAULDRON — the D3 gamble, in a CLEAR pocket off the running lane (CLEAR-PATCH LAW): the
   // nearest patrol is broom #2 ending ~10u back and spider #2 ~18u on; nothing sweeps within 6u of it.
   { const mc = new MysteryCauldron(94, 0, 1.7, -0.2);

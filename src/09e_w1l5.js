@@ -218,7 +218,9 @@ function buildW1L5(G){
 
   // --- G5 + Station 5: THE SPRING (void 169..177; only a wound spring reaches the shelf) ---
   groundX(G, 164, 169, 0x4c3f5e);
-  signPost(G, 165, 0.25, 0.15, 'Station the Fifth and Final: THE SPRING. Hold 💥 to wind, let go to fly. Mind the gap. — The (nervous) Management');
+  signPost(G, 165, 0.25, 0.15, INPUT.isTouch ?
+    'Station the Fifth and Final: THE SPRING. Hold 💥 to wind, let go to fly. Mind the gap. — The (nervous) Management' :
+    'Station the Fifth and Final: THE SPRING. Hold K to wind, let go to fly. Mind the gap. — The (nervous) Management');
   const springboard = mesh('box',[1.4,0.18,2.2], emat(0xffd34d,0x7a5a10,0.4)); springboard.position.set(166.5,0.09,0); S.add(springboard);
   platform(G, 172.5, 3.7, 0, 9, 3, 0x5a4066);    // the spring shelf: top y3.7 (above double's 3.3, under spring's 4.4), x168..177
   candyLine(G, [[166.5,1.1,0],[166.9,3.5,0],[168.2,3.9,0]], 3);   // wind → launch → steer → land
