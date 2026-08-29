@@ -602,31 +602,6 @@ const UI = {
         });
         grid.appendChild(div);
       }
-      // ---- CHARACTERS — story unlocks, never sold ----
-      const kh = document.createElement('div');
-      kh.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';
-      kh.textContent = '🕯️ CHARACTERS: story unlocks';
-      grid.appendChild(kh);
-      for(const key in COSTUMES){
-        const c = COSTUMES[key];
-        if(!c.character) continue;
-        const owned = G.save.owned.includes(key);
-        const equipped = G.save.equipped===key;
-        const div = document.createElement('div');
-        div.className='item';
-        const pv = this.costumePreview(key);
-        const swInner = pv ? `<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:${owned?'drop-shadow(0 3px 5px rgba(0,0,0,.45))':'brightness(0.12) drop-shadow(0 0 8px rgba(120,80,200,.6))'}" alt="">` : '';
-        div.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(255,150,60,.18), transparent 60%), linear-gradient(135deg,#2c2450 60%,#4a3a6e)">${swInner}</div>
-          <h4>${owned?c.name:'? ? ?'}</h4><p>${owned?c.desc:'Someone is still waiting for an invitation. Finish the story to meet him.'}</p>
-          <button class="btn buy ui-block ${equipped?'ghost2':(owned?'orange':'ghost2')}">${equipped?'✓ Equipped':(owned?'Play as him':'🕯️ Save the night to unlock')}</button>`;
-        this.bindTap(div.querySelector('button'), ()=>{
-          if(equipped) return;
-          if(!owned){ AUDIO.ui(); this.toast('🕯️ Grimm joins your wardrobe when the story is done. Save the night!'); return; }
-          G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy();
-          this.renderShop('costumes'); this.updateHUD();
-        });
-        grid.appendChild(div);
-      }
       const ch = document.createElement('div');
       ch.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';
       ch.textContent = '🎩 COSTUMES: whole new looks';
@@ -721,11 +696,51 @@ const UI = {
       });
       ug.appendChild(mDiv);
     } else if(tab==='chars'){
-      body.innerHTML = `<div id="shopGrid">
-        <div class="item"><div class="sw" style="background:linear-gradient(135deg,#f2f0ff 60%,#d8d4f0)"></div><h4>Pip</h4><p>The smallest hero in Grimmwick. Never underestimated twice.</p><button class="btn buy ghost2">✓ Playing</button></div>
-        <div class="item"><div class="sw" style="background:linear-gradient(135deg,#8e5bd9 60%,#3d2178)"></div><h4>Zoe the Witchling</h4><p>Double-jump becomes a broom glide! Arrives in Update 2.</p><button class="btn buy ghost2">Coming soon</button></div>
-        <div class="item"><div class="sw" style="background:linear-gradient(135deg,#2a2438 60%,#0d0a18)"></div><h4>??? </h4><p>They say the shadow himself might join you... if you finish the story.</p><button class="btn buy ghost2">🔒 Story</button></div>
-      </div>`;
+      body.innerHTML = `<div id="shopGrid"></div>`;
+      const grid = body.querySelector('#shopGrid');
+      const isChar = k => !!(COSTUMES[k] && COSTUMES[k].character);
+      const playingPip = !isChar(G.save.equipped||'kid');
+      // --- PIP — the hero, wearing whatever costume was last equipped ---
+      const pipLook = playingPip ? (G.save.equipped||'kid') : (G.save.prevCostume||'kid');
+      const pipDiv = document.createElement('div');
+      pipDiv.className='item';
+      const pipPv = this.costumePreview(pipLook, G.save.mask);
+      pipDiv.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%), linear-gradient(135deg,#f2f0ff33 60%,#d8d4f066)">${pipPv?`<img src="${pipPv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">`:''}</div>
+        <h4>Pip</h4><p>The smallest hero in Grimmwick. Never underestimated twice.</p>
+        <button class="btn buy ui-block ${playingPip?'ghost2':'orange'}">${playingPip?'✓ Playing':'Play as Pip'}</button>`;
+      this.bindTap(pipDiv.querySelector('button'), ()=>{
+        if(playingPip) return;
+        G.save.equipped = G.save.prevCostume||'kid'; G.player && G.player.buildRig(G.save.equipped);
+        G.persist(); AUDIO.buy(); this.renderShop('chars'); this.updateHUD();
+      });
+      grid.appendChild(pipDiv);
+      // --- CHARACTER UNLOCKS (Grimm) — story-earned, never sold ---
+      for(const key in COSTUMES){
+        const c = COSTUMES[key];
+        if(!c.character) continue;
+        const owned = G.save.owned.includes(key);
+        const equipped = G.save.equipped===key;
+        const div = document.createElement('div');
+        div.className='item';
+        const pv = this.costumePreview(key);
+        const swInner = pv ? `<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:${owned?'drop-shadow(0 3px 5px rgba(0,0,0,.45))':'brightness(0.12) drop-shadow(0 0 8px rgba(120,80,200,.6))'}" alt="">` : '';
+        div.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(255,150,60,.18), transparent 60%), linear-gradient(135deg,#2c2450 60%,#4a3a6e)">${swInner}</div>
+          <h4>${owned?c.name:'? ? ?'}</h4><p>${owned?c.desc:'Someone is still waiting for an invitation. Finish the story to meet him.'}</p>
+          <button class="btn buy ui-block ${equipped?'ghost2':(owned?'orange':'ghost2')}">${equipped?'✓ Playing':(owned?'Play as him':'🕯️ Save the night to unlock')}</button>`;
+        this.bindTap(div.querySelector('button'), ()=>{
+          if(equipped) return;
+          if(!owned){ AUDIO.ui(); this.toast('🕯️ Grimm joins you when the story is done. Save the night!'); return; }
+          if(!isChar(G.save.equipped||'kid')) G.save.prevCostume = G.save.equipped||'kid';   // remember Pip's look for the way back
+          G.save.equipped = key; G.player && G.player.buildRig(key);
+          G.persist(); AUDIO.buy(); this.renderShop('chars'); this.updateHUD();
+        });
+        grid.appendChild(div);
+      }
+      // --- ZOE — Update 2 tease ---
+      const zoe = document.createElement('div');
+      zoe.className='item';
+      zoe.innerHTML = `<div class="sw" style="height:110px;background:linear-gradient(135deg,#8e5bd9 60%,#3d2178)"></div><h4>Zoe the Witchling</h4><p>Double-jump becomes a broom glide! Arrives in Update 2.</p><button class="btn buy ghost2 ui-block">Coming soon</button></div>`;
+      grid.appendChild(zoe);
     } else {
       // 25 tiers — one per level completed. [free, premium, marquee?]
       setTimeout(()=>{
