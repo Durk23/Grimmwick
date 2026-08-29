@@ -609,7 +609,7 @@ const UI = {
       for(const key in COSTUMES){
         const c = COSTUMES[key];
         if(c.pass && !G.save.owned.includes(key)) continue;   // v1.0 launch: pass-exclusive looks hidden until the Spook Pass ships (owners from testing keep theirs)
-        if(c.retired && !G.save.owned.includes(key)) continue;   // retired from the rack — anyone who owns it keeps it forever
+        if(c.retired) continue;   // retired from the rack entirely (owners keep the data; a future season can re-release them)
         const owned = G.save.owned.includes(key);
         const equipped = G.save.equipped===key;
         const div = document.createElement('div');
