@@ -52,6 +52,9 @@ const UI = {
       #btnC { width:56px; height:56px; font-size:20px; background:radial-gradient(circle at 35% 30%, #63c6e6, #2a7fa8); margin-right:8px; }
       /* landscape + touch: keep dialogue/sign text clear of the right-hand action buttons (owner: horizontal is the primary orientation) */
       @media (orientation:landscape){ .touch #dlg{ left:16px; right:210px; transform:none; width:auto; max-width:600px; margin-inline:auto; } .touch #prompt{ bottom:200px; } }
+      /* town interactions pop — a real orange button you can't miss (levels keep the quiet pill) */
+      #prompt.hot { background:linear-gradient(180deg,#ffb02e,#ff7b2e) !important; border:1px solid #ffd98a !important; color:#2a1608 !important; font-weight:800; font-size:14px; padding:8px 18px; box-shadow:0 0 18px rgba(255,150,40,.55), 0 3px 10px rgba(0,0,0,.4) !important; animation:promptPulse 1.6s ease-in-out infinite; }
+      @keyframes promptPulse { 0%,100%{ transform:translateX(-50%) scale(1); } 50%{ transform:translateX(-50%) scale(1.07); } }
       /* full screens */
       /* pointer-events:auto is LOAD-BEARING: without it an overflowing card can't be touch-scrolled in landscape,
          stranding everything below the fold (including the close button) */
@@ -426,6 +429,7 @@ const UI = {
     if(!p){ el.style.display='none'; this._prompt=null; return; }
     this._prompt = p;
     el.style.display='block';
+    el.classList.toggle('hot', !!p.hot);
     el.textContent = p.label + (INPUT.isTouch?'':'  (E)');
   },
   dialogue(icon, text){

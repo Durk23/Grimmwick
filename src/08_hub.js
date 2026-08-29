@@ -664,6 +664,7 @@ function updateHub(G, dt){
       }
     }
   }
+  if(prompt) prompt.hot = true;   // town interactions glow orange — impossible to miss
   UI.setPrompt(prompt);
   if(prompt && INPUT.interactEdge){
     if(prompt.kind==='mayor'){
