@@ -61,7 +61,17 @@ const G = {
     }
   },
   persist(){ Store.set('grimmwick_save', JSON.stringify(this.save)); },
-  resetSave(){ Store.del('grimmwick_save'); Store.del('hollowville_save'); },
+  resetSave(){
+    // a reset clears PROGRESS, never PROPERTY: costumes, masks, the Star Crown, and the Pass survive.
+    // (This also makes Reset Save the official fresh-run button for the Flawless Night board.)
+    const w = this.save || {};
+    const fresh = { candy:0, embers:0, worlds:{}, gp:{},
+      owned: w.owned||['kid'], equipped: w.equipped||'kid',
+      ownedMasks: w.ownedMasks||[], mask: w.mask||null,
+      pass: !!w.pass, seenIntro:false, maxHearts:3 };
+    Store.set('grimmwick_save', JSON.stringify(fresh));
+    Store.del('hollowville_save');
+  },
 
   addCandy(n){
     this.save.candy += n;

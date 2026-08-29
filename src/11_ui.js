@@ -213,7 +213,7 @@ const UI = {
           <button class="btn ghost2 ui-block" id="pauseRestartBtn">🔁 Restart Level</button>
           <button class="btn ghost2 ui-block" id="pauseMapBtn">🗺️ Level Select (Map)</button>
           <button class="btn ghost2 ui-block" id="townBtn">🏘️ Return to Town</button>
-          <button class="btn ghost2 ui-block" id="resetBtn">🗑️ Reset Save</button>
+          <button class="btn ghost2 ui-block" id="resetBtn">🗑️ Reset Save (outfits stay)</button>
         </div>
       </div></div>
       <div id="shop-screen" class="screen"><div class="card">
@@ -524,7 +524,7 @@ const UI = {
     const G=this.G;
     const show = force!==undefined?force:(G.state!=='paused');
     if(show && G.state!=='play') return;
-    this._resetArm=false; this.el('resetBtn').textContent='🗑️ Reset Save';
+    this._resetArm=false; this.el('resetBtn').textContent='🗑️ Reset Save (outfits stay)';
     if(show){ G.state='paused'; this.el('pause-screen').style.display='flex'; this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(this.G.save.cozy?'ON':'OFF');
       const inLevel = !!G.levelDef || G.area.startsWith('boss');   // Restart/Map only make sense inside a level or boss
       this.el('pauseRestartBtn').style.display = inLevel?'block':'none';
