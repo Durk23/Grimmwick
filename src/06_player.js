@@ -14,7 +14,8 @@ const COSTUMES = {
   candycorn: {name:'Candy Corn', price:350, body:0xfff6e0, accent:0xff8c2e, hat:'none', cape:null, desc:'Three flavors of controversy in one costume.'},
   doctor:    {name:'Doctor Pip', price:400, body:0xf4f4f8, accent:0x63b6a8, hat:'none', cape:null, human:true, desc:'The night shift. Prescribes candy, twice daily.'},
   police:    {name:'Officer Pip', price:400, body:0x2c3a5e, accent:0xffd23f, hat:'none', cape:null, human:true, desc:'Grimmwick\'s finest. Writes tickets for insufficient spookiness.'},
-  grimm:     {name:'GRIMM', price:0, character:true, body:0x5a5578, accent:0x3a3658, glow:0xff9a50, trail:0xff9a50, hat:'none', cape:null, desc:'The Forgotten Guest, playable. His double-jump is a SHADOW LEAP: a forward phase through danger itself.'},
+  zoe:       {name:'ZOE THE WITCHLING', price:20000, character:true, pron:'her', body:0x7a4fc9, accent:0x3d2178, trail:0xb37dff, hat:'witch', cape:null, human:true, desc:'Her double-jump pops her onto the broom. Hold JUMP to glide on witch-magic.'},
+  grimm:     {name:'GRIMM', price:0, character:true, pron:'him', body:0x5a5578, accent:0x3a3658, glow:0xff9a50, trail:0xff9a50, hat:'none', cape:null, desc:'The Forgotten Guest, playable. His double-jump is a SHADOW LEAP: a forward phase through danger itself.'},
 };
 
 // ============ MASKS — the wardrobe's first slot: wear any mask over ANY costume ============
@@ -114,6 +115,7 @@ class Player {
     this.climbing = false;
     this.iframes = 0;
     this.blinkT = 0;
+    this.zoeGlideT = 0; this._zoeDJ = false; this.zoeGliding = false;
     this.dead = false;
     this.canDouble = true;
     this.coyote = 0; this.jumpBuf = 0;
@@ -132,6 +134,7 @@ class Player {
   buildRig(costumeKey, maskKeyOverride){
     this.costumeKey = costumeKey;
     this.grimmAura = null; this.grimmLight = null;
+    this.zoeBroom = null; this.zoeBroomBack = null;
     const c = COSTUMES[costumeKey]||COSTUMES.kid;
     while(this.group.children.length) this.group.remove(this.group.children[0]);
     const body = new THREE.Group();
@@ -327,6 +330,25 @@ class Player {
       const badge = mesh('cyl',[0.09,0.09,0.03,6], mat(0xffd23f)); badge.position.set(-0.18,0.85,0.42); badge.rotation.x=Math.PI/2; body.add(badge);
       const belt = mesh('cyl',[0.42,0.46,0.1,10], mat(0x14101f)); belt.position.y=0.42; body.add(belt);
       const buckle = mesh('box',[0.12,0.09,0.04], mat(0xffd23f)); buckle.position.set(0,0.42,0.44); body.add(buckle);
+    }
+    if(costumeKey==='zoe'){         // ZOE THE WITCHLING — braids, star belt, and the broom that earns her keep
+      const braidM = mat(0x8a4a2a), tieM = mat(0xffd23f);
+      for(const sx of [-1,1]){
+        for(let i=0;i<3;i++){ const b=mesh('sph',[0.09-i*0.012,6,5], braidM); b.position.set(sx*0.34, 1.18-i*0.14, -0.02); body.add(b); }
+        const tie=mesh('cyl',[0.045,0.05,0.05,6], tieM); tie.position.set(sx*0.34, 0.78, -0.02); body.add(tie);
+      }
+      const belt = mesh('tor',[0.35,0.045,5,12], mat(0x2a1f3d)); belt.position.y=0.62; belt.rotation.x=Math.PI/2; body.add(belt);
+      const star = mesh('cyl',[0.09,0.09,0.03,5], emat(0xffd23f,0xb8901a,0.6)); star.position.set(0,0.62,0.42); star.rotation.x=Math.PI/2; body.add(star);
+      // the broom: slung across her back on foot, underneath her in flight
+      const mkBroom = ()=>{
+        const g2 = new THREE.Group();
+        const stick = mesh('cyl',[0.035,0.045,1.3,6], mat(0x8a5a2e)); stick.rotation.x=Math.PI/2; g2.add(stick);
+        const bris = mesh('cone',[0.13,0.42,7], mat(0xc9a05a)); bris.rotation.x=-Math.PI/2; bris.position.z=-0.8; g2.add(bris);
+        const band = mesh('cyl',[0.07,0.08,0.07,6], tieM); band.rotation.x=Math.PI/2; band.position.z=-0.6; g2.add(band);
+        return g2;
+      };
+      this.zoeBroomBack = mkBroom(); this.zoeBroomBack.position.set(0,0.75,-0.3); this.zoeBroomBack.rotation.set(0.35,0.25,0.5); body.add(this.zoeBroomBack);
+      this.zoeBroom = mkBroom(); this.zoeBroom.position.set(0,0.02,0.1); this.zoeBroom.visible=false; body.add(this.zoeBroom);
     }
     if(costumeKey==='grimm'){       // THE FORGOTTEN GUEST — hooded robe, ember eyes, his watch-lantern on the belt
       const trimM = mat(c.accent);
@@ -578,7 +600,7 @@ class Player {
     }
 
     // --- jumping ---
-    if(this.grounded){ this.coyote = 0.12; this.canDouble = true; this.batFlutters = 0; this._springAir = false; }
+    if(this.grounded){ this.coyote = 0.12; this.canDouble = true; this.batFlutters = 0; this._springAir = false; this._zoeDJ = false; this.zoeGlideT = 1.6; }
     else this.coyote -= dt;
     this.jumpT = (this.jumpT||0) + dt;
     if(INPUT.jumpEdge) this.jumpBuf = 0.14; else this.jumpBuf -= dt;
@@ -593,6 +615,12 @@ class Player {
         AUDIO.djump();
         this.squashV = 6;
         if(this.costumeKey==='skeleton') AUDIO.noise({t:0.15,vol:0.1,fFrom:3000,fTo:1000});
+        if(this.costumeKey==='zoe'){
+          // BROOM GLIDE armed: same rise as any double-jump (height gates stay honest);
+          // holding JUMP on the way down floats her on the broom while the magic lasts.
+          this._zoeDJ = true;
+          G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.5,this.pos.z), 0xb37dff, 6, {speed:1.6, life:0.4, gravity:0.5, size:0.7});
+        }
         if(this.costumeKey==='grimm'){
           // SHADOW LEAP — same rise as any double-jump (height gates stay honest), plus a
           // short forward phase with ghost i-frames. Direction locks at the leap.
@@ -684,6 +712,15 @@ class Player {
     if(!this.climbing) this.vel.y -= (lift?16:24)*dt;
     if(this.vel.y < -26 && !this.pounding) this.vel.y = -26;
     if(this.batT>0 && !this.pounding && this.vel.y < -4.5) this.vel.y = -4.5; // gentle bat glide
+    const zg = this.costumeKey==='zoe' && this._zoeDJ && !this.grounded && !this.pounding && !this.climbing && INPUT.jumpHeld && this.vel.y < 0 && this.zoeGlideT > 0;
+    if(zg){
+      if(!this.zoeGliding) AUDIO.tone({f:620, f2:880, type:'triangle', t:0.18, vol:0.13});   // hop-on chime
+      this.zoeGlideT -= dt;
+      if(this.vel.y < -2.0) this.vel.y = -2.0;   // the broom carries her
+      G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.1,this.pos.z), 0xb37dff, 1, {speed:0.7, life:0.4, gravity:-0.5, size:0.6});
+      if(Math.random()<0.3) G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.05,this.pos.z), 0xffd23f, 1, {speed:0.5, life:0.35, gravity:-0.3, size:0.5});
+    }
+    this.zoeGliding = zg;
 
     // --- physics ---
     const wasGrounded = this.grounded;
@@ -738,6 +775,10 @@ class Player {
     if(this.grounded) this.lastSafe.copy(this.pos);
     // costume run-trail (pass cosmetics)
     const cz = COSTUMES[this.costumeKey];
+    if(this.zoeBroom){
+      this.zoeBroom.visible = !!this.zoeGliding;
+      this.zoeBroomBack.visible = !this.zoeGliding;
+    }
     if(this.grimmAura){
       const tt = G.time, flare = this.blinkT>0 ? 0.3 : 0;
       this.grimmAura.material.opacity = 0.11 + 0.05*Math.sin(tt*2.6) + flare;

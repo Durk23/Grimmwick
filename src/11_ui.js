@@ -714,33 +714,35 @@ const UI = {
         G.persist(); AUDIO.buy(); this.renderShop('chars'); this.updateHUD();
       });
       grid.appendChild(pipDiv);
-      // --- CHARACTER UNLOCKS (Grimm) — story-earned, never sold ---
+      // --- CHARACTER UNLOCKS — Zoe is candy-bought, Grimm is story-earned (never sold) ---
       for(const key in COSTUMES){
         const c = COSTUMES[key];
         if(!c.character) continue;
         const owned = G.save.owned.includes(key);
         const equipped = G.save.equipped===key;
+        const buyable = c.price > 0;
         const div = document.createElement('div');
         div.className='item';
         const pv = this.costumePreview(key);
-        const swInner = pv ? `<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:${owned?'drop-shadow(0 3px 5px rgba(0,0,0,.45))':'brightness(0.12) drop-shadow(0 0 8px rgba(120,80,200,.6))'}" alt="">` : '';
+        const dark = !owned && !buyable;   // story characters hide until earned; buyable ones show off
+        const swInner = pv ? `<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:${dark?'brightness(0.12) drop-shadow(0 0 8px rgba(120,80,200,.6))':'drop-shadow(0 3px 5px rgba(0,0,0,.45))'}" alt="">` : '';
         div.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(255,150,60,.18), transparent 60%), linear-gradient(135deg,#2c2450 60%,#4a3a6e)">${swInner}</div>
-          <h4>${owned?c.name:'? ? ?'}</h4><p>${owned?c.desc:'Someone is still waiting for an invitation. Finish the story to meet him.'}</p>
-          <button class="btn buy ui-block ${equipped?'ghost2':(owned?'orange':'ghost2')}">${equipped?'✓ Playing':(owned?'Play as him':'🕯️ Save the night to unlock')}</button>`;
+          <h4>${dark?'? ? ?':c.name}</h4><p>${dark?'Someone is still waiting for an invitation. Finish the story to meet him.':c.desc}</p>
+          <button class="btn buy ui-block ${equipped?'ghost2':(owned||buyable?'orange':'ghost2')}">${equipped?'✓ Playing':(owned?'Play as '+(c.pron||'them'):(buyable?'🍬 '+c.price:'🕯️ Save the night to unlock'))}</button>`;
         this.bindTap(div.querySelector('button'), ()=>{
           if(equipped) return;
-          if(!owned){ AUDIO.ui(); this.toast('🕯️ Grimm joins you when the story is done. Save the night!'); return; }
+          if(!owned && !buyable){ AUDIO.ui(); this.toast('🕯️ Grimm joins you when the story is done. Save the night!'); return; }
+          if(!owned){
+            if(G.save.candy < c.price){ AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); return; }
+            G.save.candy -= c.price; G.save.owned.push(key);
+            this.toast('🧙 '+c.name+' JOINS THE NIGHT!');
+          }
           if(!isChar(G.save.equipped||'kid')) G.save.prevCostume = G.save.equipped||'kid';   // remember Pip's look for the way back
           G.save.equipped = key; G.player && G.player.buildRig(key);
           G.persist(); AUDIO.buy(); this.renderShop('chars'); this.updateHUD();
         });
         grid.appendChild(div);
       }
-      // --- ZOE — Update 2 tease ---
-      const zoe = document.createElement('div');
-      zoe.className='item';
-      zoe.innerHTML = `<div class="sw" style="height:110px;background:linear-gradient(135deg,#8e5bd9 60%,#3d2178)"></div><h4>Zoe the Witchling</h4><p>Double-jump becomes a broom glide! Arrives in Update 2.</p><button class="btn buy ghost2 ui-block">Coming soon</button></div>`;
-      grid.appendChild(zoe);
     } else {
       // 25 tiers — one per level completed. [free, premium, marquee?]
       setTimeout(()=>{
