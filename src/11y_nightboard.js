@@ -26,11 +26,12 @@ const GC = {
     })();
     return this._authing;
   },
+  lastError: null,
   async submit(board, value, context){
     const p = this.plugin();
     if(!p || !this.authed){ Night.queuePending(board, value, context); return; }
-    try{ await p.submit({ board, value: Math.round(value), context: Math.round(context||0) }); }
-    catch(e){ Night.queuePending(board, value, context); }
+    try{ await p.submit({ board, value: Math.round(value), context: Math.round(context||0) }); this.lastError = null; }
+    catch(e){ this.lastError = (e && e.message) || String(e); Night.queuePending(board, value, context); }
   },
   async load(board, friends, count=25){
     const p = this.plugin(); if(!p || !this.authed) return null;
@@ -206,8 +207,12 @@ const Night = {
     el.querySelector('#nb-sub').textContent = b.sub;
     const list = el.querySelector('#nb-list');
     const mine = this.localValue(G, b.key);
-    el.querySelector('#nb-you').textContent = mine != null ? ('Your best: '+fmtCS(decodeNight(mine).timeCS))
-      : (b.key==='flawless' ? `Stars: ${this.totalStars(G)}/75. Earn them ALL to enter!` : 'Finish the night to enter!');
+    const nPend = Object.keys(G.save.pendingScores||{}).length;
+    el.querySelector('#nb-you').textContent = (mine != null ? ('Your best: '+fmtCS(decodeNight(mine).timeCS))
+      : (b.key==='flawless' ? `Stars: ${this.totalStars(G)}/75. Earn them ALL to enter!` : 'Finish the night to enter!'))
+      + (nPend && GC.authed ? ' · 📮 posting…' : '');
+    if(nPend && GC.authed && GC.lastError && !this._errToasted){ this._errToasted = true;
+      UI.toast('📮 Score queued. Game Center said: "'+GC.lastError.slice(0,80)+'". New boards can take a while, it will keep retrying!', 5200); }
     const hdr = `<div class="nb-row hdr"><div class="nb-rank"></div><div class="nb-name">PLAYER</div><div class="nb-time">TIME</div><div class="nb-st">STARS</div><div class="nb-cd">CANDY</div><div class="nb-dm">DMG</div><div class="nb-dt">DEATHS</div></div>`;
     if(!GC.native()){
       list.innerHTML = hdr + (mine!=null
