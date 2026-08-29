@@ -539,9 +539,10 @@ const UI = {
   closeShop(){ this.el('shop-screen').style.display='none'; this.G.state='play'; AUDIO.ui(); },
   // real 3D portrait of Pip WEARING a costume — a tiny offscreen render of the actual rig, cached per key
   // (owner call, Aug 2026: the cauldron sold looks blind — you never saw the outfit until you were wearing it)
-  costumePreview(key){
+  costumePreview(key, mask){
     this._pvCache = this._pvCache || {};
-    if(this._pvCache[key] !== undefined) return this._pvCache[key];
+    const ck = key + '|' + (mask||'');
+    if(this._pvCache[ck] !== undefined) return this._pvCache[ck];
     let url = null;
     try{
       if(!this._pvR){
@@ -554,14 +555,14 @@ const UI = {
         this._pvCam.position.set(0.42, 1.25, 3.2); this._pvCam.lookAt(0, 0.8, 0);
       }
       const fake = { group: new THREE.Group() };   // buildRig only needs .group (its G.carryWeapon read is guarded)
-      Player.prototype.buildRig.call(fake, key);
+      Player.prototype.buildRig.call(fake, key, mask||null);
       fake.group.rotation.y = 0.38;                // 3/4 hero pose
       this._pvScene.add(fake.group);
       this._pvR.render(this._pvScene, this._pvCam);
       url = this._pvR.domElement.toDataURL();
       this._pvScene.remove(fake.group);
     }catch(e){ url = null; }
-    this._pvCache[key] = url;
+    this._pvCache[ck] = url;
     return url;
   },
   renderShop(tab){
@@ -596,6 +597,34 @@ const UI = {
           this.renderShop('costumes'); this.updateHUD();
         };
         this.bindTap(btn, ()=>act({stopPropagation(){}}));
+        grid.appendChild(div);
+      }
+      // ---- THE MASK RACK — one accessory slot, any mask over any costume ----
+      const mh = document.createElement('div');
+      mh.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';
+      mh.textContent = '🎭 MASKS — wear one over ANY costume';
+      grid.appendChild(mh);
+      const wornCostume = G.save.equipped || 'kid';
+      for(const mkey in MASKS){
+        const m = MASKS[mkey];
+        const ownedM = G.save.ownedMasks.includes(mkey);
+        const wearing = G.save.mask === mkey;
+        const div = document.createElement('div');
+        div.className = 'item';
+        const pv = this.costumePreview(wornCostume, mkey);
+        div.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%), linear-gradient(135deg,#3a2f5a66 60%,#5a3f7a66)">${pv?`<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">`:`<div style="font-size:52px;line-height:110px">${m.icon}</div>`}</div>
+          <h4>${m.icon} ${m.name}</h4><p>${m.desc}</p>
+          <button class="btn buy ui-block ${wearing?'ghost2':(ownedM?'':'orange')}">${wearing?'✓ On — tap to take off':(ownedM?'Wear it':'🍬 '+m.price)}</button>`;
+        const btn = div.querySelector('button');
+        this.bindTap(btn, ()=>{
+          if(wearing){ G.save.mask = null; }
+          else if(ownedM){ G.save.mask = mkey; }
+          else if(G.save.candy >= m.price){ G.save.candy -= m.price; G.save.ownedMasks.push(mkey); G.save.mask = mkey; AUDIO.buy(); this.toast('🎭 New mask: '+m.name+'!'); }
+          else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); return; }
+          G.player && G.player.buildRig(G.save.equipped||'kid');
+          G.persist(); AUDIO.buy();
+          this.renderShop('costumes'); this.updateHUD();
+        });
         grid.appendChild(div);
       }
     } else if(tab==='ups'){

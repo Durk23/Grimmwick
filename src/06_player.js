@@ -10,7 +10,63 @@ const COSTUMES = {
   skeleton: {name:'Mr. Bones',     price:500,  body:0x2a2438, accent:0xe8e4d8, hat:'none',  cape:null,     desc:'Rattles when he double-jumps.'},
   ember:    {name:'Ember Spirit',  price:0, pass:'Tier 5', body:0xff5ea8, accent:0xffd166, glow:0xff2e10, trail:0xff8c2e, hat:'none', cape:0xff8c2e, desc:'Season 1 Pass · Tier 5. Burns bright. Never burns out.'},
   nightstitch: {name:'NIGHTSTITCH', price:0, pass:'Instant', body:0x2c2a6e, accent:0x63e6e2, glow:0x2a3fd0, trail:0x63e6e2, stitched:true, hat:'none', cape:0x1c1a4e, desc:'Stitched from the night sky itself. Yours the INSTANT you get the Pass.'},
+  patchwork: {name:'Patchwork Pal', price:450, body:0x7fae62, accent:0x4a6a3a, hat:'none', cape:null, desc:'Sewn together with love and spare parts. The bolts are decorative. Probably.'},
+  wolfpup:   {name:'Wolf Pup', price:450, body:0x8a6a4a, accent:0x5a4632, hat:'none', cape:null, desc:'Awooo! Fur by moonlight, zoomies by midnight.'},
+  clockwork: {name:'Clockwork Pip', price:500, body:0xb8933a, accent:0x6a5a20, hat:'none', cape:null, desc:'Wind the key and off he goes. Please do not overwind.'},
+  candycorn: {name:'Candy Corn', price:350, body:0xfff6e0, accent:0xff8c2e, hat:'none', cape:null, desc:'Three flavors of controversy in one costume.'},
 };
+
+// ============ MASKS — the wardrobe's first slot: wear any mask over ANY costume ============
+// All designs ORIGINAL (folklore + generic shapes only — no film/game likenesses, ever).
+const MASKS = {
+  pumpkinhead: {name:'Pumpkin Head', price:400, icon:'🎃', desc:'The classic. Nobody will know it\'s you. (Everybody will know it\'s you.)'},
+  hockey:      {name:'Hockey Mask',  price:250, icon:'🏒', desc:'Straight from the equipment shed. The scuffs are all original.'},
+  skull:       {name:'Skull Mask',   price:250, icon:'💀', desc:'Borrowed from a very polite skeleton. He\'d like it back by midnight.'},
+  crow:        {name:'Crow Mask',    price:300, icon:'🐦', desc:'Long beak, longer stare. Smells faintly of herbs.'},
+  cat:         {name:'Cat Mask',     price:200, icon:'🐱', desc:'Purrfect for prowling. Whiskers included.'},
+};
+function buildMask(key){
+  const g = new THREE.Group();
+  if(key==='pumpkinhead'){        // a whole jack-o'-lantern worn over the head, face aglow
+    const pk = mesh('sph',[0.52,12,10], mat(0xff8c2e)); pk.scale.set(1.1,0.95,1.1); g.add(pk);
+    const stem = mesh('cyl',[0.06,0.09,0.24,6], mat(PAL.stem)); stem.position.y=0.5; stem.rotation.z=0.2; g.add(stem);
+    const fm = emat(0xffe08a, 0xffb02e, 1);
+    const eL = mesh('cone',[0.11,0.15,3], fm); eL.position.set(-0.18,0.08,0.48); eL.rotation.x=0.3; g.add(eL);
+    const eR = eL.clone(); eR.position.x=0.18; g.add(eR);
+    const mo = mesh('box',[0.28,0.07,0.05], fm); mo.position.set(0,-0.16,0.5); g.add(mo);
+    const t1 = mesh('box',[0.05,0.07,0.05], fm); t1.position.set(-0.08,-0.12,0.5); g.add(t1);
+    const t2 = t1.clone(); t2.position.set(0.09,-0.2,0.5); g.add(t2);
+  } else if(key==='hockey'){       // plain white goalie mask, pumpkin-orange straps — OUR scuffs, no movie markings
+    const m = mesh('sph',[0.44,12,10], mat(0xf2efe6)); m.scale.set(0.98,1.12,0.55); m.position.z=0.16; g.add(m);
+    for(const [hx,hy] of [[-0.13,0.12],[0.13,0.12],[0,-0.04],[-0.16,-0.13],[0.16,-0.13],[0,-0.23],[-0.08,-0.32],[0.08,-0.32]]){
+      const h = mesh('cyl',[0.024,0.024,0.06,5], mat(0x2a2438)); h.rotation.x=Math.PI/2; h.position.set(hx,hy,0.42); g.add(h);
+    }
+    const eL = mesh('sph',[0.075,7,6], mat(0x14101f)); eL.position.set(-0.15,0.12,0.41); eL.scale.set(1,1.25,0.5); g.add(eL);
+    const eR = eL.clone(); eR.position.x=0.15; g.add(eR);
+    for(const s of [-1,1]){ const st=mesh('box',[0.3,0.05,0.05], mat(0xff8c2e)); st.position.set(s*0.32,0.06,-0.02); st.rotation.y=s*0.55; g.add(st); }
+  } else if(key==='skull'){        // friendly bone-white skull plate with a big square grin
+    const m = mesh('sph',[0.45,12,10], mat(0xe8e4d8)); m.scale.set(1,1.05,0.58); m.position.z=0.12; g.add(m);
+    const eL = mesh('sph',[0.1,7,6], mat(0x14101f)); eL.position.set(-0.15,0.08,0.4); g.add(eL);
+    const eR = eL.clone(); eR.position.x=0.15; g.add(eR);
+    const nose = mesh('cone',[0.05,0.09,3], mat(0x14101f)); nose.position.set(0,-0.08,0.44); nose.rotation.x=-0.3; g.add(nose);
+    for(let i=0;i<4;i++){ const t=mesh('box',[0.05,0.08,0.04], mat(0xfaf6ec)); t.position.set(-0.12+i*0.078,-0.26,0.38); g.add(t); }
+  } else if(key==='crow'){         // long-beaked bird mask (plague-doctor folklore, Grimmwick flavor)
+    const m = mesh('sph',[0.42,12,10], mat(0x2a2438)); m.scale.set(0.95,1,0.58); m.position.z=0.12; g.add(m);
+    const beak = mesh('cone',[0.12,0.52,6], mat(0xd9a02e)); beak.rotation.x=Math.PI/2-0.28; beak.position.set(0,-0.04,0.56); g.add(beak);
+    const eL = mesh('sph',[0.08,7,6], emat(0xffd23f,0xffb020,0.7)); eL.position.set(-0.15,0.12,0.37); g.add(eL);
+    const eR = eL.clone(); eR.position.x=0.15; g.add(eR);
+  } else if(key==='cat'){          // sleek midnight cat with pink ears and whiskers
+    const m = mesh('sph',[0.42,12,10], mat(0x3a3448)); m.scale.set(0.98,0.95,0.55); m.position.z=0.14; g.add(m);
+    for(const s of [-1,1]){ const ear=mesh('cone',[0.12,0.24,4], mat(0x3a3448)); ear.position.set(s*0.22,0.46,0.08); g.add(ear);
+      const inner=mesh('cone',[0.06,0.13,4], mat(0xff8caa)); inner.position.set(s*0.22,0.44,0.12); g.add(inner); }
+    const eL = mesh('sph',[0.08,7,6], emat(0x9fe066,0x6fb040,0.8)); eL.position.set(-0.14,0.1,0.4); eL.scale.set(1,1.35,0.5); g.add(eL);
+    const eR = eL.clone(); eR.position.x=0.14; g.add(eR);
+    const nose = mesh('cone',[0.05,0.07,3], mat(0xff8caa)); nose.position.set(0,-0.05,0.44); nose.rotation.x=Math.PI; g.add(nose);
+    for(const s of [-1,1]) for(let w=0;w<2;w++){ const wh=mesh('box',[0.28,0.012,0.012], mat(0xd8d4f0)); wh.position.set(s*0.3,-0.05-w*0.05,0.4); wh.rotation.y=s*0.25; g.add(wh); }
+  }
+  g.position.set(0, 1.18, 0.02);
+  return g;
+}
 
 class Player {
   constructor(scene, G){
@@ -44,7 +100,7 @@ class Player {
     scene.add(this.group, this.shadow);
     this.buildRig(G.save.equipped||'kid');
   }
-  buildRig(costumeKey){
+  buildRig(costumeKey, maskKeyOverride){
     this.costumeKey = costumeKey;
     const c = COSTUMES[costumeKey]||COSTUMES.kid;
     while(this.group.children.length) this.group.remove(this.group.children[0]);
@@ -200,6 +256,39 @@ class Player {
         body.add(rib);
       }
     }
+    if(costumeKey==='patchwork'){   // neck bolts + forehead stitches — sewn with love
+      for(const s of [-1,1]){ const bolt=mesh('cyl',[0.05,0.05,0.16,6], mat(0x8a8f9a)); bolt.rotation.z=Math.PI/2; bolt.position.set(s*0.46,1.02,0.08); body.add(bolt); }
+      const st = mesh('box',[0.3,0.03,0.04], mat(0x2a3a20)); st.position.set(0.08,1.42,0.36); st.rotation.z=0.25; body.add(st);
+      for(let i=0;i<3;i++){ const tick=mesh('box',[0.03,0.09,0.04], mat(0x2a3a20)); tick.position.set(-0.02+i*0.1,1.42+(i-1)*0.025,0.37); tick.rotation.z=0.25; body.add(tick); }
+    }
+    if(costumeKey==='wolfpup'){     // furry ears, a happy tail, and a little snout
+      for(const s of [-1,1]){ const ear=mesh('cone',[0.13,0.26,5], mat(c.body)); ear.position.set(s*0.24,1.62,0); body.add(ear);
+        const inner=mesh('cone',[0.06,0.13,5], mat(0xd8a87e)); inner.position.set(s*0.24,1.6,0.05); body.add(inner); }
+      const snout = mesh('sph',[0.16,8,6], mat(0x9a7a58)); snout.position.set(0,1.12,0.38); snout.scale.set(1,0.7,0.9); body.add(snout);
+      const nose = mesh('sph',[0.06,6,5], mat(0x14101f)); nose.position.set(0,1.15,0.5); body.add(nose);
+      const tail = mesh('cone',[0.12,0.5,6], mat(c.body)); tail.position.set(0,0.5,-0.42); tail.rotation.x=1.0; body.add(tail);
+    }
+    if(costumeKey==='clockwork'){   // the wind-up key + brass rivets
+      const keyG = new THREE.Group();
+      const shaft = mesh('cyl',[0.045,0.045,0.3,6], mat(0x8a6f2a)); shaft.rotation.x=Math.PI/2; keyG.add(shaft);
+      const ring = mesh('tor',[0.14,0.045,6,12], mat(0x8a6f2a)); ring.position.z=-0.26; keyG.add(ring);
+      keyG.position.set(0,0.75,-0.5); body.add(keyG); this.windKey = keyG;
+      for(const [rx,ry] of [[-0.3,0.5],[0.3,0.5],[-0.25,0.95],[0.25,0.95]]){
+        const rv = mesh('sph',[0.035,5,4], mat(0x6a5a20)); rv.position.set(rx,ry,0.42); body.add(rv);
+      }
+      // a little chest clock — stopped at midnight, of course
+      const dial = mesh('cyl',[0.14,0.14,0.05,10], mat(0xf4efe0)); dial.rotation.x=Math.PI/2; dial.position.set(0,0.66,0.44); body.add(dial);
+      const rim = mesh('tor',[0.15,0.025,6,14], mat(0x6a5a20)); rim.position.set(0,0.66,0.46); body.add(rim);
+      const hH = mesh('box',[0.025,0.09,0.02], mat(0x2a2438)); hH.position.set(0,0.7,0.47); body.add(hH);
+      const hM = mesh('box',[0.02,0.11,0.02], mat(0x2a2438)); hM.position.set(0.01,0.71,0.475); body.add(hM);
+    }
+    if(costumeKey==='candycorn'){   // the three sacred stripes
+      const band = mesh('cyl',[0.43,0.49,0.34,10], mat(0xff8c2e)); band.position.y=0.62; body.add(band);
+      const tip = mesh('cone',[0.2,0.34,9], mat(0xffd23f)); tip.position.y=1.62; body.add(tip);
+    }
+    // ---- THE MASK SLOT (wardrobe brick #1): any mask over any costume ----
+    const mk = maskKeyOverride !== undefined ? maskKeyOverride : (this.G && this.G.save ? this.G.save.mask : null);
+    if(mk && typeof MASKS !== 'undefined' && MASKS[mk]) body.add(buildMask(mk));
     // persistent-weapon tell: a little salt shaker on Pip's belt when the Salt Shaker is equipped.
     // buildRig runs on every switchArea (Player is rebuilt per area), so reading G.carryWeapon here
     // is exactly what re-arms the weapon's visible tell after crossing between levels.

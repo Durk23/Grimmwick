@@ -46,6 +46,8 @@ const G = {
     if(this.save.cozy===undefined) this.save.cozy = false;
     if(this.save.tutDone===undefined) this.save.tutDone = false;
     if(!this.save.owned.includes('kid')) this.save.owned.unshift('kid');
+    if(this.save.mask===undefined) this.save.mask = null;        // the wardrobe's mask slot
+    if(!this.save.ownedMasks) this.save.ownedMasks = [];
     if(this.save.pass===undefined) this.save.pass = false;
     if(!this.save.levels) this.save.levels = {};
     if(!this.save.best) this.save.best = {};
@@ -104,14 +106,31 @@ const G = {
     }
     starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sp,3));
     s.add(new THREE.Points(starGeo, new THREE.PointsMaterial({color:0xcfd4ff, size:0.5, sizeAttenuation:false})));
-    // moon + halo
+    // GRAPHICS LIFT (owner call, Aug 2026 — "a minor upgrade as a whole game"): a second layer of
+    // brighter warm-tinted stars, faint nebula washes, and a deeper layered moon glow. One shared
+    // function → every area in the game gets the richer night at zero per-level cost.
+    const starGeo2 = new THREE.BufferGeometry();
+    const sp2 = [];
+    for(let i=0;i<120;i++){
+      const a=rand(TAU), b=rand(0.08,1.25), r=149;
+      sp2.push(Math.cos(a)*Math.cos(b)*r, Math.sin(b)*r, Math.sin(a)*Math.cos(b)*r);
+    }
+    starGeo2.setAttribute('position', new THREE.Float32BufferAttribute(sp2,3));
+    s.add(new THREE.Points(starGeo2, new THREE.PointsMaterial({color:0xffe9c4, size:1.1, sizeAttenuation:false, transparent:true, opacity:0.9})));
+    for(const [nx,ny,nc,nr,no] of [[-70,45,0x6a4fd0,34,0.05],[80,30,0x2a6a7a,42,0.045],[-20,70,0x8a3a6a,30,0.04]]){
+      const neb = new THREE.Mesh(geo('circ',nr,20), new THREE.MeshBasicMaterial({color:nc, transparent:true, opacity:no, blending:THREE.AdditiveBlending, depthWrite:false}));
+      neb.position.set(nx,ny,-120); neb.lookAt(0,0,0); s.add(neb);
+    }
+    // moon + layered halo
     const moon = new THREE.Mesh(geo('circ',9,24), new THREE.MeshBasicMaterial({color:PAL.moon}));
     moon.position.set(55,62,-95); moon.lookAt(0,0,0);
     const halo = new THREE.Mesh(geo('circ',14,24), new THREE.MeshBasicMaterial({color:PAL.moon, transparent:true, opacity:0.16}));
     halo.position.copy(moon.position).multiplyScalar(1.01); halo.lookAt(0,0,0);
+    const halo2 = new THREE.Mesh(geo('circ',22,24), new THREE.MeshBasicMaterial({color:0xd8ceff, transparent:true, opacity:0.07, blending:THREE.AdditiveBlending, depthWrite:false}));
+    halo2.position.copy(moon.position).multiplyScalar(1.02); halo2.lookAt(0,0,0);
     const crater = new THREE.Mesh(geo('circ',1.7,12), new THREE.MeshBasicMaterial({color:0xe8dba8}));
     crater.position.copy(moon.position).multiplyScalar(0.99); crater.position.x-=2.5; crater.position.y+=2; crater.lookAt(0,0,0);
-    s.add(moon, halo, crater);
+    s.add(moon, halo, halo2, crater);
     return s;
   },
   switchArea(area){
