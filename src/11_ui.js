@@ -926,7 +926,7 @@ const UI = {
       w2:{e:'🪦', t:'GUARDIAN FREED!', b:'Mossgrave settles back into his hill with a happy rumble — the second ember is yours! Ravenmoor\'s lanterns glow green tonight.'},
       w3:{e:'🧹', t:'GUARDIAN FREED!', b:'Broomhilda cackles a THANK-you and loops the moon — the third ember is yours! Witchwood\'s cauldrons bubble bright tonight.'},
       w4:{e:'⚓', t:'GUARDIAN FREED!', b:'Captain Wraith tips his hat as THE SEA RUSHES BACK — the fourth ember is yours! Ghost Harbor floats again tonight.'},
-      w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'Grimm said YES. The Everflame burns whole, every district glows to its rooftops, and the Forgotten Guest walks the night-watch with a lantern of his own.<br><b>You saved Grimmwick, Pip. Happy Halloween. 🏮</b>'},
+      w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'Grimm said yes.<br>The Everflame burns whole again. Every district is safe and bright. And Grimm — the spirit no one ever invited — is now the town\'s night-watchman, keeping every lantern lit.<br><b>You saved Grimmwick, Pip. Happy Halloween. 🏮</b><br><span style="opacity:.8;font-size:13px">He\'s waiting by the Everflame in town — go say hello.</span>'},
     };
     const c = COPY[stats.district] || COPY.w1;
     this.el('vEmoji').textContent = c.e;

@@ -288,9 +288,9 @@ class GrimmCauldron {
           if(this._snow) for(const fl of this._snow){ const u=fl.userData; const f=((this.t*u.sp+u.ph)%1); fl.position.set(u.x0+Math.sin(this.t+u.ph)*0.8, 11*(1-f), u.z0); }
         }
         if(this._endStage===0 && this._endT>0.5){ this._endStage=1;
-          window.UI && UI.finaleBanner('🧒 “You were never a monster. You were just never invited.”', 3000); }
+          window.UI && UI.finaleBanner('🧒 Pip: “You were never a monster. You were just never invited.”', 3000); }
         else if(this._endStage===1 && this._endT>3.6){ this._endStage=2;
-          window.UI && UI.finaleBanner('🏮 “Come to the festival, Grimm. There\'s a lantern with your name on it.”', 3000);
+          window.UI && UI.finaleBanner('🧒 Pip: “Come to the festival, Grimm. There\'s a lantern with your name on it.”', 3000);
           // the lantern appears in his hand — the night-watchman is born
           const lan = new THREE.Group();
           const cage = mesh('box',[0.34,0.42,0.34], mat(0x241c38));
@@ -298,10 +298,14 @@ class GrimmCauldron {
           lan.add(cage, glow);
           lan.position.set(1.15, 2.6, 0.4); lan.scale.setScalar(0.01);
           this.group.add(lan); this._lantern = lan;
-          this._warm = 0;                                             // start the transformation
           AUDIO.heart && AUDIO.heart(); }
-        else if(this._endStage===2 && this._endT>6.8){ this._endStage=3;
-          window.UI && UI.finaleBanner('🔥 THE EVERFLAME BURNS WHOLE AGAIN', 3200);
+        else if(this._endStage===2 && this._endT>6.8){ this._endStage=25;
+          // GRIMM'S ANSWER — the beat the whole game builds to. He warms from shadow to lamplight AS he says it.
+          window.UI && UI.finaleBanner('🫥 Grimm: “...yes. I would like that very much.”', 3000);
+          this._warm = 0;                                             // the transformation begins with the yes
+          AUDIO.heart && AUDIO.heart(); }
+        else if(this._endStage===25 && this._endT>10.0){ this._endStage=3;
+          window.UI && UI.finaleBanner('🔥 GRIMM SAID YES — AND THE EVERFLAME BURNS WHOLE AGAIN', 3200);
           // THE RELIGHT — a roaring flame column erupts from the cauldron
           this._flame = new THREE.Mesh(geo('cone',1.8,4.6,10), new THREE.MeshLambertMaterial({color:0xff7020, emissive:0xff6a1a, emissiveIntensity:0.9, transparent:true, opacity:0.94}));
           this._flame.position.set(0,5.0,0); this.group.add(this._flame);
@@ -322,8 +326,8 @@ class GrimmCauldron {
             fl.userData = {x0:rand(-20,20), z0:rand(-2,3), sp:rand(0.14,0.3), ph:rand(9)};
             G.scene.add(fl); this._snow.push(fl);
           } }
-        else if(this._endStage===3 && this._endT>10.6){ this._endStage=4;
-          window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED', 3600);
+        else if(this._endStage===3 && this._endT>13.8){ this._endStage=4;
+          window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED — HAPPY HALLOWEEN!', 3600);
           G.onBossDefeated(); }
         break;
       }
