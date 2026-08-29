@@ -15,7 +15,7 @@ const GC = {
   native(){ return !!this.plugin(); },
   signIn(){
     const p = this.plugin(); if(!p) return Promise.resolve(false);
-    if(this.authed) return Promise.resolve(true);
+    if(this.authed){ Night.flushPending(); return Promise.resolve(true); }   // already in: retry anything still queued
     if(this._authing) return this._authing;   // one in-flight auth — a second call would orphan the first native promise
     this._authing = (async () => {
       try{ const r = await p.signIn(); this.authed = !!(r && r.authenticated); this.alias = (r && r.alias) || null; }
@@ -184,7 +184,7 @@ const Night = {
     el.querySelectorAll('.nb-tab').forEach(x=>x.classList.toggle('on', x.dataset.k===this._sel));
     AUDIO.ui && AUDIO.ui();
     this.render();                                    // paint your local numbers immediately…
-    if(GC.native() && !GC.authed){ await GC.signIn(); this.render(); }   // …then retry auth on every open
+    if(GC.native()){ await GC.signIn(); this.render(); }   // auth (or retry queued submits) on every open
   },
   close(){ const el = document.getElementById('nb-screen'); if(el) el.style.display='none'; if(window.UI) UI._ovCloseT = performance.now(); AUDIO.ui && AUDIO.ui(); },
   _row(rank, name, v, stars, me){
