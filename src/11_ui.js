@@ -204,16 +204,16 @@ const UI = {
         <h2 style="margin-bottom:16px">⏸️ Paused</h2>
         <div style="display:flex;flex-direction:column;gap:10px">
           <button class="btn ui-block" id="resumeBtn">▶️ Resume</button>
+          <button class="btn ghost2 ui-block" id="pauseRestartBtn">🔁 Restart Level</button>
+          <button class="btn ghost2 ui-block" id="pauseMapBtn">🗺️ Level Select (Map)</button>
+          <button class="btn ghost2 ui-block" id="nightBtn">🏮 The Night Board</button>
+          <button class="btn ghost2 ui-block" id="townBtn">🏘️ Return to Town</button>
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🎵 Music</span><input type="range" id="musVol" class="ui-block" min="0" max="100" value="50" style="width:150px"></div>
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🔊 Sounds</span><input type="range" id="sfxVol" class="ui-block" min="0" max="100" value="80" style="width:150px"></div>
           <button class="btn ghost2 ui-block" id="cozyBtn">🧸 Cozy Mode: OFF</button>
-          <button class="btn ghost2 ui-block" id="nightBtn">🏮 The Night Board</button>
           <button class="btn ghost2 ui-block" id="howBtn">📖 How to Play</button>
-          <button class="btn ghost2 ui-block" id="feedbackBtn">💬 Send Feedback</button>
-          <button class="btn ghost2 ui-block" id="pauseRestartBtn">🔁 Restart Level</button>
-          <button class="btn ghost2 ui-block" id="pauseMapBtn">🗺️ Level Select (Map)</button>
-          <button class="btn ghost2 ui-block" id="townBtn">🏘️ Return to Town</button>
           <button class="btn ghost2 ui-block" id="resetBtn">🗑️ Reset Save (outfits stay)</button>
+          <button class="btn ghost2 ui-block" id="feedbackBtn">💬 Send Feedback</button>
         </div>
       </div></div>
       <div id="shop-screen" class="screen"><div class="card">
