@@ -49,6 +49,8 @@ const G = {
     if(!this.save.owned.includes('kid')) this.save.owned.unshift('kid');
     if(this.save.mask===undefined) this.save.mask = null;        // the wardrobe's mask slot
     if(!this.save.ownedMasks) this.save.ownedMasks = [];
+    if(this.save.mask && typeof MASKS!=='undefined' && !MASKS[this.save.mask]) this.save.mask = null;              // curated away
+    if(this.save.equipped && typeof COSTUMES!=='undefined' && !COSTUMES[this.save.equipped]) this.save.equipped = 'kid';
     if(this.save.pass===undefined) this.save.pass = false;
     if(!this.save.levels) this.save.levels = {};
     if(!this.save.best) this.save.best = {};
