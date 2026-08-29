@@ -831,14 +831,16 @@ const UI = {
     const fmt = v => typeof v==='number' ? (Math.floor(v/60)+':'+String(Math.floor(v%60)).padStart(2,'0')) : v;
     this.el('clearName').textContent = stats.levelName || '';
     const st = stats.stars||{};
-    // missed stars must READ as missed — ✖ icon + dimmed card + "missed:" prefix (a dim ⭐ still read as earned)
+    // missed stars must READ as missed — ✖ icon + dimmed card + "missed:" prefix (a dim ⭐ still read as earned).
+    // In Cozy they're not "missed", they're ASLEEP (💤) — cozy pauses earning, and the card says so loudly.
     const slot = (on,lbl)=>{ const won = on && !stats.cozy;
+      if(stats.cozy) return `<div class="cstar off" style="opacity:.6"><div class="big">💤</div><div class="lbl">${lbl}</div></div>`;
       return `<div class="cstar${won?'':' off'}"${won?'':' style="opacity:.5"'}><div class="big">${won?'⭐':'✖️'}</div><div class="lbl">${won?lbl:'missed: '+lbl}</div></div>`; };
     this.el('clearStars').innerHTML =
       slot(st.time, '⏱ fast') +
       slot(st.candy, '🍬 '+(stats.candy??0)+'/'+(stats.candyTotal??0)) +
       slot(st.clean, '💜 no damage');
-    const rec = stats.cozy ? `<div style="margin-top:6px;opacity:.85">🧸 cozy night — stars & records asleep</div>`
+    const rec = stats.cozy ? `<div style="margin-top:8px;padding:7px 12px;background:rgba(255,180,90,.14);border:1px solid rgba(255,180,90,.35);border-radius:12px;font-weight:800">🧸 Cozy Mode is ON — stars &amp; best times are asleep.<br><span style="font-weight:600;opacity:.85">Turn Cozy off in the ⚙️ pause menu to earn them!</span></div>`
       : stats.isRecord ? `<div style="margin-top:8px;font-weight:900;color:#ffd23f;font-size:18px">🏆 NEW RECORD — ${fmt(stats.time)}!</div>`
       : (stats.best!=null ? `<div style="margin-top:6px;opacity:.85">🏆 Your best: <b>${fmt(stats.best)}</b></div>` : '');
     this.el('clearStats').innerHTML = `⏱️ Time: <b>${fmt(stats.time)}</b>${rec}`;
