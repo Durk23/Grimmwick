@@ -64,7 +64,7 @@ const NIGHT_BOARDS = [
   { key:'flawless', id:'grimmwick.flawless', icon:'🏆', name:'FLAWLESS NIGHT',
     sub:'ALL 75 stars: every level, every challenge. Fastest total clock wins. The mastery board.' },
   { key:'night', id:'grimmwick.night', icon:'🌙', name:'THE NIGHT',
-    sub:'Everyone who saved Grimmwick. Time first; fewest deaths, least damage, most candy break ties.' },
+    sub:'Everyone who saved Grimmwick. Fastest night wins; fewest deaths breaks ties.' },
 ];
 
 const Night = {
@@ -191,7 +191,7 @@ const Night = {
       <div class="nb-rank">${me?'⭐':''}#${rank}</div>
       <div class="nb-main">
         <div class="nb-name">${String(name||'???').replace(/[<>&"]/g,'')}</div>
-        <div class="nb-stats">⭐${stars!=null?stars:'–'} · 🍬${d.candy>=9999?'9999+':d.candy} · 💜${d.dmg>=999?'–':d.dmg} · ☠️${d.deaths>=99?'–':d.deaths}</div>
+        <div class="nb-stats">⭐${stars!=null?stars:'–'} · 🍬${d.candy>=9999?'9999+':d.candy} · ☠️${d.deaths>=99?'–':d.deaths}</div>
       </div>
       <div class="nb-time">${fmtCS(d.timeCS)}</div>
     </div>`;
