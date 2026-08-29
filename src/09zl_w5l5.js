@@ -200,7 +200,13 @@ function updateW5L5(G, dt){
     W5L5_rainT += dt;
     while(W5L5_rainT >= W5L5_beat * W5L5_P){
       const n = W5L5_beat;
-      const cols = [W5L5_COLS[n % 7], W5L5_COLS[(n + 3) % 7]];   // two danger columns; 5 of 7 stay safe
+      // one shell HUNTS: it drops on the column nearest Pip at cast time ("it falls where you WERE" —
+      // the sanctioned bombardment rule; a fixed pattern alone always landed behind a running player
+      // and read as broken aim). The second keeps the learnable rhythm. Both ring-marked, both dodgeable.
+      const nearCol = W5L5_COLS.reduce((a,b)=>Math.abs(b-pl.pos.x)<Math.abs(a-pl.pos.x)?b:a);
+      let patCol = W5L5_COLS[(n + 3) % 7];
+      if(patCol === nearCol) patCol = W5L5_COLS[(n + 5) % 7];
+      const cols = [nearCol, patCol];
       for(const cx of cols){
         // the growing target ring on the ground (a live MeshBasic — grows + pulses over the lead, then vanishes)
         const ringMat = new THREE.MeshBasicMaterial({color:W5PAL.ember, transparent:true, opacity:0.5, side:THREE.DoubleSide, depthWrite:false});
