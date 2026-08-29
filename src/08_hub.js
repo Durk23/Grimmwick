@@ -533,6 +533,7 @@ function buildHub(G){
   // spawn
   G.spawnPoint.set(0,0.6,10);
   G.world.killY = -20;
+  buildGateTrail(G);
 }
 
 function makeBats(S, n, spread){
@@ -563,6 +564,26 @@ function updateBats(bats, dt){
   }
 }
 
+function buildGateTrail(G){
+  // KID-PROOF WAYFINDING: until the first level is cleared, a runway of little lights
+  // pulses from the town plaza toward the open gate — direction with zero reading.
+  G.gateTrail = null;
+  const anyDone = Object.values(G.save.levels||{}).some(l=>l && l.done);
+  if(anyDone) return;
+  const gate = G.gates && G.gates.find(gt=>gt.open && !G.save.worlds[gt.w.key]);
+  if(!gate) return;
+  const dots = [];
+  const sx = Math.sin(Math.atan2(gate.x, gate.z))*5.5, sz = Math.cos(Math.atan2(gate.x, gate.z))*5.5;   // start just outside the plaza, on the gate's bearing
+  const N = 9;
+  for(let i=0;i<N;i++){
+    const tt = i/(N-1);
+    const d = new THREE.Mesh(geo('sph',0.14,7,6), new THREE.MeshLambertMaterial({color:0xffd98a, emissive:0xffb02e, emissiveIntensity:1, transparent:true, opacity:0.9}));
+    d.position.set(lerp(sx, gate.x, tt), 0.1, lerp(sz, gate.z, tt));
+    d.scale.y = 0.45;
+    G.scene.add(d); dots.push(d);
+  }
+  G.gateTrail = dots;
+}
 function updateHub(G, dt){
   G.hubTime += dt;
   const t = G.hubTime;
@@ -573,6 +594,17 @@ function updateHub(G, dt){
   }
   // lamps flicker
   G.hubLamps && G.hubLamps.forEach((l,i)=>{ l.intensity = 48+Math.sin(t*11+i*2)*7+rand(-2,2); });
+  // gate runway: brightness chases toward the door
+  if(G.gateTrail) G.gateTrail.forEach((d,i)=>{
+    const ph = Math.sin(t*2.6 - i*0.55);
+    d.material.emissiveIntensity = 0.55 + Math.max(0,ph)*1.3;
+    d.scale.setScalar(0.8 + Math.max(0,ph)*0.5); d.scale.y *= 0.45;
+  });
+  // fresh player idling in town: one gentle spoken reminder of the verb
+  if(G.gateTrail && G.save.metMayor && G.save.seenShop && !G._gateNudged && G.hubTime > 30){
+    G._gateNudged = true;
+    window.UI && UI.toast('🎃 WALK INTO the glowing gate to play!', 4200);
+  }
   // portal spin
   for(const w of WORLDS){
     if(w.ringMesh){ w.ringMesh.rotation.z = t*1.2; w.ringMesh.scale.setScalar(1+Math.sin(t*2.4)*0.05); }
