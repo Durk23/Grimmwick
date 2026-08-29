@@ -28,15 +28,7 @@
 // ---- in-file: the potion-bog void floor (pure DECO, well below the planks — a miss is a fall, not a wall)
 // A missed hop drops past killY → onPlayerFell (a heart + a walk-back to the last lantern), never a life.
 function w3l4Bog(G, x1, x2){
-  const g = new THREE.Group();
-  const w = Math.abs(x2-x1), cx = (x1+x2)/2;
-  const surf = mesh('box',[w,0.2,4.8], emat(0x2f6b45, 0x1e4a30, 0.7)); surf.position.set(cx,-1.0,0);
-  g.add(surf);
-  for(let i=0;i<Math.floor(w/2.4);i++){   // a few glowing brew bubbles rising off the bog (baked emissive fakes)
-    const b = mesh('sph',[rand(0.1,0.22),6,5], emat(pick([W3PAL.brew,W3PAL.brewV]),W3PAL.brew,0.85));
-    b.position.set(rand(x1+1,x2-1), -0.8, rand(-1.7,1.7)); g.add(b);
-  }
-  G.scene.add(bakeGroup(g));
+  brewBed(G, x1, x2, -1.0, 'green');   // bubbling green witch's-brew lava (dressed + splash-registered in one call)
 }
 
 // ---- in-file: THE QUIET PROP — "a young witch's first flying lesson" (deep-lore; NEVER signposted) ----
@@ -254,11 +246,7 @@ function buildW3L4(G){
   G.ents.add(new Crow(184, 0.15, -2.6));
 
   exitGate(G, 196);
-  // the bog voids get the impact treatment: Pip SPLASHES into the brew surface (y≈-1) with the full
-  // Mario death sequence + bubbles rising off the bog — no more silent fall-through (owner playthrough note)
-  pitRegister(G, 56, 77, 'wood', -1.9);
-  pitRegister(G, 112, 140, 'wood', -1.9);
-  pitRegister(G, 158, 178, 'wood', -1.9);
+  // (the bog voids are dressed + splash-registered by w3l4Bog/brewBed above)
 
   // ---- tail: ambience + bats + clutter (clutter on SOLID spans only — never floating over a void) ----
   w3LevelFinish(G, -14, 205, null);          // spores/potion-motes/fireflies + bats; theme=null keeps kit clutter off the gaps

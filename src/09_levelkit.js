@@ -76,7 +76,35 @@ const PIT_FX = {   // per-theme: danger glow color, eruption burst colors, risin
   wood:   { glow:0x8a5fd0, burst:[0xb37dff,0x8a5fd0], mote:0xb37dff },
   harbor: { glow:0x63e6e2, burst:[0x63e6e2,0xbafcf8], mote:0x63e6e2 },
   castle: { glow:0xff8a3a, burst:[0xffa030,0xff5030], mote:0xffc060 },
+  brewP:  { glow:0xb37dff, burst:[0xb37dff,0x8a5fd0], mote:0xb37dff },   // witch's-brew lava, purple (w1l4)
+  brewG:  { glow:0x9fe066, burst:[0x9fe066,0x4fae66], mote:0x9fe066 },   // witch's-brew lava, green (w3l4)
 };
+// BUBBLING BREW-LAVA (owner call, Aug 2026): the flat bog slabs read as "empty floor" even though the
+// splash fired. This is the proper bed for surface-pits: a hot pulsing brew surface, proud bubble domes,
+// crusted rims, glowing cracks — plus the ticker's rising bubbles and a matching splash on impact.
+function brewBed(G, x1, x2, surfY, kind){
+  const P = kind==='purple';
+  const surfM = emat(P?0x5a2f9a:0x2f7a4c, P?0x8a3fd0:0x4fae66, 0.85).clone();
+  const w = x2-x1, cx = (x1+x2)/2;
+  const surf = mesh('box',[w,0.22,4.6], surfM); surf.position.set(cx, surfY, 0); G.scene.add(surf);   // UNBAKED — it pulses
+  const g = new THREE.Group();
+  const domeM = emat(P?0x7a4fc0:0x4a9a5c, P?0x9a5fe0:0x6fce7e, 0.7);
+  for(let i=0;i<Math.max(6, Math.floor(w*1.1));i++){
+    const d = mesh('sph',[rand(0.14,0.34),8,6], domeM);
+    d.position.set(rand(x1+0.5,x2-0.5), surfY+0.08, rand(-1.6,1.6)); d.scale.y=0.55; g.add(d);
+  }
+  const crustM = mat(P?0x2a1c44:0x1c3a28);
+  for(const ex of [x1+0.25, x2-0.25]){ const c = mesh('box',[0.5,0.3,4.6], crustM); c.position.set(ex, surfY+0.02, 0); g.add(c); }
+  const crackM = emat(P?0xd0a8ff:0xc8f0a0, P?0xb37dff:0x9fe066, 1.1);
+  for(let i=0;i<Math.max(2, Math.floor(w/4));i++){
+    const ck = mesh('box',[rand(0.8,1.8),0.05,0.1], crackM);
+    ck.position.set(rand(x1+1,x2-1), surfY+0.13, rand(-1.4,1.4)); ck.rotation.y=rand(-0.5,0.5); g.add(ck);
+  }
+  G.scene.add(bakeGroup(g));
+  pitRegister(G, x1, x2, P?'brewP':'brewG', surfY-1.05);   // splash th lands just above the surface
+  const p = G.pits[G.pits.length-1];
+  p.brew = surfM; p.brewBase = 0.85; p.moteSize = 0.75;    // the ticker pulses the surface + fattens the bubbles
+}
 function pitDressing(G, x1, x2, theme, bedTop=-4.3){   // bedTop: spike-base height — deepen for pits whose lips sit below 0
   if(G._pitArea !== G.area){ G.pits = []; G._pitTicker = null; G._pitArea = G.area; }   // areas that skip levelBegin (tutorial) must not inherit stale pits
   const g = new THREE.Group();
@@ -160,9 +188,10 @@ function ensurePitTicker(G){
       for(const p of G.pits){
         if(Math.abs(p.cx - px) > 46) continue;
         if(p.glow) p.glow.material.opacity = 0.10 + Math.sin(G.time*2.2 + p.cx)*0.045;
+        if(p.brew) p.brew.emissiveIntensity = p.brewBase + Math.sin(G.time*3 + p.cx)*0.3;   // the brew BREATHES
         if(this.t > 0.34){
           const f = PIT_FX[p.theme]||PIT_FX.patch;
-          G.fx.spawn(new THREE.Vector3(p.x1+rand(0.3, Math.max(0.4,(p.x2-p.x1)-0.6)), p.moteY, rand(-0.8,0.8)), f.mote, 1, {speed:0.5, gravity:-1.6, life:1.4, size:0.5});
+          G.fx.spawn(new THREE.Vector3(p.x1+rand(0.3, Math.max(0.4,(p.x2-p.x1)-0.6)), p.moteY, rand(-0.8,0.8)), f.mote, 1, {speed:0.5, gravity:-1.6, life:1.4, size:p.moteSize||0.5});
         }
       }
       if(this.t > 0.34) this.t = 0;

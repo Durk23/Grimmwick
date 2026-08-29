@@ -330,10 +330,9 @@ function buildW1L4(G){
   signPost(G, 180.8, 1.8, -0.3, 'The Pumpkin King waits beyond this gate. He was the kindest guardian of all... until the ember burned his heart. Free him, Pip!');
 
   // ---- Act 3 deco (baked, one draw call): glowing bog floors, background trees, the hedge-tree, silhouettes ----
-  for(const g of [[113,121.5],[130,142],[152,167]]){
-    const bog = mesh('box',[g[1]-g[0], 0.2, 4.4], emat(0x2f6b45, 0x1e4a30, 0.7));
-    bog.position.set((g[0]+g[1])/2, -0.85, 0); decoAct.add(bog);    // the brew below each void (scenery, well under the pads)
-  }
+  // the brew below each void: BUBBLING PURPLE BREW-LAVA between the witch's cauldrons — pulsing
+  // surface, bubble domes, glowing cracks (brewBed registers the splash-impact zone too)
+  for(const g of [[113,121.5],[130,142],[152,167]]) brewBed(G, g[0], g[1], -0.85, 'purple');
   for(let i=0;i<7;i++) decoAct.add(deadTree(rand(106,186), rand(-8,-4.4), rand(1.0,1.6)));
   const bt1 = mesh('cyl',[0.3,0.44,6.6,7], mat(0x241a33)); bt1.position.set(143.7,3.3,-0.7); bt1.rotation.z=0.07;
   const bt2 = mesh('cyl',[0.22,0.32,6.4,6], mat(0x2e2140)); bt2.position.set(144.4,3.2,-0.9); bt2.rotation.z=-0.09;
@@ -361,12 +360,8 @@ function buildW1L4(G){
   // bog voids stay undressed too: their glowing brew surface already spans them.
   pitDressing(G, 50, 64, 'patch');    // Gap 2 — the crossing pair
   pitDressing(G, 95, 104, 'patch');   // the ride-down gap into the clearing
-  // Act-3 brew-bog voids: their glowing surface is the visual — register them so Pip SPLASHES in
-  // with the full impact sequence instead of silently falling through. (Gap 1 at x2..14 is the
+  // (Act-3 brew voids are dressed + registered by brewBed above. Gap 1 at x2..14 is the
   // LEAP OF FAITH — never registered, never dressed, never a tell.)
-  pitRegister(G, 113, 121.5, 'patch', -2.0);
-  pitRegister(G, 130, 142, 'patch', -2.0);
-  pitRegister(G, 152, 167, 'patch', -2.0);
 
   // clutter per solid span ONLY — never over a void, and NOTHING inside x 2..14: the leap
   // gap keeps its zero-tell rule (no clutter, no lights, no signs, no geometry hints — sacred).
