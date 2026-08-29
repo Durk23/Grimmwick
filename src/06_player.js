@@ -131,6 +131,7 @@ class Player {
   }
   buildRig(costumeKey, maskKeyOverride){
     this.costumeKey = costumeKey;
+    this.grimmAura = null; this.grimmLight = null;
     const c = COSTUMES[costumeKey]||COSTUMES.kid;
     while(this.group.children.length) this.group.remove(this.group.children[0]);
     const body = new THREE.Group();
@@ -345,6 +346,11 @@ class Player {
       body.add(cage,lglow,lcap);
       // tattered hem
       for(let i=0;i<5;i++){ const a=i/5*TAU+0.3; const tat=mesh('cone',[0.09,0.17,4], bodyMat); tat.position.set(Math.sin(a)*0.42,0.07,Math.cos(a)*0.42); tat.rotation.x=Math.PI; body.add(tat); }
+      // THE GLOW — a breathing ember aura + a real carried light (the night-watchman brings the light with him)
+      this.grimmAura = new THREE.Mesh(geo('sph',0.78,14,11),
+        new THREE.MeshBasicMaterial({color:0xff9a50, transparent:true, opacity:0.13, blending:THREE.AdditiveBlending, depthWrite:false}));
+      this.grimmAura.position.y=0.85; this.grimmAura.scale.set(1,1.35,1); body.add(this.grimmAura);
+      this.grimmLight = new THREE.PointLight(0xff9a50, 42, 9); this.grimmLight.position.y=1.0; body.add(this.grimmLight);
     }
     // ---- THE MASK SLOT (wardrobe brick #1): any mask over any costume ----
     const mk = maskKeyOverride !== undefined ? maskKeyOverride : (this.G && this.G.save ? this.G.save.mask : null);
@@ -732,6 +738,12 @@ class Player {
     if(this.grounded) this.lastSafe.copy(this.pos);
     // costume run-trail (pass cosmetics)
     const cz = COSTUMES[this.costumeKey];
+    if(this.grimmAura){
+      const tt = G.time, flare = this.blinkT>0 ? 0.3 : 0;
+      this.grimmAura.material.opacity = 0.11 + 0.05*Math.sin(tt*2.6) + flare;
+      this.grimmAura.rotation.y = tt*0.4;
+      if(this.grimmLight) this.grimmLight.intensity = 42 + Math.sin(tt*7.3)*6 + Math.sin(tt*13.1)*3 + (this.blinkT>0?45:0);
+    }
     if(cz && cz.trail){
       this._trailT = (this._trailT||0)-dt;
       if(this._trailT<=0 && Math.hypot(this.vel.x,this.vel.z)>4){
