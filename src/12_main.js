@@ -25,7 +25,7 @@ const G = {
       if(raw) this.save = JSON.parse(raw);
     }catch(e){}
     if(!this.save || !this.save.owned){
-      this.save = { candy:0, embers:0, worlds:{}, gp:{}, owned:['kid','ghost'], equipped:'kid', seenIntro:false, maxHearts:3 };
+      this.save = { candy:0, embers:0, worlds:{}, gp:{}, owned:['kid'], equipped:'kid', seenIntro:false, maxHearts:3 };
     }
     if(!this.save.maxHearts) this.save.maxHearts = 3;
     if(this.save.upMagnet===undefined) this.save.upMagnet = 0;

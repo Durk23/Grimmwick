@@ -1,12 +1,12 @@
 // ============ PLAYER — Pip the trick-or-treater, costumes, moveset ============
 const COSTUMES = {
   kid:      {name:'Just Pip',      price:0,    body:0xe8503c, accent:0x4d7bc4, hat:'none',  cape:null,     human:true, flannel:true, desc:'The smallest kid in Grimmwick. Red flannel, white tee, bravery by nature.'},
-  hoodie:   {name:'Pumpkin Hoodie', price:0,   body:0xff8c42, accent:0x4a3a6e, hat:'none',  cape:null,     human:true, desc:'Pip\'s old favorite. Hoodie by Gran, worn soft at the sleeves.'},
-  ghost:    {name:'Gran\'s Ghost Sheet', price:0, body:0xf2f0ff, accent:0xd8d4f0, hat:'none', cape:null,   desc:'The sheet Gran sewed, crooked eye-holes and all. An heirloom.'},
+  hoodie:   {name:'Pumpkin Hoodie', price:0,   body:0xff8c42, accent:0x4a3a6e, hat:'none',  cape:null,     human:true, retired:true, desc:'Pip\'s old favorite. Hoodie by Gran, worn soft at the sleeves.'},
+  ghost:    {name:'Gran\'s Ghost Sheet', price:0, body:0xf2f0ff, accent:0xd8d4f0, hat:'none', cape:null, retired:true,   desc:'The sheet Gran sewed, crooked eye-holes and all. An heirloom.'},
   pumpkin:  {name:'Pumpkin Pal',   price:150,  body:0xff8c2e, accent:0xd96a12, hat:'stem',  cape:null,     retired:true, desc:'Round, orange, and proud of it.'},
   witch:    {name:'Witchling',     price:250,  body:0x8e5bd9, accent:0x5b3a8e, hat:'witch', cape:null,     desc:'Comes with a very pointy hat.'},
   vampire:  {name:'Count Pip',     price:250,  body:0xe8e4f0, accent:0x1a1128, hat:'none',  cape:0x8f1030, desc:'Vants to collect your candy.'},
-  mummy:    {name:'Wrap Star',     price:350,  body:0xd9d2b8, accent:0xb8b096, hat:'none',  cape:null,     desc:'It took forever to get dressed.'},
+  mummy:    {name:'Wrap Star',     price:350,  body:0xd9d2b8, accent:0xb8b096, hat:'none',  cape:null,  retired:true,     desc:'It took forever to get dressed.'},
   skeleton: {name:'Mr. Bones',     price:500,  body:0x2a2438, accent:0xe8e4d8, hat:'none',  cape:null,     desc:'Rattles when he double-jumps.'},
   ember:    {name:'Ember Spirit',  price:0, pass:'Tier 5', body:0xff5ea8, accent:0xffd166, glow:0xff2e10, trail:0xff8c2e, hat:'none', cape:0xff8c2e, desc:'Season 1 Pass · Tier 5. Burns bright. Never burns out.'},
   nightstitch: {name:'NIGHTSTITCH', price:0, pass:'Instant', body:0x2c2a6e, accent:0x63e6e2, glow:0x2a3fd0, trail:0x63e6e2, stitched:true, hat:'none', cape:0x1c1a4e, desc:'Stitched from the night sky itself. Yours the INSTANT you get the Pass.'},
@@ -276,11 +276,26 @@ class Player {
         body.add(wrap);
       }
     }
-    if(costumeKey==='skeleton'){
-      for(let i=0;i<3;i++){
-        const rib = mesh('tor',[0.3-i*0.05, 0.035, 5, 10], mat(c.accent));
-        rib.rotation.x=Math.PI/2; rib.position.y=0.5+i*0.2; rib.scale.z=0.6;
-        body.add(rib);
+    if(costumeKey==='skeleton'){   // Mr. Bones, done properly: glow-in-the-dark skull face + full painted bones
+      const boneM = emat(0xf0ecdd, 0x8a8570, 0.5), sockM = mat(0x0c0a14);
+      // the skull face — a bone plate over the dark head, big sockets, nose slit, a proud grin
+      const plate = mesh('sph',[0.4,12,10], boneM); plate.position.set(0,1.18,0.2); plate.scale.set(0.95,0.9,0.62); body.add(plate);
+      const sL = mesh('sph',[0.1,7,6], sockM); sL.position.set(-0.14,1.24,0.48); body.add(sL);
+      const sR = sL.clone(); sR.position.x=0.14; body.add(sR);
+      const nose = mesh('cone',[0.045,0.08,3], sockM); nose.position.set(0,1.1,0.5); nose.rotation.x=-0.3; body.add(nose);
+      for(let i=0;i<4;i++){ const t=mesh('box',[0.045,0.07,0.04], boneM); t.position.set(-0.105+i*0.07,0.96,0.46); body.add(t); }
+      const gum = mesh('box',[0.32,0.025,0.045], sockM); gum.position.set(0,1.0,0.46); body.add(gum);
+      // spine + rib cage down the front
+      const spine = mesh('box',[0.05,0.62,0.04], boneM); spine.position.set(0,0.6,0.43); body.add(spine);
+      for(let i=0;i<4;i++){
+        const rib = mesh('tor',[0.3-i*0.045, 0.03, 5, 12], boneM);
+        rib.rotation.x=Math.PI/2; rib.position.y=0.82-i*0.13; rib.scale.z=0.55; body.add(rib);
+      }
+      // pelvis V + femur stripes on the lower cone
+      for(const s of [-1,1]){
+        const hip = mesh('box',[0.05,0.2,0.04], boneM); hip.position.set(s*0.09,0.31,0.44); hip.rotation.z=s*0.5; body.add(hip);
+        const femur = mesh('box',[0.05,0.24,0.04], boneM); femur.position.set(s*0.13,0.12,0.5); femur.rotation.z=s*0.12; body.add(femur);
+        const knob = mesh('sph',[0.04,5,4], boneM); knob.position.set(s*0.14,0.02,0.52); body.add(knob);
       }
     }
     if(costumeKey==='wolfpup'){     // furry ears, a happy tail, and a little snout
