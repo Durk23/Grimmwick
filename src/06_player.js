@@ -135,7 +135,7 @@ class Player {
       if(!c.flannel){
         // hood (down) around the neck + zipper stripe on the hoodie
         const hood = mesh('tor',[0.3,0.12,7,14], mat(c.accent)); hood.position.set(0,1.0,-0.12); hood.rotation.x=1.2;
-        const zip = mesh('box',[0.05,0.8,0.04], mat(c.accent)); zip.position.set(0,0.62,0.5);
+        const zip = mesh('box',[0.05,0.6,0.04], mat(c.accent)); zip.position.set(0,0.46,0.44);   // stops at the collar — it was riding up over the chin
         const pocket = mesh('box',[0.4,0.2,0.06], mat(c.accent)); pocket.position.set(0,0.34,0.48);
         body.add(hood, zip, pocket);
       }
