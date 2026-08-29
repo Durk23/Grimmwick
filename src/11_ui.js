@@ -602,6 +602,31 @@ const UI = {
         });
         grid.appendChild(div);
       }
+      // ---- CHARACTERS — story unlocks, never sold ----
+      const kh = document.createElement('div');
+      kh.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';
+      kh.textContent = '🕯️ CHARACTERS: story unlocks';
+      grid.appendChild(kh);
+      for(const key in COSTUMES){
+        const c = COSTUMES[key];
+        if(!c.character) continue;
+        const owned = G.save.owned.includes(key);
+        const equipped = G.save.equipped===key;
+        const div = document.createElement('div');
+        div.className='item';
+        const pv = this.costumePreview(key);
+        const swInner = pv ? `<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:${owned?'drop-shadow(0 3px 5px rgba(0,0,0,.45))':'brightness(0.12) drop-shadow(0 0 8px rgba(120,80,200,.6))'}" alt="">` : '';
+        div.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(255,150,60,.18), transparent 60%), linear-gradient(135deg,#2c2450 60%,#4a3a6e)">${swInner}</div>
+          <h4>${owned?c.name:'? ? ?'}</h4><p>${owned?c.desc:'Someone is still waiting for an invitation. Finish the story to meet him.'}</p>
+          <button class="btn buy ui-block ${equipped?'ghost2':(owned?'orange':'ghost2')}">${equipped?'✓ Equipped':(owned?'Play as him':'🕯️ Save the night to unlock')}</button>`;
+        this.bindTap(div.querySelector('button'), ()=>{
+          if(equipped) return;
+          if(!owned){ AUDIO.ui(); this.toast('🕯️ Grimm joins your wardrobe when the story is done. Save the night!'); return; }
+          G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy();
+          this.renderShop('costumes'); this.updateHUD();
+        });
+        grid.appendChild(div);
+      }
       const ch = document.createElement('div');
       ch.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';
       ch.textContent = '🎩 COSTUMES: whole new looks';
@@ -609,7 +634,7 @@ const UI = {
       for(const key in COSTUMES){
         const c = COSTUMES[key];
         if(c.pass && !G.save.owned.includes(key)) continue;   // v1.0 launch: pass-exclusive looks hidden until the Spook Pass ships (owners from testing keep theirs)
-        if(c.retired) continue;   // retired from the rack entirely (owners keep the data; a future season can re-release them)
+        if(c.retired || c.character) continue;   // retired looks are off the rack; characters live in their own section above
         const owned = G.save.owned.includes(key);
         const equipped = G.save.equipped===key;
         const div = document.createElement('div');

@@ -142,6 +142,7 @@ function buildHub(G){
     const lampGlow = mesh('sph',[0.09,7,6], emat(0xffd98a,0xffb02e,1.3)); lampGlow.position.copy(lamp.position); lampArm.add(lampGlow);
     grimm.add(lampArm);
     grimm.position.set(-1.5, 0.1, -6.2); grimm.rotation.y = 2.9;   // north of the Everflame on his watch rounds, well clear of the Cauldron's interact zone
+    if(!G.save.grimmPlayToast){ G.save.grimmPlayToast = 1; G.persist(); setTimeout(()=>{ window.UI && UI.toast('🕯️ GRIMM IS PLAYABLE! Visit the Costume Cauldron to play as him.', 5600); }, 1600); }
     S.add(grimm);
     G.hubGrimm = grimm;
     G.ents.add({ dead:false, cull:false, group:new THREE.Group(), t:rand(0,9), update(dt){

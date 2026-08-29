@@ -43,6 +43,7 @@ const G = {
     // Their clock is playT at migration — honest or WORSE (includes post-game wandering), and the unknowable
     // stats take worst-case tiebreaks, so the entry can never rank unfairly high. A fresh run replaces it.
     if(this.save.nightDone===undefined) this.save.nightDone = (this.save.embers||0) >= 5;
+    if(this.save.nightDone && this.save.owned && !this.save.owned.includes('grimm')) this.save.owned.push('grimm');   // existing finishers get playable Grimm
     if(this.save.nightDone && this.save.nightT===undefined){
       this.save.nightT = this.save._finishT !== undefined ? this.save._finishT : (this.save.playT||0);
       this.save.nightDmg = 999; this.save.nightDeaths = 99;
@@ -520,6 +521,7 @@ const G = {
     // total play-clock from New Game to inviting Grimm; damage + candy lifetime counters break ties)
     if(district==='w5' && !this.save.nightDone){
       this.save.nightDone = true;
+      if(!this.save.owned.includes('grimm')) this.save.owned.push('grimm');   // GRIMM BECOMES PLAYABLE — the story's promise
       this.save.nightEligible = !this.save.nightCozy;   // ANY cozy time during the night = no board entry (Pip still wins his party)
       this.save.nightT = this.save._finishT !== undefined ? this.save._finishT : (this.save.playT||0);
       this.save.nightDmg = this.save.dmgUntracked ? 999 : (this.save.damageLifetime||0);   // untracked saves take the worst tiebreak, honestly

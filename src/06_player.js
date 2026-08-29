@@ -9,11 +9,12 @@ const COSTUMES = {
   mummy:    {name:'Wrap Star',     price:350,  body:0xd9d2b8, accent:0xb8b096, hat:'none',  cape:null,  retired:true,     desc:'It took forever to get dressed.'},
   skeleton: {name:'Mr. Bones',     price:500,  body:0x2a2438, accent:0xe8e4d8, hat:'none',  cape:null,     desc:'Rattles when he double-jumps.'},
   ember:    {name:'Ember Spirit',  price:0, pass:'Tier 5', body:0xff5ea8, accent:0xffd166, glow:0xff2e10, trail:0xff8c2e, hat:'none', cape:0xff8c2e, desc:'Season 1 Pass · Tier 5. Burns bright. Never burns out.'},
-  nightstitch: {name:'NIGHTSTITCH', price:0, pass:'Instant', body:0x2c2a6e, accent:0x63e6e2, glow:0x2a3fd0, trail:0x63e6e2, stitched:true, hat:'none', cape:0x1c1a4e, desc:'Stitched from the night sky itself. Yours the INSTANT you get the Pass.'},
+  nightstitch: {name:'NIGHTSTITCH', price:2000, body:0x2c2a6e, accent:0x63e6e2, glow:0x2a3fd0, trail:0x63e6e2, stitched:true, hat:'none', cape:0x1c1a4e, desc:'Stitched from the night sky itself. The rarest thread in Grimmwick.'},
   wolfpup:   {name:'Wolf Pup', price:450, body:0x8a6a4a, accent:0x5a4632, hat:'none', cape:null, desc:'Awooo! Fur by moonlight, zoomies by midnight.'},
   candycorn: {name:'Candy Corn', price:350, body:0xfff6e0, accent:0xff8c2e, hat:'none', cape:null, desc:'Three flavors of controversy in one costume.'},
   doctor:    {name:'Doctor Pip', price:400, body:0xf4f4f8, accent:0x63b6a8, hat:'none', cape:null, human:true, desc:'The night shift. Prescribes candy, twice daily.'},
   police:    {name:'Officer Pip', price:400, body:0x2c3a5e, accent:0xffd23f, hat:'none', cape:null, human:true, desc:'Grimmwick\'s finest. Writes tickets for insufficient spookiness.'},
+  grimm:     {name:'GRIMM', price:0, character:true, body:0x5a5578, accent:0x3a3658, glow:0xff9a50, trail:0xff9a50, hat:'none', cape:null, desc:'The Forgotten Guest, playable. His double-jump is a SHADOW LEAP: a forward phase through danger itself.'},
 };
 
 // ============ MASKS — the wardrobe's first slot: wear any mask over ANY costume ============
@@ -112,6 +113,7 @@ class Player {
     this.batT = 0; this.batFlutters = 0; this.wingL = null; this.wingR = null;
     this.climbing = false;
     this.iframes = 0;
+    this.blinkT = 0;
     this.dead = false;
     this.canDouble = true;
     this.coyote = 0; this.jumpBuf = 0;
@@ -325,6 +327,25 @@ class Player {
       const belt = mesh('cyl',[0.42,0.46,0.1,10], mat(0x14101f)); belt.position.y=0.42; body.add(belt);
       const buckle = mesh('box',[0.12,0.09,0.04], mat(0xffd23f)); buckle.position.set(0,0.42,0.44); body.add(buckle);
     }
+    if(costumeKey==='grimm'){       // THE FORGOTTEN GUEST — hooded robe, ember eyes, his watch-lantern on the belt
+      const trimM = mat(c.accent);
+      // deep hood: swept sphere over the head + peaked cowl, rim framing the face
+      const hoodB = mesh('sph',[0.46,10,9], bodyMat); hoodB.position.set(0,1.24,-0.08); hoodB.scale.set(1.04,1.12,0.95); body.add(hoodB);
+      const cowl = mesh('cone',[0.42,0.6,9], bodyMat); cowl.position.set(0,1.66,-0.05); cowl.rotation.x=-0.12; body.add(cowl);
+      const rim = mesh('tor',[0.34,0.07,6,14], trimM); rim.position.set(0,1.26,0.16); rim.rotation.x=1.32; body.add(rim);
+      // ember eyes burn through the hood shadow (cover the standard dark eyes)
+      const emE = emat(0xffb46a,0xff9a3a,1);
+      const gE1 = mesh('sph',[0.085,7,6], emE); gE1.position.set(-0.15,1.26,0.38); gE1.scale.set(1,1.4,0.6); body.add(gE1);
+      const gE2 = gE1.clone(); gE2.position.x=0.15; body.add(gE2);
+      // rope belt + the night-watchman's tiny lantern
+      const belt = mesh('tor',[0.37,0.045,5,12], mat(0x8a6a3a)); belt.position.y=0.52; belt.rotation.x=Math.PI/2; body.add(belt);
+      const cage = mesh('box',[0.11,0.15,0.11], trimM); cage.position.set(-0.42,0.48,0.14);
+      const lglow = mesh('sph',[0.05,6,5], emat(0xffd98a,0xffb02e,1)); lglow.position.copy(cage.position);
+      const lcap = mesh('cone',[0.08,0.07,6], trimM); lcap.position.set(-0.42,0.58,0.14);
+      body.add(cage,lglow,lcap);
+      // tattered hem
+      for(let i=0;i<5;i++){ const a=i/5*TAU+0.3; const tat=mesh('cone',[0.09,0.17,4], bodyMat); tat.position.set(Math.sin(a)*0.42,0.07,Math.cos(a)*0.42); tat.rotation.x=Math.PI; body.add(tat); }
+    }
     // ---- THE MASK SLOT (wardrobe brick #1): any mask over any costume ----
     const mk = maskKeyOverride !== undefined ? maskKeyOverride : (this.G && this.G.save ? this.G.save.mask : null);
     if(mk && typeof MASKS !== 'undefined' && MASKS[mk]) body.add(buildMask(mk));
@@ -533,6 +554,12 @@ class Player {
     const speed = 7.2 * (this.moonT>0 ? 1.35 : 1);
     const accel = this.grounded ? 50 : 28;
     if(this.climbing){ /* velocities set by climb logic above */ }
+    else if(this.blinkT>0){   // Grimm's shadow phase: locked burst along the leap direction, afterimages trailing
+      this.blinkT -= dt;
+      this.vel.x = this._blinkVX; if(G.mode==='side') this.vel.z = 0; else this.vel.z = this._blinkVZ;
+      G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.55,this.pos.z), 0x5a3fa0, 2, {speed:0.6, life:0.35, gravity:0, size:0.9});
+      G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.7,this.pos.z), 0xff9a50, 1, {speed:0.9, life:0.3, gravity:0, size:0.6});
+    }
     else if(this.launchT>0 && !this.grounded){ this.launchT -= dt; }   // cannon launch: ballistic — preserve horizontal momentum (air friction would bleed the arc short)
     else if(mag>0.01 && !this.pounding && !(this.springT>0)){   // a winding spring holds its ground
       this.vel.x = damp(this.vel.x, md.x*speed, accel/speed, dt);
@@ -560,6 +587,15 @@ class Player {
         AUDIO.djump();
         this.squashV = 6;
         if(this.costumeKey==='skeleton') AUDIO.noise({t:0.15,vol:0.1,fFrom:3000,fTo:1000});
+        if(this.costumeKey==='grimm'){
+          // SHADOW LEAP — same rise as any double-jump (height gates stay honest), plus a
+          // short forward phase with ghost i-frames. Direction locks at the leap.
+          this.blinkT = 0.13;
+          this._blinkVX = Math.sin(this.facing)*24;
+          this._blinkVZ = G.mode==='side' ? 0 : Math.cos(this.facing)*24;
+          this.iframes = Math.max(this.iframes, 0.45);
+          AUDIO.noise({t:0.14,vol:0.14,fFrom:1600,fTo:250});
+        }
         G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.6,this.pos.z), PAL.purpleFx, 8, {speed:2, life:0.35, gravity:1});
       } else if(this.batT>0 && this.batFlutters<4){
         // bat-wing flutter: up to 4 extra wing-beats per airtime
