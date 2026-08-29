@@ -80,6 +80,7 @@ public class GameCenterPlugin: CAPPlugin, CAPBridgedPlugin {
                 if let l = localEntry, l.rank > 0 {
                     result["localRank"] = l.rank
                     result["localValue"] = l.score
+                    result["localContext"] = l.context
                 }
                 call.resolve(result)
             }

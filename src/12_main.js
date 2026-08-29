@@ -53,7 +53,8 @@ const G = {
         const cs = Math.round(this.save.nightT*100);
         const stars = Object.values(this.save.levels||{}).reduce((s,l)=>s + (l.stars ? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
         const q = this.save.pendingScores || (this.save.pendingScores = {});
-        q['grimmwick.night'] = { v: cs*1e9 + 99*1e7 + 999*1e4 + (9999 - Math.min(this.save.nightCandy||0,9999)), c: stars };
+        // v3 composite: stars in the score (dmg 998 = the grandfather notch so refreshes can supersede)
+        q['grimmwick.night'] = { v: cs*1e9 + 99*1e7 + 998*1e4 + (75 - Math.min(stars,75))*1e2, c: this.save.candyLifetime||0 };
       }
     }
     if(this.save.lives===undefined) this.save.lives = 5;

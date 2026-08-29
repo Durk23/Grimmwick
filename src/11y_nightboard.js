@@ -48,16 +48,19 @@ function fmtCS(cs){
   if(h) return h+'h '+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
   return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0');
 }
-// the composite: rank by time, ties by deaths, then damage, then candy. Fits in 2^53 (timeCS ≤ 3.6e6 → 3.6e15).
-function encodeNight(timeCS, deaths, dmg, candy){
-  return timeCS*1e9 + Math.min(Math.max(deaths,0),99)*1e7 + Math.min(Math.max(dmg,0),999)*1e4 + (9999 - Math.min(Math.max(candy,0),9999));
+// the composite v3: rank by time, ties by deaths, then damage, then STARS (more = better).
+// Stars live IN the score so earning one post-completion strictly improves it — Game Center then
+// accepts the resubmit and the board's star count stays LIVE. Candy rides the context field
+// (uncapped). Fits in 2^53 (timeCS ≤ 3.6e6 → 3.6e15).
+function encodeNight(timeCS, deaths, dmg, stars){
+  return timeCS*1e9 + Math.min(Math.max(deaths,0),99)*1e7 + Math.min(Math.max(dmg,0),999)*1e4 + (75 - Math.min(Math.max(stars,0),75))*1e2;
 }
 function decodeNight(v){
   const timeCS = Math.floor(v/1e9);
   const deaths = Math.floor(v/1e7) % 100;
   const dmg = Math.floor(v/1e4) % 1000;
-  const candy = 9999 - (v % 1e4);
-  return { timeCS, deaths, dmg, candy };
+  const stars = 75 - (Math.floor(v/1e2) % 100);
+  return { timeCS, deaths, dmg, stars: Math.max(0, Math.min(75, stars)) };
 }
 
 const NIGHT_BOARDS = [
@@ -75,10 +78,22 @@ const Night = {
   localValue(G, key){
     const sv = G.save;
     if(key==='night') return sv.nightDone && sv.nightT && sv.nightEligible!==false
-      ? encodeNight(Math.round(sv.nightT*100), sv.nightDeaths||0, sv.nightDmg||0, sv.nightCandy||0) : null;
+      ? encodeNight(Math.round(sv.nightT*100), sv.nightDeaths||0, this._dmgFor(sv), this.totalStars(G)) : null;
     if(key==='flawless') return sv.flawlessT
-      ? encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths||0, sv.flawlessDmg||0, sv.flawlessCandy||0) : null;
+      ? encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths||0, sv.flawlessDmg||0, 75) : null;
     return null;
+  },
+  // grandfathered saves report damage 998 instead of the untracked 999: the one-notch dip makes the
+  // re-encoded score strictly better than their legacy entry, so the star-refresh replaces it. Shown as '–' either way.
+  _dmgFor(sv){ return sv.dmgUntracked ? 998 : Math.min(sv.nightDmg||0, 997); },
+  // THE LIVING ENTRY: after completion, every star earned (and better stats) re-improves the score,
+  // so the board reflects the player's CURRENT stars, not completion-day stars.
+  refreshNight(G){
+    const sv = G.save;
+    if(!sv.nightDone || sv.nightEligible===false || !sv.nightSubmitted) return;
+    const timeCS = Math.round((sv.nightT||0)*100);
+    if(timeCS<=0) return;
+    GC.submit('grimmwick.night', encodeNight(timeCS, sv.nightDeaths||0, this._dmgFor(sv), this.totalStars(G)), Math.min(sv.candyLifetime||0, 999999999));
   },
   // ---- submissions (queued while signed out; Game Center keeps each player's best) ----
   queuePending(board, value, context){
@@ -114,17 +129,15 @@ const Night = {
   },
   onLevelClear(G, levelId){
     if(!(G.save.cozy || G.runCozy)) this.checkFlawless(G);
+    this.refreshNight(G);
   },
   onBossDefeated(G, w){
     if(w === 'w5' && G.save.nightDone && !G.save.nightSubmitted){
       G.save.nightSubmitted = true;
-      const timeCS = Math.round((G.save.nightT||0)*100);
-      if(timeCS > 0 && G.save.nightEligible !== false){
-        GC.submit('grimmwick.night', encodeNight(timeCS, G.save.nightDeaths||0, G.save.nightDmg||0, G.save.nightCandy||0), this.totalStars(G));
-      }
       G.persist();
     }
     if(!(G.save.cozy || G.runCozy)) this.checkFlawless(G);
+    this.refreshNight(G);
   },
 
   // ================= THE NIGHT BOARD UI (two tabs, jewel not menu) =================
@@ -185,13 +198,13 @@ const Night = {
     if(GC.native()){ await GC.signIn(); this.render(); }   // auth (or retry queued submits) on every open
   },
   close(){ const el = document.getElementById('nb-screen'); if(el) el.style.display='none'; if(window.UI) UI._ovCloseT = performance.now(); AUDIO.ui && AUDIO.ui(); },
-  _row(rank, name, v, stars, me){
+  _row(rank, name, v, candyCtx, me){
     const d = decodeNight(v);
     return `<div class="nb-row${me?' me':''}">
       <div class="nb-rank">${me?'⭐':''}#${rank}</div>
       <div class="nb-main">
         <div class="nb-name">${String(name||'???').replace(/[<>&"]/g,'')}</div>
-        <div class="nb-stats">⭐${stars!=null?stars:'–'} · 🍬${d.candy>=9999?'9999+':d.candy} · ☠️${d.deaths>=99?'–':d.deaths}</div>
+        <div class="nb-stats">⭐${d.stars} · 🍬${candyCtx!=null&&candyCtx>0?(+candyCtx).toLocaleString():'–'} · ☠️${d.deaths>=99?'–':d.deaths}</div>
       </div>
       <div class="nb-time">${fmtCS(d.timeCS)}</div>
     </div>`;
@@ -234,7 +247,7 @@ const Night = {
     }
     list.innerHTML = hdr + r.entries.map(e => this._row(e.rank, e.name, e.value, e.context, e.me)).join('');
     if(r.localRank && !r.entries.some(e=>e.me)){
-      list.innerHTML += this._row(r.localRank, GC.alias||'You', r.localValue!=null?r.localValue:0, null, true);
+      list.innerHTML += this._row(r.localRank, GC.alias||'You', r.localValue!=null?r.localValue:0, r.localContext!=null?r.localContext:null, true);
     }
   },
 };
