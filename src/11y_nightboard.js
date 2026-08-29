@@ -143,16 +143,13 @@ const Night = {
       .nb-tab.on { background:rgba(255,170,60,.18); border-color:#ffb35e; color:#ffd98a; box-shadow:0 0 14px rgba(255,170,60,.25); }
       #nb-sub { font-size:12px; opacity:.75; margin:2px 2px 6px; text-align:center; }
       #nb-list { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; border-radius:16px; background:rgba(255,255,255,.045); border:1.5px solid rgba(255,255,255,.1); padding:6px; }
-      .nb-row { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; font-size:13.5px; font-variant-numeric:tabular-nums; }
-      .nb-row.hdr { font-size:10.5px; opacity:.6; font-weight:800; letter-spacing:1px; padding:4px 10px 2px; }
-      .nb-row.me { background:rgba(255,170,60,.14); border:1.5px solid rgba(255,180,90,.4); font-weight:800; }
-      .nb-rank { width:42px; font-weight:900; color:#ffd98a; flex:0 0 auto; }
-      .nb-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:60px; }
-      .nb-time { width:76px; font-weight:900; text-align:right; flex:0 0 auto; }
-      .nb-st { width:44px; text-align:right; flex:0 0 auto; opacity:.95; }
-      .nb-cd { width:52px; text-align:right; flex:0 0 auto; opacity:.8; }
-      .nb-dm { width:40px; text-align:right; flex:0 0 auto; opacity:.8; }
-      .nb-dt { width:40px; text-align:right; flex:0 0 auto; opacity:.8; }
+      .nb-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:12px; font-variant-numeric:tabular-nums; }
+      .nb-row.me { background:rgba(255,170,60,.14); border:1.5px solid rgba(255,180,90,.4); }
+      .nb-rank { width:44px; font-weight:900; font-size:15px; color:#ffd98a; flex:0 0 auto; }
+      .nb-main { flex:1; min-width:0; }
+      .nb-name { font-size:14.5px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .nb-stats { font-size:11.5px; opacity:.72; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .nb-time { font-weight:900; font-size:15px; text-align:right; flex:0 0 auto; }
       .nb-note { padding:20px 16px; text-align:center; opacity:.8; font-size:13.5px; line-height:1.55; }
       #nb-foot { display:flex; gap:8px; align-items:center; padding-top:8px; }
       #nb-friends { padding:7px 13px; border-radius:14px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.16); font-size:12.5px; font-weight:800; cursor:pointer; }
@@ -192,12 +189,11 @@ const Night = {
     const d = decodeNight(v);
     return `<div class="nb-row${me?' me':''}">
       <div class="nb-rank">${me?'⭐':''}#${rank}</div>
-      <div class="nb-name">${String(name||'???').replace(/[<>&"]/g,'')}</div>
+      <div class="nb-main">
+        <div class="nb-name">${String(name||'???').replace(/[<>&"]/g,'')}</div>
+        <div class="nb-stats">⭐${stars!=null?stars:'–'} · 🍬${d.candy>=9999?'9999+':d.candy} · 💜${d.dmg>=999?'–':d.dmg} · ☠️${d.deaths>=99?'–':d.deaths}</div>
+      </div>
       <div class="nb-time">${fmtCS(d.timeCS)}</div>
-      <div class="nb-st">⭐${stars!=null?stars:'–'}</div>
-      <div class="nb-cd">🍬${d.candy>=9999?'9999+':d.candy}</div>
-      <div class="nb-dm">💜${d.dmg>=999?'–':d.dmg}</div>
-      <div class="nb-dt">☠️${d.deaths>=99?'–':d.deaths}</div>
     </div>`;
   },
   async render(){
@@ -213,7 +209,7 @@ const Night = {
       + (nPend && GC.authed ? ' · 📮 posting…' : '');
     if(nPend && GC.authed && GC.lastError && !this._errToasted){ this._errToasted = true;
       UI.toast('📮 Score queued. Game Center said: "'+GC.lastError.slice(0,80)+'". New boards can take a while, it will keep retrying!', 5200); }
-    const hdr = `<div class="nb-row hdr"><div class="nb-rank"></div><div class="nb-name">PLAYER</div><div class="nb-time">TIME</div><div class="nb-st">STARS</div><div class="nb-cd">CANDY</div><div class="nb-dm">DMG</div><div class="nb-dt">DEATHS</div></div>`;
+    const hdr = '';
     if(!GC.native()){
       list.innerHTML = hdr + (mine!=null
         ? this._row('–', 'You (local)', mine, b.key==='flawless'?75:this.totalStars(G), true)
