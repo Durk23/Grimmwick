@@ -39,10 +39,23 @@ const G = {
       if(Object.keys(this.save.levels||{}).length > 0 || (this.save.playT||0) > 60) this.save.dmgUntracked = true;   // damage AND deaths both started false-zero on these saves
     }
     if(this.save.deathsLifetime===undefined) this.save.deathsLifetime = 0;
-    // legacy saves that already beat Grimm: the night is done but board-ineligible — their playT
-    // includes post-game wandering, so a Fastest Night submit would be unfair either way
+    // legacy saves that already beat Grimm (finished before the Night Board existed): GRANDFATHER them in.
+    // Their clock is playT at migration — honest or WORSE (includes post-game wandering), and the unknowable
+    // stats take worst-case tiebreaks, so the entry can never rank unfairly high. A fresh run replaces it.
     if(this.save.nightDone===undefined) this.save.nightDone = (this.save.embers||0) >= 5;
-    if(this.save.nightDone && this.save.nightSubmitted===undefined){ this.save.nightSubmitted = true; this.save.nightEligible = false; }
+    if(this.save.nightDone && this.save.nightT===undefined){
+      this.save.nightT = this.save.playT||0;
+      this.save.nightDmg = 999; this.save.nightDeaths = 99;
+      this.save.nightCandy = this.save.candyLifetime||0;
+      this.save.nightEligible = (this.save.playT||0) > 60;
+      this.save.nightSubmitted = true;
+      if(this.save.nightEligible){
+        const cs = Math.round(this.save.nightT*100);
+        const stars = Object.values(this.save.levels||{}).reduce((s,l)=>s + (l.stars ? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
+        const q = this.save.pendingScores || (this.save.pendingScores = {});
+        q['grimmwick.night'] = { v: cs*1e9 + 99*1e7 + 999*1e4 + (9999 - Math.min(this.save.nightCandy||0,9999)), c: stars };
+      }
+    }
     if(this.save.lives===undefined) this.save.lives = 5;
     if(this.save.cozy===undefined) this.save.cozy = false;
     if(this.save.tutDone===undefined) this.save.tutDone = false;
