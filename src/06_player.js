@@ -22,6 +22,7 @@ const MASKS = {
   pumpkinhead: {name:'Pumpkin Head', price:400, icon:'🎃', desc:'The classic. Nobody will know it\'s you. (Everybody will know it\'s you.)'},
   hockey:      {name:'Hockey Mask',  price:250, icon:'🏒', desc:'Straight from the equipment shed. The scuffs are all original.'},
   witchhat:    {name:'Witch\'s Hat', price:300, icon:'🧙', desc:'Properly crooked, personally enchanted. Fits over anything.'},
+  starcrown:   {name:'THE STAR CROWN', price:0, earned:75, icon:'👑', desc:'All 75 stars. Every level, every challenge. Cannot be bought — only EARNED.'},
 };
 function buildMask(key){
   const g = new THREE.Group();
@@ -74,6 +75,21 @@ function buildMask(key){
     const band = mesh('cyl',[0.315,0.35,0.1,10], emat(0x8a5fd0,0x5a3fa0,0.35)); band.position.y=0.38; band.rotation.z=0.06; g.add(band);
     const buckle = mesh('box',[0.1,0.09,0.03], mat(0xffd23f)); buckle.position.set(0,0.38,0.34); g.add(buckle);
     const moon = mesh('sph',[0.045,6,5], emat(0xffd98a,0xffb02e,0.9)); moon.position.set(0.2,0.4,0.26); g.add(moon);
+  }
+  else if(key==='starcrown'){      // the 75-star crown — gold points, star jewels, and one floating star. Earned, never sold.
+    const goldM = emat(0xffd23f, 0xb8860a, 0.6), gemM = emat(0x63e6e2, 0x2a9aa0, 0.9);
+    const band = mesh('cyl',[0.34,0.36,0.14,10], goldM); band.position.y=0.42; g.add(band);
+    for(let i=0;i<5;i++){
+      const a = (i/5)*Math.PI*2 + 0.3;
+      const pt = mesh('cone',[0.07,0.22,4], goldM); pt.position.set(Math.cos(a)*0.32, 0.58, Math.sin(a)*0.32); g.add(pt);
+      if(i%2===0){ const gem = mesh('sph',[0.04,6,5], gemM); gem.position.set(Math.cos(a)*0.36, 0.44, Math.sin(a)*0.36); g.add(gem); }
+    }
+    const star = new THREE.Group();
+    for(const rz of [0, Math.PI/2]){ const bar = mesh('box',[0.16,0.05,0.05], emat(0xffe9a8,0xffd23f,1.2)); bar.rotation.z=rz; star.add(bar); }
+    for(const rz of [Math.PI/4, -Math.PI/4]){ const bar = mesh('box',[0.11,0.04,0.04], emat(0xffe9a8,0xffd23f,1)); bar.rotation.z=rz; star.add(bar); }
+    star.position.set(0, 0.86, 0); g.add(star);
+    const halo = new THREE.Mesh(geo('sph',0.14,8,7), new THREE.MeshBasicMaterial({color:0xffd98a, transparent:true, opacity:0.35, blending:THREE.AdditiveBlending, depthWrite:false}));
+    halo.position.copy(star.position); g.add(halo);
   }
   g.position.set(0, 1.18, 0.02);
   return g;

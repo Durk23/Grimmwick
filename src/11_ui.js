@@ -586,11 +586,12 @@ const UI = {
         const pv = this.costumePreview(wornCostume, mkey);
         div.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%), linear-gradient(135deg,#3a2f5a66 60%,#5a3f7a66)">${pv?`<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">`:`<div style="font-size:52px;line-height:110px">${m.icon}</div>`}</div>
           <h4>${m.icon} ${m.name}</h4><p>${m.desc}</p>
-          <button class="btn buy ui-block ${wearing?'ghost2':(ownedM?'':'orange')}">${wearing?'✓ On — tap to take off':(ownedM?'Wear it':'🍬 '+m.price)}</button>`;
+          <button class="btn buy ui-block ${wearing?'ghost2':(ownedM?'':(m.earned?'ghost2':'orange'))}">${wearing?'✓ On — tap to take off':(ownedM?'Wear it':(m.earned?'⭐ Earn all '+m.earned+' stars':'🍬 '+m.price))}</button>`;
         const btn = div.querySelector('button');
         this.bindTap(btn, ()=>{
           if(wearing){ G.save.mask = null; }
           else if(ownedM){ G.save.mask = mkey; }
+          else if(m.earned){ AUDIO.ui(); this.toast('👑 The Star Crown can\'t be bought — earn all '+m.earned+' stars! (Check ⬆️ Level Ups)'); return; }
           else if(G.save.candy >= m.price){ G.save.candy -= m.price; G.save.ownedMasks.push(mkey); G.save.mask = mkey; AUDIO.buy(); this.toast('🎭 New mask: '+m.name+'!'); }
           else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); return; }
           G.player && G.player.buildRig(G.save.equipped||'kid');
@@ -644,6 +645,11 @@ const UI = {
         {id:'s20', at:20, label:'🍬 600 + 👻 1-UP',         grant:()=>{ G.addCandy(600); G.save.lives=Math.min(9,(G.save.lives!==undefined?G.save.lives:5)+1); }},
         {id:'s30', at:30, label:'❤️ +1 MAX HEART',          grant:()=>{ if(!grantHeart()){ G.addCandy(900); this.toast('❤️ Hearts maxed — 🍬 900 instead!'); } }},
         {id:'s45', at:45, label:'🍬 2000 + 👻👻👻 3 1-UPs', grant:()=>{ G.addCandy(2000); G.save.lives=Math.min(9,(G.save.lives!==undefined?G.save.lives:5)+3); }},
+        {id:'s75', at:75, label:'👑 THE STAR CROWN + 🍬 3000 — the FLAWLESS reward', grant:()=>{
+          G.addCandy(3000);
+          if(!G.save.ownedMasks.includes('starcrown')) G.save.ownedMasks.push('starcrown');
+          G.save.mask='starcrown'; G.player && G.player.buildRig(G.save.equipped||'kid');
+          AUDIO.goldPumpkin(); this.toast('👑 THE STAR CROWN — all 75 stars. You ARE the night, Pip.', 5200); }},
       ];
       body.innerHTML = `
         <div class="ribbon">⭐ Earn stars in levels (fast · all-candy · no-damage) to LEVEL UP — plus candy upgrades below</div>
