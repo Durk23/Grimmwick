@@ -88,8 +88,24 @@ function pitDressing(G, x1, x2, theme, bedTop=-4.3){   // bedTop: spike-base hei
     if(theme==='grave'){        // bone spikes + the odd skull
       const b = mesh('cone',[0.16,rand(0.9,1.5),5], mat(PAL.bone)); b.position.set(px,BY,pz); b.rotation.z=rand(-0.25,0.25); g.add(b);
       if(i%5===0){ const sk = mesh('sph',[0.22,7,6], mat(PAL.bone)); sk.position.set(px,BY+0.05,pz); sk.scale.y=0.85; g.add(sk); }
-    } else if(theme==='wood'){  // giant witchwood thorns + a faint glowing shroom
+    } else if(theme==='wood'){  // giant witchwood thorns + CRASHED BROOMSTICKS (owner call: Broomhilda's fallen fliers) + a glowing shroom
       const th = mesh('cone',[0.2,rand(1.0,1.7),5], emat(0x8a5fd0,0x5a2fa0,0.55)); th.position.set(px,BY,pz); th.rotation.z=rand(-0.3,0.3); g.add(th);
+      if(i%4===0){   // a wrecked broom stuck handle-down, bristles up — tilted like a dart that missed
+        const br = new THREE.Group();
+        const shaft = mesh('cyl',[0.05,0.06,1.5,5], mat(0x4a3222)); shaft.position.y=0.55; br.add(shaft);
+        const wrap = mesh('cyl',[0.1,0.1,0.1,6], mat(0x8a5fd0)); wrap.position.y=1.12; br.add(wrap);
+        const bristles = mesh('cone',[0.19,0.5,6], mat(0xb8923a)); bristles.position.y=1.42; br.add(bristles);
+        br.position.set(px,BY,pz); br.rotation.z=rand(-0.45,0.45); br.rotation.x=rand(-0.2,0.2);
+        g.add(br);
+      }
+      if(i%7===0){   // a fallen witch hat, crumpled on the bed beside the wrecks — the rest of the story
+        const hat = new THREE.Group();
+        const brim = mesh('cyl',[0.34,0.38,0.05,10], mat(0x3d2a5e)); hat.add(brim);
+        const crown = mesh('cone',[0.2,0.55,8], mat(0x3d2a5e)); crown.position.y=0.28; crown.rotation.z=rand(-0.35,0.35); hat.add(crown);
+        const band = mesh('cyl',[0.21,0.22,0.08,8], mat(0x8a5fd0)); band.position.y=0.07; hat.add(band);
+        hat.position.set(px, BY+0.03, pz); hat.rotation.z=rand(-0.5,0.5); hat.rotation.y=rand(0,3);
+        g.add(hat);
+      }
       if(i%6===0){ const sh = mesh('sph',[0.14,6,5], emat(0x9fe066,0x6fb040,0.8)); sh.position.set(px,BY,pz); g.add(sh); }
     } else if(theme==='harbor'){ // dead coral spears + splintered ship timbers
       const c = mesh('cone',[0.17,rand(0.8,1.4),4], mat(0x9a8f86)); c.position.set(px,BY,pz); c.rotation.z=rand(-0.35,0.35); g.add(c);
@@ -98,10 +114,24 @@ function pitDressing(G, x1, x2, theme, bedTop=-4.3){   // bedTop: spike-base hei
       const s = mesh('cone',[0.15,rand(1.0,1.6),4], mat(0x6a6f7a)); s.position.set(px,BY,pz); g.add(s);
       if(i%5===0){ const gt = mesh('box',[0.4,0.5,0.24], mat(0x5a4f20)); gt.position.set(px,BY+0.05,pz); gt.rotation.z=rand(-0.4,0.4); g.add(gt); }
       if(i%3===0){ const lv = mesh('box',[rand(0.7,1.6),0.14,rand(0.6,1.4)], emat(0xff6a20,0xff4a10,1.0)); lv.position.set(px,BY-0.02,pz); g.add(lv); }
-    } else {                    // 'patch' default: bramble thorns + flickering will-o-flames among the pickets
-      const th = mesh('cone',[0.15,rand(0.7,1.2),5], mat(0x3a2a20)); th.position.set(px,BY,pz); th.rotation.z=rand(-0.3,0.3); g.add(th);
-      if(i%5===0){ const pk = mesh('box',[0.14,rand(0.7,1.1),0.1], mat(PAL.woodD)); pk.position.set(px,BY+0.15,pz); pk.rotation.z=rand(-0.35,0.35); g.add(pk); }
-      if(i%4===0){ const fl = mesh('cone',[0.14,rand(0.4,0.7),5], emat(0xff8c2e,0xff5020,0.95)); fl.position.set(px,BY+0.05,pz); g.add(fl); }
+    } else {                    // 'patch' default (owner call, Aug 2026): SPOOKY PUMPKINS — rotting gourds with jagged
+      // glowing jack-o'-faces glaring up from the pit. Instantly reads "not the bouncy kind" — the friendly
+      // pumpkins bounce you, THESE end you. Bramble thorns between them keep the bed spiky.
+      if(i%2===0){
+        const s = rand(0.55,0.9);
+        const pk = new THREE.Group();
+        const body = mesh('sph',[0.5,10,8], mat(0x6a2a08)); body.scale.set(1.15,0.8,1.15); pk.add(body);   // rotten dark orange
+        const stem = mesh('cone',[0.09,0.3,5], mat(0x2a3a18)); stem.position.y=0.44; stem.rotation.z=rand(-0.5,0.5); pk.add(stem);
+        const faceM = emat(0xff8a2e, 0xff5a10, 1.0);
+        const eL = mesh('cone',[0.1,0.16,3], faceM); eL.position.set(-0.17,0.12,0.44); eL.rotation.x=0.35; eL.rotation.z=Math.PI;   // angry down-point eyes
+        const eR = eL.clone(); eR.position.x=0.17; pk.add(eL,eR);
+        for(let t=0;t<3;t++){ const tooth = mesh('cone',[0.07,0.12,3], faceM); tooth.position.set(-0.14+t*0.14, -0.14+(t%2?0.05:0), 0.46); tooth.rotation.x=0.3; if(t%2) tooth.rotation.z=Math.PI; pk.add(tooth); }   // jagged grin
+        pk.scale.setScalar(s); pk.position.set(px, BY+0.34*s, pz); pk.rotation.y=rand(-0.6,0.6);
+        g.add(pk);
+      } else {
+        const th = mesh('cone',[0.15,rand(0.7,1.2),5], mat(0x3a2a20)); th.position.set(px,BY,pz); th.rotation.z=rand(-0.3,0.3); g.add(th);
+      }
+      if(i%5===0){ const fl = mesh('cone',[0.14,rand(0.4,0.7),5], emat(0xff8c2e,0xff5020,0.95)); fl.position.set(px,BY+0.05,pz); g.add(fl); }
     }
   }
   G.scene.add(bakeGroup(g));
@@ -109,25 +139,35 @@ function pitDressing(G, x1, x2, theme, bedTop=-4.3){   // bedTop: spike-base hei
   const fx = PIT_FX[theme]||PIT_FX.patch;
   const gl = new THREE.Mesh(geo('plane', Math.max(0.5,w-0.4), 1.2), new THREE.MeshBasicMaterial({color:fx.glow, transparent:true, opacity:0.10, depthWrite:false, side:THREE.DoubleSide}));
   gl.rotation.x = -Math.PI/2; gl.position.set(cx, BY+0.6, 0); G.scene.add(gl);
-  (G.pits ||= []).push({x1, x2, cx, theme, glow:gl, bedY:BY, th:BY+1.6});
-  // ONE shared ticker per level animates every pit: glow pulse + slow rising motes (embers/wisps/spores/mist/sparks)
-  if(!G._pitTicker){
-    G._pitTicker = { dead:false, cull:false, group:new THREE.Group(), t:0,
-      update(dt){
-        this.t += dt;
-        const px = G.player ? G.player.pos.x : 0;
-        for(const p of G.pits){
-          if(Math.abs(p.cx - px) > 46) continue;
-          p.glow.material.opacity = 0.10 + Math.sin(G.time*2.2 + p.cx)*0.045;
-          if(this.t > 0.34){
-            const f = PIT_FX[p.theme]||PIT_FX.patch;
-            G.fx.spawn(new THREE.Vector3(p.x1+rand(0.3, Math.max(0.4,(p.x2-p.x1)-0.6)), p.bedY+0.4, rand(-0.8,0.8)), f.mote, 1, {speed:0.5, gravity:-1.6, life:1.4, size:0.5});
-          }
+  (G.pits ||= []).push({x1, x2, cx, theme, glow:gl, bedY:BY, th:BY+1.6, moteY:BY+0.4});
+  ensurePitTicker(G);
+}
+// register a fall zone WITHOUT building a spike bed — for pits whose visual bottom already exists
+// (the glowing potion-bogs in w1l4/w3l4): the Mario impact sequence fires AT that surface (a brew
+// SPLASH), and the motes rise from it like bubbles. Never used on a Leap of Faith.
+function pitRegister(G, x1, x2, theme, bedTop, moteY){
+  if(G._pitArea !== G.area){ G.pits = []; G._pitTicker = null; G._pitArea = G.area; }
+  (G.pits ||= []).push({x1, x2, cx:(x1+x2)/2, theme, glow:null, bedY:bedTop, th:bedTop+1.6, moteY: moteY!==undefined?moteY:bedTop+1.5});
+  ensurePitTicker(G);
+}
+function ensurePitTicker(G){
+  // ONE shared ticker per level animates every pit: glow pulse + slow rising motes (embers/wisps/spores/mist/sparks/bubbles)
+  if(G._pitTicker) return;
+  G._pitTicker = { dead:false, cull:false, group:new THREE.Group(), t:0,
+    update(dt){
+      this.t += dt;
+      const px = G.player ? G.player.pos.x : 0;
+      for(const p of G.pits){
+        if(Math.abs(p.cx - px) > 46) continue;
+        if(p.glow) p.glow.material.opacity = 0.10 + Math.sin(G.time*2.2 + p.cx)*0.045;
+        if(this.t > 0.34){
+          const f = PIT_FX[p.theme]||PIT_FX.patch;
+          G.fx.spawn(new THREE.Vector3(p.x1+rand(0.3, Math.max(0.4,(p.x2-p.x1)-0.6)), p.moteY, rand(-0.8,0.8)), f.mote, 1, {speed:0.5, gravity:-1.6, life:1.4, size:0.5});
         }
-        if(this.t > 0.34) this.t = 0;
-      } };
-    G.ents.add(G._pitTicker);
-  }
+      }
+      if(this.t > 0.34) this.t = 0;
+    } };
+  G.ents.add(G._pitTicker);
 }
 // THE DEATH ACTION (owner call, Aug 2026): falling into a pit isn't a quiet fade — the pit ERUPTS.
 // Fires once as Pip passes the spike bed: themed burst + thud + shake, and Pip vanishes INTO it
@@ -279,6 +319,30 @@ function levelFinish(G, x1, x2, theme){
   if(theme) buildClutter(G, x1, x2, theme);   // pass null and clutter manually when the span crosses a pit
 }
 
+// first-time coaching (owner call, Aug 2026: "teach as it goes") — one toast, at the exact moment
+// the move is first NEEDED, once per save. The How to Play card is the reference; this is the teacher.
+function hintOnce(G, key, msg){
+  if(!G.save.hints) G.save.hints = {};
+  if(G.save.hints[key]) return;
+  G.save.hints[key] = 1; G.persist();
+  UI.toast(msg, 4600);
+}
+function coachCheck(G, pl, dt){
+  if(!G.levelDef || G.levelDef.district !== 'w1') return;   // District 1 is the teacher; later districts trust you
+  const J = INPUT.isTouch ? 'JUMP' : 'SPACE';
+  if(G.levelDef.id === 'w1l1'){
+    if(!pl.grounded){ pl._airT = (pl._airT||0) + dt; if(pl._airT > 0.35) hintOnce(G, 'dbl', '👟 Press '+J+' again IN THE AIR — Pip can DOUBLE-JUMP!'); }
+    else pl._airT = 0;
+    if(!G.save.hints || !G.save.hints.bonk){
+      for(const e of G.ents.list){ if(e.isEnemy && !e.dead && e.group && Math.abs(e.group.position.x - pl.pos.x) < 6){
+        hintOnce(G, 'bonk', '🎃 Jump ON enemies to bonk them — or press '+(INPUT.isTouch?'SPIN':'J')+' to whack!'); break; } }
+    }
+  }
+  if(!G.save.hints || !G.save.hints.gap){
+    for(const p of (G.pits||[])){ const d = p.x1 - pl.pos.x; if(d > 0 && d < 4){
+      hintOnce(G, 'gap', '🕳️ A gap! HOLD '+J+' for a big hop — and you can jump AGAIN mid-air.'); break; } }
+  }
+}
 function updateLevelCommon(G, dt){
   updateBats(G.bats, dt);
   updateAmbience(G.amb, G.time);
@@ -286,6 +350,7 @@ function updateLevelCommon(G, dt){
   const pl = G.player;
   if(!pl) return;
   pitImpactCheck(G, pl, dt);
+  coachCheck(G, pl, dt);
   let prompt = null;
   for(const c of (G.coffins||[])){
     if(!c.opened && c.group.position.distanceTo(pl.pos)<2.8){ prompt={kind:'coffin', label:c.promptLabel||'⚰️ Open the cursed coffin...?', coffin:c}; break; }

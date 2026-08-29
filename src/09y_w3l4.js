@@ -254,6 +254,11 @@ function buildW3L4(G){
   G.ents.add(new Crow(184, 0.15, -2.6));
 
   exitGate(G, 196);
+  // the bog voids get the impact treatment: Pip SPLASHES into the brew surface (y≈-1) with the full
+  // Mario death sequence + bubbles rising off the bog — no more silent fall-through (owner playthrough note)
+  pitRegister(G, 56, 77, 'wood', -1.9);
+  pitRegister(G, 112, 140, 'wood', -1.9);
+  pitRegister(G, 158, 178, 'wood', -1.9);
 
   // ---- tail: ambience + bats + clutter (clutter on SOLID spans only — never floating over a void) ----
   w3LevelFinish(G, -14, 205, null);          // spores/potion-motes/fireflies + bats; theme=null keeps kit clutter off the gaps

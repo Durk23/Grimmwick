@@ -187,7 +187,11 @@ const UI = {
         <div id="logo">GRIMM<span class="v">WICK</span></div>
         <div id="tagline">🎃 Relight the Night 🎃</div>
         <div id="tap">— tap anywhere to play —</div>
-        <div style="opacity:.55;font-size:12px;margin-top:40px">v1.0 · all 5 districts</div>
+        <div style="display:flex;gap:10px;margin-top:26px">
+          <button id="nightBtnTitle" class="btn ghost2 ui-block">🏮 The Night Board</button>
+          <button id="howBtnTitle" class="btn ghost2 ui-block">📖 How to Play</button>
+        </div>
+        <div style="opacity:.55;font-size:12px;margin-top:14px">v1.0 · all 5 districts</div>
       </div>
       <div id="intro-screen" class="screen"><div class="card">
         <button id="introSkip" class="xClose ui-block" title="Skip">✕</button>
@@ -203,6 +207,8 @@ const UI = {
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🎵 Music</span><input type="range" id="musVol" class="ui-block" min="0" max="100" value="50" style="width:150px"></div>
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🔊 Sounds</span><input type="range" id="sfxVol" class="ui-block" min="0" max="100" value="80" style="width:150px"></div>
           <button class="btn ghost2 ui-block" id="cozyBtn">🧸 Cozy Mode: OFF</button>
+          <button class="btn ghost2 ui-block" id="nightBtn">🏮 The Night Board</button>
+          <button class="btn ghost2 ui-block" id="howBtn">📖 How to Play</button>
           <button class="btn ghost2 ui-block" id="feedbackBtn">💬 Send Feedback</button>
           <button class="btn ghost2 ui-block" id="pauseRestartBtn">🔁 Restart Level</button>
           <button class="btn ghost2 ui-block" id="pauseMapBtn">🗺️ Level Select (Map)</button>
@@ -309,6 +315,11 @@ const UI = {
     };
     instant('pauseBtn', ()=>this.togglePause());
     tap('resumeBtn', ()=>this.togglePause(false));
+    // Night Board / How-to open OVER the pause menu — the game stays paused behind them
+    tap('nightBtn', ()=>{ window.NightBoard && NightBoard.open(); });
+    tap('nightBtnTitle', ()=>{ window.NightBoard && NightBoard.open(); });
+    tap('howBtn', ()=>this.showHowTo());
+    tap('howBtnTitle', ()=>this.showHowTo());
     tap('townBtn', ()=>{ this.togglePause(false); G.returnToHub(false); });
     tap('pauseRestartBtn', ()=>{ this.togglePause(false); AUDIO.ui(); if(G.area.startsWith('boss')) G.startBoss(G.bossDistrict||'w1'); else if(G.levelDef) G.enterLevel(G.levelDef.id); });
     tap('pauseMapBtn', ()=>{ this.togglePause(false); AUDIO.ui(); const d = G.levelDef ? G.levelDef.id.slice(0,2) : (G.bossDistrict||'w1'); G.toMap(d); });
@@ -431,12 +442,57 @@ const UI = {
     this._mayorI = (this._mayorI===undefined?0:this._mayorI+1)%MAYOR_LINES.length;
     this.dialogue('👻', MAYOR_LINES[this._mayorI]);
   },
-  toast(msg){
+  toast(msg, ms){
     if(!msg) return;
     const t=this.el('toast');
     t.textContent=msg; t.style.opacity=1;
     clearTimeout(this._toastT);
-    this._toastT=setTimeout(()=>t.style.opacity=0, 2600);
+    this._toastT=setTimeout(()=>t.style.opacity=0, ms||2600);
+  },
+  // an overlay (Night Board / How-to) is showing — the title's tap-to-start must not fire beneath it
+  overlayOpen(){
+    const nb = document.getElementById('nb-screen'), how = document.getElementById('how-screen');
+    return (nb && nb.style.display === 'block') || (how && how.style.display === 'flex')
+      || performance.now() - (this._ovCloseT||0) < 350;   // the closing tap itself must not fall through to tap-to-start
+  },
+  // ---------- HOW TO PLAY (the reference card — the real teaching happens in-level) ----------
+  showHowTo(){
+    let el = this.el('how-screen');
+    if(!el){
+      el = document.createElement('div');
+      el.id='how-screen'; el.className='screen ui-block';
+      el.style.cssText = "position:fixed;z-index:65;background:rgba(10,6,22,.94);font-family:-apple-system,'SF Pro Rounded','Segoe UI',system-ui,sans-serif";   // lives on body: needs its own stacking + font (the game font is scoped to #ui)
+      document.body.appendChild(el);
+    }
+    const touch = INPUT.isTouch;
+    const rows = touch ? [
+      ['🕹️','Left thumb anywhere','walk & run'],
+      ['🟣','JUMP','hop · press AGAIN in the air = DOUBLE-JUMP · HOLD = higher'],
+      ['🟠','SPIN','bonk enemies & lanterns'],
+      ['💥','POUND','slam down · HOLD it standing still, release = SPRING JUMP'],
+      ['👆','Walk up to things','signs, coffins & friends show a button'],
+    ] : [
+      ['🕹️','WASD / arrows','walk & run'],
+      ['⬜','SPACE','jump · press AGAIN in the air = DOUBLE-JUMP · HOLD = higher'],
+      ['🅹','J','spin — bonk enemies & lanterns'],
+      ['🅺','K','ground-pound · HOLD standing still, release = SPRING JUMP'],
+      ['🅴','E','talk, read & open things'],
+    ];
+    el.innerHTML = `<div class="card" style="max-width:520px">
+      <button id="howX" class="xClose ui-block">✕</button>
+      <h2>📖 How to Play</h2>
+      <div style="text-align:left;font-size:14px;line-height:1.5;margin:10px 0 4px">
+        ${rows.map(r=>`<div style="display:flex;gap:10px;margin:7px 0"><div style="width:26px;text-align:center">${r[0]}</div><b style="min-width:${touch?118:106}px">${r[1]}</b><div style="opacity:.85">${r[2]}</div></div>`).join('')}
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.15)">
+          <b>🎩 Tricks of the night</b>
+          <div style="opacity:.85;margin-top:5px">👟 Bounce off enemies' heads · 🕸️ press UP on webs, vines &amp; chains to CLIMB · 👀 STARE at a Boo and it freezes · 🎃 ground-pound a giant pumpkin for a MEGA-BOUNCE · 🏮 checkpoint lanterns remember your place</div>
+        </div>
+        <div style="margin-top:8px;opacity:.6;font-size:12.5px">🎮 Controllers work too — stick to move, A jump, X spin, B pound.</div>
+      </div>
+    </div>`;
+    this.bindTap(el.querySelector('#howX'), ()=>{ el.style.display='none'; this._ovCloseT = performance.now(); AUDIO.ui(); });
+    el.style.display='flex';
+    AUDIO.ui();
   },
   // ---------- level card ----------
   levelIntro(name, sub){

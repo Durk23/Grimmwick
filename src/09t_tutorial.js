@@ -102,6 +102,16 @@ function updateTutorial(G, dt){
   for(const s of G.signs){
     if(Math.hypot(s.x-pl.pos.x, s.z-pl.pos.z)<2.6){ prompt={kind:'sign', label:'\ud83d\udc9c Read Gran\'s note', sign:s}; break; }
   }
+  // Gran doesn't wait to be read \u2014 walk near a lesson and she calls it out (once per save per sign).
+  // Kids sprint past signs; the lessons still land. The read-prompt stays for the full note.
+  for(const s of G.signs){
+    if(Math.abs(s.x-pl.pos.x) < 3.4){
+      const key = 'tut'+Math.round(s.x);
+      if(!G.save.hints) G.save.hints = {};
+      if(!G.save.hints[key]){ G.save.hints[key] = 1; G.persist(); UI.toast(s.text, 5200); }
+      break;
+    }
+  }
   UI.setPrompt(prompt);
   if(prompt && INPUT.interactEdge) UI.dialogue('\ud83e\uddf5', prompt.sign.text);
 }

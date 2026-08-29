@@ -32,6 +32,16 @@ const G = {
     if(!this.save.claimed) this.save.claimed = [];
     if(this.save.candyLifetime===undefined) this.save.candyLifetime = this.save.candy||0;   // old saves: seed with the balance
     if(this.save.playT===undefined) this.save.playT = 0;
+    if(this.save.damageLifetime===undefined){
+      this.save.damageLifetime = 0;
+      // a save with real progress predates damage tracking — its counter starts false-zero. Fastest Night
+      // stays fair (playT is honest) but the damage tiebreak goes worst-case and Pure Night is off-limits.
+      if(Object.keys(this.save.levels||{}).length > 0 || (this.save.playT||0) > 60) this.save.dmgUntracked = true;
+    }
+    // legacy saves that already beat Grimm: the night is done but board-ineligible — their playT
+    // includes post-game wandering, so a Fastest Night submit would be unfair either way
+    if(this.save.nightDone===undefined) this.save.nightDone = (this.save.embers||0) >= 5;
+    if(this.save.nightDone && this.save.nightSubmitted===undefined){ this.save.nightSubmitted = true; this.save.nightEligible = false; }
     if(this.save.lives===undefined) this.save.lives = 5;
     if(this.save.cozy===undefined) this.save.cozy = false;
     if(this.save.tutDone===undefined) this.save.tutDone = false;
@@ -218,7 +228,8 @@ const G = {
     const def = this.levelDef, id = def.id;
     this.state='levelclear';
     AUDIO.checkpoint(); AUDIO.goldPumpkin();
-    const secs = Math.floor(this.runT||0);
+    const secsF = Math.round((this.runT||0)*100)/100;   // bests keep centiseconds — the district boards deserve real precision
+    const secs = Math.floor(secsF);
     const collected = this.runCandyPicked||0;
     const skip = opts.warp||opts.leap;   // secret finishes honor their promised rewards
     const stars = {
@@ -228,12 +239,12 @@ const G = {
     };
     const rec = this.save.levels[id] || (this.save.levels[id] = {done:false, stars:{}, best:null});
     rec.done = true;
-    const isRecord = !this.runCozy && secs>=3 && (!rec.best || secs<rec.best);
+    const isRecord = !this.runCozy && secsF>=3 && (!rec.best || secsF<rec.best);
     if(!this.runCozy){
       rec.stars.time = rec.stars.time||stars.time;
       rec.stars.candy = rec.stars.candy||stars.candy;
       rec.stars.clean = rec.stars.clean||stars.clean;
-      if(isRecord) rec.best = secs;
+      if(isRecord) rec.best = secsF;
     }
     // bank golden pumpkins at every clear — no longer lost if you stop before the boss
     const prev = this.save.gp[def.district]||[false,false,false];
@@ -243,9 +254,10 @@ const G = {
     const list = (typeof LEVEL_LISTS!=='undefined') ? (LEVEL_LISTS.find(L=>L.includes(def))||W1_LEVELS) : W1_LEVELS;
     const idx = list.indexOf(def);
     const nextId = (idx>=0 && idx<list.length-1) ? list[idx+1].id : null;
-    const fmt = t => Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
+    const fmt = t => Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
     const stats = { levelId:id, levelName:def.name, time:fmt(secs), best:fmt(rec.best||secs), isRecord,
       stars, candy:collected, candyTotal:this.levelCandyTotal, nextId, cozy:this.runCozy };
+    window.NightBoard && NightBoard.onLevelClear(this, id);
     setTimeout(()=>UI.levelClear(stats), 1500);   // let the gate celebration land before the card
   },
   openMap(district){
@@ -339,6 +351,7 @@ const G = {
   },
   toggleCozy(){
     this.save.cozy = !this.save.cozy;
+    if(this.save.cozy) this.runCozy = true;   // turning cozy ON mid-run taints THIS run — no cozy-assisted records/stars (turning it off never untaints)
     this.persist();
     if(this.player){
       this.player.maxHearts = (this.save.maxHearts||3) + (this.save.cozy?2:0);
@@ -419,14 +432,15 @@ const G = {
     const prev = this.save.gp[district]||[false,false,false];
     this.save.gp[district] = prev.map((v,i)=>v||this.runPumpkins[i]);
     this.persist();
-    const secs = Math.floor(this.runT||this.time-this.runT0);
+    const secsF = Math.round((this.runT||this.time-this.runT0)*100)/100;
+    const secs = Math.floor(secsF);
     if(!this.save.best) this.save.best = {};
     // boss-only clock under its own key — legacy full-run bests preserved, never compared
     const prevBest = this.save.best[bestKey];
-    const isRecord = !this.runCozy && secs >= 5 && (!prevBest || secs < prevBest);   // cozy runs & debug runs don't set records
-    if(isRecord) this.save.best[bestKey] = secs;
+    const isRecord = !this.runCozy && secsF >= 5 && (!prevBest || secsF < prevBest);   // cozy runs & debug runs don't set records
+    if(isRecord) this.save.best[bestKey] = secsF;
     this.persist();
-    const fmt = t => Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
+    const fmt = t => Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
     const stats = {
       district,
       candy: this.save.candy-this.runCandy0+0,
@@ -440,11 +454,17 @@ const G = {
       lifeCandy: this.save.candyLifetime||0,
       playT: Math.floor(this.save.playT||0),
     };
-    // Game Center composite (owner spec): rank by time, ties by damage taken, then by candy (more = better).
-    // score int64, lower-is-better: timeCS*1e7 + min(dmg,999)*1e4 + (9999 - min(candyEarned,9999))
-    // window.GameCenter && GameCenter.submitScore('grimmwick.fullrun', secs*100*1e7 + Math.min(this.runDamage||0,999)*1e4 + (9999-Math.min(stats.candy,9999)));
-    // Game Center hook (wired during the Capacitor wrap):
-    // window.GameCenter && GameCenter.submitScore('grimmwick.w1.speedrun', secs*100);
+    // THE NIGHT BOARD — first full completion locks in the whole-night numbers (Fastest Night spec:
+    // total play-clock from New Game to inviting Grimm; damage + candy lifetime counters break ties)
+    if(district==='w5' && !this.save.nightDone){
+      this.save.nightDone = true;
+      this.save.nightEligible = !this.save.nightCozy;   // ANY cozy time during the night = no board entry (Pip still wins his party)
+      this.save.nightT = this.save.playT||0;
+      this.save.nightDmg = this.save.dmgUntracked ? 999 : (this.save.damageLifetime||0);   // untracked saves take the worst tiebreak, honestly
+      this.save.nightCandy = this.save.candyLifetime||0;
+      this.persist();
+    }
+    window.NightBoard && NightBoard.onBossDefeated(this, district);
     setTimeout(()=>{ this.state='victory'; UI.victoryScreen(stats); }, 4200);
   },
   onEnemyKilled(){},
@@ -525,7 +545,7 @@ const G = {
       this.camera.lookAt(0,3,0);
       updateHub(this, dt*0.6);
       this.fx.update(dt);
-      if(INPUT.anyEdge){
+      if(INPUT.anyEdge && !(window.UI && UI.overlayOpen && UI.overlayOpen())){   // Night Board / How-to over the title swallow the tap-to-start
         AUDIO.init(); AUDIO.resume();
         if(!this.save.seenIntro){ this.state='intro'; UI.startIntro(()=>this.begin()); }
         else this.begin();
@@ -544,6 +564,7 @@ const G = {
         }
       }
       this.save.playT = (this.save.playT||0) + dt;   // lifetime play clock (persists with the regular save cadence)
+      if(this.save.cozy && !this.save.nightDone && !this.save.nightCozy) this.save.nightCozy = true;   // any cozy minute taints the night's board eligibility
       if(INPUT.pauseEdge){ UI.togglePause(); INPUT.endFrame(); return; }
       if(this.area!=='hub' && this.area!=='tut') this.runT = (this.runT||0)+dt;
       this.world.updateMovers(dt);

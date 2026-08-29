@@ -361,6 +361,12 @@ function buildW1L4(G){
   // bog voids stay undressed too: their glowing brew surface already spans them.
   pitDressing(G, 50, 64, 'patch');    // Gap 2 — the crossing pair
   pitDressing(G, 95, 104, 'patch');   // the ride-down gap into the clearing
+  // Act-3 brew-bog voids: their glowing surface is the visual — register them so Pip SPLASHES in
+  // with the full impact sequence instead of silently falling through. (Gap 1 at x2..14 is the
+  // LEAP OF FAITH — never registered, never dressed, never a tell.)
+  pitRegister(G, 113, 121.5, 'patch', -2.0);
+  pitRegister(G, 130, 142, 'patch', -2.0);
+  pitRegister(G, 152, 167, 'patch', -2.0);
 
   // clutter per solid span ONLY — never over a void, and NOTHING inside x 2..14: the leap
   // gap keeps its zero-tell rule (no clutter, no lights, no signs, no geometry hints — sacred).

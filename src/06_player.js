@@ -276,6 +276,7 @@ class Player {
     }
     this.hearts -= n;
     if(this.G.area!=='hub') this.G.runDamage = (this.G.runDamage||0)+n;
+    if(this.G.save) this.G.save.damageLifetime = (this.G.save.damageLifetime||0) + n;   // Night Board tiebreaker
     this.iframes = 1.4;
     AUDIO.hurt();
     this.G.camc.shake(0.35, 0.4);
