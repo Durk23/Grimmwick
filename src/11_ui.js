@@ -883,7 +883,7 @@ const UI = {
     nodes.push({boss:true, name:(world.guardian||'The Guardian').toUpperCase(), st: beaten?'done':(bossReady?'avail':'lock')});
     this._mapNodes = nodes;
     // winding dotted path through the lantern positions (percent coords)
-    const POS=[[12,80],[32,60],[20,34],[46,19],[64,48],[84,22]];
+    const POS=[[7,76],[24,44],[40,20],[58,34],[74,58],[90,24]];   // spread wide for landscape — nodes were bunching on the left
     const P = nodes.map((n,i)=>{ const p=POS[Math.min(i,POS.length-1)]; return [p[0]*10, p[1]*5.6]; });
     let d='M '+P[0][0]+' '+P[0][1];
     for(let i=1;i<P.length;i++){

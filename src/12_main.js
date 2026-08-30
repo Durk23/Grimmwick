@@ -665,8 +665,8 @@ const G = {
       this.fx.update(dt);
     }
     if(this.state==='map' && this.mapView){
-      this.mapView.camera.aspect = this.camera.aspect;
-      this.mapView.camera.updateProjectionMatrix();
+      if(this.mapView.fitCam) this.mapView.fitCam(this.camera.aspect);
+      else { this.mapView.camera.aspect = this.camera.aspect; this.mapView.camera.updateProjectionMatrix(); }
       this.renderer.render(this.mapView.scene, this.mapView.camera);
     } else this.renderer.render(this.scene, this.camera);
     INPUT.endFrame();

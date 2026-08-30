@@ -452,7 +452,15 @@ class Player {
       return;
     }
     this.hearts -= n;
-    if(this.G.area!=='hub') this.G.runDamage = (this.G.runDamage||0)+n;
+    if(this.G.area!=='hub'){
+      const first = !(this.G.runDamage>0);
+      this.G.runDamage = (this.G.runDamage||0)+n;
+      // star hunters deserve to KNOW the instant a clean run dies (falls count too) — but only while the star is still unearned
+      if(first && this.G.levelDef && window.UI){
+        const rec = this.G.save.levels && this.G.save.levels[this.G.levelDef.id];
+        if(!(rec && rec.stars && rec.stars.clean)) UI.toast('💜 Ouch! The no-damage star needs a clean run.', 2600);
+      }
+    }
     if(this.G.save) this.G.save.damageLifetime = (this.G.save.damageLifetime||0) + n;   // Night Board tiebreaker
     this.iframes = 1.4;
     AUDIO.hurt();

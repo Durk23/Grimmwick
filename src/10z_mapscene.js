@@ -34,7 +34,17 @@ function buildMapScene(G, district){
   const camTgt  = new THREE.Vector3(0, 0.5, 2);
   camera.position.copy(camBase);
   camera.lookAt(camTgt);
-  const onResize = ()=>{ camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); };
+  // wide screens: hold the HORIZONTAL view constant instead of the vertical one, so the
+  // level board fills landscape width rather than shrinking into the middle with margins
+  const fitCam = (aspect)=>{
+    camera.aspect = aspect;
+    const land = aspect > 1.05;
+    camera.fov = land ? Math.max(30, 2*Math.atan(Math.tan(58*Math.PI/360)/aspect)*180/Math.PI) : 50;
+    camTgt.set(0, 0.5, aspect > 1.8 ? 15 : (land ? 13 : 2));   // landscape looks at the board; wide phones aim lower still so the bottom node's label clears the frame
+    camera.updateProjectionMatrix();
+  };
+  fitCam(innerWidth/innerHeight);
+  const onResize = ()=>{ fitCam(innerWidth/innerHeight); };
   addEventListener('resize', onResize);
 
   // locked districts render darker & desaturated — tone() dims a hex toward misty blue-grey
@@ -611,5 +621,5 @@ function buildMapScene(G, district){
     // shared geo()/mat() caches are deliberately untouched
   }
 
-  return {scene, camera, anchors, update, dispose};
+  return {scene, camera, anchors, fitCam, update, dispose};
 }
