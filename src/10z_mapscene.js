@@ -177,13 +177,13 @@ function buildMapScene(G, district){
 
   // the winding road — anchors ≥6u apart, unoccluded (tall deco stays off the path's camera side)
   const nodePos = [
-    new THREE.Vector3( -6, 0, 14.5),
-    new THREE.Vector3(-12, 0, 21.5),
-    new THREE.Vector3( -5, 0, 28  ),
-    new THREE.Vector3(  4, 0, 31.5),
-    new THREE.Vector3( 11.5,0, 26.5),
+    new THREE.Vector3(-10, 0, 14  ),
+    new THREE.Vector3(-19, 0, 21.5),
+    new THREE.Vector3( -8, 0, 29.5),
+    new THREE.Vector3(  4.5,0, 32.5),
+    new THREE.Vector3( 15.5,0, 26.5),
   ];
-  const bossPos = new THREE.Vector3(17, 0, 18.5);
+  const bossPos = new THREE.Vector3(20.5, 0, 15.5);   // spread wide — every node ≥12u from its neighbors so taps never fight
   const curve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(0,0,10.5), ...nodePos, bossPos,
   ], false, 'catmullrom', 0.35);
