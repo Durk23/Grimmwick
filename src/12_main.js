@@ -44,6 +44,16 @@ const G = {
     // stats take worst-case tiebreaks, so the entry can never rank unfairly high. A fresh run replaces it.
     if(this.save.nightDone===undefined) this.save.nightDone = (this.save.embers||0) >= 5;
     if(this.save.nightDone && this.save.owned && !this.save.owned.includes('grimm')) this.save.owned.push('grimm');   // existing finishers get playable Grimm
+    if(!this.save.crownMoment){
+      const totS = Object.values(this.save.levels||{}).reduce((s,l)=>s + (l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
+      if(totS >= 75){   // earned before auto-grant existed: crown them now, celebrate on boot
+        this.save.crownMoment = true;
+        if(!this.save.ownedMasks.includes('starcrown')) this.save.ownedMasks.push('starcrown');
+        this.save.mask = 'starcrown';
+        setTimeout(()=>{ window.UI && UI.toast('👑 ALL 75 STARS! THE STAR CROWN IS YOURS. Wear it proud, Pip!', 7000); window.AUDIO && AUDIO.goldPumpkin(); }, 4000);
+        setTimeout(()=>{ window.NightBoard && NightBoard.refreshNight(this); window.NightBoard && NightBoard.checkFlawless(this); }, 7000);   // push the 75-star entry to the boards right away
+      }
+    }
     if(this.save.nightDone && this.save.nightT===undefined){
       this.save.nightT = this.save._finishT !== undefined ? this.save._finishT : (this.save.playT||0);
       this.save.nightDmg = 999; this.save.nightDeaths = 99;
@@ -306,6 +316,18 @@ const G = {
     const stats = { levelId:id, levelName:def.name, time:fmt(secs), best:fmt(rec.best||secs), isRecord,
       stars, candy:collected, candyTotal:this.levelCandyTotal, nextId, cozy:this.runCozy };
     window.NightBoard && NightBoard.onLevelClear(this, id);
+    // THE 75TH STAR — the crown arrives the INSTANT it's earned, with fanfare (never behind a claim button)
+    if(!this.save.crownMoment){
+      const tot = Object.values(this.save.levels||{}).reduce((s,l)=>s + (l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
+      if(tot >= 75){
+        this.save.crownMoment = true;
+        if(!this.save.ownedMasks.includes('starcrown')) this.save.ownedMasks.push('starcrown');
+        this.save.mask = 'starcrown';
+        if(this.player) this.player.buildRig(this.save.equipped||'kid');
+        this.persist();
+        setTimeout(()=>{ AUDIO.goldPumpkin(); UI.toast('👑 ALL 75 STARS! THE STAR CROWN IS YOURS. You ARE the night, Pip!', 7000); }, 2400);
+      }
+    }
     setTimeout(()=>UI.levelClear(stats), 1500);   // let the gate celebration land before the card
   },
   openMap(district){
