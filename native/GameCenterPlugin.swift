@@ -17,6 +17,7 @@ public class GameCenterPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func signIn(_ call: CAPPluginCall) {
         let player = GKLocalPlayer.local
+        let silent = call.getBool("silent") ?? false
         if player.isAuthenticated {
             DispatchQueue.main.async { GKAccessPoint.shared.isActive = false }  // UIKit-adjacent — main thread only
             call.resolve(["authenticated": true, "alias": player.alias])
@@ -26,6 +27,12 @@ public class GameCenterPlugin: CAPPlugin, CAPBridgedPlugin {
         player.authenticateHandler = { [weak self] viewController, error in
             DispatchQueue.main.async {
                 if let vc = viewController {
+                    if silent {
+                        // background checks never interrupt play with Apple's sign-in sheet —
+                        // the sheet is reserved for the player opening the Night Board themselves
+                        if !responded { responded = true; call.resolve(["authenticated": false]) }
+                        return
+                    }
                     self?.bridge?.viewController?.present(vc, animated: true)
                     return  // the handler fires again once the sheet is dismissed
                 }
@@ -65,6 +72,10 @@ public class GameCenterPlugin: CAPPlugin, CAPBridgedPlugin {
             lb.loadEntries(for: friends ? .friendsOnly : .global,
                            timeScope: .allTime,
                            range: NSRange(location: 1, length: count)) { localEntry, entries, total, error in
+                if error != nil {
+                    call.resolve(["entries": [], "total": 0, "error": true])  // transient failure ≠ empty board
+                    return
+                }
                 let meID = GKLocalPlayer.local.gamePlayerID
                 var rows: [[String: Any]] = []
                 for e in entries ?? [] {

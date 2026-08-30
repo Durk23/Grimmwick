@@ -18,7 +18,7 @@ const GC = {
     if(this.authed){ Night.flushPending(); return Promise.resolve(true); }   // already in: retry anything still queued
     if(this._authing) return this._authing;   // one in-flight auth — a second call would orphan the first native promise
     this._authing = (async () => {
-      try{ const r = await p.signIn(); this.authed = !!(r && r.authenticated); this.alias = (r && r.alias) || null; }
+      try{ const r = await p.signIn(this._signInOpts||{}); this.authed = !!(r && r.authenticated); this.alias = (r && r.alias) || null; }
       catch(e){ this.authed = false; }
       this._authing = null;
       if(this.authed) Night.flushPending();
@@ -134,6 +134,12 @@ const Night = {
     const r = await GC.load('grimmwick.flawless', false, 1);
     if(!r || r.error) return;
     const had = !!G.save.firstFlame;
+    const rankKnown = typeof r.localRank === 'number' && r.localRank >= 1;
+    if(!rankKnown){
+      // no rank in the response (blip, empty board, no entry yet) — never dethrone on ambiguity;
+      // only positive evidence (a real rank > 1) takes the flame away
+      return;
+    }
     const isChamp = r.localRank === 1;
     if(isChamp === had) return;
     G.save.firstFlame = isChamp;
@@ -145,7 +151,9 @@ const Night = {
       const champ = (r.entries && r.entries[0] && !r.entries[0].me && r.entries[0].name) ? r.entries[0].name : 'a new champion';
       window.UI && UI.toast('🔥 The First Flame has passed to '+champ+'. Take it back.', 6800);
     }
-    if(G.player) G.player.buildRig(G.save.equipped||'kid');
+    // rebuild the rig only at a safe moment — mid-level it would orphan an active shield or
+    // bat wings (switchArea rebuilds it anyway on the next area change)
+    if(G.player && G.area === 'hub') G.player.buildRig(G.save.equipped||'kid');
   },
   onLevelClear(G, levelId){
     if(!(G.save.cozy || G.runCozy)) this.checkFlawless(G);
@@ -273,4 +281,4 @@ const Night = {
 };
 window.NightBoard = Night;
 // boot check: sign in quietly, flush queued scores, see whether the First Flame still burns here
-setTimeout(()=>{ try{ if(GC.native()) GC.signIn().then(()=>{ Night.flushPending(); Night.checkFirstFlame(window.G); }); }catch(e){} }, 6000);
+setTimeout(()=>{ try{ if(GC.native()){ GC._signInOpts = {silent:true}; GC.signIn().then(()=>{ GC._signInOpts = null; if(GC.authed){ Night.flushPending(); Night.checkFirstFlame(window.G); } }); } }catch(e){} }, 6000);

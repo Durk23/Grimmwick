@@ -48,10 +48,12 @@ const G = {
       const totS = Object.values(this.save.levels||{}).reduce((s,l)=>s + (l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
       if(totS >= 75){   // earned before auto-grant existed: crown them now, celebrate on boot
         this.save.crownMoment = true;
-        if(!this.save.ownedMasks.includes('starcrown')) this.save.ownedMasks.push('starcrown');
+        const om = this.save.ownedMasks || (this.save.ownedMasks = []);   // v1.0 saves predate the wardrobe — init before reading
+        if(!om.includes('starcrown')) om.push('starcrown');
         this.save.mask = 'starcrown';
+        this.persist();   // the crown is granted ONCE — never refire the fanfare on the next boot
         setTimeout(()=>{ window.UI && UI.toast('👑 ALL 75 STARS! THE STAR CROWN IS YOURS. Wear it proud, Pip!', 7000); window.AUDIO && AUDIO.goldPumpkin(); }, 4000);
-        setTimeout(()=>{ window.NightBoard && NightBoard.refreshNight(this); window.NightBoard && NightBoard.checkFlawless(this); }, 7000);   // push the 75-star entry to the boards right away
+        setTimeout(()=>{ window.NightBoard && NightBoard.refreshNight(this); if(!this.save.cozy && window.NightBoard) NightBoard.checkFlawless(this); }, 7000);   // cozy pauses records — same guard as every other call site
       }
     }
     if(this.save.nightDone && this.save.nightT===undefined){
@@ -93,7 +95,8 @@ const G = {
     const fresh = { candy:0, embers:0, worlds:{}, gp:{},
       owned: w.owned||['kid'], equipped: w.equipped||'kid',
       ownedMasks: w.ownedMasks||[], mask: w.mask||null,
-      pass: !!w.pass, seenIntro:false, maxHearts:3 };
+      pass: !!w.pass, firstFlame: !!w.firstFlame, firstFlameOff: !!w.firstFlameOff,
+      seenIntro:false, maxHearts:3 };
     Store.set('grimmwick_save', JSON.stringify(fresh));
     Store.del('hollowville_save');
   },
