@@ -330,8 +330,11 @@ class PowerUp {
     this.t += dt;
     if(this.wL){ const f=Math.sin(this.t*14)*0.6; this.wL.rotation.z=f; this.wR.rotation.z=-f; }
     const p = this.group.position;
-    // gentle slide + bob
-    p.x += this.vx*dt; p.z += this.vz*dt;
+    // gentle slide + bob (side mode: never drift off the lane — a z-drifted drop sat forever
+    // outside the locked player's 1.1 pickup radius, an unreachable gummy bear)
+    p.x += this.vx*dt;
+    if(G.mode==='side'){ p.z = damp(p.z, 0, 3, dt); this.vz = 0; }
+    else p.z += this.vz*dt;
     this.vx *= Math.exp(-1.2*dt); this.vz *= Math.exp(-1.2*dt);
     p.y = this.base + Math.sin(this.t*3)*0.15 + 0.1;
     this.group.rotation.y = this.t*2;
