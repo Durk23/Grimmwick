@@ -587,6 +587,26 @@ const UI = {
     if(tab==='costumes'){
       body.innerHTML = '<div style="opacity:.75;font-size:13px;margin-bottom:10px">❤️ Hearts &amp; upgrades moved to the <b>⬆️ Level Ups</b> tab!</div><div id="shopGrid"></div>';
       const grid = body.querySelector('#shopGrid');
+      if(G.save.firstFlame){
+        // ---- CHAMPION'S REGALIA — visible only while this player holds Flawless rank 1 ----
+        const fh = document.createElement('div');
+        fh.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffb35e;text-shadow:0 0 14px rgba(255,120,40,.55)';
+        fh.textContent = '🔥 CHAMPION\'S REGALIA';
+        grid.appendChild(fh);
+        const on = !G.save.firstFlameOff;
+        const fd = document.createElement('div');
+        fd.className='item';
+        fd.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 78%, rgba(255,120,40,.45), transparent 65%), linear-gradient(135deg,#3a1c10 60%,#5a2a14)"><div style="font-size:52px;line-height:110px">🔥</div></div>
+          <h4>THE FIRST FLAME</h4><p>Worn by ONE player in the world: the reigning Flawless Night champion. Yours while you hold rank 1.</p>
+          <button class="btn buy ui-block ${on?'ghost2':'orange'}">${on?'✓ Burning · tap to hide':'Wear the Flame'}</button>`;
+        this.bindTap(fd.querySelector('button'), ()=>{
+          G.save.firstFlameOff = on;
+          G.persist(); AUDIO.buy();
+          G.player && G.player.buildRig(G.save.equipped||'kid');
+          this.renderShop('costumes');
+        });
+        grid.appendChild(fd);
+      }
       // ---- THE MASK RACK — one accessory slot, any mask over any costume ----
       const mh = document.createElement('div');
       mh.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffd98a;text-shadow:0 0 12px rgba(255,180,60,.4)';

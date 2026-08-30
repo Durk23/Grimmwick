@@ -127,6 +127,26 @@ const Night = {
     UI.toast('🏆 FLAWLESS NIGHT! All 75 stars! Your time is on the board: '+fmtCS(Math.round(sv.flawlessT*100)), 5200);
     GC.submit('grimmwick.flawless', encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths, sv.flawlessDmg, sv.flawlessCandy), 75);
   },
+  // THE FIRST FLAME — one player in the world wears it: the reigning Flawless champion.
+  // Checked on boot and board open; state flips fire the take/lose toasts.
+  async checkFirstFlame(G){
+    if(!G || !G.save || !GC.native() || !GC.authed) return;
+    const r = await GC.load('grimmwick.flawless', false, 1);
+    if(!r || r.error) return;
+    const had = !!G.save.firstFlame;
+    const isChamp = r.localRank === 1;
+    if(isChamp === had) return;
+    G.save.firstFlame = isChamp;
+    G.persist && G.persist();
+    if(isChamp){
+      window.UI && UI.toast('🔥 THE FIRST FLAME IS YOURS. The Everflame favors the fastest flawless night. Guard it.', 6800);
+      window.AUDIO && AUDIO.goldPumpkin();
+    } else {
+      const champ = (r.entries && r.entries[0] && !r.entries[0].me && r.entries[0].name) ? r.entries[0].name : 'a new champion';
+      window.UI && UI.toast('🔥 The First Flame has passed to '+champ+'. Take it back.', 6800);
+    }
+    if(G.player) G.player.buildRig(G.save.equipped||'kid');
+  },
   onLevelClear(G, levelId){
     if(!(G.save.cozy || G.runCozy)) this.checkFlawless(G);
     this.refreshNight(G);
@@ -195,7 +215,7 @@ const Night = {
     el.querySelectorAll('.nb-tab').forEach(x=>x.classList.toggle('on', x.dataset.k===this._sel));
     AUDIO.ui && AUDIO.ui();
     this.render();                                    // paint your local numbers immediately…
-    if(GC.native()){ await GC.signIn(); this.render(); }   // auth (or retry queued submits) on every open
+    if(GC.native()){ await GC.signIn(); this.render(); this.checkFirstFlame(window.G); }   // auth (or retry queued submits) on every open
   },
   close(){ const el = document.getElementById('nb-screen'); if(el) el.style.display='none'; if(window.UI) UI._ovCloseT = performance.now(); AUDIO.ui && AUDIO.ui(); },
   _row(rank, name, v, candyCtx, me){
@@ -245,10 +265,12 @@ const Night = {
       list.innerHTML = `<div class="nb-note">${this._friends ? 'No friends on this board yet. Recruit some rivals! 👥' : 'The board is empty. Be the FIRST name on it. 🏮'}</div>`;
       return;
     }
-    list.innerHTML = hdr + r.entries.map(e => this._row(e.rank, e.name, e.value, e.context, e.me)).join('');
+    list.innerHTML = hdr + r.entries.map(e => this._row(e.rank, (this._sel==='flawless' && e.rank===1 ? '🔥 ' : '')+e.name, e.value, e.context, e.me)).join('');
     if(r.localRank && !r.entries.some(e=>e.me)){
       list.innerHTML += this._row(r.localRank, GC.alias||'You', r.localValue!=null?r.localValue:0, r.localContext!=null?r.localContext:null, true);
     }
   },
 };
 window.NightBoard = Night;
+// boot check: sign in quietly, flush queued scores, see whether the First Flame still burns here
+setTimeout(()=>{ try{ if(GC.native()) GC.signIn().then(()=>{ Night.flushPending(); Night.checkFirstFlame(window.G); }); }catch(e){} }, 6000);

@@ -135,6 +135,7 @@ class Player {
     this.costumeKey = costumeKey;
     this.grimmAura = null; this.grimmLight = null;
     this.zoeBroom = null; this.zoeBroomBack = null;
+    this.flameAura = null; this.flameWisp = null;
     const c = COSTUMES[costumeKey]||COSTUMES.kid;
     while(this.group.children.length) this.group.remove(this.group.children[0]);
     const body = new THREE.Group();
@@ -373,6 +374,35 @@ class Player {
         new THREE.MeshBasicMaterial({color:0xff9a50, transparent:true, opacity:0.13, blending:THREE.AdditiveBlending, depthWrite:false}));
       this.grimmAura.position.y=0.85; this.grimmAura.scale.set(1,1.35,1); body.add(this.grimmAura);
       this.grimmLight = new THREE.PointLight(0xff9a50, 42, 9); this.grimmLight.position.y=1.0; body.add(this.grimmLight);
+    }
+    if(this.G && this.G.save && this.G.save.firstFlame && !this.G.save.firstFlameOff){
+      // THE FIRST FLAME — championship regalia, kept restrained: a turning ember ring underfoot,
+      // a two-layer aura, a flame companion trailing sparks, embers rising even at rest.
+      const addM = (c,o)=>new THREE.MeshBasicMaterial({color:c, transparent:true, opacity:o, blending:THREE.AdditiveBlending, depthWrite:false});
+      this.flameAura = new THREE.Mesh(geo('sph',0.52,12,10), addM(0xff8a3a,0.16));
+      this.flameAura.position.y=0.8; this.flameAura.scale.set(1,1.5,1); body.add(this.flameAura);
+      const outer = new THREE.Mesh(geo('sph',0.88,12,10), addM(0xff6a2e,0.09));
+      outer.position.y=0.85; outer.scale.set(1,1.35,1); this.flameAura.userData.outer = outer; body.add(outer);
+      // the champion's ring: gold band + five small flames riding it
+      const ring = new THREE.Group();
+      const band = new THREE.Mesh(geo('tor',0.62,0.034,6,28), addM(0xffd98a,0.85));
+      band.rotation.x = Math.PI/2; ring.add(band);
+      for(let i=0;i<5;i++){
+        const a = i/5*TAU;
+        const fl = mesh('cone',[0.06,0.19,5], emat(0xffb35e,0xff8a3a,1));
+        fl.position.set(Math.cos(a)*0.62, 0.07, Math.sin(a)*0.62);
+        ring.add(fl);
+      }
+      ring.position.y = 0.04;
+      this.flameRing = ring; body.add(ring);
+      // the flame companion: layered teardrop, bright core inside a soft sheath
+      const w = new THREE.Group();
+      const core = mesh('sph',[0.085,7,6], emat(0xfff2c4,0xffd98a,1));
+      const inner = mesh('cone',[0.08,0.22,6], emat(0xffb35e,0xff8a3a,1)); inner.position.y=0.14;
+      const sheath = new THREE.Mesh(geo('cone',0.14,0.34,7), addM(0xff8a3a,0.4)); sheath.position.y=0.14;
+      w.add(core, inner, sheath);
+      this.flameWisp = w; body.add(w);
+      this._flameEmberT = 0;
     }
     // ---- THE MASK SLOT (wardrobe brick #1): any mask over any costume ----
     const mk = maskKeyOverride !== undefined ? maskKeyOverride : (this.G && this.G.save ? this.G.save.mask : null);
@@ -787,6 +817,27 @@ class Player {
     if(this.zoeBroom){
       this.zoeBroom.visible = !!this.zoeGliding;
       this.zoeBroomBack.visible = !this.zoeGliding;
+    }
+    if(this.flameAura){
+      const ft = G.time;
+      this.flameAura.material.opacity = 0.14 + 0.04*Math.sin(ft*2.7);
+      const out2 = this.flameAura.userData.outer;
+      if(out2) out2.material.opacity = 0.08 + 0.03*Math.sin(ft*2.7 + 1.2);
+      if(this.flameRing){ this.flameRing.rotation.y = ft*0.55; }
+      const fa = ft*1.6;
+      this.flameWisp.position.set(Math.cos(fa)*0.8, 0.95+Math.sin(ft*2.1)*0.16, Math.sin(fa)*0.8);
+      // the companion's fine spark trail + quiet embers rising from the ring even at rest
+      this._flameEmberT -= dt;
+      if(this._flameEmberT <= 0){
+        this._flameEmberT = 0.16;
+        const wp = this.flameWisp.getWorldPosition(new THREE.Vector3());
+        G.fx.spawn(wp, 0xffd98a, 1, {speed:0.25, life:0.5, gravity:-0.2, size:0.45});
+        if(Math.random() < 0.4){
+          const ra = Math.random()*TAU;
+          G.fx.spawn(new THREE.Vector3(this.pos.x+Math.cos(ra)*0.62, this.pos.y+0.08, this.pos.z+Math.sin(ra)*0.62),
+            Math.random()<0.5?0xff8a3a:0xffb35e, 1, {speed:0.3, life:0.8, gravity:-0.9, size:0.4});
+        }
+      }
     }
     if(this.grimmAura){
       const tt = G.time, flare = this.blinkT>0 ? 0.3 : 0;
