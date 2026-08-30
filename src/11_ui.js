@@ -895,8 +895,9 @@ const UI = {
     nodes.forEach((n,i)=>{
       const p=POS[Math.min(i,POS.length-1)];
       const lamp = n.boss ? '<span class="mcrown">👑</span>🎃' : '🏮';
+      const starIcon = {time:'⏱', candy:'🍬', clean:'💜'};   // a missed star shows WHAT to hunt, not just that something's missing
       const stars = (!n.boss && n.st==='done')
-        ? ['time','candy','clean'].map(k=>`<span${n.stars[k]?'':' class="off"'}>⭐</span>`).join('')
+        ? ['time','candy','clean'].map(k=>n.stars[k]?'<span>⭐</span>':`<span class="off">${starIcon[k]}</span>`).join('')
         : '&nbsp;';
       const label = n.boss ? n.name : dNum+'-'+(i+1)+' · '+n.name;
       let sub;
