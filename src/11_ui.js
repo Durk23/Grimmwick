@@ -505,8 +505,18 @@ const UI = {
     this.el('lvlname').textContent=name;
     this.el('lvlsub').textContent=sub;
     c.style.display='block'; c.style.opacity=1; c.style.transition='';
-    this._lvlT1 = setTimeout(()=>{ c.style.transition='opacity 1s'; c.style.opacity=0; }, 2400);
+    this._lvlLive = true; this._lvlShownAt = performance.now();
+    this._lvlT1 = setTimeout(()=>{ this._lvlLive=false; c.style.transition='opacity 1s'; c.style.opacity=0; }, 2400);
     this._lvlT2 = setTimeout(()=>{ c.style.display='none'; c.style.transition=''; }, 3500);
+  },
+  // the moment the player moves, the card gets out of the way (repeat players never wait on it)
+  levelIntroDismiss(){
+    if(!this._lvlLive || performance.now()-this._lvlShownAt < 250) return;
+    this._lvlLive = false;
+    clearTimeout(this._lvlT1); clearTimeout(this._lvlT2);
+    const c=this.el('lvlcard');
+    c.style.transition='opacity 0.4s'; c.style.opacity=0;
+    this._lvlT2 = setTimeout(()=>{ c.style.display='none'; c.style.transition=''; }, 450);
   },
   // ---------- boss bar ----------
   showBossBar(name, hp, max){

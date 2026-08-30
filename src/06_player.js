@@ -572,6 +572,7 @@ class Player {
       md = G.camc.moveDir();
       mag = Math.hypot(md.x, md.z);
     }
+    if((mag>0.2 || INPUT.jumpEdge) && window.UI && UI._lvlLive) UI.levelIntroDismiss();
     // moon rush: faster, sparkling, enemies crumble on contact
     if(this.moonT>0){
       this.moonT -= dt;
