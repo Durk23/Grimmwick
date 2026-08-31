@@ -404,7 +404,7 @@ class GrimmCauldron {
             fl.userData = {x0:rand(-20,20), z0:rand(-2,3), sp:rand(0.14,0.3), ph:rand(9)};
             G.scene.add(fl); this._snow.push(fl);
           } }
-        else if(this._endStage===3 && adv()){ this._endStage=4;
+        else if(this._endStage===3 && (adv() || (this._stageT > 6.2 && (this._stageT = 0, true)))){ this._endStage=4;   // the walk follows the banner right away — no dead air for the patient
           // THE WALK HOME — the ending is PLAYED, not read: a light gate opens, Grimm follows Pip through it
           window.UI && UI.finaleBanner('🏮 Walk Grimm home ➜<br><span style="font-size:0.6em">The whole town remembers him now.</span>', 60000);
           const gate = new THREE.Group();
