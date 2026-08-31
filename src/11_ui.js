@@ -1,7 +1,7 @@
 // ============ UI — HUD, title, dialogue, store, pause, boss bar, touch ============
 const STORY_SLIDES = [
   {icon:'🌕', text:'Welcome to GRIMMWICK, the town where Halloween never ends. Every 100 years, the Ember Moon rises to recharge the Everflame... the magical bonfire that keeps every ghost friendly and every candy sweet.\n\n(Nobody remembers why the town is called Grimmwick. Not even the Mayor.)'},
-  {icon:'🌑', text:'But tonight, moments before the ceremony, a jealous shadow named GRIMM swallowed the flame and shattered it into five embers, scattering them across the five districts. The beloved guardians who found them have been corrupted by ember-fire!'},
+  {icon:'🌑', text:'But tonight, moments before the ceremony, a forgotten shadow named GRIMM swallowed the flame and shattered it into five embers, scattering them across the five districts. The beloved guardians who found them have been corrupted by ember-fire!'},
   {icon:'🍬', text:'Everyone always says Pip is too small for adventures.\n\nEveryone is about to be wrong.\n\nGrab your candy bag. Free the guardians. RELIGHT THE NIGHT!'},
 ];
 const MAYOR_LINES = [
@@ -442,6 +442,16 @@ const UI = {
     this._dlgT = setTimeout(()=>this.closeDialogue(), 9000);
   },
   closeDialogue(){ this.el('dlg').style.display='none'; },
+  // finale speech uses the SAME dialogue card as the rest of the game (owner call: one voice, one font)
+  // but never auto-closes — the ending paces it with tap-to-continue.
+  finaleLine(icon, text){
+    const d = this.el('dlg');
+    d.querySelector('.ic').textContent = icon;
+    d.querySelector('.tx').innerHTML = text + '<div class="tap">'+(INPUT.isTouch?'tap':'press any key')+' ▸</div>';
+    d.style.display='block';
+    clearTimeout(this._dlgT);
+    AUDIO.ui && AUDIO.ui();
+  },
   mayorDialogue(){
     this._mayorI = (this._mayorI===undefined?0:this._mayorI+1)%MAYOR_LINES.length;
     this.dialogue('👻', MAYOR_LINES[this._mayorI]);
@@ -1045,7 +1055,7 @@ const UI = {
       w2:{e:'🪦', t:'GUARDIAN FREED!', b:'Mossgrave settles back into his hill with a happy rumble. The second ember is yours! Ravenmoor\'s lanterns glow green tonight.'},
       w3:{e:'🧹', t:'GUARDIAN FREED!', b:'Broomhilda cackles a THANK-you and loops the moon. The third ember is yours! Witchwood\'s cauldrons bubble bright tonight.'},
       w4:{e:'⚓', t:'GUARDIAN FREED!', b:'Captain Wraith tips his hat as THE SEA RUSHES BACK. The fourth ember is yours! Ghost Harbor floats again tonight.'},
-      w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'Grimm said yes.<br>The Everflame burns whole again. Every district is safe and bright. Grimm, the spirit no one ever invited, is now the town\'s night-watchman, keeping every lantern lit.<br><b>You saved Grimmwick, Pip. Happy Halloween. 🏮</b><br><span style="opacity:.8;font-size:13px">He\'s waiting by the Everflame in town. Go say hello.</span>'},
+      w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'Grimm said yes.<br>The spell of forgetting is broken. The whole town remembers its oldest friend: the one it was named for. The Everflame burns whole, and Grimm keeps every lantern lit as Grimmwick\'s night-watchman.<br><b>You saved Grimmwick, Pip. Happy Halloween. 🏮</b><br><span style="opacity:.8;font-size:13px">He\'s waiting by the Everflame in town. Go say hello.</span>'},
     };
     const c = COPY[stats.district] || COPY.w1;
     this.el('vEmoji').textContent = c.e;

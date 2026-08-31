@@ -556,7 +556,15 @@ const G = {
     }
     window.NightBoard && NightBoard.onBossDefeated(this, district);
     if(this.save._finishT !== undefined){ delete this.save._finishT; this.persist(); }
-    setTimeout(()=>{ this.state='victory'; UI.victoryScreen(stats); }, 4200);
+    if(district==='w5'){
+      // the finale lands IN the festival: fireworks, the whole flame, the town that remembers —
+      // the celebration is the payoff, the keepsake card follows once it has breathed
+      this.switchArea('hub');
+      this.state = 'play';
+      UI.fade(false, 800);
+      setTimeout(()=>{ UI.toast('🎆 THE FESTIVAL! The whole town remembers Grimm!', 5200); }, 1100);
+      setTimeout(()=>{ this.state='victory'; UI.victoryScreen(stats); }, 8500);
+    } else setTimeout(()=>{ this.state='victory'; UI.victoryScreen(stats); }, 4200);
   },
   onEnemyKilled(){},
 

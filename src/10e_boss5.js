@@ -278,6 +278,7 @@ class GrimmCauldron {
         }
         if(this._lantern){ this._lantern.scale.setScalar(Math.min(1, this._lantern.scale.x + dt*2)); this._lantern.rotation.y += dt*0.8;
           this._lantern.children[1].material.emissiveIntensity = 1 + Math.sin(this.t*6)*0.3; }
+        if(this._granny){ this._granny.position.y = 0.12 + Math.sin(this.t*1.6)*0.08; }
         // the great flame column breathes; fireworks pop; snow drifts
         if(this._flame){ const s = 1 + Math.sin(this.t*7)*0.12; this._flame.scale.set(s,1+Math.sin(this.t*5.2)*0.18,s);
           this._flameIn.scale.set(1+Math.sin(this.t*9+1)*0.15, 1+Math.sin(this.t*6.4+2)*0.2, 1); }
@@ -293,6 +294,7 @@ class GrimmCauldron {
         // TAP-TO-CONTINUE (owner call): each line STAYS until the player taps/presses — kids read at
         // their own pace while the fireworks and snow keep falling behind. Auto-advances after 14s so
         // a set-down phone still reaches the end. (_stageT = per-stage clock; 0.9s guard eats mash-taps.)
+        // Speech uses the game's own dialogue card (finaleLine); big EVENTS use the glow banner.
         this._stageT = (this._stageT||0) + dt;
         const adv = () => {
           if(this._stageT > 0.9 && INPUT.anyEdge){ INPUT.anyEdge=false; this._stageT=0; AUDIO.ui && AUDIO.ui(); return true; }
@@ -300,9 +302,9 @@ class GrimmCauldron {
           return false;
         };
         if(this._endStage===0 && this._endT>0.5){ this._endStage=1; this._stageT=0;
-          window.UI && UI.finaleBanner('🧒 Pip: “You were never a monster. You were just never invited.”  ▸', 15000); }
+          window.UI && UI.finaleLine('🫥', '“...me? You fought through my whole night... just to ask ME something?”'); }
         else if(this._endStage===1 && adv()){ this._endStage=2;
-          window.UI && UI.finaleBanner('🧒 Pip: “Come to the festival, Grimm. There\'s a lantern with your name on it.”  ▸', 15000);
+          window.UI && UI.finaleLine('🧒', '“Come to the festival, Grimm. There\'s a lantern with your name on it.”');
           // the lantern appears in his hand — the night-watchman is born
           const lan = new THREE.Group();
           const cage = mesh('box',[0.34,0.42,0.34], mat(0x241c38));
@@ -311,13 +313,33 @@ class GrimmCauldron {
           lan.position.set(1.15, 2.6, 0.4); lan.scale.setScalar(0.01);
           this.group.add(lan); this._lantern = lan;
           AUDIO.heart && AUDIO.heart(); }
-        else if(this._endStage===2 && adv()){ this._endStage=25;
+        else if(this._endStage===2 && adv()){ this._endStage=21;
+          window.UI && UI.finaleLine('🫥', '“My name. You REMEMBER my name? The spell was supposed to make everyone forget me... forever.”'); }
+        else if(this._endStage===21 && adv()){ this._endStage=22;
+          window.UI && UI.finaleLine('🧒', '“Then the spell missed a spot. The whole town is named after you. GRIMMWICK never forgot.”'); }
+        else if(this._endStage===22 && adv()){ this._endStage=25;
           // GRIMM'S ANSWER — the beat the whole game builds to. He warms from shadow to lamplight AS he says it.
-          window.UI && UI.finaleBanner('🫥 Grimm: “...yes. I would like that very much.”  ▸', 15000);
+          window.UI && UI.finaleLine('🫥', '“...yes, little one. I would love to come home.”');
           this._warm = 0;                                             // the transformation begins with the yes
           AUDIO.heart && AUDIO.heart(); }
         else if(this._endStage===25 && adv()){ this._endStage=3;
-          window.UI && UI.finaleBanner('🔥 GRIMM SAID YES. THE EVERFLAME BURNS WHOLE AGAIN  ▸', 15000);
+          window.UI && UI.closeDialogue();
+          window.UI && UI.finaleBanner('✨ THE SPELL OF FORGETTING SHATTERS ✨<br><span style="font-size:0.6em">A hundred years of memories come flooding home.</span>', 15000);
+          // memory motes — a hundred years of memories drifting back into the world
+          for(let i=0;i<44;i++) G.fx.spawn(new THREE.Vector3(rand(-20,20), rand(1,8), rand(-2,2)), pick([0xfff2c4,0xffd98a,0xb37dff,0x63e6e2]), 1, {speed:1.1, life:1.7, gravity:-0.35, size:0.7});
+          // GRANNY WICK appears behind Pip — she promised she'd be here for this
+          const gr = new THREE.Group();
+          const wm = new THREE.MeshLambertMaterial({color:0xf2f0ff, emissive:0xd8d4f0, emissiveIntensity:0.5, transparent:true, opacity:0.88});
+          const gb = new THREE.Mesh(geo('cone',0.5,1.1,9), wm); gb.position.y=0.55; gr.add(gb);
+          const gh = new THREE.Mesh(geo('sph',0.34,10,8), wm); gh.position.y=1.25; gr.add(gh);
+          const bun = new THREE.Mesh(geo('sph',0.14,7,6), wm); bun.position.set(0,1.56,-0.12); gr.add(bun);
+          const ge1 = mesh('sph',[0.05,5,5], mat(0x14101f)); ge1.position.set(-0.1,1.28,0.3); gr.add(ge1);
+          const ge2 = ge1.clone(); ge2.position.x=0.1; gr.add(ge2);
+          const sp1 = mesh('tor',[0.09,0.02,5,10], mat(0xd8b46a)); sp1.position.set(-0.1,1.28,0.33); gr.add(sp1);
+          const sp2 = sp1.clone(); sp2.position.x=0.1; gr.add(sp2);
+          gr.position.set((pl?pl.pos.x:0)-2.4, 0.12, -0.7);
+          G.scene.add(gr); this._granny = gr;
+          G.fx.spawn(gr.position.clone().setY(1.2), 0xf2f0ff, 14, {speed:2, life:0.7});
           // THE RELIGHT — a roaring flame column erupts from the cauldron
           this._flame = new THREE.Mesh(geo('cone',1.8,4.6,10), new THREE.MeshLambertMaterial({color:0xff7020, emissive:0xff6a1a, emissiveIntensity:0.9, transparent:true, opacity:0.94}));
           this._flame.position.set(0,5.0,0); this.group.add(this._flame);
@@ -339,8 +361,48 @@ class GrimmCauldron {
             G.scene.add(fl); this._snow.push(fl);
           } }
         else if(this._endStage===3 && adv()){ this._endStage=4;
-          window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED! HAPPY HALLOWEEN!', 3600);
-          G.onBossDefeated(); }
+          // THE WALK HOME — the ending is PLAYED, not read: a light gate opens, Grimm follows Pip through it
+          window.UI && UI.finaleBanner('🏮 Walk Grimm home ➜<br><span style="font-size:0.6em">The whole town remembers him now.</span>', 60000);
+          const gate = new THREE.Group();
+          const postM = emat(0xffd98a, 0xffb02e, 0.7);
+          const pgL = mesh('box',[0.4,4.4,0.5], postM); pgL.position.set(-1.3,2.2,0); gate.add(pgL);
+          const pgR = pgL.clone(); pgR.position.x=1.3; gate.add(pgR);
+          const top2 = mesh('box',[3.4,0.5,0.5], postM); top2.position.y=4.55; gate.add(top2);
+          this._gatePortal = new THREE.Mesh(geo('box',2.2,4.0,0.1), new THREE.MeshBasicMaterial({color:0xffe9b0, transparent:true, opacity:0.35, blending:THREE.AdditiveBlending, depthWrite:false}));
+          this._gatePortal.position.y=2.1; gate.add(this._gatePortal);
+          gate.position.set(20.6,0,0); G.scene.add(gate); this._gate = gate;
+          // the small night-watchman steps out of the great shadow, lantern in hand
+          this.grimm.visible = false;
+          G.fx.spawn(new THREE.Vector3(this.pos.x, 2.5, 0), 0xff9a50, 24, {speed:4, life:0.8});
+          const wk = new THREE.Group();
+          const gm2 = new THREE.MeshLambertMaterial({color:0x5a5578, emissive:0xff9a50, emissiveIntensity:0.35});
+          const robe2 = new THREE.Mesh(geo('cone',0.62,1.3,9), gm2); robe2.position.y=0.55; wk.add(robe2);
+          const hood2 = new THREE.Mesh(geo('sph',0.52,11,9), gm2); hood2.scale.set(1,1.25,0.9); hood2.position.y=1.05; wk.add(hood2);
+          const cowl2 = new THREE.Mesh(geo('cone',0.56,0.9,9), gm2); cowl2.position.y=1.5; wk.add(cowl2);
+          const weL = mesh('sph',[0.09,7,6], emat(0xffb46a,0xff9a3a,1)); weL.position.set(-0.17,1.12,0.42); wk.add(weL);
+          const weR = weL.clone(); weR.position.x=0.17; wk.add(weR);
+          const wlan = new THREE.Group();
+          const wc = mesh('box',[0.2,0.26,0.2], mat(0x241c38));
+          const wg = mesh('sph',[0.09,7,6], emat(0xffe9b0,0xffc050,1));
+          wlan.add(wc,wg); wlan.position.set(0.62,0.95,0.2); wk.add(wlan);
+          wk.position.set(this.pos.x, 0, 0);
+          G.scene.add(wk); this._walker = wk; this._walkT = 0; }
+        else if(this._endStage===4){
+          this._walkT = (this._walkT||0) + dt;
+          if(this._gatePortal) this._gatePortal.material.opacity = 0.3 + Math.sin(this.t*3.2)*0.12;
+          if(this._walker && pl){
+            const tx = Math.min(pl.pos.x - 1.7, 19.6);
+            this._walker.position.x = damp(this._walker.position.x, tx, 2.2, dt);
+            this._walker.position.y = Math.abs(Math.sin(this.t*5))*0.06;
+          }
+          // through the gate (or a set-down phone after 45s) → the festival
+          if((pl && pl.pos.x > 19.4) || this._walkT > 45){
+            this._endStage = 5;
+            window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED! HAPPY HALLOWEEN!', 3200);
+            window.UI && UI.fade(true, 700);
+            AUDIO.portal && AUDIO.portal();
+            setTimeout(()=>{ G.onBossDefeated(); }, 800);
+          } }
         break;
       }
     }
