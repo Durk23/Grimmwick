@@ -1089,7 +1089,7 @@ const UI = {
   finaleBanner(text, holdMs=2600){
     const b = this.el('finaleBanner');
     clearTimeout(this._fbT1); clearTimeout(this._fbT2);
-    b.textContent = text;
+    b.innerHTML = text;   // our own strings only — the finale uses <br>/<span> for the two-line beats
     b.style.display='block';
     requestAnimationFrame(()=>{ b.style.opacity=1; });
     this._fbT1 = setTimeout(()=>{ b.style.opacity=0; }, holdMs);
