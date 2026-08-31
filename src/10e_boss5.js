@@ -368,7 +368,7 @@ class GrimmCauldron {
           AUDIO.heart && AUDIO.heart(); }
         else if(this._endStage===25 && adv()){ this._endStage=3;
           window.UI && UI.closeDialogue();
-          window.UI && UI.finaleBanner('✨ THE SPELL OF FORGETTING SHATTERS ✨', 15000);
+          window.UI && UI.finaleBanner('✨ THE SPELL OF FORGETTING SHATTERS ✨', 6000);   // says its piece and leaves — the relight spectacle carries the moment
           // memory motes — a hundred years of memories drifting back into the world
           for(let i=0;i<44;i++) G.fx.spawn(new THREE.Vector3(rand(-20,20), rand(1,8), rand(-2,2)), pick([0xfff2c4,0xffd98a,0xb37dff,0x63e6e2]), 1, {speed:1.1, life:1.7, gravity:-0.35, size:0.7});
           // GRANNY WICK appears behind Pip — she promised she'd be here for this
