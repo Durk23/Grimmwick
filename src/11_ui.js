@@ -65,7 +65,18 @@ const UI = {
       .screen:not(#map-screen)::before { content:""; margin-top:auto; flex:0 0 0; }
       .screen:not(#map-screen)::after { content:""; margin-bottom:auto; flex:0 0 0; }
       .card { position:relative; background:rgba(26,16,50,.97); border:2px solid #8e5bd9; border-radius:26px; padding:26px 30px; max-width:min(680px,94vw); flex:0 0 auto; box-shadow:0 20px 60px rgba(0,0,0,.7); }
+      .vbox { flex:1 1 96px; max-width:130px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.16); border-radius:14px; padding:7px 4px; }
+      .vbox .vbe { font-size:19px; } .vbox .vbv { font-weight:900; font-size:15px; } .vbox .vbl { font-size:10.5px; opacity:.75; margin-top:1px; }
       @media (max-height:540px){ .screen{gap:8px;} .card{padding:12px 22px;border-radius:18px;} .card h2{margin:2px 0;font-size:19px;} .card>div:first-child{font-size:24px;} .btn{padding:8px 20px;font-size:15px;} .cstarRow{margin:5px 0 2px;} .cstar{padding:5px 6px 4px;} .cstar .big{font-size:22px;} .cstar .lbl{font-size:10.5px;margin-top:2px;} #clearStats{margin:4px 0 !important;} .clearBtns{flex-direction:row !important;flex-wrap:wrap;justify-content:center;} .clearBtns .btn{flex:1 1 30%;} }
+      /* the END keepsake card fits a landscape phone with zero scrolling */
+      @media (max-height:540px){
+        #vEmoji{display:none;} #vTitle{font-size:20px !important;margin:0 0 3px !important;}
+        #vBody{font-size:12.5px !important;line-height:1.35 !important;margin-bottom:2px !important;}
+        #vstats{margin:4px 0 !important;font-size:13px;}
+        .vbox{padding:3px 3px !important;border-radius:10px;} .vbox .vbe{font-size:14px;} .vbox .vbv{font-size:12px;} .vbox .vbl{font-size:8.5px;}
+        #vTip{font-size:11px !important;line-height:1.3 !important;}
+        #vstats .btn{padding:7px 14px !important;font-size:13.5px !important;}
+      }
       #title-screen { display:flex; background:transparent; pointer-events:auto; }
       #logo { font-size:min(13vw,84px); font-weight:900; letter-spacing:2px; color:#ffb35e; text-shadow:0 0 30px #ff8c2e88, 0 4px 0 #7a3040, 0 8px 0 #4a1f30, 0 12px 24px #000; transform:rotate(-2deg); }
       #logo .v { color:#b37dff; text-shadow:0 0 30px #8e5bd988, 0 4px 0 #3d2178, 0 8px 0 #241245, 0 12px 24px #000; }
@@ -1055,7 +1066,7 @@ const UI = {
       w2:{e:'🪦', t:'GUARDIAN FREED!', b:'Mossgrave settles back into his hill with a happy rumble. The second ember is yours! Ravenmoor\'s lanterns glow green tonight.'},
       w3:{e:'🧹', t:'GUARDIAN FREED!', b:'Broomhilda cackles a THANK-you and loops the moon. The third ember is yours! Witchwood\'s cauldrons bubble bright tonight.'},
       w4:{e:'⚓', t:'GUARDIAN FREED!', b:'Captain Wraith tips his hat as THE SEA RUSHES BACK. The fourth ember is yours! Ghost Harbor floats again tonight.'},
-      w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'Grimm said yes.<br>The spell of forgetting is broken. The whole town remembers its oldest friend: the one it was named for. The Everflame burns whole, and Grimm keeps every lantern lit as Grimmwick\'s night-watchman.<br><b>You saved Grimmwick, Pip. Happy Halloween. 🏮</b><br><span style="opacity:.8;font-size:13px">He\'s waiting by the Everflame in town. Go say hello.</span>'},
+      w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'Grimm said yes. The spell of forgetting is broken: the town remembers its oldest friend, the one it was named for. The Everflame burns whole. Grimm keeps every lantern lit as night-watchman.<br><b>You saved Grimmwick, Pip. Happy Halloween. 🏮</b>'},
     };
     const c = COPY[stats.district] || COPY.w1;
     this.el('vEmoji').textContent = c.e;
@@ -1069,20 +1080,26 @@ const UI = {
       const pt = stats.playT||0, fmtT = t => (t>=3600 ? Math.floor(t/3600)+'h ' : '') + Math.floor((t%3600)/60)+'m '+(Math.floor(t)%60)+'s';
       const starsEarned = Object.values(sv.levels||{}).reduce((s,l)=>s+(l.stars?(l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0):0),0);
       const gpFound = Object.values(sv.gp||{}).reduce((s,a)=>s+(a||[]).filter(Boolean).length,0);
-      const box = (e,v,l)=>`<div style="flex:1 1 96px;max-width:130px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.16);border-radius:14px;padding:8px 4px"><div style="font-size:20px">${e}</div><div style="font-weight:900;font-size:15.5px">${v}</div><div style="font-size:10.5px;opacity:.75;margin-top:1px">${l}</div></div>`;
+      const box = (e,v,l)=>`<div class="vbox"><div class="vbe">${e}</div><div class="vbv">${v}</div><div class="vbl">${l}</div></div>`;
       const dmgBox = sv.dmgUntracked ? '' : box('💜', (sv.nightDmg??0), 'hearts lost');
       this.el('vstats').innerHTML =
-        `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0 10px">
+        `<div style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:5px 0 7px">
           ${box('⏱️', fmtT(pt), 'the whole night')}${box('🍬', (stats.lifeCandy||0).toLocaleString(), 'candy collected')}${dmgBox}${box('⭐', starsEarned+'/75', 'stars earned')}${box('🎃', gpFound+'/15', 'golden pumpkins')}
         </div>
-        <div style="opacity:.85;font-size:13.5px;line-height:1.5">The night isn't over. Every district still glows.<br>Hunt the stars, find the Old Shortcuts... and race the night itself. 🏮</div>
-        <button id="vNight" class="btn ghost2 ui-block" style="margin-top:10px">🏮 See the Night Board</button>${rec}`;
+        <div id="vTip" style="opacity:.85;font-size:13px;line-height:1.4">The night isn't over. Hunt the stars, find the Old Shortcuts, race the night itself. 🏮</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+          <button id="vNight" class="btn ghost2 ui-block">🏮 The Night Board</button>
+          <button id="vFest" class="btn orange ui-block">🎉 Join the festival!</button>
+        </div>${rec}`;
       const vb = document.getElementById('vNight');
       if(vb) this.bindTap(vb, ()=>window.NightBoard && NightBoard.open());
+      const vf = document.getElementById('vFest');
+      if(vf) this.bindTap(vf, ()=>{ this.el('victory-screen').style.display='none'; G.returnToHub(true); });
+      this.el('vHome').style.display='none';   // the festival button lives in the row on the END card
     } else {
       this.el('vstats').innerHTML = `🍬 Candy collected: <b>${stats.candy}</b> &nbsp;·&nbsp; 🎃 Golden Pumpkins: <b>${stats.gp}/3</b><br>⏱️ Time: <b>${stats.time}</b>${rec}`;
     }
-    this.el('vHome').textContent = stats.district==='w5' ? '🎉 Join the festival in town!' : '🏘️ Return to Grimmwick';
+    if(stats.district!=='w5'){ this.el('vHome').style.display=''; this.el('vHome').textContent = '🏘️ Return to Grimmwick'; }
     this.el('victory-screen').style.display='flex';
   },
   // big cinematic center-screen text for the finale beats — unmissable, unlike a toast
