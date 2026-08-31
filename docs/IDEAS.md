@@ -31,3 +31,10 @@ Add ideas any time (or tell Claude "add to the idea vault"). We triage into: **N
 
 ## Someday / wild
 - **THE SOULS-ZELDA (future non-Pip RPG, owner vision Aug 28 2026):** looks like a high-quality Zelda (stylized, premium art bar) with an **Elden Ring playstyle** — real-time weighty combat: stamina, dodge-roll i-frames, lock-on, parries, hard fair telegraph-driven bosses. Older audience than the Pip games. Feasibility notes: combat systems are buildable (our boss-telegraph DNA transfers directly; roll/stamina/lock-on are known patterns); toon/cel-shaded look achievable in Three.js (outline pass + toon ramps); the two real challenges are (1) souls-precision on TOUCH — lean hard on controller support (already have Gamepad API) + generous lock-on + haptics, and (2) the art bar "high quality" implies — may be the first game that wants real 3D assets/artists beyond procedural primitives. Furthest-out game on the slate; tech will have evolved by then. Open: same game as the creature/companion idea, or a separate title?
+
+## Halloween Update (owner, Aug 30)
+Hold the "Happy Halloween" greetings out of 1.1 — bring them back as a special
+Halloween update near Oct 31: greetings return (END card, saved banner, festival
+toast), plus whatever seasonal dressing fits (town decorations, a costume drop,
+maybe the trick-or-treat candy event). Every update is a featuring opportunity;
+Halloween is THE one for this game.
