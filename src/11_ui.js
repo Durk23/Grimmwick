@@ -443,14 +443,14 @@ const UI = {
     el.classList.toggle('hot', !!p.hot);
     el.textContent = p.label + (INPUT.isTouch?'':'  (E)');
   },
-  dialogue(icon, text){
+  dialogue(icon, text, ms=9000){
     const d = this.el('dlg');
     d.querySelector('.ic').textContent = icon;
     d.querySelector('.tx').textContent = text;
     d.style.display='block';
     AUDIO.ui();
     clearTimeout(this._dlgT);
-    this._dlgT = setTimeout(()=>this.closeDialogue(), 9000);
+    this._dlgT = setTimeout(()=>this.closeDialogue(), ms);
   },
   closeDialogue(){ const d=this.el('dlg'); d.style.display='none'; this._finaleDlg=false; d.lastElementChild.style.display=''; },
   // finale speech uses the SAME dialogue card as the rest of the game (owner call: one voice, one font)

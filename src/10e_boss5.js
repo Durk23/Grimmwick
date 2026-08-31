@@ -114,7 +114,16 @@ class GrimmCauldron {
     if(a==='potion'){
       // rain covers the UNLIT burner lanes too — the objective is never a free camp; shrinks to 4 lanes as burners light
       const spots = [-9,-3,3,9, ...this.burners.filter(b=>!b.lit).map(b=>b.x)];
-      for(const sx of spots){ if(typeof CrabShell!=='undefined') this.G.ents.add(new CrabShell(this.G, sx, 11, 0, {targetX:sx, targetY:0, flight:1.0})); }
+      for(const sx of spots){ if(typeof CrabShell!=='undefined'){
+        const sh = new CrabShell(this.G, sx, 11, 0, {targetX:sx, targetY:0, flight:1.0});
+        if(sh.ballMesh) sh.ballMesh.material = emat(0x8fe6a8, 0x3fae6a, 0.95);   // harbor camo reads invisible in the dark castle — glow it
+        this.G.ents.add(sh);
+        // BOMBARDMENT LAW: a growing target glow marks every impact point for the whole flight
+        const ring = new THREE.Mesh(geo('tor',0.5,0.06,6,18), new THREE.MeshBasicMaterial({color:0x8fffbe, transparent:true, opacity:0.35}));
+        ring.rotation.x = Math.PI/2; ring.position.set(sx,0.06,0);
+        this.G.scene.add(ring);
+        (this.tells2 = this.tells2||[]).push({m:ring, t:0, life:1.05});
+      } }
       AUDIO.noise && AUDIO.noise({t:0.2,vol:0.14,fFrom:900,fTo:200});
     } else if(a==='shadow'){
       const alive = this.shadows.filter(s=>!s.dead).length;
@@ -157,6 +166,7 @@ class GrimmCauldron {
 
   _clearShells(){
     const G = this.G;
+    if(this.tells2){ for(const tl of this.tells2) G.scene.remove(tl.m); this.tells2.length = 0; }
     for(const e of (G.ents.list||[])){
       if(!e.dead && e.constructor && e.constructor.name==='CrabShell'){
         e.dead = true;
@@ -190,6 +200,9 @@ class GrimmCauldron {
   update(dt){
     this.t += dt; this.stateT += dt;
     const G = this.G, pl = G.player, p = this.pos;
+    if(this.tells2) for(let i=this.tells2.length-1;i>=0;i--){ const tl=this.tells2[i]; tl.t+=dt;
+      const f=Math.min(1,tl.t/tl.life); tl.m.scale.setScalar(0.4+f*1.2); tl.m.material.opacity=0.3+f*0.45;
+      if(tl.t>=tl.life){ G.scene.remove(tl.m); this.tells2.splice(i,1); } }
     // brew simmer + Grimm bob + eye pulse
     this.brew.material.emissiveIntensity = 0.5 + Math.sin(this.t*4)*0.15;
     this.grimm.position.y = damp(this.grimm.position.y, this.flushed ? 1.9 : 2.9, 3, dt) + Math.sin(this.t*2)*0.06;
@@ -204,7 +217,7 @@ class GrimmCauldron {
     switch(this.state){
       case 'intro': {
         if(this.stateT>1.0 && !this._introDlg){ this._introDlg=true; G.camc.shake(0.5,0.5);
-          window.UI && UI.dialogue('🫥', '"You. The little one even I forgot. You took back my embers, my districts, my SHADOWS... but you\'ll not take my brew. Come and be a copy, like all the rest."'); }
+          window.UI && UI.dialogue('🫥', '"You. The little one even I forgot. You took back my embers, my districts, my SHADOWS... but you\'ll not take my brew. Come and be a copy, like all the rest."', 12000); }
         if(this.stateT>1.3 && !this._hint){ this._hint=true; window.UI && UI.toast('🔥 STAND CLOSE to a burner to pour an ember in. The whole night has led to this. He HATES a sweet brew.'); }
         if(this.stateT>1.5){ this.state='fight'; this.stateT=0; this.nextAtk=this.t+1.0; }
         break;
@@ -215,7 +228,7 @@ class GrimmCauldron {
         // window is yours. Latches off forever the first time the box closes.
         if(!this._introDone){
           const d = document.getElementById('dlg');
-          if(d && d.style.display==='block') this.nextAtk = this.t + 1.0;
+          if(d && d.style.display==='block') this.nextAtk = this.t + 3.5;   // quiet while it hangs + 2.5s grace once it drops
           else if(this._introDlg) this._introDone = true;
         }
         // feed burners by CHANNELING — stand close and hold your ground under fire; later embers pour slower
