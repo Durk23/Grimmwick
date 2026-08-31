@@ -160,6 +160,7 @@ class GrimmCauldron {
     // The speedrun clock stops HERE (the invite press is the finish line) — the tap-through
     // banners after this moment must never count against the recorded time.
     if(this.G.save && !this.G.save.nightDone) this.G.save._finishT = this.G.save.playT||0;
+    this.G._bossEndT = this.G.runT||0;   // the boss record also stops at the invite — reading speed is not skill
     this.dead = true; this.state = 'ending'; this.stateT = 0; this._endStage = 0; this._endT = 0;
     for(const s of this.shadows) if(!s.dead){ s.dead=true; if(s.group) this.G.scene.remove(s.group); if(s.shadow) this.G.scene.remove(s.shadow); }
     for(const b of this.burners) if(b.light) b.light.intensity = 40;
@@ -314,9 +315,9 @@ class GrimmCauldron {
           this.group.add(lan); this._lantern = lan;
           AUDIO.heart && AUDIO.heart(); }
         else if(this._endStage===2 && adv()){ this._endStage=21;
-          window.UI && UI.finaleLine('🫥', '“My name. You REMEMBER my name? The spell was supposed to make everyone forget me... forever.”'); }
+          window.UI && UI.finaleLine('🫥', '“The spell of forgetting should have erased me from every heart in town. How can you still SEE me?”'); }
         else if(this._endStage===21 && adv()){ this._endStage=22;
-          window.UI && UI.finaleLine('🧒', '“Then the spell missed a spot. The whole town is named after you. GRIMMWICK never forgot.”'); }
+          window.UI && UI.finaleLine('🧒', '“The spell missed a spot. The whole town is named after you. GRIMMWICK never forgot.”'); }
         else if(this._endStage===22 && adv()){ this._endStage=25;
           // GRIMM'S ANSWER — the beat the whole game builds to. He warms from shadow to lamplight AS he says it.
           window.UI && UI.finaleLine('🫥', '“...yes, little one. I would love to come home.”');
@@ -386,22 +387,24 @@ class GrimmCauldron {
           const wg = mesh('sph',[0.09,7,6], emat(0xffe9b0,0xffc050,1));
           wlan.add(wc,wg); wlan.position.set(0.62,0.95,0.2); wk.add(wlan);
           wk.position.set(this.pos.x, 0, 0);
-          G.scene.add(wk); this._walker = wk; this._walkT = 0; }
+          G.scene.add(wk); this._walker = wk; this._walkT = 0;
+          this._walkArmed = !(pl && pl.pos.x > 17); }   // already at the gate? the walk arms once they step back toward Grimm
         else if(this._endStage===4){
           this._walkT = (this._walkT||0) + dt;
+          if(!this._walkArmed && pl && pl.pos.x < 17) this._walkArmed = true;
           if(this._gatePortal) this._gatePortal.material.opacity = 0.3 + Math.sin(this.t*3.2)*0.12;
           if(this._walker && pl){
             const tx = Math.min(pl.pos.x - 1.7, 19.6);
             this._walker.position.x = damp(this._walker.position.x, tx, 2.2, dt);
             this._walker.position.y = Math.abs(Math.sin(this.t*5))*0.06;
           }
-          // through the gate (or a set-down phone after 45s) → the festival
-          if((pl && pl.pos.x > 19.4) || this._walkT > 45){
+          // through the gate (or a set-down phone after 45s) → the festival; the walk beat itself can't be skipped
+          if((this._walkArmed && pl && pl.pos.x > 19.4) || this._walkT > 45){
             this._endStage = 5;
             window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED! HAPPY HALLOWEEN!', 3200);
             window.UI && UI.fade(true, 700);
             AUDIO.portal && AUDIO.portal();
-            setTimeout(()=>{ G.onBossDefeated(); }, 800);
+            setTimeout(()=>{ if(G.boss===this && G.area==='boss5') G.onBossDefeated(); }, 800);   // a restart during the fade must not double-complete
           } }
         break;
       }

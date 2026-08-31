@@ -176,6 +176,7 @@ const G = {
     return s;
   },
   switchArea(area){
+    window.UI && UI.closeDialogue && UI.closeDialogue();   // never carry a stale speech card across areas
     const def = findLevel(area);
     this.area = area;
     this.levelDef = def || null;
@@ -520,7 +521,8 @@ const G = {
     const prev = this.save.gp[district]||[false,false,false];
     this.save.gp[district] = prev.map((v,i)=>v||this.runPumpkins[i]);
     this.persist();
-    const secsF = Math.round((this.runT||this.time-this.runT0)*100)/100;
+    const secsF = Math.round(((this._bossEndT !== undefined ? this._bossEndT : (this.runT||this.time-this.runT0)))*100)/100;
+    delete this._bossEndT;   // w5 stamps this at the invite so the tap-paced ending never pollutes the boss record
     const secs = Math.floor(secsF);
     if(!this.save.best) this.save.best = {};
     // boss-only clock under its own key — legacy full-run bests preserved, never compared
@@ -559,11 +561,17 @@ const G = {
     if(district==='w5'){
       // the finale lands IN the festival: fireworks, the whole flame, the town that remembers —
       // the celebration is the payoff, the keepsake card follows once it has breathed
+      const ps = UI.el && UI.el('pause-screen'); if(ps) ps.style.display='none';   // a pause pressed during the fade must not strand its menu
       this.switchArea('hub');
       this.state = 'play';
       UI.fade(false, 800);
       setTimeout(()=>{ UI.toast('🎆 THE FESTIVAL! The whole town remembers Grimm!', 5200); }, 1100);
-      setTimeout(()=>{ this.state='victory'; UI.victoryScreen(stats); }, 8500);
+      const showEnd = ()=>{
+        if(this.area !== 'hub') return;                       // they wandered into a level — the card yields (stats live on the Night Board)
+        if(this.state !== 'play'){ setTimeout(showEnd, 1200); return; }   // pause/shop/map open — wait for a clean moment
+        this.state='victory'; UI.victoryScreen(stats);
+      };
+      setTimeout(showEnd, 8500);
     } else setTimeout(()=>{ this.state='victory'; UI.victoryScreen(stats); }, 4200);
   },
   onEnemyKilled(){},

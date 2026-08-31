@@ -371,8 +371,8 @@ const UI = {
     };
     addEventListener('resize', ()=>{ if(!this._rotDone && window.innerWidth > window.innerHeight){ this._rotDone = true; this.el('rotateHint').style.display='none'; } });
     if(INPUT.isTouch) setTimeout(rotCheck, 600);   // at boot, after the fade begins — title is visible behind it
-    this.el('dlg').addEventListener('mousedown', ()=>this.closeDialogue());
-    this.el('dlg').addEventListener('touchstart', e=>{e.preventDefault();this.closeDialogue();},{passive:false});
+    this.el('dlg').addEventListener('mousedown', ()=>{ if(this._finaleDlg) return; this.closeDialogue(); });
+    this.el('dlg').addEventListener('touchstart', e=>{ if(this._finaleDlg) return; e.preventDefault(); this.closeDialogue(); },{passive:false});
     // touch action buttons
     const bA=this.el('btnA');
     bA.addEventListener('touchstart', e=>{e.preventDefault();e.stopPropagation();INPUT.pressJump();},{passive:false});
@@ -452,11 +452,13 @@ const UI = {
     clearTimeout(this._dlgT);
     this._dlgT = setTimeout(()=>this.closeDialogue(), 9000);
   },
-  closeDialogue(){ this.el('dlg').style.display='none'; },
+  closeDialogue(){ const d=this.el('dlg'); d.style.display='none'; this._finaleDlg=false; d.lastElementChild.style.display=''; },
   // finale speech uses the SAME dialogue card as the rest of the game (owner call: one voice, one font)
   // but never auto-closes — the ending paces it with tap-to-continue.
   finaleLine(icon, text){
     const d = this.el('dlg');
+    this._finaleDlg = true;                              // finale lines are paced by the ending — a tap advances, never erases
+    d.lastElementChild.style.display = 'none';           // hide the standing 'tap to close' hint; the line carries its own
     d.querySelector('.ic').textContent = icon;
     d.querySelector('.tx').innerHTML = text + '<div class="tap">'+(INPUT.isTouch?'tap':'press any key')+' ▸</div>';
     d.style.display='block';
