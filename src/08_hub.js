@@ -709,7 +709,7 @@ function updateHub(G, dt){
     }
     else if(prompt.kind==='grimm'){
       const lines = [
-        '"Night-watchman Grimm, at your service. First shift in a hundred years... I brought snacks."',
+        '"Night watchman Grimm, at your service. First shift in a hundred years... I brought snacks."',
         '"The spell of forgetting is gone. People WAVE at me now. I wave back. It is excellent."',
         '"The lanterns stay lit better when someone WANTS them lit. Who knew."',
         '"They put my name in the festival guest book. In INK, Pip. In ink."',
