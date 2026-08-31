@@ -210,6 +210,14 @@ class GrimmCauldron {
         break;
       }
       case 'fight': {
+        // THE QUIET COURTESY (secret, speedrun tech): Grimm holds every attack while his opening
+        // line still hangs in the text box. Tap it away and the fight begins; leave it up and the
+        // window is yours. Latches off forever the first time the box closes.
+        if(!this._introDone){
+          const d = document.getElementById('dlg');
+          if(d && d.style.display==='block') this.nextAtk = this.t + 1.0;
+          else if(this._introDlg) this._introDone = true;
+        }
         // feed burners by CHANNELING — stand close and hold your ground under fire; later embers pour slower
         if(pl && !pl.dead){ for(const b of this.burners){ if(b.lit) continue;
           const need = 0.5 + this.litCount*0.35;

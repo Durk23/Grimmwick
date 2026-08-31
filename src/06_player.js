@@ -471,8 +471,10 @@ class Player {
   }
   damage(n, fromPos){
     if(this.iframes>0 || this.dead || this.G.state!=='play') return;
-    const bs = this.G.boss && this.G.boss.state;
-    if(bs==='flushed' || bs==='ending') return;   // the fight is over — nothing touches Pip while the story lands
+    const boss = this.G.boss;
+    if(boss && (boss.state==='flushed' || boss.state==='ending' || boss.litCount>=4)) return;
+    // ^ the INSTANT the fourth ember pours, Pip is untouchable — same-frame waves included.
+    //   (Speedrunners: the last pour is a free pass. Stand in the goo. Style on him.)
     if(this.moonT>0) return; // moon rush: untouchable
     if(this.shield){
       this.breakShield();
