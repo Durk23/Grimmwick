@@ -255,9 +255,13 @@ class GrimmCauldron {
         for(const wv of this.waves){ if(wv.mesh) G.scene.remove(wv.mesh); } this.waves.length = 0;
         this._clearShells();   // shells launched moments before the flush keep falling — sweep them every frame here
         this.eyeL.scale.setScalar(0.7); this.eyeR.scale.setScalar(0.7);
+        // the instruction lives in the normal text box (owner call) — reshown gently if the player dawdles
+        this._hintT = (this._hintT||0) + dt;
+        if(this._hintT > 2.4 && (this._nextHint===undefined || this._hintT >= this._nextHint)){
+          this._nextHint = this._hintT + 14;
+          window.UI && UI.dialogue('🏮', 'The fight is over. Walk up to Grimm and press ANY button.');
+        }
         if(!this._flushHint){ this._flushHint=true;
-          window.UI && UI.finaleBanner('🫥 THE FIGHT IS OVER<br><span style="font-size:0.6em">Walk up to Grimm. Press ANY button.</span>', 4200);
-          window.UI && UI.toast('👆 It was never a fight. Walk up to Grimm and press ANY button: jump, spin, anything.');
           // an unmissable bouncing golden marker over his head — the "come here" every platformer kid knows
           const mk = new THREE.Group();
           const arrow = new THREE.Mesh(geo('cone',0.34,0.7,6), new THREE.MeshLambertMaterial({color:0xffd23f, emissive:0xffb020, emissiveIntensity:1}));
