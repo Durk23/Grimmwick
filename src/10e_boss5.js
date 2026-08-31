@@ -155,6 +155,17 @@ class GrimmCauldron {
 
   onPlayerPound(pos){}   // boss contract — player calls this on every landed pound; the cauldron ignores it (pound is even an invite button here)
 
+  _clearShells(){
+    const G = this.G;
+    for(const e of (G.ents.list||[])){
+      if(!e.dead && e.constructor && e.constructor.name==='CrabShell'){
+        e.dead = true;
+        if(e.group) G.scene.remove(e.group);
+        if(e.shadow) G.scene.remove(e.shadow);
+      }
+    }
+  }
+
   defeat(){
     // THE INVITE LANDS — start the ending cutscene; onBossDefeated fires at its last beat.
     // The speedrun clock stops HERE (the invite press is the finish line) — the tap-through
@@ -162,6 +173,7 @@ class GrimmCauldron {
     if(this.G.save && !this.G.save.nightDone) this.G.save._finishT = this.G.save.playT||0;
     this.G._bossEndT = this.G.runT||0;   // the boss record also stops at the invite — reading speed is not skill
     this.dead = true; this.state = 'ending'; this.stateT = 0; this._endStage = 0; this._endT = 0;
+    this._clearShells();   // a potion volley mid-air at the invite must never bonk Pip during the speech
     for(const s of this.shadows) if(!s.dead){ s.dead=true; if(s.group) this.G.scene.remove(s.group); if(s.shadow) this.G.scene.remove(s.shadow); }
     for(const b of this.burners) if(b.light) b.light.intensity = 40;
     if(this._marker){ this.G.scene.remove(this._marker); this._marker=null; }
@@ -241,6 +253,7 @@ class GrimmCauldron {
         // Grimm sits small on the rim, startled — walk up and INVITE (interact). No more attacks.
         for(const s of this.slams){ if(s.tell) G.scene.remove(s.tell); } this.slams.length = 0;
         for(const wv of this.waves){ if(wv.mesh) G.scene.remove(wv.mesh); } this.waves.length = 0;
+        this._clearShells();   // shells launched moments before the flush keep falling — sweep them every frame here
         this.eyeL.scale.setScalar(0.7); this.eyeR.scale.setScalar(0.7);
         if(!this._flushHint){ this._flushHint=true;
           window.UI && UI.finaleBanner('🫥 GRIMM IS FLUSHED OUT: walk up & press ANY button', 3600);
