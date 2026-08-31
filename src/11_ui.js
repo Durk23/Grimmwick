@@ -1,6 +1,6 @@
 // ============ UI — HUD, title, dialogue, store, pause, boss bar, touch ============
 const STORY_SLIDES = [
-  {icon:'🌕', text:'Welcome to GRIMMWICK, the town where Halloween never ends. Every 100 years, the Ember Moon rises to recharge the Everflame... the magical bonfire that keeps every ghost friendly and every candy sweet.\n\n(Nobody remembers why the town is called Grimmwick. Not even the Mayor.)'},
+  {icon:'🌕', text:'Welcome to GRIMMWICK, the town where Halloween never ends. At the heart of town burns the EVERFLAME, a magical bonfire that keeps every ghost friendly and every candy sweet. Once every hundred years, the Ember Moon rises to recharge it.\n\nTonight is that night.\n\n(Nobody remembers why the town is called Grimmwick. Not even the Mayor.)'},
   {icon:'🌑', text:'But tonight, moments before the ceremony, a forgotten shadow named GRIMM swallowed the flame and shattered it into five embers, scattering them across the five districts. The beloved guardians who found them have been corrupted by ember-fire!'},
   {icon:'🍬', text:'Everyone always says Pip is too small for adventures.\n\nEveryone is about to be wrong.\n\nGrab your candy bag. Free the guardians. RELIGHT THE NIGHT!'},
 ];
