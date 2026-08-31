@@ -330,7 +330,7 @@ class GrimmCauldron {
         else if(this._endStage===2 && adv()){ this._endStage=21;
           window.UI && UI.finaleLine('🫥', '“The spell of forgetting should have erased me from every heart in town. How can you still SEE me?”'); }
         else if(this._endStage===21 && adv()){ this._endStage=22;
-          window.UI && UI.finaleLine('🧒', '“The spell missed a spot. The whole town is named after you. GRIMMWICK never forgot.”'); }
+          window.UI && UI.finaleLine('🧒', '“The whole town is named after you. GRIMMWICK never forgot.”'); }
         else if(this._endStage===22 && adv()){ this._endStage=25;
           // GRIMM'S ANSWER — the beat the whole game builds to. He warms from shadow to lamplight AS he says it.
           window.UI && UI.finaleLine('🫥', '“...yes, little one. I would love to come home.”');
