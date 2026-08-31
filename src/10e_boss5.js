@@ -256,7 +256,7 @@ class GrimmCauldron {
         this._clearShells();   // shells launched moments before the flush keep falling — sweep them every frame here
         this.eyeL.scale.setScalar(0.7); this.eyeR.scale.setScalar(0.7);
         if(!this._flushHint){ this._flushHint=true;
-          window.UI && UI.finaleBanner('🫥 GRIMM IS FLUSHED OUT: walk up & press ANY button', 3600);
+          window.UI && UI.finaleBanner('🫥 THE FIGHT IS OVER<br><span style="font-size:0.6em">Walk up to Grimm. Press ANY button.</span>', 4200);
           window.UI && UI.toast('👆 It was never a fight. Walk up to Grimm and press ANY button: jump, spin, anything.');
           // an unmissable bouncing golden marker over his head — the "come here" every platformer kid knows
           const mk = new THREE.Group();
