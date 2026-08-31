@@ -471,6 +471,8 @@ class Player {
   }
   damage(n, fromPos){
     if(this.iframes>0 || this.dead || this.G.state!=='play') return;
+    const bs = this.G.boss && this.G.boss.state;
+    if(bs==='flushed' || bs==='ending') return;   // the fight is over — nothing touches Pip while the story lands
     if(this.moonT>0) return; // moon rush: untouchable
     if(this.shield){
       this.breakShield();
