@@ -125,7 +125,7 @@ const Night = {
     sv.flawlessCandy = sv.candyLifetime||0;
     G.persist();
     UI.toast('🏆 FLAWLESS NIGHT! All 75 stars! Your time is on the board: '+fmtCS(Math.round(sv.flawlessT*100)), 5200);
-    GC.submit('grimmwick.flawless', encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths, sv.flawlessDmg, sv.flawlessCandy), 75);
+    GC.submit('grimmwick.flawless', encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths, sv.flawlessDmg, 75), Math.min(sv.flawlessCandy||0, 999999999));
   },
   // THE FIRST FLAME — one player in the world wears it: the reigning Flawless champion.
   // Checked on boot and board open; state flips fire the take/lose toasts.

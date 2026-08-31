@@ -89,8 +89,10 @@ class GrimmCauldron {
     }
   }
   _feedBurner(b){
+    // (pipSafe is raised below once this pour is the fourth)
     if(b.lit) return;
     b.lit = true; this.litCount++;
+    if(this.litCount>=4) this.pipSafe = true;   // the moment the last ember pours, nothing touches Pip
     this.stripped[b.attack] = true;
     b.flame.material = emat(0xffffff, W5PAL.ember, 2); b.halo.material.opacity = 0.55;
     b.light = new THREE.PointLight(W5PAL.ember, 30, 12); b.light.position.set(b.x, 2, -0.8); this.G.scene.add(b.light);
@@ -102,7 +104,7 @@ class GrimmCauldron {
     this.brew.material.color.lerpColors(new THREE.Color(0x1a0e22), new THREE.Color(0xff9ecf), litFrac);
     this.brew.material.emissive.lerpColors(new THREE.Color(W5PAL.shadowP), new THREE.Color(0xffb0d8), litFrac);
     window.UI && UI.updateBossBar(4 - this.litCount);
-    window.UI && UI.toast(this.litCount>=4 ? '🔥 The brew is SWEET! Grimm is flushed out!' : `🔥 Ember ${this.litCount}/4 fed: one of Grimm's tricks fizzles out, and the dark shrinks back!`);
+    window.UI && UI.toast(this.litCount>=4 ? '🔥 The brew is SWEET! It spits Grimm out of the pot!' : `🔥 Ember ${this.litCount}/4 fed: one of Grimm's tricks fizzles out, and the dark shrinks back!`);
   }
 
   // ---- attacks (each fixed-clock; stripped ones are skipped) ----
@@ -182,6 +184,7 @@ class GrimmCauldron {
     // banners after this moment must never count against the recorded time.
     if(this.G.save && !this.G.save.nightDone) this.G.save._finishT = this.G.save.playT||0;
     this.G._bossEndT = this.G.runT||0;   // the boss record also stops at the invite — reading speed is not skill
+    this.pipSafe = true;
     this.dead = true; this.state = 'ending'; this.stateT = 0; this._endStage = 0; this._endT = 0;
     this._clearShells();   // a potion volley mid-air at the invite must never bonk Pip during the speech
     for(const s of this.shadows) if(!s.dead){ s.dead=true; if(s.group) this.G.scene.remove(s.group); if(s.shadow) this.G.scene.remove(s.shadow); }

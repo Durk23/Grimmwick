@@ -60,7 +60,7 @@ const G = {
       this.save.nightT = this.save._finishT !== undefined ? this.save._finishT : (this.save.playT||0);
       this.save.nightDmg = 999; this.save.nightDeaths = 99;
       this.save.nightCandy = this.save.candyLifetime||0;
-      this.save.nightEligible = (this.save.playT||0) > 60;
+      this.save.nightEligible = (this.save.playT||0) > 60 && !this.save.cozy;   // cozy players get no auto-entry — Reset Save starts an eligible run
       this.save.nightSubmitted = true;
       if(this.save.nightEligible){
         const cs = Math.round(this.save.nightT*100);
@@ -96,6 +96,7 @@ const G = {
       owned: w.owned||['kid'], equipped: w.equipped||'kid',
       ownedMasks: w.ownedMasks||[], mask: w.mask||null,
       pass: !!w.pass, firstFlame: !!w.firstFlame, firstFlameOff: !!w.firstFlameOff,
+      pendingScores: w.pendingScores || undefined,   // earned scores queued offline survive the fresh-run reset
       seenIntro:false, maxHearts:3 };
     Store.set('grimmwick_save', JSON.stringify(fresh));
     Store.del('hollowville_save');
@@ -394,6 +395,7 @@ const G = {
     }, 500);
   },
   returnToHub(afterVictory){
+    if(this.area==='tut' && !this.save.tutDone){ this.save.tutDone = true; this.persist(); }   // walking out counts — never replay Gran's yard on next launch
     this.state='transition';
     UI.fade(true, 450);
     setTimeout(()=>{
@@ -455,7 +457,8 @@ const G = {
     this.persist();
     const gs = document.getElementById('gameover-screen');
     if(gs) gs.style.display='none';
-    if(this.area.startsWith('boss')) this.startBoss(this.bossDistrict||'w1');
+    if(this.area==='tut'){ this.switchArea('tut'); this.state='play'; UI.fade(false, 450); }   // a new player who falls in Gran's yard tries Gran's yard again
+    else if(this.area.startsWith('boss')) this.startBoss(this.bossDistrict||'w1');
     else this.enterLevel(this.levelDef ? this.levelDef.id : (this.save.lastLevel||'w1l1'));
   },
   candyContinue(){

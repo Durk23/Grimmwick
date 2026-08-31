@@ -703,7 +703,8 @@ function updateHub(G, dt){
       UI.mayorDialogue();
       if(!G.save.metMayor){ G.save.metMayor=true; G.persist();
         if(!G.save.seenShop){
-          setTimeout(()=>{ if(window.UI) UI.dialogue('🎩', '"One more thing, Pip! Visit the COSTUME CAULDRON before you go. Masks, costumes... and they say a golden CROWN waits for whoever earns all 75 stars. Follow the arrow!"'); }, 600);
+          // the premise line holds the stage first; the Cauldron tour follows once it has been read
+          setTimeout(()=>{ if(window.UI) UI.dialogue('🎩', '"One more thing, Pip! Visit the COSTUME CAULDRON before you go. Masks, costumes... and they say a golden CROWN waits for whoever earns all 75 stars. Follow the arrow!"'); }, 9600);
           UI.toast('🎩 Follow the golden arrow to the Costume Cauldron!');
         } else UI.toast('🎃 Follow the golden arrow. WALK INTO a glowing gate to pick a level!'); }
     }
