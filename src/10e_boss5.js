@@ -217,7 +217,7 @@ class GrimmCauldron {
     switch(this.state){
       case 'intro': {
         if(this.stateT>1.0 && !this._introDlg){ this._introDlg=true; G.camc.shake(0.5,0.5);
-          window.UI && UI.dialogue('🫥', '"You. The little one even I forgot. You took back my embers, my districts, my SHADOWS... but you\'ll not take my brew. Come and be a copy, like all the rest."', 12000); }
+          window.UI && UI.dialogue('🫥', '"You. The little one even I forgot. You took back my embers, my districts, my SHADOWS... but you will NOT take my brew. Come closer and it will swallow you too."', 12000); }
         if(this.stateT>1.3 && !this._hint){ this._hint=true; window.UI && UI.toast('🔥 STAND CLOSE to a burner to pour an ember in. The whole night has led to this. He HATES a sweet brew.'); }
         if(this.stateT>1.5){ this.state='fight'; this.stateT=0; this.nextAtk=this.t+1.0; }
         break;
