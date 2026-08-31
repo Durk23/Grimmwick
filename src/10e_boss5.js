@@ -267,7 +267,7 @@ class GrimmCauldron {
         if(this.litCount>=4 && !this.flushed){ this.flushed=true; this.state='flushed'; this.stateT=0; G.camc.shake(0.6,0.5);
           this.grimmMat.emissiveIntensity = 0.2; this.grimmMat.opacity = 1;
           G.fx.spawn(new THREE.Vector3(0,2.2,0), W5PAL.emberL, 30, {speed:6, life:1});
-          window.UI && UI.dialogue('🫥', '"...no. NO! The sweetness... it BURNS! What have you... what did you..."'); }
+          window.UI && UI.dialogue('🫥', '"...no. NO! The sweetness... it BURNS! What have you... what did you..."', 10000); }
         break;
       }
       case 'flushed': {
@@ -276,9 +276,14 @@ class GrimmCauldron {
         for(const wv of this.waves){ if(wv.mesh) G.scene.remove(wv.mesh); } this.waves.length = 0;
         this._clearShells();   // shells launched moments before the flush keep falling — sweep them every frame here
         this.eyeL.scale.setScalar(0.7); this.eyeR.scale.setScalar(0.7);
-        // the instruction lives in the normal text box (owner call) — reshown gently if the player dawdles
+        // the instruction lives in the normal text box (owner call) — but it WAITS for the burn
+        // line to finish (10s hold, or tapped away early), then reshows gently if the player dawdles
         this._hintT = (this._hintT||0) + dt;
-        if(this._hintT > 2.4 && (this._nextHint===undefined || this._hintT >= this._nextHint)){
+        if(!this._burnDone && this._hintT > 0.8){
+          const dEl = document.getElementById('dlg');
+          if(!(dEl && dEl.style.display==='block')) this._burnDone = true;
+        }
+        if(this._burnDone && (this._nextHint===undefined || this._hintT >= this._nextHint)){
           this._nextHint = this._hintT + 14;
           window.UI && UI.dialogue('🏮', 'The fight is over. Walk up to Grimm and press ANY button.');
         }
@@ -363,7 +368,7 @@ class GrimmCauldron {
           AUDIO.heart && AUDIO.heart(); }
         else if(this._endStage===25 && adv()){ this._endStage=3;
           window.UI && UI.closeDialogue();
-          window.UI && UI.finaleBanner('✨ THE SPELL OF FORGETTING SHATTERS ✨<br><span style="font-size:0.6em">A hundred years of memories come flooding home.</span>', 15000);
+          window.UI && UI.finaleBanner('✨ THE SPELL OF FORGETTING SHATTERS ✨', 15000);
           // memory motes — a hundred years of memories drifting back into the world
           for(let i=0;i<44;i++) G.fx.spawn(new THREE.Vector3(rand(-20,20), rand(1,8), rand(-2,2)), pick([0xfff2c4,0xffd98a,0xb37dff,0x63e6e2]), 1, {speed:1.1, life:1.7, gravity:-0.35, size:0.7});
           // GRANNY WICK appears behind Pip — she promised she'd be here for this
