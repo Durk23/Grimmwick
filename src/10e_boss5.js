@@ -414,7 +414,7 @@ class GrimmCauldron {
           // through the gate (or a set-down phone after 45s) → the festival; the walk beat itself can't be skipped
           if((this._walkArmed && pl && pl.pos.x > 19.4) || this._walkT > 45){
             this._endStage = 5;
-            window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED! HAPPY HALLOWEEN!', 3200);
+            window.UI && UI.finaleBanner('🎆 GRIMMWICK IS SAVED!', 3200);
             window.UI && UI.fade(true, 700);
             AUDIO.portal && AUDIO.portal();
             setTimeout(()=>{ if(G.boss===this && G.area==='boss5') G.onBossDefeated(); }, 800);   // a restart during the fade must not double-complete

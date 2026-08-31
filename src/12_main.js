@@ -400,7 +400,7 @@ const G = {
       this.switchArea('hub');
       this.state='play';
       UI.fade(false, 450);
-      if(afterVictory) UI.toast(this.save.embers>=5 ? '🎆 THE EVERFLAME BURNS WHOLE! The festival is ON! Happy Halloween, Grimmwick!' : '🔥 The Everflame flickers a little brighter...');
+      if(afterVictory) UI.toast(this.save.embers>=5 ? '🎆 THE EVERFLAME BURNS WHOLE! The festival is ON, Grimmwick!' : '🔥 The Everflame flickers a little brighter...');
     }, 500);
   },
   onPlayerFell(){
