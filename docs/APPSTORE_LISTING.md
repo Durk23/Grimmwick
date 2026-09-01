@@ -1,4 +1,6 @@
-# Grimmwick — App Store listing kit (v1.0, free, no IAP)
+# Grimmwick — App Store listing kit (v1.1, free, no IAP)
+
+> v1.1 refresh (Sept 1 2026): promo text leads with leaderboards + ending; description adds RACE THE NIGHT section (Game Center, characters, First Flame) + Star Crown; 'jealous' -> 'forgotten' per the spell canon; keywords go Halloween-first and drop 'mario-like' (trademark risk). Subtitle unchanged. REMEMBER at the Halloween update: remove 'No purchases' when the shop opens.
 
 Everything below is paste-ready for App Store Connect. Fields marked ✂️ have hard length limits.
 
@@ -16,14 +18,14 @@ Relight the Night
 
 ## Promotional text (170 chars max, editable without review) ✂️
 ```
-The town where Halloween never ends has gone dark. Only Pip is small enough to slip past the shadows. 25 levels, 5 bosses, one festival to save. Free — no ads, ever.
+A cute-spooky platformer with 25 handcrafted levels, 5 bosses, global leaderboards, and a heartfelt ending. Completely free. No ads. Ever.
 ```
 
 ## Description (4000 chars max)
 ```
 🎃 GRIMMWICK — RELIGHT THE NIGHT
 
-Welcome to Grimmwick, the town where Halloween never ends. Every hundred years the Ember Moon recharges the Everflame — the great bonfire that keeps every ghost friendly and every candy sweet. But tonight, a jealous shadow named Grimm swallowed the flame and shattered it into five embers, corrupting the beloved guardians who found them.
+Welcome to Grimmwick, the town where Halloween never ends. Every hundred years the Ember Moon recharges the Everflame — the great bonfire that keeps every ghost friendly and every candy sweet. But tonight, a forgotten shadow named Grimm swallowed the flame and shattered it into five embers, corrupting the beloved guardians who found them.
 
 Everyone always says Pip is too small for adventures.
 Everyone is about to be wrong.
@@ -33,11 +35,16 @@ Everyone is about to be wrong.
 • 5 boss guardians, each with its own fight — and each with a secret takedown for clever players to discover
 • A wholesome ending: the final blow of the game is not an attack
 
+🏆 RACE THE NIGHT
+• Game Center leaderboards: the Fastest Night board ranks every finisher, and the Flawless board crowns perfect 75-star runs
+• Unlockable characters with their own moves — ride Zoe the Witchling's broom, and someone else is waiting at the end of the story...
+• THE FIRST FLAME: a one-of-a-kind reward worn by exactly ONE player in the world — the reigning champion. Take it if you can.
+
 🕹️ FEELS LIKE THE CLASSICS
 Run, double-jump, ground-pound, mega-bounce, and climb through levels built the way you remember: one idea introduced, twisted, and mastered; secret exits; high roads and low roads; hidden warps for speedrunners. Every level plays identically every time — die, learn, triumph.
 
 🍬 CANDY IS EVERYTHING
-Bonk enemies, collect candy, and spend it in the Costume Cauldron: costumes for Pip, permanent Level Ups like extra hearts and a candy magnet — every upgrade earnable by playing. Earn stars in each level (fast · all-candy · no-damage) to unlock free level-up rewards.
+Bonk enemies, collect candy, and spend it in the Costume Cauldron: costumes, masks, and permanent Level Ups like extra hearts and a candy magnet — every upgrade earnable by playing. Earn stars in each level (fast · all-candy · no-damage) and claim THE STAR CROWN if you find all 75.
 
 🧸 MADE FOR EVERY PLAYER
 • Cozy Mode: extra hearts and gentler enemies, one toggle away — perfect for younger adventurers
@@ -53,7 +60,7 @@ The night is dark. The lanterns are waiting. Grab your candy bag, little hero.
 
 ## Keywords (100 chars max, comma-separated, no spaces needed) ✂️
 ```
-platformer,halloween,spooky,cute,kids,jump,adventure,pumpkin,ghost,candy,mario-like,offline,no ads
+halloween,spooky,platformer,ghost,pumpkin,adventure,kids,speedrun,candy,witch,castle,arcade,cute
 ```
 
 ## Category
