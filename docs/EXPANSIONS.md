@@ -51,3 +51,13 @@ are DESIGN taste passes and seasonal audio, not construction.
 
 Rule that carries over: every expansion level obeys the constitution
 (determinism, hearts-always, one gimmick, comparable heights, telegraphs).
+
+## Frostmere structure (owner-aligned, Sept 1 2026)
+Second TOWN, not extra districts: post-story ferry dock appears in Grimmwick's square —
+Captain Wraith's restored Salty Phantom sails Pip to Frostmere, the town where WINTER
+never ends (their own great flame in trouble; the kid who relit the night gets the call).
+Second hub + WORLDS w6-w10, data-driven like everything else. Winter mechanics family:
+ice momentum, freeze/thaw platforms, snowball rolling, skating. Ship shape: Winterfest
+update = Frostmere square + District 1 (arrival moment + 5 levels), then a district per
+month through winter — five featuring shots. Ferry route = the game's spine for all
+future towns (Sunken Isles next summer). START: after 1.2/Nightmare ships.
