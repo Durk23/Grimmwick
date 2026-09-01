@@ -329,6 +329,8 @@ A feature that serves none of the three joys doesn't ship.
 
 ## Monetization philosophy (HARD RULES — owner's call, do not revisit)
 
+**MODEL LOCKED (owner call, Sept 1 2026 — supersedes the pass/cosmetic-SKU plans below): ALL COSMETICS FREE (candy-earnable). The ONLY real-money product is CANDY PACKS (consumable IAP).** No Spook Pass at launch or Halloween; no paid costumes; no paid levels ever. Money buys patience, nothing else. Launch Oct 1 with ZERO purchases ('No purchases' stays in the listing); the Halloween update (~Oct 31) introduces the Candy Shop: Handful $0.99/1,200 🍬 · Bucket $2.99/4,000 🍬 · Cauldron $4.99/7,500 🍬 (tune to observed earn rates). Sacred/unbuyable stays: Star Crown, First Flame, playable Grimm, boss skills, Granny Wick. Older pass/costume-pricing text below is historical context only.
+
 **No ads. Ever, for now.** No ad SDKs, no banners, no interstitials, no "watch to continue." This is a strategic choice, not just a nice one:
 - Ads are the #1 source of 1-star reviews in free games; no ads = better ratings = better rank = better conversion.
 - No ad/tracking SDKs means the privacy nutrition label can honestly say **"Data Not Collected"** — a trust signal players and parents actually read, and a cleaner App Review every update.
