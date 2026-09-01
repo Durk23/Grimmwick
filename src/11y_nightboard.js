@@ -66,6 +66,8 @@ function decodeNight(v){
 const NIGHT_BOARDS = [
   { key:'flawless', id:'grimmwick.flawless', icon:'🏆', name:'FLAWLESS NIGHT',
     sub:'ALL 75 stars: every level, every challenge. Fastest total clock wins. The mastery board.' },
+  { key:'nightmare', id:'grimmwick.nightmare', icon:'🌑', name:'THE NIGHTMARE',
+    sub:'All 25 levels beaten with no lanterns and no mercy. Sum of your best times. The brutal board.' },
   { key:'night', id:'grimmwick.night', icon:'🌙', name:'THE NIGHT',
     sub:'Everyone who saved Grimmwick. Fastest night wins; fewest deaths breaks ties.' },
 ];
@@ -81,7 +83,23 @@ const Night = {
       ? encodeNight(Math.round(sv.nightT*100), sv.nightDeaths||0, this._dmgFor(sv), this.totalStars(G)) : null;
     if(key==='flawless') return sv.flawlessT
       ? encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths||0, sv.flawlessDmg||0, 75) : null;
+    if(key==='nightmare'){
+      const t = this.nightmareTotal(G);
+      return t != null ? Math.round(t*100) : null;   // raw centiseconds — no composite packing on this board
+    }
     return null;
+  },
+  // sum of nightmare bests, only once every level is conquered
+  nightmareTotal(G){
+    const lists = (typeof LEVEL_LISTS!=='undefined') ? LEVEL_LISTS.flat() : (typeof W1_LEVELS!=='undefined' ? W1_LEVELS : []);
+    if(!lists.length || !G.save.nm) return null;
+    let tot = 0;
+    for(const d of lists){
+      const r = G.save.nm.levels && G.save.nm.levels[d.id];
+      if(!r || !r.done || !r.best) return null;
+      tot += r.best;
+    }
+    return tot;
   },
   // grandfathered saves report damage 998 instead of the untracked 999: the one-notch dip makes the
   // re-encoded score strictly better than their legacy entry, so the star-refresh replaces it. Shown as '–' either way.
@@ -227,6 +245,17 @@ const Night = {
   },
   close(){ const el = document.getElementById('nb-screen'); if(el) el.style.display='none'; if(window.UI) UI._ovCloseT = performance.now(); AUDIO.ui && AUDIO.ui(); },
   _row(rank, name, v, candyCtx, me){
+    if(this._sel === 'nightmare'){
+      // raw-time board: rank · name · 🌑 25/25 · total time
+      return `<div class="nb-row${me?' me':''}">
+        <div class="nb-rank">${me?'⭐':''}#${rank}</div>
+        <div class="nb-main">
+          <div class="nb-name">${String(name||'???').replace(/[<>&"]/g,'')}</div>
+          <div class="nb-stats">🌑 all 25 · no lanterns</div>
+        </div>
+        <div class="nb-time">${fmtCS(v)}</div>
+      </div>`;
+    }
     const d = decodeNight(v);
     return `<div class="nb-row${me?' me':''}">
       <div class="nb-rank">${me?'⭐':''}#${rank}</div>

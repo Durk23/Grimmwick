@@ -13,7 +13,8 @@ class EntityMgr {
         const d = e.group ? Math.abs(e.group.position.x-G.player.pos.x)+Math.abs(e.group.position.z-G.player.pos.z) : 0;
         if(d>70) continue;
       }
-      e.update(dt, G);
+      // NIGHTMARE: the whole enemy cast runs 25% faster (patrols, dives, telegraphs — deterministic, just meaner)
+      e.update(e.isEnemy && G.nightmare ? dt*1.25 : dt, G);
     }
   }
   clear(){
@@ -105,7 +106,7 @@ class Heart {
     this.group.position.set(x,y,z);
     this.base=y; this.t=rand(0,9); this.dead=false;
   }
-  update(dt,G){
+  update(dt, G){
     this.t+=dt;
     this.group.position.y = this.base+Math.sin(this.t*2)*0.15;
     this.group.rotation.y = this.t*1.8;
@@ -173,6 +174,14 @@ class Checkpoint {
     this.idx=idx; this.lit=false; this.dead=false; this.t=0;
   }
   update(dt,G){
+    if(G.nightmare){
+      if(!this._snuffed){ this._snuffed = true;
+        this.flame.material = emat(0x5a1420, 0x8a1830, 0.6);   // cold red lantern — no checkpoints tonight
+        if(this.light) this.light.intensity = 0;
+        this.halo.material.opacity = 0;
+      }
+      return;   // no checkpoints tonight
+    }
     this.t+=dt;
     if(this.lit){
       const pulse = 1+Math.sin(this.t*7)*0.15;

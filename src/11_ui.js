@@ -127,6 +127,11 @@ const UI = {
       #mapSvg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
       #mapHint { position:relative; z-index:2; font-size:12.5px; font-weight:800; opacity:.55; text-shadow:0 2px 4px #000; }
       #mapClose { position:absolute; top:calc(10px + env(safe-area-inset-top)); right:calc(12px + env(safe-area-inset-right)); width:46px; height:46px; border-radius:14px; background:rgba(20,12,40,.75); border:1.5px solid rgba(255,255,255,.28); color:#fff; font-size:19px; font-weight:800; font-family:inherit; z-index:3; cursor:pointer; }
+      #nmToggle { position:absolute; top:calc(12px + env(safe-area-inset-top)); left:calc(12px + env(safe-area-inset-left)); border-radius:14px; padding:10px 16px; background:rgba(20,12,40,.8); border:1.5px solid rgba(255,255,255,.28); color:#fff; font-size:13.5px; font-weight:800; font-family:inherit; z-index:3; cursor:pointer; }
+      #map-screen.nm { background:linear-gradient(180deg,#150408 0%,#33101d 52%,#481528 100%); }
+      #map-screen.nm #mapMoon { background:radial-gradient(circle at 38% 34%, #ffd9d9, #ff5a5a 62%, #a81830); box-shadow:0 0 60px 20px rgba(255,70,70,.25); }
+      #map-screen.nm #nmToggle { background:rgba(90,10,30,.85); border-color:#ff5a7a; color:#ffb9c9; box-shadow:0 0 16px rgba(255,60,90,.35); }
+      #map-screen.nm .mnode .mlamp { filter:hue-rotate(-95deg) saturate(1.5); }
       .mnode { position:absolute; width:118px; margin-left:-59px; margin-top:-30px; text-align:center; cursor:pointer; z-index:2; }
       .mnode.lock { cursor:default; }
       .mnode .mring { position:absolute; left:50%; top:27px; width:62px; height:62px; margin:-31px 0 0 -31px; border-radius:50%; border:3px dashed rgba(255,225,160,.95); opacity:0; animation:mspin 9s linear infinite; }
@@ -919,6 +924,8 @@ const UI = {
     if(INPUT.isTouch) this.el('touchBtns').style.display='flex';
   },
   renderMap(world, dNum, beaten){
+    const nmOn = !!(this.G.nmSel && this.G.save.nightDone);
+    this.el('map-screen').classList.toggle('nm', nmOn);
     const G=this.G, district=this._mapDistrict;
     let levels = [];
     if(typeof LEVEL_LISTS!=='undefined') for(const list of LEVEL_LISTS) for(const l of list) if(l.district===district) levels.push(l);
@@ -949,12 +956,18 @@ const UI = {
       const p=POS[Math.min(i,POS.length-1)];
       const lamp = n.boss ? '<span class="mcrown">👑</span>🎃' : '🏮';
       const starIcon = {time:'⏱', candy:'🍬', clean:'💜'};   // a missed star shows WHAT to hunt, not just that something's missing
-      const stars = (!n.boss && n.st==='done')
-        ? ['time','candy','clean'].map(k=>n.stars[k]?'<span>⭐</span>':`<span class="off">${starIcon[k]}</span>`).join('')
-        : '&nbsp;';
+      const nmRec = nmOn && !n.boss ? (this.G.save.nm && this.G.save.nm.levels && this.G.save.nm.levels[n.id]) : null;
+      const stars = nmOn && !n.boss
+        ? (nmRec && nmRec.done ? `<span>🌑</span>` : `<span class="off">🌑</span>`)
+        : ((!n.boss && n.st==='done')
+          ? ['time','candy','clean'].map(k=>n.stars[k]?'<span>⭐</span>':`<span class="off">${starIcon[k]}</span>`).join('')
+          : '&nbsp;');
       const label = n.boss ? n.name : dNum+'-'+(i+1)+' · '+n.name;
       let sub;
       if(n.boss) sub = n.st==='done' ? '🔥 relit · fight again?' : (n.st==='avail' ? 'the guardian stirs…' : '🔒 clear '+dNum+'-'+levels.length);
+      else if(nmOn){
+        sub = (nmRec && nmRec.best) ? '🌑 best '+fmt(nmRec.best) : 'unconquered';
+      }
       else {
         const bits=[];
         if(n.par) bits.push('par '+fmt(n.par));
@@ -969,8 +982,18 @@ const UI = {
         <div class="mtime">${sub}</div>
       </div>`;
     });
+    if(this.G.save.nightDone) html += `<button id="nmToggle" class="ui-block">${nmOn ? '🌑 NIGHTMARE: ON' : '🌙 Nightmare Mode'}</button>`;
     const wrap=this.el('mapWrap');
     wrap.innerHTML = html;
+    const nt = document.getElementById('nmToggle');
+    if(nt) this.bindTap(nt, ()=>{
+      const G = this.G;
+      G.nmSel = !G.nmSel; AUDIO.ui();
+      // the 3D Patch map is daylight-only: dispose it for nightmare, rebuild it on the way back
+      if(G.nmSel && G.mapView){ G.mapView.dispose && G.mapView.dispose(); G.mapView = null; }
+      else if(!G.nmSel && (G._mapDistrict||world.key)==='w1' && !G.mapView && typeof buildMapScene==='function'){ G.mapView = buildMapScene(G, 'w1'); }
+      this.renderMap(world, dNum, beaten);
+    });
     wrap.querySelectorAll('.mnode').forEach(nd=>{
       this.bindTap(nd, ()=>this._mapActivate(+nd.dataset.i));   // tap-detect: a drag-brush across a lantern no longer launches a level
     });
@@ -1027,6 +1050,15 @@ const UI = {
   levelClear(stats){
     this._clearStats = stats;
     const fmt = v => typeof v==='number' ? (Math.floor(v/60)+':'+String(Math.floor(v%60)).padStart(2,'0')) : v;
+    if(stats.nightmare){
+      this.el('clearName').textContent = stats.levelName || '';
+      this.el('clearStars').innerHTML = '<div class="cstar"><div class="big">🌑</div><div class="lbl">NIGHTMARE CLEAR</div></div>';
+      this.el('clearStats').innerHTML = `⏱️ Time: <b>${fmt(stats.time)}</b><div style="margin-top:6px;opacity:.85">🌑 Best: <b>${fmt(stats.best)}</b></div>`;
+      this.el('clearNext').style.display = stats.nextId ? 'block' : 'none';
+      this.setPrompt(null);
+      this.el('clear-screen').style.display='flex';
+      return;
+    }
     this.el('clearName').textContent = stats.levelName || '';
     const st = stats.stars||{};
     // missed stars must READ as missed — ✖ icon + dimmed card + "missed:" prefix (a dim ⭐ still read as earned).

@@ -39,6 +39,7 @@ const G = {
       if(Object.keys(this.save.levels||{}).length > 0 || (this.save.playT||0) > 60) this.save.dmgUntracked = true;   // damage AND deaths both started false-zero on these saves
     }
     if(this.save.deathsLifetime===undefined) this.save.deathsLifetime = 0;
+    if(!this.save.nm) this.save.nm = {levels:{}};   // NIGHTMARE MODE progress lives apart — the 75 crown stars are never touched
     // legacy saves that already beat Grimm (finished before the Night Board existed): GRANDFATHER them in.
     // Their clock is playT at migration — honest or WORSE (includes post-game wandering), and the unknowable
     // stats take worst-case tiebreaks, so the entry can never rank unfairly high. A fresh run replaces it.
@@ -177,6 +178,7 @@ const G = {
     return s;
   },
   switchArea(area){
+    if(area==='hub' || area==='tut' || area.startsWith('boss')) this.nightmare = false;
     window.UI && UI.closeDialogue && UI.closeDialogue();   // never carry a stale speech card across areas
     const def = findLevel(area);
     this.area = area;
@@ -261,6 +263,7 @@ const G = {
     }, 500);
   },
   enterLevel(id){
+    this.nightmare = !!(this.nmSel && this.save.nightDone);
     const def = findLevel(id);
     if(!def){ if(this.state==='map') this.state='play'; UI.toast('🌘 That road is still dark...'); return; }
     if(UI.hideMap) UI.hideMap();
@@ -276,14 +279,15 @@ const G = {
       this.runCandyPicked = 0;
       this.runDamage = 0;
       this.runCozy = !!this.save.cozy;
-      this.save.lives = 5; this.save.lastLevel = id; this.persist();
+      this.save.lives = this.nightmare ? 3 : 5; this.save.lastLevel = id; this.persist();
       this.switchArea(id);
       this.state='play';
       UI.fade(false, 450);
       const dWorld = (typeof WORLDS!=='undefined') ? WORLDS.find(x=>x.key===def.district) : null;
       const dList = (typeof LEVEL_LISTS!=='undefined') ? LEVEL_LISTS.find(L=>L.includes(def)) : null;
       const dNum = dList ? dList.indexOf(def)+1 : 1;
-      UI.levelIntro(def.name, (dWorld?dWorld.name:'Grimmwick')+' · Level '+dNum);
+      UI.levelIntro(def.name, this.nightmare ? '🌑 NIGHTMARE · '+(dWorld?dWorld.name:'Grimmwick') : (dWorld?dWorld.name:'Grimmwick')+' · Level '+dNum);
+      if(this.nightmare) setTimeout(()=>this._nightmareTint(), 650);
     }, 500);
   },
   completeLevel(opts={}){
@@ -294,6 +298,32 @@ const G = {
     const secsF = Math.round((this.runT||0)*100)/100;   // bests keep centiseconds — the district boards deserve real precision
     const secs = Math.floor(secsF);
     const collected = this.runCandyPicked||0;
+    if(this.nightmare){
+      // nightmare clears track separately: done + best time only — no stars, no night clock, no boards
+      const rec = (this.save.nm.levels[id] = this.save.nm.levels[id] || {done:false, best:null});
+      rec.done = true;
+      if(secsF>=3 && (!rec.best || secsF<rec.best)) rec.best = secsF;
+      // THE NIGHTMARE board: once all 25 are conquered, the sum of bests goes up — and every
+      // improved best resubmits (lower total, Game Center accepts — a living entry)
+      if(window.NightBoard){
+        const tot = NightBoard.nightmareTotal(this);
+        if(tot != null){
+          GC.submit('grimmwick.nightmare', Math.round(tot*100), 25);
+          if(!this.save.nm.conquered){ this.save.nm.conquered = true;
+            setTimeout(()=>UI.toast('🌑 THE NIGHTMARE IS CONQUERED. Your total time is on the board.', 6200), 2600); }
+        }
+      }
+      const prevGp = this.save.gp[def.district]||[false,false,false];
+      this.save.gp[def.district] = prevGp.map((v,i)=>v||this.runPumpkins[i]);
+      this.persist();
+      const list2 = (typeof LEVEL_LISTS!=='undefined') ? (LEVEL_LISTS.find(L=>L.includes(def))||W1_LEVELS) : W1_LEVELS;
+      const idx2 = list2.indexOf(def);
+      const fmt2 = t => Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
+      setTimeout(()=>UI.levelClear({ levelId:id, levelName:def.name, time:fmt2(secs), best:fmt2(rec.best||secs),
+        isRecord:false, stars:{}, candy:collected, candyTotal:this.levelCandyTotal,
+        nextId:(idx2>=0 && idx2<list2.length-1) ? list2[idx2+1].id : null, cozy:false, nightmare:true }), 1500);
+      return;
+    }
     const skip = opts.warp||opts.leap;   // secret finishes honor their promised rewards
     const stars = {
       time: skip ? true : secs <= def.parTime,
@@ -336,9 +366,10 @@ const G = {
     setTimeout(()=>UI.levelClear(stats), 1500);   // let the gate celebration land before the card
   },
   openMap(district){
+    this._mapDistrict = district || 'w1';
     if(this.state!=='play') return;
     this.state='map';
-    this.mapView = ((district||'w1')==='w1' && typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;   // 3D "beautiful map" is Patch-only for now; other districts use the clean DOM map
+    this.mapView = ((district||'w1')==='w1' && !this.nmSel && typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;   // 3D "beautiful map" is Patch-only (and daylight-only: nightmare view uses the DOM map)
     UI.showMap(district||'w1');
   },
   closeMap(){
@@ -366,7 +397,7 @@ const G = {
     setTimeout(()=>{
       this.switchArea('hub');
       this.state='map';
-      this.mapView = ((district||'w1')==='w1' && typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;
+      this.mapView = ((district||'w1')==='w1' && !this.nmSel && typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;
       UI.showMap(district||'w1');
       UI.fade(false, 450);
     }, 500);
@@ -405,11 +436,25 @@ const G = {
       if(afterVictory) UI.toast(this.save.embers>=5 ? '🎆 THE EVERFLAME BURNS WHOLE! The festival is ON, Grimmwick!' : '🔥 The Everflame flickers a little brighter...');
     }, 500);
   },
+  _nightmareTint(){
+    // crimson wash: every light in the scene leans blood-red, plus a low red ambient
+    this.scene.traverse(o=>{ if(o.isLight && o.color) o.color.lerp(new THREE.Color(0xff2038), 0.4); });
+    this.scene.add(new THREE.AmbientLight(0x40000a, 0.55));
+  },
   onPlayerFell(){
     const pl = this.player;
     pl.group.visible = true;   // the pit eruption hides him mid-fall — always restore, even into death
     pl._pitPy = undefined;
     if(pl.dead) return;
+    if(this.nightmare && this.levelDef){
+      // THE NIGHTMARE COVENANT: falls restart the level. No lanterns. No mercy. (Owner spec.)
+      const id = this.levelDef.id;
+      pl.dead = true;
+      UI.toast('🌑 The nightmare does not forgive.');
+      this.state='transition'; UI.fade(true, 400);
+      setTimeout(()=>{ this.enterLevel(id); }, 450);
+      return;
+    }
     pl.damage(1);
     if(!pl.dead){
       const h = pl.hearts;             // falls hurt — respawn must not refill
