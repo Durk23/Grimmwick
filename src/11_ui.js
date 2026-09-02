@@ -243,7 +243,7 @@ const UI = {
           <div class="tab on ui-block" data-tab="costumes">Costumes</div>
           <div class="tab ui-block" data-tab="ups">⬆️ Level Ups</div>
           <div class="tab ui-block" data-tab="chars">Characters</div>
-          <div class="tab ui-block" data-tab="candy">🍬 Candy</div>
+          <div class="tab ui-block" data-tab="candy">🍬 Candy Store</div>
         </div>
         <div id="shopBody"></div>
         <button class="btn ui-block" id="shopClose" style="margin-top:14px">Done</button>
@@ -807,9 +807,9 @@ const UI = {
         <div id="candyNote" style="opacity:.75;font-size:12.5px;margin-top:12px"></div>`;
       const grid = body.querySelector('#candyGrid'), note = body.querySelector('#candyNote');
       const PACKS = [
-        {id:'grimmwick.candy.handful',  title:'A Handful of Candy',  candy:1200, price:'$0.99', icon:'🤲'},
-        {id:'grimmwick.candy.bucket',   title:'A Bucket of Candy',   candy:4000, price:'$2.99', icon:'🪣'},
-        {id:'grimmwick.candy.cauldron', title:'A Cauldron of Candy', candy:7500, price:'$4.99', icon:'🫕'},
+        {id:'grimmwick.candy.handful',  title:'A Handful of Candy',  candy:5000,  price:'$0.99', icon:'🤲'},
+        {id:'grimmwick.candy.bucket',   title:'A Bucket of Candy',   candy:10000, price:'$2.99', icon:'🪣'},
+        {id:'grimmwick.candy.cauldron', title:'A Cauldron of Candy', candy:40000, price:'$4.99', icon:'🫕'},
       ];
       const renderPacks = (packs, live)=>{
         grid.innerHTML = '';

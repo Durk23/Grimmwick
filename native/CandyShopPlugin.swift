@@ -27,9 +27,9 @@ public class CandyShopPlugin: CAPPlugin, CAPBridgedPlugin {
 
     // Product IDs ↔ candy amounts. Must match the consumables configured in App Store Connect.
     static let candyForProduct: [String: Int] = [
-        "grimmwick.candy.handful": 1200,   // $0.99
-        "grimmwick.candy.bucket":  4000,   // $2.99
-        "grimmwick.candy.cauldron": 7500,  // $4.99
+        "grimmwick.candy.handful": 5000,    // $0.99
+        "grimmwick.candy.bucket":  10000,   // $2.99 — one full trick
+        "grimmwick.candy.cauldron": 40000,  // $4.99 — the whole trick quartet (owner call, Sept 2 2026)
     ]
     private var updatesTask: Task<Void, Never>? = nil
     private var pending: [String: Transaction] = [:]   // notified, awaiting JS confirm — guarded by pendingLock
