@@ -63,7 +63,7 @@ function decodeNight(v){
   return { timeCS, deaths, dmg, stars: Math.max(0, Math.min(75, stars)) };
 }
 
-const APP_URL = '';   // App Store link — set when known; the challenge text omits it while empty
+const APP_URL = 'https://apps.apple.com/app/id6804521352';   // Grimmwick on the App Store
 
 const NIGHT_BOARDS = [
   { key:'flawless', id:'grimmwick.flawless', icon:'🏆', name:'FLAWLESS NIGHT',
