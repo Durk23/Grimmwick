@@ -122,7 +122,7 @@ function buildW5L2(G){
   gearPlat(G, 50, 2.1, {});
   gearPlat(G, 54, 1.6, {});
   candyLine(G, [[36,2.0,0],[38,2.1,0]], 2); candyLine(G, [[40,2.5,0],[42,2.6,0]], 2);
-  candyLine(G, [[44,2.3,0],[46,2.3,0]], 2); candyLine(G, [[48,2.7,0],[50,2.7,0]], 2);
+  candyLine(G, [[44,2.3,0],[45,2.3,0]], 2); candyLine(G, [[48,2.7,0],[50,2.7,0]], 2);   // pair ends short of the intro blade's low point — magnets from cog 42 (audit fix)
   candyLine(G, [[52,2.2,0],[54,2.2,0]], 2);
   // one blade to time mid-crossing (over cog 46, top 1.7)
   G.ents.add(new PendulumBlade(G, 46, 5.0, {len:3.0, amp:0.85, period:2.8, phase:0.4, r:0.55}));
@@ -140,7 +140,9 @@ function buildW5L2(G){
   candyLine(G, [[63,3.3,0],[63,4.6,0],[63,5.9,0]], 3);                  // the quiet lure up the chain
   // LOW ROAD — fixed cogs beneath the blade wave
   gearPlat(G, 66, 1.6, {}); gearPlat(G, 70, 1.6, {}); gearPlat(G, 74, 1.6, {}); gearPlat(G, 78, 1.6, {}); gearPlat(G, 82, 1.6, {});
-  candyLine(G, [[64,2.1,0],[66,1.9,0]], 2); candyLine(G, [[68,2.0,0],[72,2.0,0]], 3); candyLine(G, [[76,2.0,0],[80,2.0,0]], 3);
+  // NO candy under the wave (owner call, Sept 1 2026): beneath the blades + the overhead high row the low road is
+  // dodge-only — candy never asks for a grab inside a swing envelope. The stretch's candy lives on the high road.
+  candyLine(G, [[64,2.1,0],[66,1.9,0]], 2);
   // the staggered blade row (identical clocks, phase-offset — a learnable rolling wave; grazes cost a heart only)
   G.ents.add(new PendulumBlade(G, 70, 4.9, {len:3.0, amp:0.85, period:2.4, phase:0.0, r:0.55}));
   G.ents.add(new PendulumBlade(G, 74, 4.9, {len:3.0, amp:0.85, period:2.4, phase:0.6, r:0.55}));
@@ -157,6 +159,7 @@ function buildW5L2(G){
   G.ents.add(new SwoopBat(G, 76, 8.2, 0, {phase:0.2, range:4, period:3.2, aggroR:5}));
   // both roads rejoin here
   platform(G, 86, 2.2, 0, 5, 3, LEDGE);                                 // spans 83.5..88.5
+  candyLine(G, [[84.5,2.9,0],[86,3.0,0]], 2);                           // the low road's thanks for threading the wave — easy magnet grabs on solid ground
   G.ents.add(new ClockworkKnight(G, 87, 2.2, 0, {phase:0.5, range:1.4, wakeR:4}));  // a knight guarding the rejoin (tight range — stays on the ledge)
   G.ents.add(new Checkpoint(88, 2.2, 1.7, 1));                          // CP1 — LIT, the level's one mid checkpoint
 
@@ -171,7 +174,8 @@ function buildW5L2(G){
   w5l2MovingGear(G, {x:112, baseY:2.4, amp:1.2, period:3.2, phase:1.0}); // second vertical bobber
   // MIRROR BOO #2 hovering over the ferry lane
   G.ents.add(new MirrorBoo(G, 104, 5.0, 0, {range:4, mirror:0.8, phase:0.5}));
-  candyLine(G, [[90,2.9,0],[94,3.0,0]], 3); candyLine(G, [[98,3.1,0],[102,3.0,0]], 3); candyLine(G, [[108,2.9,0],[112,3.1,0]], 3);
+  // ride-line candy only (owner call): the ferry/bobber collect these for you — none sit at a blade's low point
+  candyLine(G, [[90,2.9,0],[94,3.0,0]], 3); candyLine(G, [[101,3.0,0],[104.5,3.0,0]], 3); candyLine(G, [[110,2.7,0],[113,3.2,0]], 3);
   // the reward BAY — a wide rest ledge with a Gummy Shield before the final gauntlet
   platform(G, 118, 2.4, 0, 6, 3.4, BAY);                               // spans 115..121
   G.ents.add(new BonkLantern(G, 119, 3.6, 0, 'shield'));               // armor up for the master beat
@@ -184,7 +188,7 @@ function buildW5L2(G){
   gearPlat(G, 140, 2.1, {}); gearPlat(G, 144, 2.4, {});
   G.ents.add(new PendulumBlade(G, 144, 5.4, {len:3.0, amp:0.85, period:2.4, phase:1.1, r:0.55}));
   gearPlat(G, 148, 1.9, {});                                            // last cog — steps down to the assembly floor
-  candyLine(G, [[126,2.9,0],[130,3.0,0]], 3); candyLine(G, [[140,2.9,0],[144,3.1,0]], 3);
+  candyLine(G, [[125,2.8,0],[128,2.9,0]], 3); candyLine(G, [[139,2.8,0],[141.5,2.9,0]], 3);   // pulled off the blade columns — every piece magnets from safe cog footing (owner call)
   candyLine(G, [[146,2.5,0],[148,2.3,0]], 2);
   // THE ASSEMBLY FLOOR — solid ground for the fight (the bombardment archetype: ground pressure + a diving sky lane)
   groundX(G, 150, 178, FLOOR);

@@ -294,8 +294,9 @@ const Night = {
     const list = el.querySelector('#nb-list');
     const mine = this.localValue(G, b.key);
     const nPend = Object.keys(G.save.pendingScores||{}).length;
-    el.querySelector('#nb-you').textContent = (mine != null ? ('Your best: '+fmtCS(decodeNight(mine).timeCS))
-      : (b.key==='flawless' ? `Stars: ${this.totalStars(G)}/75. Earn them ALL to enter!` : 'Finish the night to enter!'))
+    el.querySelector('#nb-you').textContent = (mine != null ? ('Your best: '+fmtCS(b.key==='nightmare' ? mine : decodeNight(mine).timeCS))
+      : (b.key==='flawless' ? `Stars: ${this.totalStars(G)}/75. Earn them ALL to enter!`
+        : b.key==='nightmare' ? 'Conquer all 25 nightmare levels to enter!' : 'Finish the night to enter!'))
       + (nPend && GC.authed ? ' · 📮 posting…' : '');
     if(nPend && GC.authed && GC.lastError && !this._errToasted){ this._errToasted = true;
       UI.toast('📮 Score queued. Game Center said: "'+GC.lastError.slice(0,80)+'". New boards can take a while, it will keep retrying!', 5200); }

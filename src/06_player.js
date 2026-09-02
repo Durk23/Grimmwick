@@ -122,6 +122,8 @@ class Player {
     this.pounding = false; this.poundHover = 0;
     this.attackT = 0; this.attackCD = 0;
     this.saltCD = 0;   // Salt Shaker throw cadence (persistent weapon; equipped via G.carryWeapon)
+    this.emberCD = 0;  // EMBER POP trick cadence (candy-bought, permanent; sleeps in Nightmare)
+    this.guardT = 0;   // GUMMY GUARD re-form countdown (bought trick; 0 = bubble ready now)
     this.hitSet = new Set();
     this.squash = 1; this.squashV = 0;
     this.animT = 0;
@@ -136,6 +138,8 @@ class Player {
     this.grimmAura = null; this.grimmLight = null;
     this.zoeBroom = null; this.zoeBroomBack = null;
     this.flameAura = null; this.flameWisp = null;
+    this.wingL = this.wingR = null;   // the rig rebuild dropped any wing meshes with the old body — full-time wings re-attach next frame
+    if(this.shieldMesh){ this.shield = false; this.shieldMesh = null; }   // same for the bubble (guardT unchanged → an unbroken Gummy Guard re-forms instantly)
     const c = COSTUMES[costumeKey]||COSTUMES.kid;
     while(this.group.children.length) this.group.remove(this.group.children[0]);
     const body = new THREE.Group();
@@ -432,15 +436,30 @@ class Player {
     if(w==='salt' && !this.saltTell && this.body){ this.saltTell = this._makeSaltTell(); this.body.add(this.saltTell); }
   }
   // --- fling a pinch of salt forward along the facing x-direction (side-scroller) ---
+  // facing → throw direction: crisp ±x in side-scroll levels, the true facing vector in the free-roam hub (audit fix — hub throws flew world-east regardless of facing)
+  _throwDir(){
+    const fx = Math.sin(this.facing), fz = Math.cos(this.facing);
+    return this.G.mode==='side' ? {dx: fx>=0?1:-1, dz: 0} : {dx: fx, dz: fz};
+  }
   throwSalt(){
     const G = this.G;
     this.saltCD = 0.35;                              // pleasant tap-to-throw cadence
-    const dir = Math.sin(this.facing) >= 0 ? 1 : -1; // +x when facing right, -x when facing left
-    const x = this.pos.x + dir*0.55, y = this.pos.y + 0.72, z = this.pos.z;
-    G.ents.add(new SaltPinch(G, x, y, z, dir));
+    const {dx: dir, dz} = this._throwDir();
+    const x = this.pos.x + dir*0.55, y = this.pos.y + 0.72, z = this.pos.z + dz*0.55;
+    G.ents.add(new SaltPinch(G, x, y, z, dir, dz));
     AUDIO.tone({f:1250, f2:1550, type:'sine', t:0.05, vol:0.08});
     AUDIO.noise({t:0.05, vol:0.07, fFrom:6500, fTo:3200});   // a light "shk!" shake
     G.fx.spawn(new THREE.Vector3(x,y,z), 0xffffff, 3, {speed:1.6, life:0.22, gravity:3, size:0.45});
+  }
+  // --- EMBER POP (bought trick): the spin flings a searing ember. Sleeps in Nightmare — that board stays pure skill. ---
+  throwEmber(){
+    const G = this.G;
+    this.emberCD = 0.45;
+    const {dx: dir, dz} = this._throwDir();
+    const x = this.pos.x + dir*0.55, y = this.pos.y + 0.78, z = this.pos.z + dz*0.55;
+    G.ents.add(new EmberBolt(G, x, y, z, dir, dz));
+    AUDIO.tone({f:520, f2:180, type:'sawtooth', t:0.09, vol:0.09});   // a warm whoomph
+    G.fx.spawn(new THREE.Vector3(x,y,z), 0xff9a50, 4, {speed:1.8, life:0.25, gravity:1, size:0.5});
   }
   heal(n){ this.hearts = Math.min(this.maxHearts, this.hearts+n); if(window.UI) UI.updateHUD(); }
   gainShield(){
@@ -468,6 +487,7 @@ class Player {
   breakShield(){
     this.shield = false;
     if(this.shieldMesh){ this.group.remove(this.shieldMesh); this.shieldMesh = null; }
+    this.guardT = 25;   // GUMMY GUARD: a true break earns a 25s wait before the bubble re-forms
   }
   damage(n, fromPos){
     if(this.iframes>0 || this.dead || this.G.state!=='play') return;
@@ -527,6 +547,7 @@ class Player {
     this.pounding = false;
     this.captured = false;   // a death while inside a cannon barrel must never leave the next life frozen
     this.launchT = 0;
+    this.guardT = 0;         // GUMMY GUARD greets every fresh life at the lantern
     if(window.UI) UI.updateHUD();
   }
   bounceOff(vy=9){ this.vel.y = vy; this.grounded=false; this.canDouble=true; this.pounding=false; }
@@ -537,6 +558,7 @@ class Player {
     if(this.iframes>0) this.iframes -= dt;
     if(this.attackCD>0) this.attackCD -= dt;
     if(this.saltCD>0) this.saltCD -= dt;
+    if(this.emberCD>0) this.emberCD -= dt;
 
     // captured by a cannon barrel (DKC-style launch): the barrel holds our position and fires us on JUMP.
     // Skip all self-control/physics while captured; the CannonBarrel (09za_w4kit) drives pos + group.position.
@@ -727,6 +749,11 @@ class Player {
       }
       // salt is an ADDED projectile on the same button, on its own faster cooldown (the bag-swing stays)
       if(this.G.carryWeapon==='salt' && this.saltCD<=0) this.throwSalt();
+      // EMBER POP — the bought trick rides the same spin; the Nightmare seals it (that board stays pure skill)
+      if(this.G.trickOn('ember')){
+        if(this.G.nightmare){ if(!this.G._nmTrickTold){ this.G._nmTrickTold = true; if(window.UI) UI.toast('🌑 The Nightmare seals your tricks.'); } }   // session-scoped: Player rebuilds every attempt, and nightmare is a retry loop (audit fix)
+        else if(this.emberCD<=0) this.throwEmber();
+      }
     }
     if(this.attackT>0){
       this.attackT -= dt;
@@ -743,6 +770,20 @@ class Player {
     }
 
     // --- bat wings timer, glide, flap animation ---
+    // FULL-TIME WINGS (bought trick): always on outside the Nightmare — the timer never runs dry
+    if(this.G.trickOn('bat') && !this.G.nightmare){
+      if(!this.wingL) this.gainBat();
+      this.batT = Math.max(this.batT, 1);
+    }
+    // GUMMY GUARD (bought trick): the bubble is always yours outside the Nightmare — re-forms 25s after a break
+    if(this.G.trickOn('guard') && !this.G.nightmare && !this.shield && !this.dead){
+      this.guardT -= dt;
+      if(this.guardT<=0){
+        this.gainShield();
+        AUDIO.tone({f:340, f2:620, type:'sine', t:0.16, vol:0.1});   // a soft gummy bloop
+        G.fx.spawn(new THREE.Vector3(this.pos.x,this.pos.y+0.8,this.pos.z), 0x63c6e6, 6, {speed:2, life:0.3, size:0.5});
+      }
+    }
     if(this.batT>0){
       this.batT -= dt;
       const flap = this.grounded ? Math.sin(this.animT*4)*0.25 : Math.sin(this.animT*16)*0.7;

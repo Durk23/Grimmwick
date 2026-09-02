@@ -29,6 +29,7 @@ const G = {
     }
     if(!this.save.maxHearts) this.save.maxHearts = 3;
     if(this.save.upMagnet===undefined) this.save.upMagnet = 0;
+    if(!this.save.trickOff) this.save.trickOff = {};   // per-trick equip toggles (owner call: tricks stack — equip any or all)
     if(!this.save.claimed) this.save.claimed = [];
     if(this.save.candyLifetime===undefined) this.save.candyLifetime = this.save.candy||0;   // old saves: seed with the balance
     if(this.save.playT===undefined) this.save.playT = 0;
@@ -97,10 +98,19 @@ const G = {
       owned: w.owned||['kid'], equipped: w.equipped||'kid',
       ownedMasks: w.ownedMasks||[], mask: w.mask||null,
       pass: !!w.pass, firstFlame: !!w.firstFlame, firstFlameOff: !!w.firstFlameOff,
+      emberPop: !!w.emberPop, batWings: !!w.batWings, gummyGuard: !!w.gummyGuard, sweetTooth: !!w.sweetTooth,   // bought tricks are PROPERTY — they survive the fresh-run reset (Nightmare seals them anyway)
+      trickOff: w.trickOff || {},   // equip choices ride along too
       pendingScores: w.pendingScores || undefined,   // earned scores queued offline survive the fresh-run reset
       seenIntro:false, maxHearts:3 };
     Store.set('grimmwick_save', JSON.stringify(fresh));
     Store.del('hollowville_save');
+  },
+
+  // a bought trick counts only while EQUIPPED in the Cauldron (they stack; the Nightmare check stays at each call site)
+  trickOn(k){
+    const s = this.save; if(!s) return false;
+    const owned = k==='ember' ? s.emberPop : k==='bat' ? s.batWings : k==='guard' ? s.gummyGuard : s.sweetTooth;
+    return !!owned && !(s.trickOff && s.trickOff[k]);
   },
 
   addCandy(n){
@@ -263,7 +273,7 @@ const G = {
     }, 500);
   },
   enterLevel(id){
-    this.nightmare = !!(this.nmSel && this.save.nightDone);
+    this.nightmare = !!this.nmSel;   // Nightmare is ALWAYS available (owner call, Sept 1 2026) — normal district gates still decide WHICH levels are open
     const def = findLevel(id);
     if(!def){ if(this.state==='map') this.state='play'; UI.toast('🌘 That road is still dark...'); return; }
     if(UI.hideMap) UI.hideMap();
@@ -302,10 +312,10 @@ const G = {
       // nightmare clears track separately: done + best time only — no stars, no night clock, no boards
       const rec = (this.save.nm.levels[id] = this.save.nm.levels[id] || {done:false, best:null});
       rec.done = true;
-      if(secsF>=3 && (!rec.best || secsF<rec.best)) rec.best = secsF;
+      if(secsF>=3 && !this.runCozy && (!rec.best || secsF<rec.best)) rec.best = secsF;   // cozy softens nightmare (0.72×dt beats the 1.25×) — cozy runs never bank bests (audit fix)
       // THE NIGHTMARE board: once all 25 are conquered, the sum of bests goes up — and every
       // improved best resubmits (lower total, Game Center accepts — a living entry)
-      if(window.NightBoard){
+      if(window.NightBoard && !this.runCozy){
         const tot = NightBoard.nightmareTotal(this);
         if(tot != null){
           GC.submit('grimmwick.nightmare', Math.round(tot*100), 25);
@@ -321,7 +331,8 @@ const G = {
       const fmt2 = t => Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
       setTimeout(()=>UI.levelClear({ levelId:id, levelName:def.name, time:fmt2(secs), best:fmt2(rec.best||secs),
         isRecord:false, stars:{}, candy:collected, candyTotal:this.levelCandyTotal,
-        nextId:(idx2>=0 && idx2<list2.length-1) ? list2[idx2+1].id : null, cozy:false, nightmare:true }), 1500);
+        nextId:(idx2>=0 && idx2<list2.length-1 && (this.save.levels[id]||{}).done) ? list2[idx2+1].id : null, cozy:false, nightmare:true }), 1500);
+        // ^ NEXT only when the next lantern is lit in NORMAL progression — nightmare must never tour levels the story hasn't opened (audit fix)
       return;
     }
     const skip = opts.warp||opts.leap;   // secret finishes honor their promised rewards
@@ -450,7 +461,7 @@ const G = {
       // THE NIGHTMARE COVENANT: falls restart the level. No lanterns. No mercy. (Owner spec.)
       const id = this.levelDef.id;
       pl.dead = true;
-      UI.toast('🌑 The nightmare does not forgive.');
+      UI.toast('🌑 The nightmare does not forgive.'+((this.save.emberPop||this.save.batWings||this.save.gummyGuard||this.save.sweetTooth)?' Your tricks sleep here.':''));
       this.state='transition'; UI.fade(true, 400);
       setTimeout(()=>{ this.enterLevel(id); }, 450);
       return;

@@ -757,6 +757,41 @@ const UI = {
         this.renderShop('ups'); this.updateHUD();
       });
       ug.appendChild(mDiv);
+      // THE TRICKS — candy-bought, permanent, and they STACK (owner call): buy once, then equip any or all
+      // right here in the Cauldron. Owned cards toggle equipped/off. The Nightmare seals them all.
+      const TRICKS = [
+        {k:'ember', flag:'emberPop',   price:10000, icon:'🔥', grad:'linear-gradient(135deg,#ff9a50 60%,#8f2a10)', name:'Ember Pop',
+         desc:'Your spin flings a searing ember that pops the first spirit it meets. Yours forever.',
+         buyToast:'🔥 EMBER POP! Your spin burns bright now. (It sleeps in Nightmare.)'},
+        {k:'bat',   flag:'batWings',   price:10000, icon:'🦇', grad:'linear-gradient(135deg,#5b3a8e 60%,#241040)', name:'Bat Wings',
+         desc:'Wear the wings ALWAYS: four flutter-jumps in the air and a gentle glide, every level, forever.',
+         buyToast:'🦇 BAT WINGS, forever! The night is yours. (They sleep in Nightmare.)'},
+        {k:'guard', flag:'gummyGuard', price:10000, icon:'🛡️', grad:'linear-gradient(135deg,#63c6e6 60%,#1a5f80)', name:'Gummy Guard',
+         desc:'A wobbly gummy bubble wraps you in every level. It eats one hit, then re-forms after 25 seconds. Forever.',
+         buyToast:'🛡️ GUMMY GUARD! The bubble has your back now. (It sleeps in Nightmare.)'},
+        {k:'sweet', flag:'sweetTooth', price:20000, icon:'🍭', grad:'linear-gradient(135deg,#ff6bb3 60%,#8f1060)', name:'Sweet Tooth',
+         desc:'Every candy that spirits drop comes out DOUBLED, forever. The richest trick in Grimmwick.',
+         buyToast:'🍭 SWEET TOOTH! Double candy from every bonk, forever. (It sleeps in Nightmare.)'},
+      ];
+      for(const tk of TRICKS){
+        const owned = !!G.save[tk.flag];
+        const off = owned && !!(G.save.trickOff && G.save.trickOff[tk.k]);
+        const div = document.createElement('div'); div.className='item';
+        div.innerHTML = `<div class="sw" style="background:${tk.grad};display:flex;align-items:center;justify-content:center;font-size:30px">${tk.icon}</div>
+          <h4>${tk.name}${owned?(off?' · off':' · equipped'):''}</h4><p>${tk.desc} <i>Tricks stack — equip any or all. Sleeps in Nightmare Mode.</i></p>
+          <button class="btn buy ui-block ${owned&&off?'ghost2':'orange'}">${owned?(off?'OFF — TAP TO EQUIP':'✓ EQUIPPED'):('🍬 '+tk.price)}</button>`;
+        wire(div.querySelector('button'), ()=>{
+          if(!owned){
+            if(G.save.candy>=tk.price){ G.save.candy-=tk.price; G.save[tk.flag]=true; G.persist(); AUDIO.buy(); this.toast(tk.buyToast, 4200); }
+            else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
+          } else {
+            const t = G.save.trickOff || (G.save.trickOff = {});
+            t[tk.k] = !t[tk.k]; G.persist(); AUDIO.ui();
+          }
+          this.renderShop('ups'); this.updateHUD();
+        });
+        ug.appendChild(div);
+      }
     } else if(tab==='chars'){
       body.innerHTML = `<div id="shopGrid"></div>`;
       const grid = body.querySelector('#shopGrid');
@@ -924,7 +959,7 @@ const UI = {
     if(INPUT.isTouch) this.el('touchBtns').style.display='flex';
   },
   renderMap(world, dNum, beaten){
-    const nmOn = !!(this.G.nmSel && this.G.save.nightDone);
+    const nmOn = !!this.G.nmSel;   // must match enterLevel's arming rule exactly — a stale nightDone term here left the toggle invisible for new players (audit fix)
     this.el('map-screen').classList.toggle('nm', nmOn);
     const G=this.G, district=this._mapDistrict;
     let levels = [];
@@ -982,13 +1017,14 @@ const UI = {
         <div class="mtime">${sub}</div>
       </div>`;
     });
-    if(this.G.save.nightDone) html += `<button id="nmToggle" class="ui-block">${nmOn ? '🌑 NIGHTMARE: ON' : '🌙 Nightmare Mode'}</button>`;
+    html += `<button id="nmToggle" class="ui-block">${nmOn ? '🌑 NIGHTMARE: ON' : '🌙 Nightmare Mode'}</button>`;   // ALWAYS offered (owner call, Sept 1 2026) — the pure-skill mode is open from night one
     const wrap=this.el('mapWrap');
     wrap.innerHTML = html;
     const nt = document.getElementById('nmToggle');
     if(nt) this.bindTap(nt, ()=>{
       const G = this.G;
       G.nmSel = !G.nmSel; AUDIO.ui();
+      if(!G.nmSel) G._nmTrickTold = false;   // re-arming nightmare later re-earns one seal reminder
       // the 3D Patch map is daylight-only: dispose it for nightmare, rebuild it on the way back
       if(G.nmSel && G.mapView){ G.mapView.dispose && G.mapView.dispose(); G.mapView = null; }
       else if(!G.nmSel && (G._mapDistrict||world.key)==='w1' && !G.mapView && typeof buildMapScene==='function'){ G.mapView = buildMapScene(G, 'w1'); }

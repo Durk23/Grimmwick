@@ -85,7 +85,9 @@ function buildW4L4(G){
     const hook = mesh('cyl',[0.03,0.03,0.5,4], mat(W4PAL.ropeD)); hook.position.set(35,2.75,0.5);
     S.add(cage, flame, hook); }
   // the plank crew-ghost you bounce (short patrol so he stays mid-plank; CLEAR of the dock crew's range)
-  G.ents.add(new BooBuccaneer(G, 37, 1.2, 0, {phase:0.0, range:3, speed:1.8, slowMul:0.4}));
+  { const plankBoo = new BooBuccaneer(G, 37, 1.2, 0, {phase:0.0, range:3, speed:1.8, slowMul:0.4});
+    plankBoo.hp = 99;   // a stepping stone, never a kill (w1l5 precedent) — a stray Ember Pop bolt or salt pinch must not delete the warp's stone
+    G.ents.add(plankBoo); }
   // the mast + crow's nest
   { const mast = mesh('cyl',[0.2,0.26, NEST_Y+1.4, 8], mat(W4PAL.hullD)); mast.position.set(40,(NEST_Y+1.4)/2,-0.3); S.add(mast);
     const ring = mesh('cyl',[1.15,1.15,0.7,14,1,true], mat(W4PAL.woodD)); ring.position.set(40,NEST_Y+0.35,0); S.add(ring); }

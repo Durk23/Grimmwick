@@ -87,6 +87,9 @@ function candyLine(G, pts, n){
   }
 }
 function candyBurst(G, pos, n){
+  // SWEET TOOTH (bought trick): every DROPPED candy doubles — enemies, jackpots, all gamble containers.
+  // Placed level candy (what the all-candy star counts) never passes through here, so stars stay honest 1×.
+  if(G.trickOn && G.trickOn('sweet') && !G.nightmare) n *= 2;
   for(let i=0;i<n;i++){
     // scatter along the lane, barely in depth — side-scroller drops must stay reachable
     const c = new Candy(pos.x, pos.y+0.5, pos.z, {pop:{vx:rand(-3.5,3.5), vy:rand(4,8), vz:rand(-0.7,0.7)}});
@@ -420,9 +423,10 @@ class Crow {
 // be airborne at once. Deterministic straight-line motion. Bosses (G.boss) aren't in ents.list, so it
 // never chips their stone hide.
 class SaltPinch {
-  constructor(G, x, y, z, dir){
+  constructor(G, x, y, z, dir, dirZ){
     this.G = G;
-    this.dir = dir;            // +1 (right) or -1 (left)
+    this.dir = dir;            // +1 (right) or -1 (left) in side mode; facing-vector x in the free-roam hub
+    this.dz = dirZ||0;         // facing-vector z (hub only — 0 in levels)
     this.group = new THREE.Group();
     const gm = emat(0xffffff, 0xf4f4ff, 0.75);   // bright so it reads against the dark levels
     for(let i=0;i<4;i++){
@@ -443,7 +447,7 @@ class SaltPinch {
     this.life -= dt;
     if(this.life<=0){ this.dead = true; return; }
     const p = this.group.position;
-    p.x += this.dir*this.speed*dt;
+    p.x += this.dir*this.speed*dt; p.z += this.dz*this.speed*dt;
     this.group.rotation.z -= this.dir*dt*11;   // tumble
     // little salt trail
     G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), 0xffffff, 1, {speed:0.5, life:0.2, gravity:6, size:0.35});
@@ -458,6 +462,44 @@ class SaltPinch {
         this.G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), 0xffffff, 7, {speed:2.6, life:0.3, gravity:3, size:0.6});
         AUDIO.stomp();
         this.dead = true;   // one pinch, one pop
+        return;
+      }
+    }
+  }
+}
+
+// ---- Ember Bolt: the bought EMBER POP trick — the spin flings a searing ember (permanent once bought).
+// Same contract as SaltPinch: straight deterministic shot, pops the first spirit it overlaps. Sleeps in Nightmare.
+class EmberBolt {
+  constructor(G, x, y, z, dir, dirZ){
+    this.G = G; this.dir = dir; this.dz = dirZ||0;   // (dir, dz) = facing vector: ±1/0 in side mode, sin/cos(facing) in the free-roam hub
+    this.group = new THREE.Group();
+    const core = mesh('sph',[0.16,8,6], emat(0xff9a50, 0xff6a20, 1));
+    const lick = mesh('cone',[0.1,0.26,5], emat(0xffd23f, 0xff9a50, 0.9));
+    lick.rotation.z = dir>=0 ? -Math.PI/2 : Math.PI/2; lick.position.x = -dir*0.2; lick.position.z = -this.dz*0.2;
+    this.group.add(core, lick);
+    this.group.position.set(x,y,z);
+    this.speed = 13.5; this.life = 0.52;   // ~7u reach — a pop, not a sniper rifle
+    this.dead = false; this.cull = false; this.t = 0;
+  }
+  update(dt, G){
+    this.t += dt; this.life -= dt;
+    const p = this.group.position;
+    if(this.life<=0){ this.dead = true; G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), 0xff9a50, 3, {speed:1.2, life:0.25, gravity:2, size:0.4}); return; }
+    p.x += this.dir*this.speed*dt; p.z += this.dz*this.speed*dt;
+    p.y += Math.sin(this.t*22)*0.012;              // a live little flame-flutter
+    this.group.rotation.x = this.t*9;
+    G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), Math.random()<0.5?0xffd23f:0xff7a30, 1, {speed:0.6, life:0.22, gravity:1.5, size:0.4});
+    for(const e of G.ents.list){
+      if(!e.isEnemy || e.dead) continue;
+      const ep = e.group.position;
+      const dx = ep.x-p.x, dz = ep.z-p.z, dy = (ep.y+(e.hitY||0.5))-p.y;
+      const rr = (e.hitR||0.6)+0.45;
+      if(dx*dx+dz*dz < rr*rr && Math.abs(dy)<1.1){
+        e.takeHit(G.player, 'swing');   // same path a bag-swing uses
+        G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), 0xff9a50, 8, {speed:2.8, life:0.3, gravity:2, size:0.6});
+        AUDIO.stomp();
+        this.dead = true;   // one ember, one pop
         return;
       }
     }
