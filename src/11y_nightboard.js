@@ -63,6 +63,8 @@ function decodeNight(v){
   return { timeCS, deaths, dmg, stars: Math.max(0, Math.min(75, stars)) };
 }
 
+const APP_URL = '';   // App Store link — set when known; the challenge text omits it while empty
+
 const NIGHT_BOARDS = [
   { key:'flawless', id:'grimmwick.flawless', icon:'🏆', name:'FLAWLESS NIGHT',
     sub:'ALL 75 stars: every level, every challenge. Fastest total clock wins. The mastery board.' },
@@ -214,6 +216,7 @@ const Night = {
       #nb-friends { padding:7px 13px; border-radius:14px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.16); font-size:12.5px; font-weight:800; cursor:pointer; }
       #nb-friends.on { background:rgba(120,200,255,.16); border-color:#63c6e6; color:#bfeaff; }
       #nb-you { flex:1; text-align:right; font-size:12.5px; opacity:.85; font-variant-numeric:tabular-nums; }
+      #nb-share { padding:7px 12px; border-radius:12px; background:rgba(255,170,60,.16); border:1.5px solid rgba(255,180,90,.45); font-size:12.5px; font-weight:800; cursor:pointer; color:#ffd98a; white-space:nowrap; }
     `;
     document.head.appendChild(css);
     const el = document.createElement('div');
@@ -223,12 +226,13 @@ const Night = {
       <div id="nb-tabs">${NIGHT_BOARDS.map(b=>`<div class="nb-tab" data-k="${b.key}">${b.icon} ${b.name}</div>`).join('')}</div>
       <div id="nb-sub"></div>
       <div id="nb-list"></div>
-      <div id="nb-foot"><div id="nb-friends">👥 Friends</div><div id="nb-you"></div></div>
+      <div id="nb-foot"><div id="nb-friends">👥 Friends</div><div id="nb-share">⚔️ Challenge a friend</div><div id="nb-you"></div></div>
     </div>`;
     document.body.appendChild(el);
     const bind = (window.UI && UI.bindTap) ? UI.bindTap : (e,f)=>e.addEventListener('mousedown',f);
     bind(el.querySelector('#nb-x'), ()=>this.close());
     bind(el.querySelector('#nb-friends'), ()=>{ this._friends=!this._friends; el.querySelector('#nb-friends').classList.toggle('on', this._friends); this.render(); });
+    bind(el.querySelector('#nb-share'), ()=>this.challenge());
     el.querySelectorAll('.nb-tab').forEach(t => bind(t, ()=>{ this._sel = t.dataset.k; el.querySelectorAll('.nb-tab').forEach(x=>x.classList.toggle('on', x.dataset.k===this._sel)); this.render(); }));
     document.addEventListener('keydown', e => {   // Escape closes the board (and never leaks to the game)
       if(e.key === 'Escape' && el.style.display === 'block'){ e.preventDefault(); e.stopPropagation(); this.close(); }
@@ -244,6 +248,22 @@ const Night = {
     if(GC.native()){ await GC.signIn(); this.render(); this.checkFirstFlame(window.G); }   // auth (or retry queued submits) on every open
   },
   close(){ const el = document.getElementById('nb-screen'); if(el) el.style.display='none'; if(window.UI) UI._ovCloseT = performance.now(); AUDIO.ui && AUDIO.ui(); },
+  // ⚔️ the viral loop: brag with your real time through the system share sheet
+  async challenge(){
+    const G = window.G, sv = G && G.save;
+    let text;
+    if(sv && sv.nightDone && sv.nightT){
+      text = 'I survived Grimmwick\u2019s whole night in ' + fmtCS(Math.round(sv.nightT*100)) + '. Think you\u2019re faster? Free, no ads.';
+    } else {
+      text = 'I\u2019m playing Grimmwick \u2014 a spooky platformer that\u2019s completely free with no ads. Race me.';
+    }
+    if(APP_URL) text += ' ' + APP_URL;
+    try{
+      if(navigator.share){ await navigator.share({ text }); }
+      else { await navigator.clipboard.writeText(text); window.UI && UI.toast('📋 Challenge copied! Paste it anywhere.'); }
+    }catch(e){ /* user closed the sheet — no drama */ }
+    AUDIO.ui && AUDIO.ui();
+  },
   _row(rank, name, v, candyCtx, me){
     if(this._sel === 'nightmare'){
       // raw-time board: rank · name · 🌑 25/25 · total time
