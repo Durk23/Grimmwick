@@ -243,6 +243,7 @@ const UI = {
           <div class="tab on ui-block" data-tab="costumes">Costumes</div>
           <div class="tab ui-block" data-tab="ups">⬆️ Level Ups</div>
           <div class="tab ui-block" data-tab="chars">Characters</div>
+          <div class="tab ui-block" data-tab="candy">🍬 Candy</div>
         </div>
         <div id="shopBody"></div>
         <button class="btn ui-block" id="shopClose" style="margin-top:14px">Done</button>
@@ -346,7 +347,7 @@ const UI = {
     tap('feedbackBtn', ()=>{ AUDIO.ui();   // opens the Mail composer — a player choosing to write is not data collection
       window.location.href = 'mailto:grimmwickgame@gmail.com?subject=' + encodeURIComponent('Grimmwick Feedback')
         + '&body=' + encodeURIComponent('\n\n--\nGrimmwick v1.0 · from the pause menu'); });
-    tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Tap again'; } });
+    tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Candy is spent too — tap again'; } });
     tap('shopClose', ()=>this.closeShop());
     tap('shopX', ()=>this.closeShop());
     tap('pauseX', ()=>this.togglePause(false));
@@ -611,6 +612,8 @@ const UI = {
   },
   renderShop(tab){
     const G=this.G, body=this.el('shopBody');
+    this._shopTab = tab;   // async re-renders (Ask-to-Buy grants) check this — never yank a different tab's body
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x.dataset.tab===tab));   // header follows the body, always (audit fix)
     this.el('shopCandy').textContent = G.save.candy;
     if(tab==='costumes'){
       body.innerHTML = '<div style="opacity:.75;font-size:13px;margin-bottom:10px">❤️ Hearts &amp; upgrades moved to the <b>⬆️ Level Ups</b> tab!</div><div id="shopGrid"></div>';
@@ -791,6 +794,66 @@ const UI = {
           this.renderShop('ups'); this.updateHUD();
         });
         ug.appendChild(div);
+      }
+    } else if(tab==='candy'){
+      // THE CANDY SHOP — the game's ONLY real-money surface (StoreKit consumables via CandyShopPlugin).
+      // Honest by law: price, what you get, no pressure, everything earnable by playing. Grants land through
+      // the 'grant' event pipe in 12_main (inline, Ask-to-Buy, and crash-recovered purchases all alike).
+      const CS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CandyShop;
+      body.innerHTML = `
+        <div class="ribbon">🍬 Candy packs support Grimmwick. Candy buys tricks, hearts and looks — never levels, never required. Everything is earnable by playing.</div>
+        <div style="font-weight:900;font-size:16px;margin-bottom:10px">Your candy: 🍬 ${(G.save.candy||0).toLocaleString()}</div>
+        <div id="candyGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;text-align:left"></div>
+        <div id="candyNote" style="opacity:.75;font-size:12.5px;margin-top:12px"></div>`;
+      const grid = body.querySelector('#candyGrid'), note = body.querySelector('#candyNote');
+      const PACKS = [
+        {id:'grimmwick.candy.handful',  title:'A Handful of Candy',  candy:1200, price:'$0.99', icon:'🤲'},
+        {id:'grimmwick.candy.bucket',   title:'A Bucket of Candy',   candy:4000, price:'$2.99', icon:'🪣'},
+        {id:'grimmwick.candy.cauldron', title:'A Cauldron of Candy', candy:7500, price:'$4.99', icon:'🫕'},
+      ];
+      const renderPacks = (packs, live)=>{
+        grid.innerHTML = '';
+        for(const p of packs){
+          const meta = PACKS.find(f=>f.id===p.id) || {};
+          const div = document.createElement('div'); div.className='item';
+          div.innerHTML = `<div class="sw" style="background:linear-gradient(135deg,#ff9de0 60%,#7a1f8f);display:flex;align-items:center;justify-content:center;font-size:30px">${meta.icon||'🍬'}</div>
+            <h4>${p.title||meta.title}</h4><p>🍬 ${(p.candy||meta.candy).toLocaleString()} candy, straight to your bag.</p>
+            <button class="btn buy ui-block ${live?'orange':'ghost2'}">${live?(p.price||meta.price):((p.price||meta.price)+' · App Store')}</button>`;
+          const btn = div.querySelector('button');
+          if(live) this.bindTap(btn, async ()=>{
+            if(this._csBuying) return;                       // one purchase at a time — mash-proof (audit fix)
+            this._csBuying = true;
+            grid.querySelectorAll('button').forEach(b=>{ b.disabled = true; });
+            btn.textContent = '...';
+            try{
+              const r = await CS.buy({id:p.id});
+              const st = r && r.state;
+              if(st==='pending') this.toast('🕰️ Waiting for a grown-up to approve — the candy arrives the moment they say yes!', 5600);
+              else if(st==='unverified') this.toast('🕯️ Apple is still checking that purchase. It is safe — the candy arrives automatically.', 5600);
+              else if(st==='busy'){ /* another purchase already in flight */ }
+              // 'granted' candy arrives via the grant event (fanfare + balance there)
+            }catch(e){ this.toast('🌫️ The Candy Shop is out of reach right now. Try again in a moment.'); }
+            this._csBuying = false;
+            setTimeout(()=>{ if(G.state==='shop' && this._shopTab==='candy') this.renderShop('candy'); }, 700);
+          });
+          grid.appendChild(div);
+        }
+      };
+      if(CS){
+        // last-good product list renders LIVE instantly (no ghost-button flicker on re-renders); the
+        // fallback shows only before the first successful fetch (audit fix)
+        if(this._csProducts) renderPacks(this._csProducts, true);
+        else renderPacks(PACKS, false);
+        note.textContent = 'Purchases are handled by the App Store. No ads, no subscriptions, all levels free forever.';
+        CS.getProducts().then(r=>{
+          if(r && r.products && r.products.length){
+            this._csProducts = r.products;
+            if(G.state==='shop' && this._shopTab==='candy') renderPacks(r.products, true);
+          }
+        }).catch(()=>{ if(!this._csProducts) note.textContent = '🌫️ The shop spirits are out of reach — check your connection and reopen.'; });
+      } else {
+        renderPacks(PACKS, false);
+        note.textContent = 'The Candy Shop lives in the App Store version of Grimmwick.';
       }
     } else if(tab==='chars'){
       body.innerHTML = `<div id="shopGrid"></div>`;

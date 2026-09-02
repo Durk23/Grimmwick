@@ -140,9 +140,12 @@ function buildW5L2(G){
   candyLine(G, [[63,3.3,0],[63,4.6,0],[63,5.9,0]], 3);                  // the quiet lure up the chain
   // LOW ROAD — fixed cogs beneath the blade wave
   gearPlat(G, 66, 1.6, {}); gearPlat(G, 70, 1.6, {}); gearPlat(G, 74, 1.6, {}); gearPlat(G, 78, 1.6, {}); gearPlat(G, 82, 1.6, {});
-  // NO candy under the wave (owner call, Sept 1 2026): beneath the blades + the overhead high row the low road is
-  // dodge-only — candy never asks for a grab inside a swing envelope. The stretch's candy lives on the high road.
+  // Low-road candy hugs the SPRINT LINE (owner calls, Sept 1–2 2026): three pieces at y1.55 on the mid-gaps —
+  // far below every blade's lowest reach at those columns (hazard bottoms ≥2.11 at x72/76/80; y1.55 even
+  // clears the blades' VISUAL pass, audit-verified), so the magnet hoovers them during the dodge-run itself.
+  // No piece ever asks for a jump inside a swing envelope; the fat rewards stay on the high road.
   candyLine(G, [[64,2.1,0],[66,1.9,0]], 2);
+  candyLine(G, [[72,1.55,0],[80,1.55,0]], 3);   // x72 · x76 · x80 — each exactly between two blades, run-height (y1.55 clears even the blades' VISUAL pass — no sprite ever gets sliced)
   // the staggered blade row (identical clocks, phase-offset — a learnable rolling wave; grazes cost a heart only)
   G.ents.add(new PendulumBlade(G, 70, 4.9, {len:3.0, amp:0.85, period:2.4, phase:0.0, r:0.55}));
   G.ents.add(new PendulumBlade(G, 74, 4.9, {len:3.0, amp:0.85, period:2.4, phase:0.6, r:0.55}));
@@ -159,7 +162,7 @@ function buildW5L2(G){
   G.ents.add(new SwoopBat(G, 76, 8.2, 0, {phase:0.2, range:4, period:3.2, aggroR:5}));
   // both roads rejoin here
   platform(G, 86, 2.2, 0, 5, 3, LEDGE);                                 // spans 83.5..88.5
-  candyLine(G, [[84.5,2.9,0],[86,3.0,0]], 2);                           // the low road's thanks for threading the wave — easy magnet grabs on solid ground
+  candyLine(G, [[85.3,2.9,0],[86.4,3.0,0]], 2);                         // the low road's thanks for threading the wave — easy magnet grabs, fully outside blade@82's swing-extreme reach (x≥85.3)
   G.ents.add(new ClockworkKnight(G, 87, 2.2, 0, {phase:0.5, range:1.4, wakeR:4}));  // a knight guarding the rejoin (tight range — stays on the ledge)
   G.ents.add(new Checkpoint(88, 2.2, 1.7, 1));                          // CP1 — LIT, the level's one mid checkpoint
 

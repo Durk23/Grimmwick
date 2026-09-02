@@ -1,10 +1,23 @@
 // ============ MAIN — game state, scenes, save, loop ============
 
 // ---- safe storage (works in app, browser, and sandboxed previews) ----
+// THE SAVE VAULT (iOS wrap only): every save write also lands in the native SaveVault plugin
+// (UserDefaults + iCloud key-value storage), so saves survive app updates AND deletion, and follow
+// the player's iCloud account to a new device. localStorage stays the live copy while it exists;
+// the vault restores into EMPTY installs only (see loadSave) — same-device play never fights the cloud.
+const Vault = ()=> (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SaveVault) || null;
 const Store = {
   mem:{},
   get(k){ try{ return localStorage.getItem(k) ?? this.mem[k] ?? null; }catch(e){ return this.mem[k] ?? null; } },
-  set(k,v){ this.mem[k]=v; try{ localStorage.setItem(k,v); }catch(e){} },
+  set(k,v){
+    if(G._restoring) return;                       // a vault restore is landing — nothing may stomp it (reload imminent)
+    this.mem[k]=v; try{ localStorage.setItem(k,v); }catch(e){}
+    // vault write-through: only real saves, and never while the boot-time restore question is unsettled —
+    // a virgin boot must never overwrite a real cloud save that just hasn't synced down yet (audit fix)
+    if(k==='grimmwick_save' && !G._vaultPending && G._saveVaultable()){
+      const V=Vault(); if(V){ try{ V.set({key:k, value:v}).catch(()=>{}); }catch(e){} }
+    }
+  },
   del(k){ delete this.mem[k]; try{ localStorage.removeItem(k); }catch(e){} },
 };
 
@@ -20,16 +33,49 @@ const G = {
   boss:null,
 
   loadSave(){
+    let parsed = false;
     try{
       const raw = Store.get('grimmwick_save') || Store.get('hollowville_save');
-      if(raw) this.save = JSON.parse(raw);
+      if(raw){ this.save = JSON.parse(raw); parsed = true; }
     }catch(e){}
+    // ---- BOOT ORCHESTRATION: vault first, Candy Shop second (audit-hardened — order is law) ----
+    // (1) Settle the vault-restore question with cloud write-through suppressed, so a fresh boot can
+    //     never overwrite the real cloud copy. The vault is consulted whenever no save with REAL PLAY
+    //     (completed levels/worlds) lives here — corrupt saves, virgin saves, and candy-only saves
+    //     from a boot-window grant must never block the lifeboat.
+    // (2) Only then attach the Candy Shop grant pipe — a purchase recovered at launch can neither block
+    //     a restore nor die in the restore's reload (unconfirmed grants re-deliver / replay).
+    // (3) The native cloudChanged event re-runs the same adoption when a slow iCloud sync lands late;
+    //     until then (or a 2-minute grace) vault writes stay suppressed so the incoming copy is safe.
+    { const V = Vault();
+      const realPlay = parsed && this.save && !!(Object.keys(this.save.levels||{}).length || Object.keys(this.save.worlds||{}).length || this.save.nightDone);
+      this._vaultPending = !!(V && !realPlay);
+      const decided = (V && !realPlay)
+        ? V.get({}).then(r=>{
+            this._adoptVault(r && r.value);   // reloads on success; vetoes or falls through otherwise
+            if(r && r.value) this._vaultPending = false;
+            else setTimeout(()=>{ this._vaultPending = false; if(this.save) this.persist(); }, 120000);
+            // ^ no cloud answer yet: iCloud's first download can land minutes late on a new device —
+            //   hold the vault-write gate so this fresh boot can't overwrite the incoming copy
+          }).catch(()=>{ this._vaultPending = false; })
+        : Promise.resolve();
+      if(V){ try{ V.addListener('cloudChanged', d=>this._adoptVault(d && d.value)); }catch(e){} }
+      decided.then(()=>this._hookCandyShop()).catch(()=>this._hookCandyShop());
+    }
+    try{ if(sessionStorage.getItem('gw_vault_restored')){ sessionStorage.removeItem('gw_vault_restored');
+      setTimeout(()=>{ if(window.UI) UI.toast('☁️ Your save flew back from the clouds.', 4200); }, 2600); } }catch(e){}
     if(!this.save || !this.save.owned){
       this.save = { candy:0, embers:0, worlds:{}, gp:{}, owned:['kid'], equipped:'kid', seenIntro:false, maxHearts:3 };
     }
+    this._migrateSave();
+  },
+  // every schema backfill lives HERE so both boot and the vault's in-place adoption run the same
+  // migrations (audit fix — an adopted older-schema save must never skip a backfill)
+  _migrateSave(){
     if(!this.save.maxHearts) this.save.maxHearts = 3;
     if(this.save.upMagnet===undefined) this.save.upMagnet = 0;
     if(!this.save.trickOff) this.save.trickOff = {};   // per-trick equip toggles (owner call: tricks stack — equip any or all)
+    if(!this.save.iapSeen) this.save.iapSeen = [];      // granted StoreKit transaction ids — the double-grant guard
     if(!this.save.claimed) this.save.claimed = [];
     if(this.save.candyLifetime===undefined) this.save.candyLifetime = this.save.candy||0;   // old saves: seed with the balance
     if(this.save.playT===undefined) this.save.playT = 0;
@@ -91,6 +137,7 @@ const G = {
   },
   persist(){ Store.set('grimmwick_save', JSON.stringify(this.save)); },
   resetSave(){
+    this._vaultForce = true;   // a reset MUST reach the vault (bypasses the virgin gate) — a reinstall must never resurrect pre-reset progress
     // a reset clears PROGRESS, never PROPERTY: costumes, masks, the Star Crown, and the Pass survive.
     // (This also makes Reset Save the official fresh-run button for the Flawless Night board.)
     const w = this.save || {};
@@ -100,10 +147,82 @@ const G = {
       pass: !!w.pass, firstFlame: !!w.firstFlame, firstFlameOff: !!w.firstFlameOff,
       emberPop: !!w.emberPop, batWings: !!w.batWings, gummyGuard: !!w.gummyGuard, sweetTooth: !!w.sweetTooth,   // bought tricks are PROPERTY — they survive the fresh-run reset (Nightmare seals them anyway)
       trickOff: w.trickOff || {},   // equip choices ride along too
+      iapSeen: w.iapSeen || [],     // granted-transaction ledger survives resets (a reset must never re-grant old purchases)
       pendingScores: w.pendingScores || undefined,   // earned scores queued offline survive the fresh-run reset
       seenIntro:false, maxHearts:3 };
     Store.set('grimmwick_save', JSON.stringify(fresh));
     Store.del('hollowville_save');
+  },
+
+  // ---- the Save Vault's JS half ----
+  // A save is worth vaulting once it carries real play (or when resetSave forces the write) — virgin
+  // boot saves never reach the cloud, so a fresh install can't clobber a backup mid-sync (audit fix).
+  _saveVaultable(){
+    if(this._vaultForce) return true;
+    const s = this.save; if(!s) return false;
+    // REAL PLAY only — watching the intro is not progress worth beating a 40-hour cloud save to the
+    // punch (audit fix: seenIntro flipped within seconds and opened the clobber window on slow syncs)
+    return !!(Object.keys(s.levels||{}).length || Object.keys(s.worlds||{}).length || s.nightDone);
+  },
+  // The one adoption path (boot get + late cloudChanged both land here). Adopts ONLY over a save with
+  // no real play; a launch-recovered candy purchase on the fresh boot is merged in, never lost.
+  _adoptVault(value){
+    if(this._restoring) return;
+    const s = this.save;
+    if(s && (Object.keys(s.levels||{}).length || Object.keys(s.worlds||{}).length || s.nightDone)){
+      this._vaultPending = false;   // real play here — never clobber it; writes may flow (last-writer wins, documented)
+      return;
+    }
+    if(!value || !s) return;
+    let cloud = null; try{ cloud = JSON.parse(value); }catch(e){ return; }   // never spend the restore on garbage
+    if(!cloud || !cloud.owned) return;
+    if((s.candy|0) || (s.iapSeen||[]).length){   // carry a boot-window grant into the adopted save
+      cloud.candy = (cloud.candy|0) + (s.candy|0);
+      cloud.iapSeen = [...new Set([...(cloud.iapSeen||[]), ...(s.iapSeen||[])])];
+    }
+    let out = null; try{ out = JSON.stringify(cloud); }catch(e){ return; }
+    this._restoring = true;                      // Store.set is dead from here — nothing may stomp the restore
+    try{ localStorage.setItem('grimmwick_save', out); }
+    catch(e){
+      // storage down: adopt in place — same migrations as a boot, no reload
+      this.save = cloud; Store.mem['grimmwick_save'] = out; this._restoring = false;
+      try{ this._migrateSave(); }catch(_){}
+      if(window.UI && UI.updateHUD) UI.updateHUD();
+      return;
+    }
+    try{ sessionStorage.setItem('gw_vault_restored','1'); }catch(e){}   // cosmetic toast flag — must never veto the reload
+    location.reload();                           // cleanest restore: boot again as if the save never left
+  },
+  // CANDY SHOP grant pipe — attached only AFTER the vault decision settles. The ONE place purchased
+  // candy lands: inline buys, Ask-to-Buy approvals hours later, and crash-recovered transactions all
+  // arrive here, deduped by txid, and are CONFIRMED back to native only after the save is persisted —
+  // Apple's transaction stays open until the candy is durably granted (two-phase; audit fix).
+  // Bought candy skips candyLifetime, so "most candy collected" (the board tiebreak) stays earned-only.
+  _hookCandyShop(){
+    try{
+      const CS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CandyShop;
+      if(!CS || this._csHooked) return;
+      this._csHooked = true;
+      CS.addListener('grant', d=>{
+        if(!d || !d.candy || !d.txid || this._restoring) return;   // mid-restore grants stay unconfirmed → re-deliver next boot
+        const seen = this.save.iapSeen || (this.save.iapSeen = []);
+        if(!seen.includes(d.txid)){
+          seen.push(d.txid); while(seen.length>30) seen.shift();
+          this.save.candy += d.candy; this.persist();
+          if(window.AUDIO) AUDIO.buy();
+          if(window.UI){ UI.updateHUD(); UI.toast('🍬 +'+d.candy.toLocaleString()+' candy! Sweet.', 4200);
+            if(this.state==='shop' && UI._shopTab==='candy') UI.renderShop('candy'); }
+        }
+        // confirm ONLY when the txid is provably on disk — if localStorage is down the grant lives in
+        // memory this session, the transaction stays open, and next launch re-delivers (dedupe absorbs it)
+        let landed = false;
+        try{ landed = (localStorage.getItem('grimmwick_save')||'').includes(d.txid); }catch(e){}
+        if(landed){ try{ CS.confirm({txid: d.txid}).catch(()=>{}); }catch(e){} }   // ack AFTER durable persist — the sale completes now
+      });
+      // re-offer grants notified in a previous page life (the restore reload consumes retained events;
+      // the native pending map survives webview reloads, so replay hands them straight back)
+      try{ CS.replay({}).catch(()=>{}); }catch(e){}
+    }catch(e){}
   },
 
   // a bought trick counts only while EQUIPPED in the Cauldron (they stack; the Nightmare check stays at each call site)
