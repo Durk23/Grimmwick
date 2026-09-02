@@ -10,6 +10,7 @@ const COSTUMES = {
   skeleton: {name:'Mr. Bones',     price:500,  body:0x2a2438, accent:0xe8e4d8, hat:'none',  cape:null,     desc:'Rattles when he double-jumps.'},
   ember:    {name:'Ember Spirit',  price:0, pass:'Tier 5', body:0xff5ea8, accent:0xffd166, glow:0xff2e10, trail:0xff8c2e, hat:'none', cape:0xff8c2e, desc:'Season 1 Pass · Tier 5. Burns bright. Never burns out.'},
   nightstitch: {name:'NIGHTSTITCH', price:2000, body:0x2c2a6e, accent:0x63e6e2, glow:0x2a3fd0, trail:0x63e6e2, stitched:true, hat:'none', cape:0x1c1a4e, desc:'Stitched from the night sky itself. The rarest thread in Grimmwick.'},
+  nightbreaker:{name:'NIGHTBREAKER', price:0, earnedNM:true, body:0x1c1016, accent:0xff4a3c, glow:0x8a1020, trail:0xff4a3c, stitched:true, hat:'none', cape:0x120a10, desc:'Woven from the nightmare\'s own dark, seams still smoldering. Cannot be bought — only survived.'},
   wolfpup:   {name:'Wolf Pup', price:450, body:0x8a6a4a, accent:0x5a4632, hat:'none', cape:null, desc:'Awooo! Fur by moonlight, zoomies by midnight.'},
   candycorn: {name:'Candy Corn', price:350, body:0xfff6e0, accent:0xff8c2e, hat:'none', cape:null, desc:'Three flavors of controversy in one costume.'},
   doctor:    {name:'Doctor Pip', price:400, body:0xf4f4f8, accent:0x63b6a8, hat:'none', cape:null, human:true, desc:'The night shift. Prescribes candy, twice daily.'},
@@ -25,6 +26,7 @@ const MASKS = {
   hockey:      {name:'Hockey Mask',  price:250, icon:'🏒', desc:'Straight from the equipment shed. The scuffs are all original.'},
   witchhat:    {name:'Witch\'s Hat', price:300, icon:'🧙', desc:'Properly crooked, personally enchanted. Fits over anything.'},
   starcrown:   {name:'THE STAR CROWN', price:0, earned:75, icon:'👑', desc:'All 75 stars. Every level, every challenge. Cannot be bought, only EARNED.'},
+  nightcrown:  {name:'THE NIGHTMARE CROWN', price:0, earnedNM:true, icon:'🌑', desc:'All 25 levels conquered in the Nightmare. Black iron, smoldering embers. Cannot be bought — only survived.'},
 };
 function buildMask(key){
   const g = new THREE.Group();
@@ -93,6 +95,20 @@ function buildMask(key){
     const halo = new THREE.Mesh(geo('sph',0.14,8,7), new THREE.MeshBasicMaterial({color:0xffd98a, transparent:true, opacity:0.35, blending:THREE.AdditiveBlending, depthWrite:false}));
     halo.position.copy(star.position); g.add(halo);
   }
+  else if(key==='nightcrown'){     // the Nightmare crown — black iron, crimson-ember points, a smoldering coal. Survived, never sold.
+    const ironM = emat(0x3a2a34, 0x1c1018, 0.4), emberM = emat(0xff4a30, 0x8a1020, 1.0);   // iron lifted a shade — pure black vanished at shop-preview size
+    const band = mesh('cyl',[0.34,0.36,0.14,10], ironM); band.position.y=0.42; g.add(band);
+    const rim = mesh('tor',[0.35,0.02,5,16], emberM); rim.rotation.x=Math.PI/2; rim.position.y=0.49; g.add(rim);
+    for(let i=0;i<5;i++){
+      const a = (i/5)*Math.PI*2 + 0.3;
+      const pt = mesh('cone',[0.07,0.22,4], ironM); pt.position.set(Math.cos(a)*0.32, 0.58, Math.sin(a)*0.32); g.add(pt);
+      const tip = mesh('sph',[0.028,5,4], emberM); tip.position.set(Math.cos(a)*0.32, 0.7, Math.sin(a)*0.32); g.add(tip);
+      if(i%2===0){ const gem = mesh('sph',[0.04,6,5], emberM); gem.position.set(Math.cos(a)*0.36, 0.44, Math.sin(a)*0.36); g.add(gem); }
+    }
+    const coal = mesh('sph',[0.09,8,7], emat(0x2a0a10, 0xff3a20, 1.2)); coal.position.set(0,0.85,0); g.add(coal);
+    const halo = new THREE.Mesh(geo('sph',0.16,8,7), new THREE.MeshBasicMaterial({color:0xff3a30, transparent:true, opacity:0.28, blending:THREE.AdditiveBlending, depthWrite:false}));
+    halo.position.set(0,0.85,0); g.add(halo);
+  }
   g.position.set(0, 1.18, 0.02);
   return g;
 }
@@ -138,6 +154,7 @@ class Player {
     this.grimmAura = null; this.grimmLight = null;
     this.zoeBroom = null; this.zoeBroomBack = null;
     this.flameAura = null; this.flameWisp = null;
+    this.blackAura = null; this.blackWisp = null; this.blackRing = null;
     this.wingL = this.wingR = null;   // the rig rebuild dropped any wing meshes with the old body — full-time wings re-attach next frame
     if(this.shieldMesh){ this.shield = false; this.shieldMesh = null; }   // same for the bubble (guardT unchanged → an unbroken Gummy Guard re-forms instantly)
     const c = COSTUMES[costumeKey]||COSTUMES.kid;
@@ -407,6 +424,33 @@ class Player {
       w.add(core, inner, sheath);
       this.flameWisp = w; body.add(w);
       this._flameEmberT = 0;
+    }
+    if(this.G && this.G.save && this.G.save.blackFlame && !this.G.save.blackFlameOff){
+      // THE BLACK FLAME — the Nightmare board's reigning champion: the First Flame's dark twin.
+      // Same regalia bones, black-crimson palette; a double champion wears both and looks like a legend.
+      const addM = (c,o)=>new THREE.MeshBasicMaterial({color:c, transparent:true, opacity:o, blending:THREE.AdditiveBlending, depthWrite:false});
+      this.blackAura = new THREE.Mesh(geo('sph',0.55,12,10), addM(0xd42a3c,0.14));
+      this.blackAura.position.y=0.8; this.blackAura.scale.set(1,1.5,1); body.add(this.blackAura);
+      const bouter = new THREE.Mesh(geo('sph',0.92,12,10), addM(0x8a1424,0.09));
+      bouter.position.y=0.85; bouter.scale.set(1,1.35,1); this.blackAura.userData.outer = bouter; body.add(bouter);
+      const bring = new THREE.Group();
+      const bband = new THREE.Mesh(geo('tor',0.66,0.034,6,28), addM(0xff4a30,0.7));
+      bband.rotation.x = Math.PI/2; bring.add(bband);
+      for(let i=0;i<5;i++){
+        const a = i/5*TAU + 0.35;
+        const fl = mesh('cone',[0.06,0.19,5], emat(0xff4a30,0x8a1020,1));
+        fl.position.set(Math.cos(a)*0.66, 0.07, Math.sin(a)*0.66);
+        bring.add(fl);
+      }
+      bring.position.y = 0.04;
+      this.blackRing = bring; body.add(bring);
+      const bw = new THREE.Group();
+      const bcore = mesh('sph',[0.085,7,6], emat(0xffc4b0,0xff8a70,1));
+      const binner = mesh('cone',[0.08,0.22,6], emat(0xff4a30,0x8a1020,1)); binner.position.y=0.14;
+      const bsheath = new THREE.Mesh(geo('cone',0.14,0.34,7), addM(0xd42a3c,0.4)); bsheath.position.y=0.14;
+      bw.add(bcore, binner, bsheath);
+      this.blackWisp = bw; body.add(bw);
+      this._blackEmberT = 0;
     }
     // ---- THE MASK SLOT (wardrobe brick #1): any mask over any costume ----
     const mk = maskKeyOverride !== undefined ? maskKeyOverride : (this.G && this.G.save ? this.G.save.mask : null);
@@ -882,6 +926,28 @@ class Player {
           const ra = Math.random()*TAU;
           G.fx.spawn(new THREE.Vector3(this.pos.x+Math.cos(ra)*0.62, this.pos.y+0.08, this.pos.z+Math.sin(ra)*0.62),
             Math.random()<0.5?0xff8a3a:0xffb35e, 1, {speed:0.3, life:0.8, gravity:-0.9, size:0.4});
+        }
+      }
+    }
+    if(this.blackAura){
+      const bt = G.time;
+      this.blackAura.material.opacity = 0.12 + 0.04*Math.sin(bt*2.3 + 0.7);
+      const bout = this.blackAura.userData.outer;
+      if(bout) bout.material.opacity = 0.07 + 0.03*Math.sin(bt*2.3 + 1.9);
+      if(this.blackRing){ this.blackRing.rotation.y = -bt*0.5; }   // counter-spin to the First Flame's ring
+      const ba = -bt*1.45 + Math.PI;                               // the dark wisp orbits opposite the bright one
+      if(this.blackWisp){
+        this.blackWisp.position.set(Math.cos(ba)*0.84, 0.95+Math.sin(bt*1.9+0.8)*0.16, Math.sin(ba)*0.84);
+        this._blackEmberT -= dt;
+        if(this._blackEmberT <= 0){
+          this._blackEmberT = 0.18;
+          const bp = this.blackWisp.getWorldPosition(new THREE.Vector3());
+          G.fx.spawn(bp, 0xff6a50, 1, {speed:0.25, life:0.5, gravity:-0.2, size:0.45});
+          if(Math.random() < 0.4){
+            const ra = Math.random()*TAU;
+            G.fx.spawn(new THREE.Vector3(this.pos.x+Math.cos(ra)*0.66, this.pos.y+0.08, this.pos.z+Math.sin(ra)*0.66),
+              Math.random()<0.5?0xd42a3c:0xff4a30, 1, {speed:0.3, life:0.8, gravity:-0.9, size:0.4});
+          }
         }
       }
     }

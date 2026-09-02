@@ -65,13 +65,15 @@ function decodeNight(v){
 
 const APP_URL = 'https://apps.apple.com/app/id6804521352';   // Grimmwick on the App Store
 
+// Tab order = the player's journey (owner call, Sept 2 2026): the open board first, then the mastery
+// exam, then the gauntlet. 🌙 everyone → 🏆 pure Pip → 🌑 no mercy.
 const NIGHT_BOARDS = [
-  { key:'flawless', id:'grimmwick.flawless', icon:'🏆', name:'FLAWLESS NIGHT',
-    sub:'ALL 75 stars: every level, every challenge. Fastest total clock wins. The mastery board.' },
-  { key:'nightmare', id:'grimmwick.nightmare', icon:'🌑', name:'THE NIGHTMARE',
-    sub:'All 25 levels beaten with no lanterns and no mercy. Sum of your best times. The brutal board.' },
   { key:'night', id:'grimmwick.night', icon:'🌙', name:'THE NIGHT',
     sub:'Everyone who saved Grimmwick. Fastest night wins; fewest deaths breaks ties.' },
+  { key:'flawless', id:'grimmwick.flawless', icon:'🏆', name:'FLAWLESS NIGHT',
+    sub:'ALL 75 stars: every level, every challenge. Fastest total clock wins. Pure Pip — bought tricks rest here.' },
+  { key:'nightmare', id:'grimmwick.nightmare', icon:'🌑', name:'THE NIGHTMARE',
+    sub:'All 25 levels beaten with no lanterns and no mercy. Sum of your best times. The brutal board.' },
 ];
 
 const Night = {
@@ -137,7 +139,7 @@ const Night = {
   // stars (in any order, across any number of nights), the clock stops and the run is banked. Cozy taints it.
   checkFlawless(G){
     const sv = G.save;
-    if(sv.flawlessT || sv.nightCozy) return;
+    if(sv.flawlessT || sv.nightCozy || sv.nightTricked) return;   // cozy OR an equipped bought trick disqualifies — the First Flame is unbuyable
     if(!sv.nightDone || this.totalStars(G) < 75) return;
     sv.flawlessT = sv._finishT !== undefined ? sv._finishT : (sv.playT||0);   // finale-path completions use the invite-moment stamp
     sv.flawlessDeaths = sv.dmgUntracked ? 99 : Math.min(sv.deathsLifetime||0, 99);
@@ -175,6 +177,28 @@ const Night = {
     // bat wings (switchArea rebuilds it anyway on the next area change)
     if(G.player && G.area === 'hub') G.player.buildRig(G.save.equipped||'kid');
   },
+  // THE BLACK FLAME — the First Flame's dark twin: one player wears it, the reigning Nightmare champion.
+  // Same rank-watcher rules: only positive evidence (a real rank > 1) ever takes it away.
+  async checkBlackFlame(G){
+    if(!G || !G.save || !GC.native() || !GC.authed) return;
+    const r = await GC.load('grimmwick.nightmare', false, 1);
+    if(!r || r.error) return;
+    const had = !!G.save.blackFlame;
+    const rankKnown = typeof r.localRank === 'number' && r.localRank >= 1;
+    if(!rankKnown) return;
+    const isChamp = r.localRank === 1;
+    if(isChamp === had) return;
+    G.save.blackFlame = isChamp;
+    G.persist && G.persist();
+    if(isChamp){
+      window.UI && UI.toast('🖤 THE BLACK FLAME IS YOURS. The Nightmare kneels to one. Guard it.', 6800);
+      window.AUDIO && AUDIO.goldPumpkin();
+    } else {
+      const champ = (r.entries && r.entries[0] && !r.entries[0].me && r.entries[0].name) ? r.entries[0].name : 'a new champion';
+      window.UI && UI.toast('🖤 The Black Flame has passed to '+champ+'. Take it back.', 6800);
+    }
+    if(G.player && G.area === 'hub') G.player.buildRig(G.save.equipped||'kid');
+  },
   onLevelClear(G, levelId){
     if(!(G.save.cozy || G.runCozy)) this.checkFlawless(G);
     this.refreshNight(G);
@@ -189,7 +213,7 @@ const Night = {
   },
 
   // ================= THE NIGHT BOARD UI (two tabs, jewel not menu) =================
-  _built: false, _sel: 'flawless', _friends: false,
+  _built: false, _sel: 'night', _friends: false,   // THE NIGHT greets first — the board everyone is on
   build(){
     if(this._built) return; this._built = true;
     const css = document.createElement('style');
@@ -245,7 +269,7 @@ const Night = {
     el.querySelectorAll('.nb-tab').forEach(x=>x.classList.toggle('on', x.dataset.k===this._sel));
     AUDIO.ui && AUDIO.ui();
     this.render();                                    // paint your local numbers immediately…
-    if(GC.native()){ await GC.signIn(); this.render(); this.checkFirstFlame(window.G); }   // auth (or retry queued submits) on every open
+    if(GC.native()){ await GC.signIn(); this.render(); this.checkFirstFlame(window.G); this.checkBlackFlame(window.G); }   // auth (or retry queued submits) on every open
   },
   close(){ const el = document.getElementById('nb-screen'); if(el) el.style.display='none'; if(window.UI) UI._ovCloseT = performance.now(); AUDIO.ui && AUDIO.ui(); },
   // ⚔️ the viral loop: brag with your real time through the system share sheet
@@ -295,7 +319,7 @@ const Night = {
     const mine = this.localValue(G, b.key);
     const nPend = Object.keys(G.save.pendingScores||{}).length;
     el.querySelector('#nb-you').textContent = (mine != null ? ('Your best: '+fmtCS(b.key==='nightmare' ? mine : decodeNight(mine).timeCS))
-      : (b.key==='flawless' ? `Stars: ${this.totalStars(G)}/75. Earn them ALL to enter!`
+      : (b.key==='flawless' ? (G.save.nightTricked ? 'Tricks woke during this run — Flawless needs a pure one. (Reset Save starts it.)' : `Stars: ${this.totalStars(G)}/75. Earn them ALL to enter!`)
         : b.key==='nightmare' ? 'Conquer all 25 nightmare levels to enter!' : 'Finish the night to enter!'))
       + (nPend && GC.authed ? ' · 📮 posting…' : '');
     if(nPend && GC.authed && GC.lastError && !this._errToasted){ this._errToasted = true;
@@ -323,7 +347,7 @@ const Night = {
       list.innerHTML = `<div class="nb-note">${this._friends ? 'No friends on this board yet. Recruit some rivals! 👥' : 'The board is empty. Be the FIRST name on it. 🏮'}</div>`;
       return;
     }
-    list.innerHTML = hdr + r.entries.map(e => this._row(e.rank, (this._sel==='flawless' && e.rank===1 ? '🔥 ' : '')+e.name, e.value, e.context, e.me)).join('');
+    list.innerHTML = hdr + r.entries.map(e => this._row(e.rank, (e.rank===1 ? (this._sel==='flawless' ? '🔥 ' : this._sel==='nightmare' ? '🖤 ' : '') : '')+e.name, e.value, e.context, e.me)).join('');
     if(r.localRank && !r.entries.some(e=>e.me)){
       list.innerHTML += this._row(r.localRank, GC.alias||'You', r.localValue!=null?r.localValue:0, r.localContext!=null?r.localContext:null, true);
     }
@@ -331,4 +355,4 @@ const Night = {
 };
 window.NightBoard = Night;
 // boot check: sign in quietly, flush queued scores, see whether the First Flame still burns here
-setTimeout(()=>{ try{ if(GC.native()){ GC._signInOpts = {silent:true}; GC.signIn().then(()=>{ GC._signInOpts = null; if(GC.authed){ Night.flushPending(); Night.checkFirstFlame(window.G); } }); } }catch(e){} }, 6000);
+setTimeout(()=>{ try{ if(GC.native()){ GC._signInOpts = {silent:true}; GC.signIn().then(()=>{ GC._signInOpts = null; if(GC.authed){ Night.flushPending(); Night.checkFirstFlame(window.G); Night.checkBlackFlame(window.G); } }); } }catch(e){} }, 6000);

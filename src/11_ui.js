@@ -618,12 +618,14 @@ const UI = {
     if(tab==='costumes'){
       body.innerHTML = '<div style="opacity:.75;font-size:13px;margin-bottom:10px">❤️ Hearts &amp; upgrades moved to the <b>⬆️ Level Ups</b> tab!</div><div id="shopGrid"></div>';
       const grid = body.querySelector('#shopGrid');
-      if(G.save.firstFlame){
-        // ---- CHAMPION'S REGALIA — visible only while this player holds Flawless rank 1 ----
+      if(G.save.firstFlame || G.save.blackFlame){
+        // ---- CHAMPION'S REGALIA — visible only while this player holds a board's rank 1 ----
         const fh = document.createElement('div');
         fh.style.cssText = 'grid-column:1/-1;margin:14px 0 2px;font-weight:900;letter-spacing:2px;color:#ffb35e;text-shadow:0 0 14px rgba(255,120,40,.55)';
         fh.textContent = '🔥 CHAMPION\'S REGALIA';
         grid.appendChild(fh);
+      }
+      if(G.save.firstFlame){
         const on = !G.save.firstFlameOff;
         const fd = document.createElement('div');
         fd.className='item';
@@ -637,6 +639,22 @@ const UI = {
           this.renderShop('costumes');
         });
         grid.appendChild(fd);
+      }
+      if(G.save.blackFlame){
+        // the First Flame's dark twin — one holder in the world: the reigning Nightmare champion
+        const bon = !G.save.blackFlameOff;
+        const bd = document.createElement('div');
+        bd.className='item';
+        bd.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 78%, rgba(212,42,60,.45), transparent 65%), linear-gradient(135deg,#1c0a10 60%,#3a1018)"><div style="font-size:52px;line-height:110px">🖤</div></div>
+          <h4>THE BLACK FLAME</h4><p>Worn by ONE player in the world: the reigning Nightmare champion. Yours while you hold rank 1.</p>
+          <button class="btn buy ui-block ${bon?'ghost2':'orange'}">${bon?'✓ Smoldering · tap to hide':'Wear the Flame'}</button>`;
+        this.bindTap(bd.querySelector('button'), ()=>{
+          G.save.blackFlameOff = bon;
+          G.persist(); AUDIO.buy();
+          G.player && G.player.buildRig(G.save.equipped||'kid');
+          this.renderShop('costumes');
+        });
+        grid.appendChild(bd);
       }
       // ---- THE MASK RACK — one accessory slot, any mask over any costume ----
       const mh = document.createElement('div');
@@ -653,12 +671,13 @@ const UI = {
         const pv = this.costumePreview(wornCostume, mkey);
         div.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%), linear-gradient(135deg,#3a2f5a66 60%,#5a3f7a66)">${pv?`<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">`:`<div style="font-size:52px;line-height:110px">${m.icon}</div>`}</div>
           <h4>${m.icon} ${m.name}</h4><p>${m.desc}</p>
-          <button class="btn buy ui-block ${wearing?'ghost2':(ownedM?'':(m.earned?'ghost2':'orange'))}">${wearing?'✓ On · tap to take off':(ownedM?'Wear it':(m.earned?'⭐ Earn all '+m.earned+' stars':'🍬 '+m.price))}</button>`;
+          <button class="btn buy ui-block ${wearing?'ghost2':(ownedM?'':((m.earned||m.earnedNM)?'ghost2':'orange'))}">${wearing?'✓ On · tap to take off':(ownedM?'Wear it':(m.earned?'⭐ Earn all '+m.earned+' stars':(m.earnedNM?'🌑 Conquer the Nightmare':'🍬 '+m.price)))}</button>`;
         const btn = div.querySelector('button');
         this.bindTap(btn, ()=>{
           if(wearing){ G.save.mask = null; }
           else if(ownedM){ G.save.mask = mkey; }
           else if(m.earned){ AUDIO.ui(); this.toast('👑 The Star Crown can\'t be bought. Earn all '+m.earned+' stars! (Check ⬆️ Level Ups)'); return; }
+          else if(m.earnedNM){ AUDIO.ui(); this.toast('🌑 The Nightmare Crown can\'t be bought. Conquer all 25 levels in Nightmare Mode!'); return; }
           else if(G.save.candy >= m.price){ G.save.candy -= m.price; G.save.ownedMasks.push(mkey); G.save.mask = mkey; AUDIO.buy(); this.toast('🎭 New mask: '+m.name+'!'); }
           else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); return; }
           G.player && G.player.buildRig(G.save.equipped||'kid');
@@ -687,11 +706,12 @@ const UI = {
         const swInner = pv ? `<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">` : '';
         div.innerHTML = `${passBadge}<div class="sw" style="height:110px;background:linear-gradient(135deg,${cs}44 60%,${ac}66), radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%)${c.glow?';box-shadow:0 0 18px '+cs+' inset, 0 0 12px '+cs:''}">${swInner}</div>
           <h4>${c.name}</h4><p>${c.desc}</p>
-          <button class="btn buy ui-block ${equipped?'ghost2':(owned?'':'orange')}">${equipped?'✓ Equipped':(owned?'Equip':(c.pass?'Try it (Pass)':(c.price===0?'Free':'🍬 '+c.price)))}</button>`;
+          <button class="btn buy ui-block ${equipped?'ghost2':(owned?'':(c.earnedNM?'ghost2':'orange'))}">${equipped?'✓ Equipped':(owned?'Equip':(c.earnedNM?'🌑 Conquer the Nightmare':(c.pass?'Try it (Pass)':(c.price===0?'Free':'🍬 '+c.price))))}</button>`;
         const btn = div.querySelector('button');
         const act = ev=>{
           ev.stopPropagation();
           if(equipped) return;
+          if(c.earnedNM && !owned){ AUDIO.ui(); this.toast('🌑 NIGHTBREAKER can\'t be bought. Conquer all 25 levels in Nightmare Mode!'); return; }
           if(owned || c.price===0){ G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy(); }
           else if(G.save.candy>=c.price){ G.save.candy-=c.price; G.save.owned.push(key); G.save.equipped=key; G.player&&G.player.buildRig(key); G.persist(); AUDIO.buy(); this.toast('🎉 New costume: '+c.name+'!'); }
           else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); }
@@ -781,7 +801,7 @@ const UI = {
         const off = owned && !!(G.save.trickOff && G.save.trickOff[tk.k]);
         const div = document.createElement('div'); div.className='item';
         div.innerHTML = `<div class="sw" style="background:${tk.grad};display:flex;align-items:center;justify-content:center;font-size:30px">${tk.icon}</div>
-          <h4>${tk.name}${owned?(off?' · off':' · equipped'):''}</h4><p>${tk.desc} <i>Tricks stack — equip any or all. Sleeps in Nightmare Mode.</i></p>
+          <h4>${tk.name}${owned?(off?' · off':' · equipped'):''}</h4><p>${tk.desc} <i>Tricks stack — equip any or all. Sleeps in Nightmare Mode and rests for Flawless runs.</i></p>
           <button class="btn buy ui-block ${owned&&off?'ghost2':'orange'}">${owned?(off?'OFF — TAP TO EQUIP':'✓ EQUIPPED'):('🍬 '+tk.price)}</button>`;
         wire(div.querySelector('button'), ()=>{
           if(!owned){

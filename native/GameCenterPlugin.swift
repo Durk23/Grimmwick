@@ -4,6 +4,7 @@
 import Foundation
 import Capacitor
 import GameKit
+import StoreKit
 
 @objc(GameCenterPlugin)
 public class GameCenterPlugin: CAPPlugin, CAPBridgedPlugin {
@@ -13,7 +14,19 @@ public class GameCenterPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "signIn", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "submit", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "loadBoard", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestReview", returnType: CAPPluginReturnPromise),
     ]
+
+    // Apple's rate-this-app card. The game asks only at happy moments (guardian freed, night finished);
+    // iOS decides whether a card actually appears — capped at 3 shows/year per player, system-managed.
+    @objc func requestReview(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                SKStoreReviewController.requestReview(in: scene)
+            }
+            call.resolve()
+        }
+    }
 
     @objc func signIn(_ call: CAPPluginCall) {
         let player = GKLocalPlayer.local

@@ -140,12 +140,9 @@ function buildW5L2(G){
   candyLine(G, [[63,3.3,0],[63,4.6,0],[63,5.9,0]], 3);                  // the quiet lure up the chain
   // LOW ROAD — fixed cogs beneath the blade wave
   gearPlat(G, 66, 1.6, {}); gearPlat(G, 70, 1.6, {}); gearPlat(G, 74, 1.6, {}); gearPlat(G, 78, 1.6, {}); gearPlat(G, 82, 1.6, {});
-  // Low-road candy hugs the SPRINT LINE (owner calls, Sept 1–2 2026): three pieces at y1.55 on the mid-gaps —
-  // far below every blade's lowest reach at those columns (hazard bottoms ≥2.11 at x72/76/80; y1.55 even
-  // clears the blades' VISUAL pass, audit-verified), so the magnet hoovers them during the dodge-run itself.
-  // No piece ever asks for a jump inside a swing envelope; the fat rewards stay on the high road.
-  candyLine(G, [[64,2.1,0],[66,1.9,0]], 2);
-  candyLine(G, [[72,1.55,0],[80,1.55,0]], 3);   // x72 · x76 · x80 — each exactly between two blades, run-height (y1.55 clears even the blades' VISUAL pass — no sprite ever gets sliced)
+  // NO candy on the LOW ROAD (owner FINAL call, Sept 2 2026, after seeing it in-game): the lower gear row
+  // under the blade wave is dodge-only, start to finish — ZERO pieces down here. Every candy in this
+  // stretch lives on the HIGH road in plain sight overhead, plus the rejoin ledge. Sprint the low line clean.
   // the staggered blade row (identical clocks, phase-offset — a learnable rolling wave; grazes cost a heart only)
   G.ents.add(new PendulumBlade(G, 70, 4.9, {len:3.0, amp:0.85, period:2.4, phase:0.0, r:0.55}));
   G.ents.add(new PendulumBlade(G, 74, 4.9, {len:3.0, amp:0.85, period:2.4, phase:0.6, r:0.55}));

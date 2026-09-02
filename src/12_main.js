@@ -86,7 +86,14 @@ const G = {
       if(Object.keys(this.save.levels||{}).length > 0 || (this.save.playT||0) > 60) this.save.dmgUntracked = true;   // damage AND deaths both started false-zero on these saves
     }
     if(this.save.deathsLifetime===undefined) this.save.deathsLifetime = 0;
-    if(!this.save.nm) this.save.nm = {levels:{}};   // NIGHTMARE MODE progress lives apart — the 75 crown stars are never touched
+    if(!this.save.nm) this.save.nm = {levels:{}, v:2};   // NIGHTMARE MODE progress lives apart — the 75 crown stars are never touched
+    if(this.save.nm && !this.save.nm.v){
+      // pre-1.3 nightmare data predates the cozy guard (shipped 1.2 could bank cozy-assisted bests, and
+      // the coronation must never trust them): clears stay remembered, but times + conquest re-prove honestly
+      this.save.nm.v = 2;
+      this.save.nm.conquered = false;
+      for(const k in (this.save.nm.levels||{})) this.save.nm.levels[k].best = null;
+    }
     // legacy saves that already beat Grimm (finished before the Night Board existed): GRANDFATHER them in.
     // Their clock is playT at migration — honest or WORSE (includes post-game wandering), and the unknowable
     // stats take worst-case tiebreaks, so the entry can never rank unfairly high. A fresh run replaces it.
@@ -125,6 +132,10 @@ const G = {
     if(this.save.mask===undefined) this.save.mask = null;        // the wardrobe's mask slot
     if(!this.save.ownedMasks) this.save.ownedMasks = [];
     if(this.save.mask && typeof MASKS!=='undefined' && !MASKS[this.save.mask]) this.save.mask = null;              // curated away
+    if(this.save.nm && this.save.nm.conquered){   // conquered before the regalia existed: crown them on boot
+      if(!this.save.owned.includes('nightbreaker')) this.save.owned.push('nightbreaker');
+      if(!this.save.ownedMasks.includes('nightcrown')) this.save.ownedMasks.push('nightcrown');
+    }
     if(this.save.equipped && typeof COSTUMES!=='undefined' && !COSTUMES[this.save.equipped]) this.save.equipped = 'kid';
     if(this.save.pass===undefined) this.save.pass = false;
     if(this.save.seenShop===undefined) this.save.seenShop = !!this.save.metMayor;   // the cauldron tour is for brand-new players only
@@ -145,8 +156,9 @@ const G = {
       owned: w.owned||['kid'], equipped: w.equipped||'kid',
       ownedMasks: w.ownedMasks||[], mask: w.mask||null,
       pass: !!w.pass, firstFlame: !!w.firstFlame, firstFlameOff: !!w.firstFlameOff,
+      blackFlame: !!w.blackFlame, blackFlameOff: !!w.blackFlameOff,   // the Nightmare's reigning flame is rank-based property, like the First
       emberPop: !!w.emberPop, batWings: !!w.batWings, gummyGuard: !!w.gummyGuard, sweetTooth: !!w.sweetTooth,   // bought tricks are PROPERTY — they survive the fresh-run reset (Nightmare seals them anyway)
-      trickOff: w.trickOff || {},   // equip choices ride along too
+      trickOff: {ember:true, bat:true, guard:true, sweet:true},   // a FRESH RUN starts with every trick RESTING (audit fix: equipped-by-default re-tainted Flawless on frame one of the reset — re-equip in the Cauldron any time, knowingly)
       iapSeen: w.iapSeen || [],     // granted-transaction ledger survives resets (a reset must never re-grant old purchases)
       pendingScores: w.pendingScores || undefined,   // earned scores queued offline survive the fresh-run reset
       seenIntro:false, maxHearts:3 };
@@ -222,6 +234,23 @@ const G = {
       // re-offer grants notified in a previous page life (the restore reload consumes retained events;
       // the native pending map survives webview reloads, so replay hands them straight back)
       try{ CS.replay({}).catch(()=>{}); }catch(e){}
+    }catch(e){}
+  },
+
+  // Apple's rate-this-app card — only ever asked at HAPPY moments (a guardian just freed, the night
+  // just finished), never at boot, never near a death. The OS decides whether a card actually shows
+  // (Apple caps it at 3/year per player); we ask at most twice per save.
+  _maybeAskReview(){
+    try{
+      const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GameCenter;
+      if(!P || !P.requestReview) return;
+      const s = this.save;
+      const beaten = Object.keys(s.worlds||{}).length;
+      if((beaten===2 && !s.rateAsked) || (s.nightDone && s.rateAsked!=='night')){
+        s.rateAsked = s.nightDone ? 'night' : '2';
+        this.persist();
+        setTimeout(()=>{ try{ P.requestReview(); }catch(e){} }, 3500);   // after the victory fanfare breathes
+      }
     }catch(e){}
   },
 
@@ -439,7 +468,14 @@ const G = {
         if(tot != null){
           GC.submit('grimmwick.nightmare', Math.round(tot*100), 25);
           if(!this.save.nm.conquered){ this.save.nm.conquered = true;
-            setTimeout(()=>UI.toast('🌑 THE NIGHTMARE IS CONQUERED. Your total time is on the board.', 6200), 2600); }
+            // THE CORONATION (owner call, Sept 2 2026): conquering all 25 grants the full regalia —
+            // NIGHTBREAKER (the outfit) + THE NIGHTMARE CROWN (black iron, next to the Star Crown).
+            // Honest by construction: cozy runs bank no bests, so nightmareTotal (and this block) never
+            // fires for them. Earn-only forever — never sold, never granted any other way.
+            if(!this.save.owned.includes('nightbreaker')) this.save.owned.push('nightbreaker');
+            if(!this.save.ownedMasks.includes('nightcrown')) this.save.ownedMasks.push('nightcrown');
+            setTimeout(()=>UI.toast('🌑 THE NIGHTMARE IS CONQUERED. Your total time is on the board.', 6200), 2600);
+            setTimeout(()=>{ UI.toast('👑 NIGHTBREAKER + THE NIGHTMARE CROWN ARE YOURS. Woven from the dark you beat. (Wear them in the Cauldron.)', 7500); AUDIO.goldPumpkin(); }, 9200); }
         }
       }
       const prevGp = this.save.gp[def.district]||[false,false,false];
@@ -735,6 +771,7 @@ const G = {
       this.persist();
     }
     window.NightBoard && NightBoard.onBossDefeated(this, district);
+    this._maybeAskReview();
     if(this.save._finishT !== undefined){ delete this.save._finishT; this.persist(); }
     if(district==='w5'){
       // the finale lands IN the festival: fireworks, the whole flame, the town that remembers —
@@ -852,6 +889,14 @@ const G = {
       this._ptAcc = (this._ptAcc||0) + dt;   // flush the clock every few seconds — force-quitting must never refund run time
       if(this._ptAcc > 4){ this._ptAcc = 0; this.persist(); }
       if(this.save.cozy && !this.save.nightDone && !this.save.nightCozy) this.save.nightCozy = true;   // any cozy minute taints the night's board eligibility
+      // THE FLAWLESS RULE (owner call, Sept 2 2026): an EQUIPPED trick taints Flawless eligibility until the
+      // flawless run is captured — money can never touch the First Flame. THE NIGHT stays open to everything;
+      // nightmare needs no taint (it seals tricks outright). Reset Save = the fresh eligible run, as ever.
+      if(!this.save.flawlessT && !this.save.nightTricked && !this.nightmare &&
+         (this.trickOn('ember')||this.trickOn('bat')||this.trickOn('guard')||this.trickOn('sweet'))){
+        this.save.nightTricked = true;   // said out loud the moment it happens — never a silent disqualification (audit fix)
+        UI.toast('🏆 A trick is awake! This run counts everywhere except FLAWLESS NIGHT. (Reset Save starts a pure run.)', 6600);
+      }
       if(INPUT.pauseEdge){ UI.togglePause(); INPUT.endFrame(); return; }
       if(this.area!=='hub' && this.area!=='tut') this.runT = (this.runT||0)+dt;
       this.world.updateMovers(dt);
