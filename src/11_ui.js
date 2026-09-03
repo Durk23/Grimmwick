@@ -223,6 +223,7 @@ const UI = {
         <h2 style="margin-bottom:16px">⏸️ Paused</h2>
         <div style="display:flex;flex-direction:column;gap:10px">
           <button class="btn ui-block" id="resumeBtn">▶️ Resume</button>
+          <button class="btn ui-block" id="updateBtn" style="display:none; background:linear-gradient(90deg,#ff8c2e,#ffd23f); color:#241f30">🆕 Update Grimmwick</button>
           <button class="btn ghost2 ui-block" id="pauseRestartBtn">🔁 Restart Level</button>
           <button class="btn ghost2 ui-block" id="pauseMapBtn">🗺️ Level Select (Map)</button>
           <button class="btn ghost2 ui-block" id="nightBtn">🏮 The Night Board</button>
@@ -337,6 +338,7 @@ const UI = {
     };
     instant('pauseBtn', ()=>this.togglePause());
     tap('resumeBtn', ()=>this.togglePause(false));
+    tap('updateBtn', ()=>{ try{ window.open('itms-apps://apps.apple.com/app/id6804521352'); }catch(e){} });
     // Night Board / How-to open OVER the pause menu — the game stays paused behind them
     tap('nightBtn', ()=>{ window.NightBoard && NightBoard.open(); });
     tap('nightBtnTitle', ()=>{ window.NightBoard && NightBoard.open(); });
@@ -576,6 +578,7 @@ const UI = {
     if(show && G.state!=='play') return;
     this._resetArm=false; this.el('resetBtn').textContent='🗑️ Reset Save (outfits stay)';
     if(show){ G.state='paused'; this.el('pause-screen').style.display='flex'; this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(this.G.save.cozy?'ON':'OFF');
+      const ub = this.el('updateBtn'); if(ub){ ub.style.display = G._updateAvail ? '' : 'none'; if(G._updateAvail) ub.textContent = '🆕 Update Grimmwick (v'+G._updateAvail+' is out!)'; }
       const inLevel = !!G.levelDef || G.area.startsWith('boss');   // Restart/Map only make sense inside a level or boss
       this.el('pauseRestartBtn').style.display = inLevel?'block':'none';
       this.el('pauseMapBtn').style.display = inLevel?'block':'none'; }

@@ -64,6 +64,7 @@ const G = {
     }
     try{ if(sessionStorage.getItem('gw_vault_restored')){ sessionStorage.removeItem('gw_vault_restored');
       setTimeout(()=>{ if(window.UI) UI.toast('☁️ Your save flew back from the clouds.', 4200); }, 2600); } }catch(e){}
+    setTimeout(()=>this._checkForUpdate(), 8000);   // after boot settles; no-op on web and when checked recently
     if(!this.save || !this.save.owned){
       this.save = { candy:0, embers:0, worlds:{}, gp:{}, owned:['kid'], equipped:'kid', seenIntro:false, maxHearts:3 };
     }
@@ -234,6 +235,30 @@ const G = {
       // re-offer grants notified in a previous page life (the restore reload consumes retained events;
       // the native pending map survives webview reloads, so replay hands them straight back)
       try{ CS.replay({}).catch(()=>{}); }catch(e){}
+    }catch(e){}
+  },
+
+  // UPDATE NUDGE (native builds, once a day): asks Apple's public lookup API for the current store
+  // version and compares against the running binary. If the store is ahead: one friendly toast + an
+  // Update button in the pause menu. Never nags, never blocks — most players auto-update anyway;
+  // this catches the rest and speeds up launch windows.
+  async _checkForUpdate(){
+    try{
+      const V = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SaveVault;
+      if(!V || !V.appVersion) return;
+      const last = +(Store.get('gw_upd_check')||0);
+      if(Date.now() - last < 20*3600*1000) return;   // at most ~once a day
+      Store.set('gw_upd_check', String(Date.now()));
+      const mine = ((await V.appVersion())||{}).version;
+      if(!mine) return;
+      const r = await fetch('https://itunes.apple.com/lookup?id=6804521352&t='+Date.now());
+      const j = await r.json();
+      const store = j && j.results && j.results[0] && j.results[0].version;
+      if(!store || store === mine) return;
+      const num = v => v.split('.').slice(0,3).reduce((s,x,i)=>s + (parseInt(x)||0)/Math.pow(1000,i), 0);
+      if(num(store) <= num(mine)) return;            // never nudge sideways or backward
+      this._updateAvail = store;
+      setTimeout(()=>{ if(window.UI) UI.toast('🆕 A Grimmwick update is out! New treats await — grab it from the pause menu.', 5200); }, 12000);
     }catch(e){}
   },
 

@@ -22,7 +22,14 @@ public class SaveVaultPlugin: CAPPlugin, CAPBridgedPlugin {
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "get", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "set", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "appVersion", returnType: CAPPluginReturnPromise),
     ]
+
+    // The running binary's marketing version — the update nudge compares this against the App Store's
+    // current version (zero-maintenance: no hardcoded constants to forget at release time).
+    @objc func appVersion(_ call: CAPPluginCall) {
+        call.resolve(["version": (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? ""])
+    }
     static let saveKey = "grimmwick_save"   // the vault holds exactly one treasure
 
     public override func load() {
