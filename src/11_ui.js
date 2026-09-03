@@ -226,6 +226,8 @@ const UI = {
           <button class="btn ghost2 ui-block" id="pauseRestartBtn">🔁 Restart Level</button>
           <button class="btn ghost2 ui-block" id="pauseMapBtn">🗺️ Level Select (Map)</button>
           <button class="btn ghost2 ui-block" id="nightBtn">🏮 The Night Board</button>
+          <button class="btn ghost2 ui-block" id="pauseShopBtn">🎩 Costume Cauldron</button>
+          <button class="btn ghost2 ui-block" id="pauseCandyBtn">🍬 Candy Store</button>
           <button class="btn ghost2 ui-block" id="townBtn">🏘️ Return to Town</button>
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🎵 Music</span><input type="range" id="musVol" class="ui-block" min="0" max="100" value="50" style="width:150px"></div>
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🔊 Sounds</span><input type="range" id="sfxVol" class="ui-block" min="0" max="100" value="80" style="width:150px"></div>
@@ -343,6 +345,11 @@ const UI = {
     tap('townBtn', ()=>{ this.togglePause(false); G.returnToHub(false); });
     tap('pauseRestartBtn', ()=>{ this.togglePause(false); AUDIO.ui(); if(G.area.startsWith('boss')) G.startBoss(G.bossDistrict||'w1'); else if(G.levelDef) G.enterLevel(G.levelDef.id); });
     tap('pauseMapBtn', ()=>{ this.togglePause(false); AUDIO.ui(); const d = G.levelDef ? G.levelDef.id.slice(0,2) : (G.bossDistrict||'w1'); G.toMap(d); });
+    // the Cauldron from ANYWHERE (owner call, Sept 3 2026 — "it needs to be very easy to find", and App
+    // Review agreed): pause is reachable from every corner of the game, so the shop is too. Closing the
+    // shop resumes play right where it was.
+    tap('pauseShopBtn', ()=>{ this.togglePause(false); AUDIO.ui(); this.G.state='shop'; this.el('shop-screen').style.display='flex'; this.renderShop('costumes'); });
+    tap('pauseCandyBtn', ()=>{ this.togglePause(false); AUDIO.ui(); this.G.state='shop'; this.el('shop-screen').style.display='flex'; this.renderShop('candy'); });
     tap('cozyBtn', ()=>{ G.toggleCozy(); this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(G.save.cozy?'ON':'OFF'); });
     tap('feedbackBtn', ()=>{ AUDIO.ui();   // opens the Mail composer — a player choosing to write is not data collection
       window.location.href = 'mailto:grimmwickgame@gmail.com?subject=' + encodeURIComponent('Grimmwick Feedback')
