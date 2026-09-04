@@ -965,7 +965,6 @@ class Player {
         }
       }
     }
-    }
     if(this.grimmAura){
       const tt = G.time, flare = this.blinkT>0 ? 0.3 : 0;
       this.grimmAura.material.opacity = 0.11 + 0.05*Math.sin(tt*2.6) + flare;
