@@ -189,6 +189,14 @@ const G = {
     if(!value || !s) return;
     let cloud = null; try{ cloud = JSON.parse(value); }catch(e){ return; }   // never spend the restore on garbage
     if(!cloud || !cloud.owned) return;
+    // 1.3.1 HOTFIX (the Reset Save black screen): three locks against the adopt-reload loop.
+    // (1) NEVER adopt a vault save with no real play — there is nothing worth restoring, and adopting
+    //     a virgin save over a virgin save re-triggered adoption on every boot, reloading forever.
+    if(!(Object.keys(cloud.levels||{}).length || Object.keys(cloud.worlds||{}).length || cloud.nightDone)) return;
+    // (2) if the vault holds exactly what is already stored, there is nothing to do
+    try{ if(localStorage.getItem('grimmwick_save') === value) return; }catch(e){}
+    // (3) at most ONE adoption attempt per session chain — sessionStorage survives our own reload
+    try{ if(sessionStorage.getItem('gw_adopted')) return; sessionStorage.setItem('gw_adopted','1'); }catch(e){}
     if((s.candy|0) || (s.iapSeen||[]).length){   // carry a boot-window grant into the adopted save
       cloud.candy = (cloud.candy|0) + (s.candy|0);
       cloud.iapSeen = [...new Set([...(cloud.iapSeen||[]), ...(s.iapSeen||[])])];
