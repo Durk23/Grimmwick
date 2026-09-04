@@ -150,10 +150,12 @@ const G = {
   persist(){ Store.set('grimmwick_save', JSON.stringify(this.save)); },
   resetSave(){
     this._vaultForce = true;   // a reset MUST reach the vault (bypasses the virgin gate) — a reinstall must never resurrect pre-reset progress
-    // a reset clears PROGRESS, never PROPERTY: costumes, masks, the Star Crown, and the Pass survive.
-    // (This also makes Reset Save the official fresh-run button for the Flawless Night board.)
+    // a reset clears PROGRESS, never PROPERTY: candy, costumes, masks, the Star Crown, and the Pass survive.
+    // (Candy joined the property list Sept 3 2026, owner call — bought or earned, a wallet is never wiped.
+    // Reset Save remains the official fresh-run button for the Flawless Night board: stars, levels, and
+    // the clock reset; the candy balance doesn't touch any of those.)
     const w = this.save || {};
-    const fresh = { candy:0, embers:0, worlds:{}, gp:{},
+    const fresh = { candy: w.candy|0, candyLifetime: w.candyLifetime|0, embers:0, worlds:{}, gp:{},
       owned: w.owned||['kid'], equipped: w.equipped||'kid',
       ownedMasks: w.ownedMasks||[], mask: w.mask||null,
       pass: !!w.pass, firstFlame: !!w.firstFlame, firstFlameOff: !!w.firstFlameOff,

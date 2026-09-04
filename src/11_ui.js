@@ -234,7 +234,7 @@ const UI = {
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🔊 Sounds</span><input type="range" id="sfxVol" class="ui-block" min="0" max="100" value="80" style="width:150px"></div>
           <button class="btn ghost2 ui-block" id="cozyBtn">🧸 Cozy Mode: OFF</button>
           <button class="btn ghost2 ui-block" id="howBtn">📖 How to Play</button>
-          <button class="btn ghost2 ui-block" id="resetBtn">🗑️ Reset Save (outfits stay)</button>
+          <button class="btn ghost2 ui-block" id="resetBtn">🗑️ Reset Save (candy &amp; outfits stay)</button>
           <button class="btn ghost2 ui-block" id="feedbackBtn">💬 Send Feedback</button>
         </div>
       </div></div>
@@ -356,7 +356,7 @@ const UI = {
     tap('feedbackBtn', ()=>{ AUDIO.ui();   // opens the Mail composer — a player choosing to write is not data collection
       window.location.href = 'mailto:grimmwickgame@gmail.com?subject=' + encodeURIComponent('Grimmwick Feedback')
         + '&body=' + encodeURIComponent('\n\n--\nGrimmwick v1.0 · from the pause menu'); });
-    tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? Candy is spent too — tap again'; } });
+    tap('resetBtn', ()=>{ if(this._resetArm){ G.resetSave(); location.reload(); } else { this._resetArm=true; this.el('resetBtn').textContent='⚠️ Really? All progress resets — tap again'; } });
     tap('shopClose', ()=>this.closeShop());
     tap('shopX', ()=>this.closeShop());
     tap('pauseX', ()=>this.togglePause(false));
@@ -576,7 +576,7 @@ const UI = {
     const G=this.G;
     const show = force!==undefined?force:(G.state!=='paused');
     if(show && G.state!=='play') return;
-    this._resetArm=false; this.el('resetBtn').textContent='🗑️ Reset Save (outfits stay)';
+    this._resetArm=false; this.el('resetBtn').textContent='🗑️ Reset Save (candy & outfits stay)';
     if(show){ G.state='paused'; this.el('pause-screen').style.display='flex'; this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(this.G.save.cozy?'ON':'OFF');
       const ub = this.el('updateBtn'); if(ub){ ub.style.display = G._updateAvail ? '' : 'none'; if(G._updateAvail) ub.textContent = '🆕 Update Grimmwick (v'+G._updateAvail+' is out!)'; }
       const inLevel = !!G.levelDef || G.area.startsWith('boss');   // Restart/Map only make sense inside a level or boss
