@@ -1054,6 +1054,7 @@ const UI = {
   renderMap(world, dNum, beaten){
     const nmOn = !!this.G.nmSel;   // must match enterLevel's arming rule exactly — a stale nightDone term here left the toggle invisible for new players (audit fix)
     this.el('map-screen').classList.toggle('nm', nmOn);
+    this.el('map-screen').style.background = this.G.mapView ? 'transparent' : '';   // re-own the 3D transparency EVERY render — a stale inline 'transparent' let the disposed 3D frame bleed through the first nightmare toggle (repro-proven fix)
     const G=this.G, district=this._mapDistrict;
     let levels = [];
     if(typeof LEVEL_LISTS!=='undefined') for(const list of LEVEL_LISTS) for(const l of list) if(l.district===district) levels.push(l);
@@ -1195,8 +1196,15 @@ const UI = {
     const fmt = v => typeof v==='number' ? (Math.floor(v/60)+':'+String(Math.floor(v%60)).padStart(2,'0')) : v;
     if(stats.nightmare){
       this.el('clearName').textContent = stats.levelName || '';
-      this.el('clearStars').innerHTML = '<div class="cstar"><div class="big">🌑</div><div class="lbl">NIGHTMARE CLEAR</div></div>';
-      this.el('clearStats').innerHTML = `⏱️ Time: <b>${fmt(stats.time)}</b><div style="margin-top:6px;opacity:.85">🌑 Best: <b>${fmt(stats.best)}</b></div>`;
+      // NIGHTMARE'S OWN STARS on the card (owner call, option A): three dark hunts, and all three open the next lantern
+      const nst = stats.stars||{};
+      const nSlot = (on,icon,lbl)=> on
+        ? `<div class="cstar"><div class="big">🌑</div><div class="lbl">${lbl}</div></div>`
+        : `<div class="cstar off" style="opacity:.55"><div class="big">${icon}</div><div class="lbl">${lbl}</div></div>`;
+      this.el('clearStars').innerHTML = nSlot(nst.time,'⏱','FAST') + nSlot(nst.candy,'🍬','ALL CANDY') + nSlot(nst.clean,'💜','CLEAN');
+      const n3 = nst.time && nst.candy && nst.clean;
+      this.el('clearStats').innerHTML = `⏱️ Time: <b>${fmt(stats.time)}</b><div style="margin-top:6px;opacity:.85">🌑 Best: <b>${fmt(stats.best)}</b></div>`
+        + (n3 ? '' : `<div style="margin-top:6px;opacity:.85">🔒 All 3 🌑 stars open the next nightmare</div>`);
       this.el('clearNext').style.display = stats.nextId ? 'block' : 'none';
       this.setPrompt(null);
       this.el('clear-screen').style.display='flex';
