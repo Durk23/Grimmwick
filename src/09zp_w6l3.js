@@ -3,36 +3,49 @@
 // district's ceiling-lane gimmick played start to finish, and Frostmere's CLIMB level (owner law 6a: climbing
 // is FUN — the frozen waterfall is a BRANCHING climb with rhythm candy and boosted-hop targets, never a
 // ladder-chore). Signature gimmick: DROPPING SPIKE ICICLES — shimmer + drip + growing floor-glow (~0.7s, the
-// bombardment telegraph language) then the drop; a graze costs a heart, never a one-shot. Full
-// introduce->twist->escalate->master at D3 density ("fairly competitive" — 10 threats on three lanes:
-// ground penguins/snowman/boos · grotto-air Blizzard Bats · the icicle ceiling lane), plus the district
-// MID-BOSS: THE SNOWBALL TRIPLETS (Gourd Triplets tradition — deterministic take-turns rollers).
+// bombardment telegraph language) then the drop; a graze costs a heart, never a one-shot.
+// RETUNE (owner call, Sept 4 2026): Glimmerfields is POST-STORY — the unofficial mastery exam, one column
+// RIGHT of D5 on the curve, main-game fair (never Kaizo/Nightmare). This pass: 13 roaming threats on three
+// lanes (ground penguins/snowmen · float Snow-Boos · air Blizzard Bats) + 16 SpikeIcicles whose phases compose
+// into TWO readable left-to-right waves + the meaner TRIPLETS mid-boss (Gourd Triplets tradition —
+// deterministic take-turns rollers) + a second gap (the undercut) + the ice-run-INTO-crevasse master beat.
+// Checkpoint law tightened to the D5 rule: CP0 + ONE lit lantern at 51% — the walk-back is part of the price.
 //   BEAT 1 THE LAST LAMPPOSTS (approach)      x -8..28  — CP0. The village's last festival lights; one
 //          Frostbite Penguin to warm up on; the MYSTERY IGLOO in a clear pocket; the grotto mouth looms.
 //   BEAT 2 THE FIRST DRIPS (INTRODUCE)        x 28..54  — under the ice ceiling: TWO icicles over safe flat
-//          ground (period 4.2, staggered), the whole telegraph readable at leisure; a Snow-Boo drifts in.
+//          ground (period 4.2, staggered), the whole telegraph readable at leisure; a penguin patrols the
+//          pocket BETWEEN the columns (ground+ceiling composing from the introduce); a Snow-Boo drifts in.
 //   BEAT 3 THE EMBEDDED STAIR (TWIST)         x 54..84  — embed-icicles bite the snow and STAY: standable
-//          stumps that OPEN the high road (stump -> stump -> ledges, shield lantern up top); a penguin works
-//          the low lane beneath, a late icicle + the Spooky Snowman guard the convergence. Routes cross in sight.
-//   BEAT 4 THE FROZEN WATERFALL (the CLIMB)   x 84..118 — CP1. The cliff: climb the frozen cascade. JUNCTION
-//          at the notch — LEFT strand: rhythm candy + the GOLDEN PUMPKIN alcove (its gold glow visible from
-//          the main wall) · RIGHT/straight: the quick way to the shelf. Icicles + a Blizzard Bat work the
-//          shelf crossing; Bat Wings at the lip; a bat-diver harries the ledge descent. Quiet prop at the base.
-//   BEAT 5 THE SNOWBALL TRIPLETS (MID-BOSS)   x 120..146 — CP2. The grotto's festival-lit great hall: three
-//          rollers take turns charging the arena on fixed staggered clocks, GROWING as they roll. Hop them,
-//          or stomp each once (they die on stomp) — pure attention test, announced with full pomp.
-//   BEAT 6 THE DRIPSTONE WAY (ESCALATE+MASTER) x 146..176 — a crevasse hop, then the icicle CORRIDOR: five
-//          columns whose phases compose into a readable left-to-right WAVE — the dodge rhythm IS the path.
-//          A Snow-Boo drifts the corridor (stare it into a standable ice block: your own pause button).
+//          stumps that OPEN the high road (stump -> stump -> ledges, shield lantern up top); a SNOW-BOO
+//          HOVERS THE STUMPS (stare it into its block = a bonus step — pressure that doubles as route tech);
+//          a penguin works the low lane, a late icicle + the Spooky Snowman guard the convergence.
+//   BEAT 4 THE FROZEN WATERFALL (the CLIMB)   x 84..118 — CP1 at x90 (the level's ONE lit lantern, 51%). The
+//          cliff: climb the frozen cascade. JUNCTION at the notch — LEFT strand: rhythm candy + the GOLDEN
+//          PUMPKIN alcove · RIGHT/straight: the quick way. THE FALLS' OWN TEETH (retune): one icicle beside
+//          EACH strand, half-period staggered — dodge WHILE climbing by clinging the candy-marked safe side
+//          (the D5 chain). WAVE #1 (three columns, 0.7 steps) + TWO staggered Blizzard Bats work the shelf;
+//          Bat Wings at the lip; THE UNDERCUT (retune, gap #2): the descent ledges now hover a 4u void while
+//          the third bat dives the lane. Quiet prop at the base.
+//   BEAT 5 THE SNOWBALL TRIPLETS (MID-BOSS)   x 120..146 — the grotto's festival-lit great hall (no lantern —
+//          the exam's walk-back rule): three rollers take turns charging on fixed staggered clocks, GROWING
+//          as they roll — retuned meaner (speed 3.8, grown top 2.4 vs the 2.6 held jump). Hop them, or stomp
+//          each once (they die on stomp) — pure attention test, announced with full pomp.
+//   BEAT 6 THE DRIPSTONE WAY (ESCALATE+MASTER) x 146..176 — THE ICE RUN (tag:'ice') carries your momentum
+//          INTO the crevasse hop off an honest snow lip, then the CORRIDOR: WAVE #2 — SIX columns at exact
+//          0.7 steps (a perfect 4.2s loop, no two fall together) — the dodge rhythm IS the path, and under it
+//          the full exam: a Snow-Boo (freeze = your own pause button), a diving corridor bat, a second Spooky
+//          Snowman that hops exactly when you look up at a telegraph, and a rear-guard penguin.
 // Reads UNMISTAKABLY Frostmere-underground: W6PAL moonlit snow outside, blue-dark ice-rock walls + warm
-// lantern pools inside (2 real PointLights, emissive fakes elsewhere — igloo + GP + CP1 + CP2 make 6 total,
-// the budget ceiling), festival strings some villager hung right through the cave, aurora glimpses at both
-// mouths. Comparable heights throughout (tap 1.8 / held 2.6 / double 3.3; max main-route rise 1.5, the one
-// big rise is a GATED climb; crevasse 4.4 = a comfortable held hop, candy-arc telegraphed). ICE (tag:'ice')
-// is deliberately ABSENT — slick floors never combine with the crevasse in 6-1..6-3 (owner law). Deterministic
-// to the tooth — icicle clocks fixed from level start (the embed stumps have ALWAYS landed by the time anyone
-// reaches them), roller clocks fixed, seeded rand() only inside baked cosmetic deco. No Math.random on the
-// critical path. NO Leap of Faith (both already placed — sacred).
+// lantern pools inside (3 real lamp PointLights, emissive fakes elsewhere — igloo + GP + CP1 + 3 pools make
+// 6 total, the budget ceiling; CP2's removal freed the third pool), festival strings some villager hung right
+// through the cave, aurora glimpses at both mouths. Comparable heights throughout (tap 1.8 / held 2.6 /
+// double 3.3; max main-route rise 1.5, the one big rise is a GATED climb; crevasse 4.4 = a comfortable held
+// hop, candy-arc telegraphed; undercut hops <=1u across, all descending). ICE (tag:'ice') appears ONCE, as
+// the crevasse's run-up (retune, Sept 4 2026: 6-3+ may compose slick+gap — momentum management off an honest
+// snow lip; 6-1/6-2 still keep the verbs apart, they teach). Deterministic to the tooth — icicle clocks fixed
+// from level start (the embed stumps have ALWAYS landed by the time anyone reaches them), roller clocks
+// fixed, seeded rand() only inside baked cosmetic deco. No Math.random on the critical path. NO Leap of
+// Faith (both already placed — sacred).
 
 // ---- a frozen CASCADE: the visible climbable — translucent ice columns + ripple knuckles merged to ONE
 // transparent draw call (mergeStrands; bakeGroup would discard the glassy opacity). Caller adds the matching
@@ -54,8 +67,8 @@ function w6l3Cascade(S, x, y0, y1, w){
   return fallM;
 }
 
-// ---- a warm grotto LAMP on a post: cage + flame + halo. real:true spends one of the level's two true
-// PointLights (max ~6/scene incl. igloo, GP and the two lit checkpoints); false = emissive fake, zero cost. ----
+// ---- a warm grotto LAMP on a post: cage + flame + halo. real:true spends one of the level's three true
+// PointLights (max ~6/scene incl. igloo, GP and the one lit checkpoint); false = emissive fake, zero cost. ----
 function w6l3Lamp(G, deco, x, y, real){
   const g = new THREE.Group();
   const post = mesh('cyl',[0.07,0.1,y,6], mat(W6PAL.woodD)); post.position.set(x,y/2,-0.9); g.add(post);
@@ -97,18 +110,23 @@ function buildW6L3(G){
   G.ents.add(new Checkpoint(2, 0, 1.6, 0, {noLight:true}));            // CP0 — start
   signPost(G, 5, 1.7, -0.12, "ICICLE GROTTO. The road goes UNDER the frozen falls - and the ceiling in there has TEETH. When an icicle shimmers and drips, its landing spot glows. That glow is a promise. Don't stand on promises.");
   // FROSTBITE PENGUIN #1 — one polite patroller on open snow to warm up on (squawk = the telegraph; the slide
-  // runs its fixed length and it waddles home). Patrol reach 3.8..8.2 — a full 13.8u clear of the igloo@22.
-  G.ents.add(new FrostbitePenguin(G, 14, 0, 0, {phase:0.0, range:2.2, dir:1, speed:1.2}));   // fleet-audit fix: home 6 slid its toboggan back through CP0 — from 14 its wakeR can't even see an idle spawn player
+  // runs its fixed length and it waddles home). REACH MATH: patrol 11.8..16.2, wakeR 5 -> it engages players
+  // 6.8..21.2 only — an idle spawn at x2 is 4.8u outside its sight, and the igloo@22 sits 0.8u past the wake
+  // zone (patrol edge 5.8u from the door ~= the ~6u clear-patch law; fleet-blessed placement, unchanged).
+  // (retune-verify fix: the beat-1 warm-up penguin is GONE — home 6 slid through CP0, home 14's slide
+  // envelope crossed the igloo pocket at x22 by 3.1u; no home on this stretch satisfies both laws, and the
+  // beat-2 penguin between the icicle columns teaches the squawk just as well. Roaming threats: 12.)
   candyLine(G, [[6,0.9,0],[10,0.9,0],[13,0.9,0]], 3);
   G.ents.add(new Crow(14, 0.95, 2.2));                                 // winter crow #1 — flaps off when neared
   // the village's last festival strings (the kit's marquee — someone lit the way to the falls)
   deco.add(w6LightPost(9, -1.6, 3.2)); deco.add(w6LightPost(15, -1.6, 3.2)); deco.add(w6LightPost(21, -1.6, 3.2));
   w6String(L, 9, 3.2, 15, 3.2, {}); w6String(L, 15, 3.2, 21, 3.2, {});
-  // THE MYSTERY IGLOO — the Frostmere gamble, in a CLEAR POCKET (CLEAR-PATCH LAW: penguin#1's patrol reach ends
-  // 13.8u left; the first icicle column is 14u right; both Blizzard Bat homes sit 80u+ deep in the grotto (they
-  // drift toward the player after diving — kept far by design); SnowBoo#1@49 is a leashless drifter like w5l1's
-  // Shadow Copies, but it lives 27u PAST the igloo and only closes on a player who has already moved on. Opening
-  // is a deliberate safe act; the penguin ambush spawns on its own ring with 1s grace.)
+  // THE MYSTERY IGLOO — the Frostmere gamble, in a CLEAR POCKET (CLEAR-PATCH LAW, re-audited for the retune:
+  // penguin#1's patrol edge is 5.8u left and its wake zone stops 0.8u short of the door; penguin#2@40's worst
+  // toboggan reach is x28.9 — 6.9u clear; the first icicle column is 14u right; all four Blizzard Bat homes sit
+  // 77u+ deep in the grotto (they drift toward the player after diving — kept far by design); Snow-Boo homes at
+  // 49/60.5/161 are all >=27u past the igloo and leashed to chaseR 14 of home. Opening is a deliberate safe
+  // act; the penguin ambush spawns on its own ring with 1s grace.)
   { const ig = new MysteryIgloo(22, 0, -0.5, 0.18); G.coffins.push(ig); G.ents.add(ig); }
 
   // =============================== BEAT 2 — THE FIRST DRIPS (x 28..54): INTRODUCE the icicle ===============================
@@ -122,6 +140,11 @@ function buildW6L3(G){
   G.ents.add(new SpikeIcicle(G, 44, 7.0, {period:4.2, phase:2.1}));
   candyLine(G, [[32.5,0.9,0],[34.5,0.9,0]], 2);                        // candy parks you SHORT of each column...
   candyLine(G, [[39,0.9,0],[41.5,0.9,0]], 3);                          // ...then pulls you through on the gap in the clock
+  // FROSTBITE PENGUIN #2 (RETUNE) — patrols the pocket BETWEEN the columns, so the introduce already composes
+  // ground+ceiling: cross column one on its clock, hop the squawk->toboggan (a tap always clears a penguin),
+  // cross column two. Patrol 37.8..42.2 stays clear of both drop zones (35.5..36.5 / 43.5..44.5) — the pockets
+  // are the fight floor, the columns stay pure timing. Slide reach 28.9 = 6.9u clear of the igloo@22.
+  G.ents.add(new FrostbitePenguin(G, 40, 0, 0, {phase:0.9, range:2.2, dir:-1, speed:1.3}));
   w6l3Lamp(G, deco, 40, 2.6, true);                                    // REAL LIGHT #1 — the first warm pool in the dark
   // SNOW-BOO #1 — the stare rule's winter twist arrives: face it and it freezes into a STANDABLE ice block
   G.ents.add(new SnowBoo(G, 49, 0, 0, {phase:0.0, speed:2.0, range:10}));
@@ -134,6 +157,11 @@ function buildW6L3(G){
   // clocks land them within seconds of level start, so the stair has always already been built when you arrive.
   G.ents.add(new SpikeIcicle(G, 59, 9.0, {period:4.2, phase:0.7, embed:true, len:1.8}));    // stump top ~1.1
   G.ents.add(new SpikeIcicle(G, 62, 9.0, {period:4.2, phase:1.6, embed:true, len:2.6}));    // stump top ~1.6
+  // SNOW-BOO #2 (RETUNE) — HOVERS THE STUMPS: it drifts the stair whenever your back is turned, and the
+  // counter is the level's own verb — STARE it mid-climb and its ice block (floats ~1.3, top ~2.8) freezes
+  // into a BONUS STEP toward the first ledge at 3.1. Pressure that doubles as route tech, the D5 way.
+  // Home 60.5 = 38.5u from the igloo (>=15u boo law); leashed chaseR 14 -> it never sees CP0 or CP1.
+  G.ents.add(new SnowBoo(G, 60.5, 1.3, 0, {phase:1.3, speed:2.0, range:10}));
   // THE HIGH ROAD — stump -> stump -> frost ledges (every rise <=1.5, slight over-clearance throughout)
   platform(G, 65.5, 3.1, 0, 3, 3, LEDGE);                              // spans 64..67 (+1.5 off stump B)
   platform(G, 70, 4.4, 0, 3.5, 3, LEDGE);                              // spans 68.25..71.75 (+1.3)
@@ -148,12 +176,21 @@ function buildW6L3(G){
   G.ents.add(new SpikeIcicle(G, 79, 9.0, {period:4.2, phase:1.4}));    // the convergence column — both roads read it
   // THE SPOOKY SNOWMAN — perfectly still while watched, hops closer when you look away (and you WILL look away:
   // there's an icicle telegraph overhead). Eyes flare cyan mid-hop; stomp pops the head for the comedy window.
-  G.ents.add(new SpookySnowman(G, 81, 0, 0, {phase:0.0, watchR:11, aggroR:7}));
+  // aggroR trimmed 7->5.0 for CP1@90 (retune): a rightward-passing player can bait it at most ~3u east (hop
+  // ~1.7u per ~1.3s vs run speed), so its drag-east worst case is ~x84 -> engage ceiling 89.0 < the lantern.
+  // 5.0 still blankets the whole 77..83.5 convergence, where every route crosses within 4u of it.
+  G.ents.add(new SpookySnowman(G, 81, 0, 0, {phase:0.0, watchR:11, aggroR:4.5}));   // retune-verify: 4.5 keeps a drag-east kite ≥1.5u short of CP1's lantern
   candyLine(G, [[77.5,0.9,0],[83,0.9,0]], 3);
 
   // =============================== BEAT 4 — THE FROZEN WATERFALL (x 84..118): the CLIMB + CP1 + GP #1 ===============================
-  G.ents.add(new Checkpoint(85, 0, 1.6, 1));                           // CP1 — LIT, mid-level checkpoint #1
-  signPost(G, 88, 1.7, -0.12, "THE FROZEN FALLS. Hold UP on the ice to climb - JUMP off with a big hop. At the notch, choose your strand: LEFT is the long way, all sweets and a golden glow. STRAIGHT UP is the quick way. A waterfall has no wrong way up - only a braver one.");
+  // CP1 — THE level's ONE lit lantern (retune: mastery-exam checkpoint law, CP0 + one mid lantern; the
+  // walk-back is part of the price). x90 = 51% of the 176u course, at the falls' foot.
+  // RESPAWN-SAFETY REACH MATH (do not regress): penguin#3@68 engages <=75.2 (patrol 65.8..70.2 + wakeR 5) ·
+  // snowman@81 aggroR 5.0, drag-east worst case ~x84 -> engage ceiling 89.0 · climb-icicle drop lanes are
+  // 91.2..92.2 and 94.2..95.2 (nearest edge 1.2u clear of an idle player at 90; fixed clocks, floor glows) ·
+  // bat#2 patrols >=97.4 with aggroR 4.0 -> engages >=93.4. Nothing reaches a player idling at the lantern.
+  G.ents.add(new Checkpoint(90, 0, 1.6, 1));
+  signPost(G, 88, 1.7, -0.12, "THE FROZEN FALLS. Hold UP on the ice to climb - JUMP off with a big hop. At the notch, choose your strand: LEFT is the long way, all sweets and a golden glow. STRAIGHT UP is the quick way. And mind the falls' own TEETH - icicles grow on frozen water, and they keep the same old clock. Cling wide of the shimmer.");
   // the cliff massif: the road ends at a 7.2 wall; the shelf on top IS the route (falls off the climb land on
   // soft snow at the base — a climb miss costs seconds, never a heart: climbing stays FUN, owner law 6a)
   { const m = mesh('box',[18,7.2,10], mat(SNOW)); m.position.set(105,3.6,0); S.add(m);
@@ -164,74 +201,115 @@ function buildW6L3(G){
   const cascadeM = w6l3Cascade(S, 95.3, 0, 7.8, 1.6);
   G.world.addBox(95.3, 0, 0, 1.1, 7.8, 1.2, {type:'climb'});
   w6l3Lamp(G, deco, 91, 2.8, true);                                    // REAL LIGHT #2 — the pool at the foot of the falls
-                                                                       // (scene total 6: igloo + GP + CP1 + CP2 + 2 pools = the ceiling)
-  candyLine(G, [[95.3,1.8,0],[95.3,3.4,0],[95.3,4.6,0]], 3);           // rhythm candy up the main strand
+                                                                       // (scene total 6: igloo + GP + CP1 + 3 pools = the ceiling)
+  candyLine(G, [[95.5,1.8,0],[95.5,3.4,0],[95.5,4.6,0]], 3);           // rhythm candy up the main strand — parked on
+                                                                       // the SAFE cling side (east of the tooth's lane)
   // THE JUNCTION NOTCH — a frost ledge jutting left at 4.6: hop off here for the brave branch
   platform(G, 93.6, 4.6, 0, 2.0, 2.6, LEDGE);                          // spans 92.6..94.6
   candyLine(G, [[93.6,5.3,0],[92.5,5.6,0]], 2);                        // the quiet lure LEFT (toward the gold glow)
   // THE LEFT BRANCH — a freestanding side-spout pillar: candy all the way up, the GOLDEN PUMPKIN at the top
   const pillarM = w6l3Cascade(S, 92.2, 4.2, 9.8, 0.9);
   G.world.addBox(92.2, 4.6, 0, 1.1, 5.0, 1.2, {type:'climb'});
-  candyLine(G, [[92.2,6.6,0],[92.2,8.0,0],[92.2,9.2,0]], 3);
+  candyLine(G, [[92.45,6.6,0],[92.45,8.0,0],[92.45,9.2,0]], 3);        // pillar rhythm candy — the safe cling side
   platform(G, 90, 9.2, 0, 2.6, 2.6, LEDGE);                            // the hidden alcove (boosted hop LEFT off the pillar)
   G.ents.add(new GoldPumpkin(90, 10.0, 0, 1));                         // GOLDEN PUMPKIN idx 1 — behind the branch; its
                                                                        // gold PointLight glow bleeds across the main wall
   platform(G, 93.8, 8.4, 0, 2.2, 2.6, LEDGE);                          // the way back: alcove -> return ledge -> shelf
   candyLine(G, [[93.8,9.0,0],[95.5,8.2,0]], 2);
   candyLine(G, [[96.6,8.0,0],[98.5,8.0,0]], 2);                        // the shortcut's climb-exit hop target on the lip
-  // THE SHELF CROSSING — icicles hang from the high vault; a Blizzard Bat works the grotto air
+  // THE FALLS' OWN TEETH (RETUNE — dodge WHILE climbing, the D5 chain): one icicle rooted in EACH frozen
+  // strand, phases a half-period apart so exactly one side works at a time. Drop lanes (|dx|<0.5): main
+  // strand 94.2..95.2 -> SAFE CLING 95.2..95.85, where the rhythm candy sits · pillar 91.2..92.2 -> SAFE
+  // CLING 92.2..92.75, ditto. The 0.7s shimmer+drip reads at eye level on the wall; a graze costs a heart and
+  // a hop-off lands on soft snow (seconds) — never both. The notch ledge keeps an honest 92.6..94.2 stand-and-
+  // choose span clear of both lanes, and the return ledge at y8.4 rides ABOVE the main tooth's whole path.
+  G.ents.add(new SpikeIcicle(G, 94.7, 7.5, {period:4.2, phase:3.0}));
+  G.ents.add(new SpikeIcicle(G, 91.7, 9.6, {period:4.2, phase:0.9}));
+  // THE SHELF CROSSING — WAVE #1 (RETUNE): three columns at exact 0.7 steps rolling left-to-right across the
+  // shelf, TWO phase-staggered Blizzard Bats in the grotto air. Pockets 103.5..106 and 107..109.5 are the
+  // safe lanes; bat #2 guards the lip candy so the climb-exit hop is a decision, not a freebie.
   w6l3Ceiling(deco, 96, 118, 11.2);
-  G.ents.add(new SpikeIcicle(G, 103, 11.2, {period:4.2, phase:0.6, floorY:7.2}));
-  G.ents.add(new SpikeIcicle(G, 110, 11.2, {period:4.2, phase:2.7, floorY:7.2}));
-  G.ents.add(new BlizzardBat(G, 106, 9.9, 0, {phase:0.2, range:3, period:3.6, aggroR:4.5}));   // grotto air #1 (84u+ from the igloo)
+  G.ents.add(new SpikeIcicle(G, 103,   11.2, {period:4.2, phase:0.6, floorY:7.2}));
+  G.ents.add(new SpikeIcicle(G, 106.5, 11.2, {period:4.2, phase:1.3, floorY:7.2}));
+  G.ents.add(new SpikeIcicle(G, 110,   11.2, {period:4.2, phase:2.0, floorY:7.2}));
+  G.ents.add(new BlizzardBat(G, 99.8, 9.6, 0, {phase:1.8, range:2.4, period:3.6, aggroR:4.0}));   // bat #2 THE LIP GUARD (RETUNE — engages >=93.4, clear of CP1@90)
+  G.ents.add(new BlizzardBat(G, 106, 9.9, 0, {phase:0.2, range:3, period:3.6, aggroR:4.5}));   // bat #1 THE SHELF BAT (84u+ from the igloo)
   candyLine(G, [[100.5,8.0,0],[106.5,8.0,0],[112.5,8.0,0]], 3);        // the dodge rhythm traced along the shelf
-  G.ents.add(new BonkLantern(G, 113.5, 8.6, 0, 'bat'));                // Bat Wings at the lip — GLIDE the descent (a toy)
-  // THE DESCENT — frost ledges step down the far face (every drop a safe fall onto ground at 114+)
+  G.ents.add(new BonkLantern(G, 113.5, 8.6, 0, 'bat'));                // Bat Wings at the lip — GLIDE the undercut (a toy with a target)
+  // THE UNDERCUT (RETUNE — the level's second gap): the great-hall floor now starts at 118, opening a 4u void
+  // under the descent (massif east face 114 -> floor 118, pitDressing'd, visible from the lip). The frost
+  // ledges HOVER the void — lip(7.28) -> 4.8 (spans 115..117.6) -> 2.4 (spans 118..120.6) -> floor: every hop
+  // <=1u across and descending (over-clearance law), while bat #3 dives the lane on its fixed clock. A miss
+  // costs a heart + the CP1 walk-back (the exam's price); a confident runner long-jumps the whole thing.
   platform(G, 116.3, 4.8, 0, 2.6, 3, LEDGE);                           // spans 115..117.6
   platform(G, 119.3, 2.4, 0, 2.6, 3, LEDGE);                           // spans 118..120.6
-  groundX(G, 114, 148, SNOW);                                          // the great-hall floor
-  G.ents.add(new Heart(116.3, 5.7, 0));                                // a heart before the triplets — D3 is kind, once
+  groundX(G, 118, 142.5, SNOW);                                        // the great-hall floor (ends at the ICE RUN — beat 6)
+  G.ents.add(new Heart(116.3, 5.7, 0));                                // a heart riding the void hop — the exam is kind, once
   candyLine(G, [[118.6,3.1,0],[120,3.3,0]], 2);
-  G.ents.add(new BlizzardBat(G, 114.5, 6.5, 0, {phase:1.4, range:2.5, period:3.6, aggroR:3.5}));   // grotto air #2 — dives the descent (fleet-audit fix: re-homed off CP2's lantern — a triplets death must never respawn into a dive lane)
+  G.ents.add(new BlizzardBat(G, 114.5, 6.5, 0, {phase:1.4, range:2.5, period:3.6, aggroR:3.5}));   // bat #3 THE DESCENT DIVER — home hovers the undercut void, flagging it (CP2 is gone; nearest respawn is CP1@90, 24.5u west — no dive lane touches a respawn)
 
-  // =============================== BEAT 5 — THE SNOWBALL TRIPLETS (x 120..146): MID-BOSS + CP2 ===============================
-  G.ents.add(new Checkpoint(121.5, 0, 1.6, 2));                        // CP2 — LIT, mid-level checkpoint #2 (>100u rule)
+  // =============================== BEAT 5 — THE SNOWBALL TRIPLETS (x 120..146): MID-BOSS ===============================
+  // (RETUNE: CP2 deleted per the mastery-exam checkpoint law — CP0 + the ONE lit lantern at x90. A triplets
+  //  death now walks back through the falls climb; the D5 rule says the walk-back is part of the price.)
   // announced with full pomp (the Gourd Triplets tradition — a loving nod, deterministic take-turns patterns)
-  signPost(G, 123, 1.7, 0.12, "PRESENTING... THE SNOWBALL TRIPLETS! Undefeated! (Nobody has checked.) They start small. They do not STAY small. They were ASKED to charge one at a time. They are TRIPLETS. Hop the little ones - or flatten each brother once.");
+  signPost(G, 123, 1.7, 0.12, "PRESENTING... THE SNOWBALL TRIPLETS! Undefeated! (Nobody has checked.) They start small. They do not STAY small. They were ASKED to charge one at a time. They are TRIPLETS. And they have been PRACTICING. Hop the little ones - or flatten each brother once.");
   G.ents.add(new Crow(126, 0.95, 2.4));                                // winter crow #2 — flees as the show begins
   // the festival-lit great hall: villagers strung the arena for the show
   w6l3Ceiling(deco, 120, 146, 12.0);
   deco.add(w6LightPost(125, -1.8, 3.4)); deco.add(w6LightPost(134, -1.8, 3.4)); deco.add(w6LightPost(143, -1.8, 3.4));
   w6String(L, 125, 3.4, 134, 3.4, {}); w6String(L, 134, 3.4, 143, 3.4, {});
   deco.add(w6GiftBox(124.5, -2.2, 0.8)); deco.add(w6GiftBox(143.5, -2.1, 0.7));   // presents for the winners
-  // THE TRIPLETS — three rollers on one lane, staggered thirds of a shared beat, alternating directions; each
-  // GROWS as it rolls (r0 0.35 -> r1 1.1 — hop the big end with a HELD jump, or stomp: one stomp each, forever)
-  G.ents.add(new SnowballRoller(G, 142, 0, 0, {x1:124, speed:3.6, r0:0.35, r1:1.1, pause:1.4, phase:0.0}));
-  G.ents.add(new SnowballRoller(G, 124, 0, 0, {x1:142, speed:3.6, r0:0.35, r1:1.1, pause:1.4, phase:2.1}));
-  G.ents.add(new SnowballRoller(G, 142, 0, 0, {x1:124, speed:3.6, r0:0.35, r1:1.1, pause:1.4, phase:4.2}));
+  // THE TRIPLETS (RETUNED MEANER — owner call Sept 4: speed 3.8, r1 1.2) — three rollers on one lane,
+  // staggered exact thirds of the shared 6.14s beat (18u/3.8 + 1.4 pause), alternating directions; each GROWS
+  // as it rolls (r0 0.35 -> r1 1.2: grown top 2.4 vs the 2.6 held jump — 0.2 over-clearance at the very worst
+  // end of the lane, comfy anywhere earlier). Hop the big end with a HELD jump, or stomp: one stomp each, forever.
+  G.ents.add(new SnowballRoller(G, 142, 0, 0, {x1:124, speed:3.8, r0:0.35, r1:1.2, pause:1.4, phase:0.0}));
+  G.ents.add(new SnowballRoller(G, 124, 0, 0, {x1:142, speed:3.8, r0:0.35, r1:1.2, pause:1.4, phase:2.046}));
+  G.ents.add(new SnowballRoller(G, 142, 0, 0, {x1:124, speed:3.8, r0:0.35, r1:1.2, pause:1.4, phase:4.092}));
   candyLine(G, [[128,2.7,0],[133,2.7,0],[138,2.7,0]], 3);              // hop-height candy — the arc that clears a grown ball
   candyLine(G, [[126,0.9,0],[140,0.9,0]], 2);
 
   // =============================== BEAT 6 — THE DRIPSTONE WAY (x 146..176): ESCALATE + MASTER + finish ===============================
-  signPost(G, 147, 1.7, -0.1, "THE DRIPSTONE WAY. The ceiling plays its tune LEFT to RIGHT, round and round - dance the drops like a song you know. And mind the crack in the floor. The mountain yawned once and never shut its mouth.");
-  // the CREVASSE — a 4.4u held hop (comfortable vs the 5.5 ceiling), candy-arc telegraphed; the fall costs a
-  // heart + the walk back to CP2 (pitDressing = the visible danger; NEVER combined with slick ice here)
+  signPost(G, 140.5, 1.7, -0.1, "THE DRIPSTONE WAY. First: the floor ahead turns to GLASS, and past the glass the mountain yawned once and never shut its mouth. Carry your speed across the ice and JUMP from the snow lip. Then the ceiling plays its tune LEFT to RIGHT, round and round - dance the drops like a song you know.");
+  // THE ICE RUN INTO THE CREVASSE (RETUNE — the master beat composes slick+gap, sanctioned for 6-3+): 4.4u of
+  // glossy tag:'ice' (the kit's emissive sheen strip telegraphs the surface change from a screen away), then a
+  // 1.1u HONEST SNOW LIP — grippy, wide enough to check your speed and set the takeoff — then the 4.4u held
+  // hop (comfortable vs the 5.5 ceiling), candy-arc telegraphed. Momentum management, never a blind slide-off:
+  // the lip is the promise kept. The fall costs a heart + the CP1 walk-back (pitDressing = the visible danger).
+  w6IceX(G, 142.5, 146.9);
+  groundX(G, 146.9, 148, SNOW);                                        // the honest snow lip at the crack's edge
   candyLine(G, [[147,1.3,0],[150.2,2.9,0],[153.6,1.3,0]], 3);
   groundX(G, 152.4, 180, SNOW);
-  // THE ICICLE WAVE — five columns, phases at exact 0.7 steps (= one telegraph): as each drops, the NEXT starts
-  // shimmering — the wave rolls left-to-right forever and the dodge rhythm IS the path. MASTER the gimmick here.
-  w6l3Ceiling(deco, 154, 172, 7.0);
+  // THE ICICLE WAVE — WAVE #2 (RETUNE: grown to SIX columns at exact 0.7 steps, 3.2 spacing — six phases
+  // cover the full 4.2 period, a PERFECT LOOP: as each drops the next shimmers, no two ever fall together,
+  // and the wave rolls left-to-right forever at ~4.6u/s. Ride it. Drop zones are 1u wide, so every pocket is
+  // a 2.2u safe lane, and the crevasse landing keeps a 1.3u clear shelf (152.4..153.7) before column one.
+  w6l3Ceiling(deco, 153.4, 172, 7.0);
   w6String(L, 158, 5.8, 164, 5.8, {sag:0.5});                          // someone lit the way out, bless them
-  G.ents.add(new SpikeIcicle(G, 156,   7.0, {period:4.2, phase:0.0}));
-  G.ents.add(new SpikeIcicle(G, 159.5, 7.0, {period:4.2, phase:0.7}));
-  G.ents.add(new SpikeIcicle(G, 163,   7.0, {period:4.2, phase:1.4}));
-  G.ents.add(new SpikeIcicle(G, 166.5, 7.0, {period:4.2, phase:2.1}));
-  G.ents.add(new SpikeIcicle(G, 170,   7.0, {period:4.2, phase:2.8}));
-  candyLine(G, [[157.8,0.9,0],[161.2,0.9,0],[164.7,0.9,0],[168.3,0.9,0]], 4);   // candy sits in the wave's safe pockets
-  // SNOW-BOO #2 — drifts the corridor when unwatched; STARE it into a standable ice block: the level's own
-  // learned verbs stack — freeze yourself a pause between drops (the block is safe, the glow never lies)
+  G.ents.add(new SpikeIcicle(G, 154.2, 7.0, {period:4.2, phase:0.0}));
+  G.ents.add(new SpikeIcicle(G, 157.4, 7.0, {period:4.2, phase:0.7}));
+  G.ents.add(new SpikeIcicle(G, 160.6, 7.0, {period:4.2, phase:1.4}));
+  G.ents.add(new SpikeIcicle(G, 163.8, 7.0, {period:4.2, phase:2.1}));
+  G.ents.add(new SpikeIcicle(G, 167,   7.0, {period:4.2, phase:2.8}));
+  G.ents.add(new SpikeIcicle(G, 170.2, 7.0, {period:4.2, phase:3.5}));
+  candyLine(G, [[155.8,0.9,0],[159,0.9,0],[162.2,0.9,0],[165.4,0.9,0],[168.6,0.9,0]], 5);   // candy sits in the wave's safe pockets
+  // THE CORRIDOR GAUNTLET (RETUNE — the exam proper: every verb the level taught, composed under the wave;
+  // all three lanes busy, every threat on its own fixed clock, the pockets always safe from the ceiling):
+  // SNOW-BOO #3 — drifts when unwatched; STARE it into a standable ice block: the level's own learned verbs
+  // stack — freeze yourself a pause button between drops (the block is safe, the glow never lies).
   G.ents.add(new SnowBoo(G, 161, 0, 0, {phase:0.8, speed:2.0, range:10, freezeMax:2.4}));
-  w6l3Lamp(G, deco, 165, 2.6, false);                                  // emissive fake — the corridor's warm dot
+  // BAT #4 THE CORRIDOR BAT — works the low grotto air under the 7.0 ceiling; squeak-telegraphed snapshot
+  // dive through the pockets. Level-wide bat phases staggered: 0.2 / 1.4 / 1.8 / 2.6 — never two at once.
+  G.ents.add(new BlizzardBat(G, 162.6, 5.2, 0, {phase:2.6, range:2.6, period:3.6, aggroR:3.5}));
+  // SPOOKY SNOWMAN #2 — parked in the 167/170.2 pocket: it hops exactly when you look UP at a telegraph (the
+  // watched-rule played against the wave). Edge-guarded hops, eyes flare mid-hop, stomp pops the head — and
+  // the crevasse means it can never be kited west of x152.4 toward the lantern.
+  G.ents.add(new SpookySnowman(G, 168.5, 0, 0, {phase:0.4, watchR:11, aggroR:7}));
+  // PENGUIN #4 THE REAR GUARD — patrol 170.8..175.2 sits fully clear of column six's 169.7..170.7 drop zone;
+  // its toboggan hunts corridor dawdlers from behind. Hop it — the x14 verb, at exam grade.
+  G.ents.add(new FrostbitePenguin(G, 173, 0, 0, {phase:0.5, range:2.2, dir:-1, speed:1.3}));
+  w6l3Lamp(G, deco, 165, 2.6, true);                                   // REAL LIGHT #3 (the slot CP2's lantern freed) —
+                                                                       // the gauntlet must READ. Budget: igloo + GP + CP1 + 3 pools = 6, the ceiling
   // the run-out: back under the open sky and the aurora
   candyLine(G, [[172.5,0.9,0],[174.5,0.9,0]], 2);
   G.ents.add(new Crow(174, 0.95, 2.3));                                // winter crow #3
@@ -286,13 +364,15 @@ function buildW6L3(G){
   // three-depth Frostmere skyline (snowdrifts+birches / lamplit village / blue peaks) + aurora via the tail
   w6Parallax(S, -8, 180);
 
-  // themed death-pit dressing (the crevasse ONLY — the one void in the level; the fall is the hazard)
+  // themed death-pit dressing (the level's TWO voids — the undercut + the crevasse; the fall is the hazard)
+  pitDressing(G, 114, 118, 'winter');
   pitDressing(G, 148, 152.4, 'winter');
 
-  // exit + the W6 tail. clutter split by hand around the massif and the crevasse (no props poking through)
+  // exit + the W6 tail. clutter split by hand around the massif, both voids and the ice run (no props poking
+  // through — and the glassy run stays CLEAN: glossy = slick must read at a glance)
   w6LevelFinish(G, -8, 180, null);
   w6Clutter(G, -8, 96, 'winter');
-  w6Clutter(G, 114, 148, 'winter');
+  w6Clutter(G, 118, 142.5, 'winter');
   w6Clutter(G, 152.4, 178, 'winter');
 
   return {spawnX: 0, exitX: 176};
@@ -304,4 +384,4 @@ function updateW6L3(G, dt){
   // all self-tick deterministically through G.ents from their fixed phases. The frozen lantern stays frozen.
 }
 
-W6_LEVELS.push({id:'w6l3', district:'w6', name:'ICICLE GROTTO', build:buildW6L3, update:updateW6L3, parTime:160});
+W6_LEVELS.push({id:'w6l3', district:'w6', name:'ICICLE GROTTO', build:buildW6L3, update:updateW6L3, parTime:165});   // par +5s for the retune's clock-waits (climb teeth, meaner triplets) — the time star stays honest-tough

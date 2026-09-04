@@ -89,9 +89,33 @@ hub-square snowman. District relights: the lights of Glimmerfields blaze, aurora
 - w6 in WORLDS with `req` = story done; district map reuses the standard map screen with
   the winter palette. Nightmare/challenge integration for winter levels ships LATER
   (winter nm remix = a January content beat, not this drop).
-- Difficulty: tuned to D3-ish ("fairly competitive" — the audience is post-story veterans),
-  but 2 checkpoints per level and ice never combines with pits until 6-4.
+- **Difficulty (owner call, Sept 4 2026): BEYOND DISTRICT 5.** Glimmerfields is the post-story
+  mastery exam — every player arriving has beaten all 25 levels and Grimm, so winter greets them
+  one column right of D5 on the curve: 12–15 enemies/level (internal ramp 6-1→6-5), checkpoints
+  = CP0 + ONE lit mid-level lantern, chained-mechanic set-pieces in every escalate/master beat
+  (D5 is the owner's favorite district for "obstacles and things" — its composition style is the
+  bar, in winter vocabulary). Still main-game fair, never Kaizo: hearts-always, ≥0.6s telegraphs,
+  fixed clocks, ≤4 simultaneous threats, one-good-run-away. Ice+pits legal from 6-3 on
+  (6-1/6-2 still teach the verb cleanly). Grumble tuned to hardest-guardian (12 hits, 3/4/5),
+  one notch under the Grimm finale; the brazier secret shines brighter against the harder brute path.
 - Music: 'winter' mood — the Grimmwick waltz recast with bell/glockenspiel voices (synth).
+
+## Winter District 2 seeds (owner call, Sept 4 2026 — build AFTER the w6 drop ships)
+**W7 = FROZEN LAKE FELL, pulled forward** (was slotted w9; Evergreen Deep slides back — the owner's
+lake idea IS a district signature, so it gets the next drop). Signature mechanic: **CRACKING ICE** —
+frozen lakes you cross where STANDING STILL is the hazard (owner: "if standing still too long in an
+area pip falls in and death action happens"):
+- `CrackIce` panels: dwell on a panel builds a crack budget (~1.1s at D5+ tuning); leaving/jumping
+  drains it. Telegraph stages: spiderweb cracks at 40% → deep cracks + CREAK + shudder at 75% →
+  SHATTER: Pip plunges into the black water below with the full Mario death-plunge spectacle
+  (the pit-impact sequence: splash, flash, pop-flip) — heart cost + lantern walk-back, death when
+  hearts run out (hearts-always law holds; at exam tuning this WILL kill careless players).
+  Panels refreeze ~3.2s later so routes never soft-lock. Deterministic: budget = time-stood,
+  identical every run (the gearPlat dwell-spike's proven pattern — pure D5 DNA in winter clothes).
+- Composition beats: whole lake crossings where the only floor is cracking panels · panel hops
+  between grippy islands · cracking ice UNDER icicle waves (move, but move THROUGH the pattern) ·
+  penguin lanes that slide across panels without cracking them (they're light — the tell that
+  weight matters) · trap-route panels over TRUE deep water on marked trap branches (D5 trap law).
 
 ## Ship plan
 1. Foundation: ice physics + snowfall + string-lights builder + kit file (09zm_w6kit) +

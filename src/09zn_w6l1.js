@@ -4,29 +4,42 @@
 // level in the game: one unbroken chain of bulb-strings post to post to rooftop to maypole to the gate arch,
 // glowing gift piles, bulb-wrapped pines, lamplit cottages). Signature gimmick: THE ICE PATCHES — the ponds
 // froze over the ROAD this year, so short glassy runs (tag:'ice' — 06_player swaps friction) interrupt the
-// snow. Introduce SAFELY -> twist -> escalate -> master (kishotenketsu), at D3 "fairly competitive" warmth
-// since it's the district opener — 8 threats on three lanes, never empty, everything telegraphed:
+// snow. Introduce SAFELY -> twist -> escalate -> master (kishotenketsu). PRESSURE-PASSED Sept 4 2026 (owner
+// call: Glimmerfields is POST-STORY — the unofficial mastery-exam district, one column RIGHT of D5, still
+// main-game fair, never Nightmare/Kaizo): the arrival courtesy holds for the first ~30 units, then D5+ heat
+// from the village green on. 12 enemies (+2 SpikeIcicle ceiling hazards) across all three lanes, CP0 + ONE
+// lit lantern at ~55% (the D5 law — the walk-back is part of the price), every threat on a fixed clock,
+// telegraphed, a safe lane always live:
 //   BEAT 1 THE FERRY ROAD (INTRODUCE ice)      x -8..33  — CP0. A flat 5u ice patch on safe snow; the sign
 //          warns about the frozen road. One decorative snowman TURNS ITS HEAD to watch Pip pass (the
 //          foreshadow) — then the first REAL Spooky Snowman lands among a decoy cluster (the horror-comedy:
-//          some snowmen are real; the decoys make the real ones land).
+//          some snowmen are real; the decoys make the real ones land). Still the gentle handshake.
 //   BEAT 2 THE VILLAGE GREEN (HIGH ROAD)        x 33..66  — a bulb-wrapped CLIMB POLE up to a rooftop run
 //          over two cottages (snow-drifted eaves at y 3.2 / 4.2), a Gummy-Shield lantern its reward; the
 //          route crowns at the MAYPOLE — the tallest light post on the lane — with GOLDEN PUMPKIN #0
 //          floating above it (double-jump off the far eave). A 2nd snowman + a drifting Snow-Boo below.
-//   BEAT 3 THE FROZEN RISE (TWIST)              x 66..85  — CP1 (lit). An ice patch ON A SLIGHT RISE: a snow
-//          shelf with a glassy top — land sliding, manage the momentum, shoot off the far edge onto soft snow.
+//   BEAT 3 THE FROZEN RISE (TWIST)              x 66..85  — an ice patch ON A SLIGHT RISE: land sliding,
+//          manage the momentum, shoot off the far edge — now under SNOW-BOO #2, floating at SHELF height
+//          (it pressures exactly the glassy crossing, passes harmlessly over the low approach; stare it
+//          into a standable ice block — the district's rule, now practiced under momentum).
 //   BEAT 4 THE POND CROSSING (ESCALATE)         x 85..108 — two ice-patch lanes with Frostbite Penguins
-//          waddling them (squawk-telegraphed belly-slides); a Blizzard Bat works the snow breather between.
-//   BEAT 5 THE LANE'S END (MASTER · finish)     x 108..183 — CP2, the Mystery Igloo in its clear pocket,
-//          then THE LONG FREEZE: a 10u ice run into TWO friendly gaps (3.5u, SNOW on both sides — ice never
-//          touches a pit lip in 6-1..6-3, owner law) with candy arcing the jumps; a farewell decoy cluster
-//          hides the last real snowman on the run to the gate.
+//          (squawk-telegraphed belly-slides); the FAR pond composes ice + penguin + BLIZZARD BAT #2 diving
+//          the glass itself — dodging on slide, not traction. CP1 (LIT, x97.5 ≈ 55%) stands on the snow
+//          breather between the ponds — the level's ONE lit lantern, reach-proven safe for an idle player.
+//   BEAT 5 THE LANE'S END (MASTER · finish)     x 108..183 — the Mystery Igloo in its clear pocket, then THE
+//          LONG FREEZE as a CHAINED SET-PIECE (the D5 soul in winter vocabulary): a 12u ice run where a
+//          penguin TOBOGGANS the lane and a bat DIVES the run-in while a LIT ROOFTOP EAVE floats over the
+//          middle — weave ice->rooftop->ice, candy tracing the safe braid (the roof passes clean over the
+//          penguin's wake height). Then the plant-your-feet snow lip (ice never touches a pit lip in
+//          6-1..6-3, owner law) and TWO 3.5u gaps, each takeoff lip now guarded by ONE SpikeIcicle on a
+//          festival arch (fixed 4.2s clocks, phases offset a half-period — honest taps stay honest). A
+//          farewell CROWD of snowmen sees you off: five decoys, TWO real.
 // Reads UNMISTAKABLY Glimmerfields: W6PAL moonlit snow + deep blue-violet night, warm bulb-strings overhead
 // the WHOLE way, lamplit cottage skyline, aurora ribbons, snowfall. Three lanes busy throughout (ground
-// snowmen/penguins · air Blizzard Bats + the Snow-Boo · the rooftop road). Comparable heights (tap 1.8 /
-// held 2.6 / double 3.3; every rise slight-over-clearance — shelf 1.4, eave hop +1.0, GP rise 2.8; the one
-// 3.2 rise is GATED by the climb pole with candy telegraphing the verb; gaps 3.5 <= 4 tap). NO Leap of Faith
+// snowmen/penguins/toboggans · air Blizzard Bats + the Snow-Boos · the rooftop road + icicle ceiling).
+// Comparable heights (tap 1.8 / held 2.6 / double 3.3; every rise slight-over-clearance — shelf 1.4, eave
+// hop +1.0, GP rise 2.8, master roof 2.8 as a candy-traced DOUBLE-JUMP route <= 3.0; the one 3.2 rise is
+// GATED by the climb pole with candy telegraphing the verb; gaps 3.5 <= 4 tap). NO Leap of Faith
 // (the game's two are placed and sacred). Deterministic to the flake — fixed enemy phases, fixed clocks,
 // seeded rand() only inside baked cosmetic deco. No Math.random on the critical path (the igloo's gamble is
 // opt-in side content, where RNG legally lives).
@@ -83,7 +96,7 @@ function w6l1Cottage(x, z, bw, bh){
 }
 
 // ---- ICICLE FRINGE for a snow eave/shelf lip — tiny glassy teeth hanging from the front edge (baked; pure
-// cosmetic, no hazard — 6-1's icicles only decorate; the DROPPING kind waits for a later level). ----
+// cosmetic, no hazard — the DROPPING kind (SpikeIcicle) now guards the two gap-lip arches, pressure pass). ----
 function w6l1Fringe(x1, x2, y, z){
   const g = new THREE.Group();
   for(let x=x1+0.3; x<x2-0.2; x+=rand(0.5,0.85)){
@@ -91,6 +104,22 @@ function w6l1Fringe(x1, x2, y, z){
     ic.rotation.x=Math.PI; ic.position.set(x, y-rand(0.1,0.18), z); g.add(ic);
   }
   return g;
+}
+
+// ---- a FESTIVAL ARCH astride the lane (baked): two snow-knobbed posts (z ±1.5, off the physics lane) and a
+// garlanded crossbeam. The pressure pass hangs ONE SpikeIcicle under each gap-lip arch — the arch exists so
+// the tooth has an honest ceiling to grow from (icicles never float in air). Pure deco, zero colliders; the
+// beam rides at y4.7, above a double-jump's headroom (3.3 apex + 1.2 body = 4.5). ----
+function w6l1Arch(deco, x, beamY){
+  const g = new THREE.Group();
+  for(const s of [-1,1]){
+    const post = mesh('cyl',[0.09,0.13,beamY,6], mat(W6PAL.woodD)); post.position.set(x, beamY/2, s*1.5); g.add(post);
+    const knob = mesh('sph',[0.15,6,5], mat(0xbfd0ec)); knob.position.set(x, beamY+0.06, s*1.5); g.add(knob);
+  }
+  const beam = mesh('box',[0.5,0.22,3.3], mat(W6PAL.wood)); beam.position.set(x, beamY, 0); g.add(beam);
+  const cap  = mesh('box',[0.56,0.09,3.36], mat(W6PAL.pineSnow)); cap.position.set(x, beamY+0.15, 0); g.add(cap);
+  for(let i=0;i<4;i++){ const cc=pick(W6PAL.bulbs); const bb=mesh('sph',[0.06,5,4], emat(cc,cc,0.95)); bb.position.set(x, beamY-0.18, -1.1+i*0.74); g.add(bb); }
+  deco.add(g);
 }
 
 // ---- a GLOWING GIFT PILE: presents heaped on a warm pool of bulb-light (emissive fake — the real-light
@@ -139,7 +168,7 @@ function buildW6L1(G){
   // ICE PATCH #1 (INTRODUCE, x 16..21): flat, safe, 5u — feel the slide with nothing at stake
   w6IceX(G, 16, 21);
   candyLine(G, [[16.8,0.9,0],[20.2,0.9,0]], 3);                        // the glide line — coast through it
-  groundX(G, 21, 88, SNOW);                                            // one long snow slab under beats 1-3
+  groundX(G, 21, 86, SNOW);                                            // one long snow slab under beats 1-3 (ends where pond #2 now begins)
   G.ents.add(new Crow(23, 0.95, 2.2));                                 // reactive winter crow — flaps off when neared
   // THE DECOY CLUSTER + SPOOKY SNOWMAN #1: three snowmen by the road... one of them is REAL (moves only when
   // you're NOT looking — eyes flare cyan mid-hop, the tell you can trust). Decoys sit OFF the lane (z<0) so
@@ -203,41 +232,62 @@ function buildW6L1(G){
   G.ents.add(new BlizzardBat(G, 63, 5.4, 0, {phase:0.2, range:2.5, period:3.4, aggroR:4.5}));
 
   // =============================== BEAT 3 — THE FROZEN RISE (x 66..85): TWIST — ice on a slight rise ===============================
-  G.ents.add(new Checkpoint(70, 0, 1.6, 1));                           // CP1 — LIT, the first of the two mid lanterns (>100u rule)
+  // (the old CP1 lantern stood here at x70 — PRESSURE PASS: one column right of D5 means ONE lit lantern;
+  // it moved to the pond breather at x97.5, ~55% of the course. From here on the twist runs hot.)
   // a snow shelf with a GLASSY TOP (rise 1.4 — tap clears it with margin): jump on carrying speed, slide the
-  // 8u run, shoot off the far edge onto soft snow. Momentum management with zero stakes — the twist teaches
-  // what the master beat will demand.
+  // 8u run, shoot off the far edge onto soft snow. Momentum management — but no longer zero stakes: SNOW-BOO
+  // #2 haunts the shelf line below.
   w6IcePlat(G, 77, 1.4, 0, 8, 6);                                      // the icy shelf top (spans 73..81)
   { const fill = mesh('box',[8,0.95,5.7], mat(SNOW)); fill.position.set(77,0.45,0); deco.add(fill);   // the drift it sits on
     deco.add(w6l1Fringe(73, 81, 1.15, 3.0)); }                         // icicle teeth on the lip
   candyLine(G, [[70,0.9,0],[72.4,1.6,0]], 2);                          // the run-up arc onto it
   candyLine(G, [[74.5,2.2,0],[77,2.2,0],[79.5,2.2,0]], 3);             // the slide line across the glass
   candyLine(G, [[81.4,1.8,0],[82.6,1.2,0]], 2);                        // the shoot-off arc back to snow
+  // SNOW-BOO #2 (NEW, pressure pass) — floats at SHELF height (home y1.9 -> bobs ~2.1..2.45): it can only
+  // ever touch a player up on the glass (a ground walker at y0 passes clean beneath), so it pressures exactly
+  // the momentum crossing. Stare it and it freezes into a standable block hanging at the shelf line — the
+  // district's platform rule, practiced mid-slide. LEASH MATH: home x77, chaseR 14 -> max trail x91 (it can
+  // dog you into pond #2's entry — composed, and the stare still works there). The lit lantern at 97.5 sits
+  // 20.5u from home: an idle respawner is 6.5u OUTSIDE its engage ring, so it always floats home. Igloo at
+  // 120: 43u (boo homes stay >=15u from igloos, law).
+  G.ents.add(new SnowBoo(G, 77, 1.9, 0, {phase:0.9, speed:2.0, range:10}));
 
   // =============================== BEAT 4 — THE POND CROSSING (x 85..108): ESCALATE — penguin lanes ===============================
-  signPost(G, 85, 1.8, -0.1, "POND CROSSING. The penguins found the ice first, and they do NOT share. When one squawks with both flippers up - that's your half-second to hop. Catch your breath on the snow between ponds.");
-  // ICE PATCH #2 (x 88..96) with FROSTBITE PENGUIN #1 waddling it — squawk (~0.5s, flippers up) then a flat
-  // fast belly-slide; you dodge ON the ice (the twist's momentum lesson, now under pressure)
-  w6IceX(G, 88, 96);
-  G.ents.add(new FrostbitePenguin(G, 92, 0, 0, {phase:0.0, range:2.4, dir:1, wakeR:5}));
-  candyLine(G, [[88.6,0.9,0],[95.4,0.9,0]], 4);
-  // the snow BREATHER (x 96..100) — where BLIZZARD BAT #2 dives (dodging happens on TRACTION, kind for 6-1;
-  // base reach 96..100 — 20u clear of the igloo, honoring CLEAR-PATCH + the diver-drift rule)
-  groundX(G, 96, 100, SNOW);
-  G.ents.add(new BlizzardBat(G, 98, 5.0, 0, {phase:1.6, range:2, period:3.2, aggroR:4.5}));
-  // ICE PATCH #3 (x 100..106) with PENGUIN #2 — tighter lane, opposite phase; its longest slide (trigger at
-  // the lane's right lip + 9u of belly) tops out ~112.5, a clear 7.5u short of the igloo's pocket
-  w6IceX(G, 100, 106);
-  G.ents.add(new FrostbitePenguin(G, 102.6, 0, 0, {phase:0.7, range:1.6, dir:-1, wakeR:5}));
-  candyLine(G, [[100.6,0.9,0],[105.4,0.9,0]], 3);
-  groundX(G, 106, 140, SNOW);                                          // the long snow shoulder into the master beat
+  signPost(G, 85, 1.8, -0.1, "POND CROSSING. The penguins found the ice first, and they do NOT share - and the bats have claimed the far pond's sky. Flippers up and a squawk means hop; a squeak overhead means step where the shadow isn't. The lantern on the middle snow is yours.");
+  // ICE PATCH #2 (x 86..94) with FROSTBITE PENGUIN #1 waddling it — squawk (flippers up) then a flat fast
+  // belly-slide; you dodge ON the ice (the twist's momentum lesson, now under pressure). Patrol 88..92
+  // (home 90, range 2.0): rightmost 92 keeps 5.5u from the lit lantern (> wakeR 5), so an IDLE respawner
+  // never wakes it; its slide-max right (92 + 8.9u of belly = 100.9) transits the breather only mid-chase.
+  w6IceX(G, 86, 94);
+  G.ents.add(new FrostbitePenguin(G, 88.5, 0, 0, {phase:0.0, range:2.0, dir:1, wakeR:5}));   // retune-verify: wake edge 95.5 — a full 2u shy of CP1's idle spot
+  candyLine(G, [[86.6,0.9,0],[93.4,0.9,0]], 3);
+  // the snow BREATHER (x 94..101) — now carrying CP1, the level's ONE lit mid lantern (x97.5 = ~55% of the
+  // 0..177 course; the D5 walk-back law). SPAWN-SAFETY REACH MATH for an idle player standing exactly here:
+  //   penguin #1 rightmost 92.0    -> gap 5.5 > wakeR 5.0   -> never wakes
+  //   penguin #2 leftmost 102.6    -> gap 5.1 > wakeR 4.5   -> never wakes
+  //   bat #2 patrol nearest 103.0  -> gap 5.5 > aggroR 4.5  -> never dives
+  //   Snow-Boo #2 home 77 (20.5u) and #1 home 62 (35.5u)    -> both > chaseR 14, both float home
+  //   bat #3 patrol nearest 138.5 (41u) · penguin #3 leftmost 145.6 (48u) · icicles fixed at 153.8/162.4
+  groundX(G, 94, 101, SNOW);
+  G.ents.add(new Checkpoint(97.5, 0, 1.6, 1));                         // CP1 — LIT, the one mid-level lantern
+  // ICE PATCH #3 (x 101..107) — the ESCALATE compose: PENGUIN #2 on a tighter lane, opposite phase, AND
+  // BLIZZARD BAT #2 diving the same glass (moved off the breather to make room for the lantern — and so the
+  // dodge now happens ON ice, D5+ grade). Penguin patrol 102.6..105.0 (home 103.8, range 1.2, wakeR 4.5):
+  // slide-max right 105.0+8.9 = 113.9, a clear 6.1u short of the igloo's pocket (CLEAR-PATCH). Bat base
+  // reach 103.0..106.6 — 13.4u from the igloo, honoring the diver-drift rule (divers stay >=6u clear).
+  w6IceX(G, 101, 107);
+  G.ents.add(new FrostbitePenguin(G, 103.8, 0, 0, {phase:0.7, range:1.2, dir:-1, wakeR:4.0, slideT:0.95}));   // retune-verify: slideT 0.95 keeps the igloo pocket a clean 6.9u; wakeR 4.0 widens CP1's breather to 1.1u
+  G.ents.add(new BlizzardBat(G, 104.8, 5.0, 0, {phase:1.6, range:1.8, period:3.2, aggroR:4.5}));
+  candyLine(G, [[101.6,0.9,0],[106.4,0.9,0]], 2);
+  groundX(G, 107, 138, SNOW);                                          // the snow shoulder into the master beat
   G.ents.add(new Crow(109, 0.95, -2.2));                               // reactive critter #2
 
   // =============================== BEAT 5 — THE LANE'S END (x 108..183): MASTER + igloo + finish ===============================
-  candyLine(G, [[110,0.9,0],[115,0.9,0]], 3);
-  // THE MYSTERY IGLOO — Frostmere's gamble, in a CLEAR POCKET per the law: nearest patrol/dive reach is the
-  // penguin's ~112.5 slide-max (7.5u), bat #2 tops out at 100 (20u), snowman #3 homes at 169.5 (49u) — the
-  // peek is a deliberate safe act; the ambush penguins spawn on the kit's fixed ring with 1s grace
+  candyLine(G, [[110,0.9,0],[115,0.9,0]], 2);
+  // THE MYSTERY IGLOO — Frostmere's gamble, in a CLEAR POCKET per the law (re-proven after the pressure
+  // pass): penguin #2 slide-max 113.9 (6.1u clear), bat #2 tops out at 106.6 (13.4u), bat #3 starts at 138.5
+  // (18.5u), penguin #3 slide-max left 140.5 (20.5u), Snow-Boo #2 home 77 (43u), snowman #3 home 169.5
+  // (49.5u) — the peek stays a deliberate safe act; the ambush penguins spawn on the kit's fixed ring, 1s grace
   { const ig = new MysteryIgloo(120, 0, 0.3, -0.25); G.coffins.push(ig); G.ents.add(ig); }
   candyLine(G, [[125,0.9,0],[130,0.9,0]], 2);
   // ---- THE QUIET PROP (never signposted): a snow family just off the road — two big snowmen leaning close,
@@ -248,26 +298,58 @@ function buildW6L1(G){
   deco.add(w6SnowmanDeco(129.4, -2.4, 0.82, -0.6));
   deco.add(w6SnowmanDeco(128.5, -2.0, 0.34, 0.1));
   { for(const mx of [129.0, 129.25]){ const mit=mesh('sph',[0.07,6,5], mat(0xd83a4a)); mit.scale.y=0.6; mit.position.set(mx,0.05,-1.85); deco.add(mit); } }
-  signPost(G, 133, 1.7, 0.12, "THE LONG FREEZE. One glassy run, then the road's cracked clean through - twice. Snow holds firm on either side, so slide, set your feet, and jump where the candy flies.");
-  G.ents.add(new Checkpoint(136, 0, 1.6, 2));                          // CP2 — LIT, right before the master gauntlet
-  // THE MASTER RUN: ICE PATCH #4 (x 140..150, the level's longest) — then 4.5u of snow to plant your feet
-  // (ice NEVER touches a pit lip in 6-1..6-3, owner law) before two friendly 3.5u gaps with candy arcing the
-  // jumps. A miss costs a heart + the walk from CP2, never a life with hearts in hand.
-  w6IceX(G, 140, 150);
-  candyLine(G, [[140.8,0.9,0],[149.2,0.9,0]], 4);                      // the long glide line
-  groundX(G, 150, 154.5, SNOW);                                        // the plant-your-feet lip
+  signPost(G, 133, 1.7, 0.12, "THE LONG FREEZE. One long glassy run - a penguin tobogganing it, a bat diving it, and a lit rooftop to weave across when the lane gets crowded. Then the road's cracked clean through, twice, and the crossing arches grew TEETH. Watch the shimmer, set your feet on snow, and jump where the candy flies.");
+  // (the old CP2 lantern stood at x136 — PRESSURE PASS: deleted per the one-lit-lantern law. The master
+  // gauntlet's price is the honest walk from CP1 at 97.5, exactly the D5 pattern.)
+  // THE MASTER RUN — the CHAINED SET-PIECE (D5's escalate/master composition in winter vocabulary): ICE
+  // PATCH #4 (x 138..150, lengthened to 12u, the level's longest) composes THREE fixed-clock mechanics —
+  //   the SLIDE itself · BLIZZARD BAT #3 diving the run-in (patrol 138.5..143.5, phase-staggered against
+  //   bat #2) · PENGUIN #3 tobogganing the exit lane (patrol 145.6..148.2; slideT capped at 0.6 so its
+  //   longest belly, 148.2+5.1 = 153.3, always stops on the snow lip and NEVER carries over gap #1's edge
+  //   at 154.5; slide-max left 140.5 stays on the glass).
+  // The counter is the LIT ROOFTOP: a bulb-strung cottage eave at y2.8 over the run's middle (a candy-traced
+  // DOUBLE-JUMP route, 3.3 apex -> 0.5 over-clearance) that passes CLEAN OVER the penguin's wake (roof y2.8
+  // > its 1.8 wake height — cross above it without waking it, drop at ~149.5 behind its patrol+touch reach
+  // 148.9). Weave ice -> roof -> ice; the low road stays fully honest: hop the toboggan, step off the dive
+  // shadow, never stop. Both lanes' candy traces the safe braid.
+  w6IceX(G, 138, 150);
+  G.ents.add(new BlizzardBat(G, 141, 5.2, 0, {phase:0.9, range:2.5, period:3.4, aggroR:4.5}));
+  G.ents.add(new FrostbitePenguin(G, 146.9, 0, 0, {phase:0.3, range:1.3, dir:-1, wakeR:5, slideT:0.6}));
+  deco.add(w6l1Cottage(143, -4, 4.4, 2.2));                            // the roofline behind the master eave
+  platform(G, 143, 2.8, 0, 5, 2.6, EAVE);                              // THE LIT ROOFTOP (top 2.8, spans 140.5..145.5)
+  deco.add(w6l1Fringe(140.5, 145.5, 2.55, 1.25));                      // icicle teeth under its lip (cosmetic)
+  candyLine(G, [[138.8,0.9,0],[149.2,0.9,0]], 3);                      // the low braid — through the joust
+  candyLine(G, [[139.6,1.4,0],[141.3,2.6,0],[143,3.7,0]], 3);          // the weave UP (double-jump trace off the glass)
+  candyLine(G, [[145.6,3.4,0],[149.4,1.2,0]], 2);                      // ...the glide DOWN, landing behind the penguin
+  groundX(G, 150, 154.5, SNOW);                                        // the plant-your-feet lip (ice never meets a pit lip in 6-1)
+  // THE TOOTHED CROSSINGS: each 3.5u gap keeps its comfortable tap — but a festival ARCH now stands at each
+  // takeoff lip with ONE SpikeIcicle under its beam (period 4.2s, 0.72s shimmer + growing floor-glow — the
+  // bombardment telegraph language, never below 0.6s; phases offset a HALF-PERIOD so the two never drop
+  // together: read A's drop, cross, read B on the approach). The icicle guards the PLANT, not the arc —
+  // floors are honest snow, the glow reads on the lip, and any drop costs a heart at worst (hearts-always).
+  w6l1Arch(deco, 153.8, 4.7);
+  G.ents.add(new SpikeIcicle(G, 153.8, 4.4, {period:4.2, phase:0.0}));
   // GAP #1 (154.5..158, 3.5u — comfortable tap, snow both sides)
   groundX(G, 158, 163, SNOW);                                          // the mid island (its light post rides here)
+  w6l1Arch(deco, 162.4, 4.7);
+  G.ents.add(new SpikeIcicle(G, 162.4, 4.4, {period:4.2, phase:2.1}));
   // GAP #2 (163..166.5, 3.5u)
   groundX(G, 166.5, 183, SNOW);
   candyLine(G, [[153.6,1.0,0],[155.4,2.0,0],[157.1,2.0,0],[158.9,1.0,0]], 4);   // arc over gap 1 — jump where the candy flies
   candyLine(G, [[162.1,1.0,0],[163.9,2.0,0],[165.6,2.0,0],[167.4,1.0,0]], 4);   // arc over gap 2 (arcs 1's landing + 2's takeoff keep the island fed)
-  // THE FAREWELL CLUSTER + SPOOKY SNOWMAN #3: land from gap 2 into a little crowd of snowmen seeing you off
-  // to the gate... one is real. Watch it while you back toward the arch — the level's rule, mastered.
+  // THE FAREWELL CROWD + SPOOKY SNOWMEN #3 AND #4: land from gap 2 into a whole CROWD of snowmen seeing you
+  // off to the gate... and TWO are real now (five decoys, two hunters — the decoy game's cruel graduation,
+  // pressure-pass grade). Phases staggered so their hops ALTERNATE: hold one in your stare and the other
+  // moves — the mastered counters are the stomp, or backing to the gate with both in frame. The tells never
+  // lie: eyes flare cyan mid-hop, the snow whumps behind you. Cruel, never cheap. (Nearest respawn is CP1
+  // at x97.5 — 72u away; both hunters are trivially out of aggro of an idle player there.)
   deco.add(w6SnowmanDeco(167.6, -1.3, 0.9, 0.4));
-  deco.add(w6SnowmanDeco(171.5, -1.6, 0.95, -0.2));
-  deco.add(w6SnowmanDeco(173.8, -1.1, 0.8, 0.6));
+  deco.add(w6SnowmanDeco(170.6, -1.7, 0.85, -0.5));
+  deco.add(w6SnowmanDeco(171.9, -1.1, 0.95, -0.2));
+  deco.add(w6SnowmanDeco(174.6, -1.6, 0.8, 0.6));
+  deco.add(w6SnowmanDeco(175.8, -1.2, 0.88, 0.15));
   G.ents.add(new SpookySnowman(G, 169.5, 0, 0, {phase:0.7, watchR:11, aggroR:7.5}));
+  G.ents.add(new SpookySnowman(G, 173.2, 0, 0, {phase:1.3, watchR:11, aggroR:7.5}));
   candyLine(G, [[170.5,0.9,0],[173.5,0.9,0]], 2);
   exitGate(G, 177);
 
@@ -276,21 +358,22 @@ function buildW6L1(G){
   // rooflines to the maypole's crown, back down the lane, ACROSS both gaps, and converging on the exit gate.
   // The kit merges every bulb into 5 twinkling draw calls; posts bake with the deco.
   { const L = w6LightsBegin();
-    const tops = [[-6,3.3],[6,3.5],[20,3.3],[33,3.5],[42,4.6],[50.5,5.6],[56.5,6.3],[70,3.5],[84,3.3],[98,3.5],[112,3.3],[126,3.5],[138,3.3],[152,3.5],[160.5,3.3],[170,3.5],[176.6,5.0]];
+    const tops = [[-6,3.3],[6,3.5],[20,3.3],[33,3.5],[42,4.6],[50.5,5.6],[56.5,6.3],[70,3.5],[84,3.3],[98,3.5],[112,3.3],[126,3.5],[138,3.3],[143,4.6],[152,3.5],[160.5,3.3],[170,3.5],[176.6,5.0]];
     for(let i=0;i<tops.length-1;i++) w6String(L, tops[i][0],tops[i][1], tops[i+1][0],tops[i+1][1]);
     w6String(L, 56.5,6.3, 48,4.0, {z:-1.2});                           // the maypole's crown radiates
     w6String(L, 56.5,6.3, 64,3.6, {z:-1.2});
     w6String(L, 116,3.3, 122,3.3, {z:-2.6, sag:0.7});                  // a double-strand over the igloo pocket
     w6LightsFinish(G, L);
-    // the posts under the chain (the roofline anchors at 42/50.5/56.5/176.6 are the cottages/maypole/gate)
-    for(const [px,py] of tops){ if(px===42||px===50.5||px===56.5||px===176.6) continue; deco.add(w6LightPost(px, -1.8, py-0.2)); } }
+    // the posts under the chain (the roofline anchors at 42/50.5/56.5/143/176.6 are the cottages/maypole/
+    // master-eave/gate — the swag at 143 rides the LIT ROOFTOP, min-sag ~3.9 clearing its y2.8 top)
+    for(const [px,py] of tops){ if(px===42||px===50.5||px===56.5||px===143||px===176.6) continue; deco.add(w6LightPost(px, -1.8, py-0.2)); } }
 
   // =============================== DECO · PINES · GIFTS · MOON · PARALLAX ===============================
   // bulb-wrapped pines and glowing gift piles the whole way down the lane (background z<0)
   deco.add(w6l1FestivePine(-4, -2.6, 1.1)); deco.add(w6l1FestivePine(9, -3.0, 1.25));
   deco.add(w6l1FestivePine(31, -2.7, 1.0)); deco.add(w6l1FestivePine(60, -3.1, 1.3));
   deco.add(w6l1FestivePine(74, -3.4, 1.1)); deco.add(w6l1FestivePine(103, -2.8, 1.2));
-  deco.add(w6l1FestivePine(124, -3.0, 1.05)); deco.add(w6l1FestivePine(143, -2.9, 1.2));
+  deco.add(w6l1FestivePine(124, -3.0, 1.05)); deco.add(w6l1FestivePine(134.5, -2.9, 1.2));   // (moved off x143 — the master cottage lives there now)
   deco.add(w6l1FestivePine(159.5, -2.6, 0.9)); deco.add(w6l1FestivePine(181, -2.7, 1.15));
   deco.add(w6Pine(17, -3.3, 0.9)); deco.add(w6Pine(46, -3.4, 0.85)); deco.add(w6Pine(95, -3.2, 1.0)); deco.add(w6Pine(136, -3.3, 0.9));
   deco.add(w6l1GiftPile(34, -2.3, 1)); deco.add(w6l1GiftPile(68, -2.5, 0.9));
@@ -310,7 +393,7 @@ function buildW6L1(G){
   // three-depth Glimmerfields skyline (snowdrifts & birches / lamplit village + snow pines / great blue peaks)
   w6Parallax(S, -8, 183);
 
-  // themed crevasse dressing under the two gaps only (visual — the fall is the hazard; a heart + CP2 walk-back)
+  // themed crevasse dressing under the two gaps only (visual — the fall is the hazard; a heart + the CP1 walk-back)
   pitDressing(G, 154.5, 158, 'winter');
   pitDressing(G, 163, 166.5, 'winter');
 
@@ -320,8 +403,8 @@ function buildW6L1(G){
   w6LevelFinish(G, -8, 183, null);
   w6Clutter(G, -8, 16, 'winter');
   w6Clutter(G, 21, 72.5, 'winter');
-  w6Clutter(G, 81.5, 88, 'winter');
-  w6Clutter(G, 106, 140, 'winter');
+  w6Clutter(G, 81.5, 86, 'winter');
+  w6Clutter(G, 107, 138, 'winter');
   w6Clutter(G, 150, 154, 'winter');
   w6Clutter(G, 158.5, 162.5, 'winter');
   w6Clutter(G, 167, 183, 'winter');

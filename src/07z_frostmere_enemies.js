@@ -155,7 +155,7 @@ class FrostbitePenguin extends Enemy {
       this.flipL.rotation.z = damp(this.flipL.rotation.z, 2.6, 12, dt);
       this.flipR.rotation.z = damp(this.flipR.rotation.z, -2.6, 12, dt);
       this.body.rotation.z = Math.sin(this.t*24)*0.1;
-      if(this.st>0.5){ this.state='slide'; this.st=0;
+      if(this.st>0.6){ this.state='slide'; this.st=0;   // 0.6s squawk (retune pass: the telegraph floor is law — three verifiers flagged 0.5)
         AUDIO.noise && AUDIO.noise({t:0.3,vol:0.12,fFrom:900,fTo:300}); }
     } else if(this.state==='slide'){
       // the toboggan — flat out on the belly, fast and low

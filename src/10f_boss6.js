@@ -4,10 +4,11 @@
 // phases, with a bigger gimmick each time:
 //   PHASE 1 (3 hits) — hop-chases Pip on learnable arcs, ground shudder on every landing; 3 hops → big slam
 //                      → dizzy window (stomp the head / spin the body). Top tier bursts → REBUILD spectacle.
-//   PHASE 2 (3 hits) — adds SNOWBALL LOBS on a fixed clock (arcing shots, growing target-glow telegraph
-//                      for the full 1.15s flight — ≥0.7s, the bombardment language), hops faster.
-//   PHASE 3 (4 hits) — adds the ROLLING RING (2 SnowballRollers on fixed crossing tracks) + telegraphed
-//                      SpikeIcicle drops from the frost bough + a one-time pair of FrostbitePenguin adds.
+//   PHASE 2 (4 hits) — adds SNOWBALL LOBS on a fixed clock (arcing shots, growing target-glow telegraph
+//                      for the full 0.9s flight — never under the 0.65s floor, the bombardment language),
+//                      hops faster, dizzy tightens.
+//   PHASE 3 (5 hits) — the ROLLING RING (2 SnowballRollers on fixed crossing tracks) AND the SpikeIcicle
+//                      rain run CONCURRENTLY + a one-time TRIO of FrostbitePenguin adds; lob flight 0.72s.
 // SECRET TAKEDOWN (the speedrun meta): FOUR cold HEARTH-BRAZIERS on the arena rim. Spin one to LIGHT it —
 // each lit hearth MELTS a quarter of the loose snow (the drift mounds visibly steam away). All 4 lit and
 // Grumble CANNOT REBUILD: his next knockdown skips straight to the FINAL PHASE REMNANT (hp clamped to 2,
@@ -22,16 +23,19 @@
 // ENGINE CONTRACT (mirrors 10_boss1 exactly): G.boss singleton with update(dt), NOT an ents entity. The
 // boss runs its OWN stomp/spin detection during the dizzy window (the player's generic stomp/swing loops
 // only reach G.ents enemies) and exposes onPlayerPound(pos) — 06_player calls it on every landed pound.
-// Boss bar via UI.showBossBar/updateBossBar (10 hit-pips: 3+3+4). Adds/rollers ARE ents (stompable, drop
+// Boss bar via UI.showBossBar/updateBossBar (12 hit-pips: 3+4+5). Adds/rollers ARE ents (stompable, drop
 // candy, cleared on defeat like boss1/boss2). HEARTS-ALWAYS: every attack costs exactly 1 heart.
 // DETERMINISM: all clocks fixed-phase from their start; volley spreads are fixed offsets; rand() (seeded
-// per area) touches cosmetic jitter only. Difficulty: D3 boss — hotter than Broomhilda's opener, cooler
-// than Wraith.
+// per area) touches cosmetic jitter only. Difficulty (OWNER CALL, Sept 2026): Glimmerfields is the
+// post-story mastery exam — the hardest GUARDIAN, out-pressures Captain Wraith, one notch under the Grimm
+// finale (the finale keeps its crown). THREAT BUDGET: ≤4 simultaneous threats on the player at any instant
+// — hop-contact and the volley are made exclusive by the lob clock (balls resolve in-state), the 9u icicle
+// lanes can't reach the rollers' ±11 crossing zones, so fixed clocks sum to 3; the 4th is a woken penguin.
 
 class Grumble {
   constructor(G, opts={}){
     this.G = G;
-    this.maxHp = 10; this.hp = 10;          // 3 (P1) + 3 (P2) + 4 (P3) — knockdowns at hp 7 and hp 4
+    this.maxHp = 12; this.hp = 12;          // 3 (P1) + 4 (P2) + 5 (P3) — knockdowns at hp 9 and hp 5
     this.dead = false;
     this.phase = 1;
     this.remnant = false;                    // the brazier shortcut's final form
@@ -175,7 +179,7 @@ class Grumble {
     this.G.fx.spawn(new THREE.Vector3(this.pos.x, this.headWorldY(), this.pos.z), 0xf0f4ff, 18, {speed:5});
     UI.updateBossBar(this.hp);
     if(this.hp<=0){ this.defeat(); return; }
-    if(this.hp===7 || this.hp===4){ this._knockdown(); return; }
+    if(this.hp===9 || this.hp===5){ this._knockdown(); return; }
     UI.toast(pick2([ '⛄ "Grumble!!"', '⛄ "GRUMBLE?!"', '⛄ "...grumble."' ], this.hp));
   }
 
@@ -194,11 +198,17 @@ class Grumble {
   }
 
   _applyPhase(){
-    // phase stats in one place (the tuning table)
+    // phase stats in one place (the tuning table). MASTERY-EXAM TUNE (owner call, Sept 2026):
+    // hopVy DROPS per phase — shorter airtime = faster landings = more re-aims per second (the cadence
+    // dial); sp caps at 7.2 (= player run speed — the fairness ceiling: he corners you, never outruns you);
+    // dizzy 1.7→1.35→1.1 (≥1.6 in P1 per the owner floor); rec = recover pause; lob = snowball flight time
+    // (the full-flight target-glow telegraph — 0.9/0.72, never under the 0.65s floor).
+    // The remnant row is the BRAZIER SECRET'S payoff and stays untouched — the mercy the observant earn.
     const P = this.remnant
       ? {hopVy:9.0, sp:7.8, dizzy:2.6, eyes:1.2}
-      : [{hopVy:8.4, sp:5.2, dizzy:4.2, eyes:0.5}, {hopVy:8.7, sp:6.4, dizzy:3.6, eyes:0.8}, {hopVy:9.0, sp:7.2, dizzy:3.0, eyes:1.05}][this.phase-1];
+      : [{hopVy:8.2, sp:5.8, dizzy:1.7, eyes:0.5, rec:0.7}, {hopVy:7.9, sp:6.8, dizzy:1.35, eyes:0.8, rec:0.55, lob:0.9}, {hopVy:7.6, sp:7.2, dizzy:1.1, eyes:1.05, rec:0.45, lob:0.72}][this.phase-1];
     this.hopVy = P.hopVy; this.chaseSp = P.sp; this.dizzyLen = P.dizzy;
+    this.recLen = P.rec || 0.8; this.lobT = P.lob || 1.15;
     this.eyeM.emissiveIntensity = P.eyes;
     if(this.phase>=3 && !this.remnant && !this._p3Spawned){
       this._p3Spawned = true;
@@ -208,10 +218,14 @@ class Grumble {
       this.rollers.push(r1, r2);
       // icicles under the frost bough — fixed period, staggered phases, the built-in 0.7s target-glow telegraph
       for(let i=0;i<3;i++) this.icicles.push(this.G.ents.add(new SpikeIcicle(this.G, [-9,0,9][i], 7.0, {period:4.6, phase:i*1.55, floorY:0})));
-      // the one-time penguin pair (spawnGrace per the clear-patch law — ambushes never bite instantly)
+      // the one-time penguin TRIO (spawnGrace per the clear-patch law — ambushes never bite instantly).
+      // Spread serves the ≤4 threat budget: flankers at ±9 spawn just OUTSIDE wakeR 7 (they engage as the
+      // player moves, never on spawn), the third holds the far edge opposite the player — homes stay wide
+      // so the trio engages serially, not as a converging pack.
       const pl = this.G.player, px = pl?pl.pos.x:0;
-      for(const s of [-1,1]){
-        const pg = new FrostbitePenguin(this.G, clamp(px+7*s, -19, 19), 0, 0, {phase:s>0?0.5:0, range:3, dir:s, wakeR:7});
+      const spots = [[clamp(px-9,-19,19), -1, 0], [clamp(px+9,-19,19), 1, 0.5], [px>=0?-17:17, px>=0?-1:1, 1.0]];
+      for(const [gx, gd, ph] of spots){
+        const pg = new FrostbitePenguin(this.G, gx, 0, 0, {phase:ph, range:3, dir:gd, wakeR:7});
         pg.spawnGrace = 1.0; this.G.ents.add(pg);
       }
     }
@@ -241,11 +255,11 @@ class Grumble {
       const tx = clamp(pl.pos.x + o, -20, 20);
       const ball = mesh('sph',[0.42,9,8], emat(0xf0f4ff, 0x8aa4d0, 0.3));
       ball.position.set(this.pos.x, sy, 0);
-      // the growing floor target-glow — visible for the FULL flight (1.15s ≥ the 0.7s telegraph law)
+      // the growing floor target-glow — visible for the FULL flight (0.9s P2 / 0.72s P3, ≥ the 0.65s floor)
       const glow = new THREE.Mesh(geo('circ',0.6,12), new THREE.MeshBasicMaterial({color:W6PAL.coldFx, transparent:true, opacity:0, depthWrite:false}));
       glow.rotation.x = -Math.PI/2; glow.position.set(tx, 0.05, 0);
       this.G.scene.add(ball, glow);
-      const T = 1.15;
+      const T = this.lobT || 1.15;
       this.snowballs.push({mesh:ball, glow, tx, vx:(tx-this.pos.x)/T, vy:0.5*22*T - sy/T, t:0, T});
     }
     AUDIO.noise && AUDIO.noise({t:0.25, vol:0.16, fFrom:400, fTo:900});
@@ -447,7 +461,7 @@ class Grumble {
       case 'recover':
         this.body.position.y = damp(this.body.position.y, 0, 6, dt);
         this.body.rotation.z = damp(this.body.rotation.z, 0, 6, dt);
-        if(this.stateT>0.8){
+        if(this.stateT>(this.recLen||0.8)){   // recover shortens per phase — the cadence dial
           this.stateT=0; this.hopCount=0;
           // fixed alternation — never RNG (boss time feeds the leaderboard; the fight must replay identically)
           this.seq++;
@@ -457,10 +471,12 @@ class Grumble {
         }
         break;
       case 'lob':
-        // scoop-and-throw: 0.45s wind-up squash, then the volley (each ball carries its own 1.15s floor glow)
+        // scoop-and-throw: 0.45s wind-up squash, then the volley (each ball carries its own full-flight
+        // floor glow). Exit at windup+flight+0.05 — every ball RESOLVES inside this state, so hop-contact
+        // and the volley can never overlap (the threat-budget exclusivity, verified by these clocks).
         this.body.scale.y = 1-Math.sin(Math.min(this.stateT/0.45,1)*Math.PI)*0.12;
         if(this.stateT>0.45 && !this._lobFired){ this._lobFired=true; this._lobVolley(); }
-        if(this.stateT>1.3){ this.state='hop'; this.stateT=0; this.hopCount=0; this.body.scale.y=1; }
+        if(this.stateT>0.5+(this.lobT||1.15)){ this.state='hop'; this.stateT=0; this.hopCount=0; this.body.scale.y=1; }
         break;
       case 'burst': {
         // the knocked-down base slumps and shivers
@@ -474,8 +490,9 @@ class Grumble {
         break;
       }
       case 'rebuild': {
-        // ~3s vulnerable-free SPECTACLE — snow streams from every unmelted drift as he restacks, bigger trouble
-        const k = Math.min(1, this.stateT/3.0);
+        // ~2.2s vulnerable-free SPECTACLE (trimmed from 3s — the exam wastes less of your run) — snow
+        // streams from every unmelted drift as he restacks, bigger trouble
+        const k = Math.min(1, this.stateT/2.2);
         if(k>0.25){
           this.tierM.visible = true; this.buttons.visible = true;
           const kk = Math.min(1,(k-0.25)/0.5);
@@ -494,7 +511,7 @@ class Grumble {
             G.fx.spawn(new THREE.Vector3(lerp(dp.x,p.x,rand(0.25,0.9)), rand(0.5,3.5), 0), 0xf0f4ff, 1, {speed:1.8, life:0.4});
           }
         }
-        if(this.stateT>3.0){
+        if(this.stateT>2.2){
           this.state='hop'; this.stateT=0; this.hopCount=0;
           this.tierM.scale.setScalar(1); this.headG.scale.setScalar(1);
           this.phase++;

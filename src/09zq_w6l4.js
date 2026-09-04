@@ -2,46 +2,66 @@
 // The glade where the festival lights went OUT. Every string hangs dead between its posts, the frost has
 // crept over doors and bridges, and one candle burns in one cottage window because somebody never gave up.
 // This is Frostmere's PUZZLE-PLATFORMING beat and the district's signature verb made whole: LIGHT THAWS ICE —
-// spin a dark W6Lantern lit and its linked ThawBlock MELTS open. Introduce it safely, twist it into a ROUTE
-// CHOICE (melting is forever — the frozen top WAS the high road), escalate it under enemy pressure and then
-// mid-slide between thaw pockets, and master it at the GLADE STAR: one whack and the whole glade blazes back.
-// Full introduce->twist->escalate->master at D3 density ("fairly competitive": 10 threats, 3 lanes), every
-// element clocked and telegraphed — structured chaos, never bullet-hell:
-//   BEAT 1 THE DARK GLADE (INTRODUCE)       x -8..36  — CP0. A Snow-Boo drifts the gloom (stare = a standable
-//          ice block — the D4 rule's winter twist); the FIRST lantern+wall pair on flat safe ground. Dead
-//          strings overhead; a startled winter crow.
-//   BEAT 2 THE FROZEN SHELF (TWIST)         x 36..64  — a ThawBlock BRIDGE-BLOCKER: frozen, its top is the
-//          STAIR to a slick high road (ice platforms, more candy, Bat Wings); melted, it's the DOOR to the
-//          safe low road (a penguin patrols it). Melting is a CHOICE — the glade doesn't refreeze.
-//   BEAT 3 THE GUARDED FLAMES (ESCALATE A)  x 64..108 — CP1 (lit). The Mystery Igloo in its clear pocket; the
-//          QUIET PROP cottage; GOLDEN PUMPKIN #2 sealed in a ThawBlock VAULT high overhead, its lantern
-//          flanked by TWO Spooky Snowmen (light it while they creep); then wall D's lantern behind a
-//          Frostbite Penguin + a Snow-Boo — the first flame you fight for.
-//   BEAT 4 THE THAW POCKETS (ESCALATE B)    x 108..134 — pit #1, then the ice pond: spin the lantern IN
-//          STRIDE and carry momentum through walls E and F as they open (the collider ghosts in a tenth of a
-//          second — faster than your slide). A Blizzard Bat works the air lane. (6-4 is the one level before
-//          6-5 allowed to combine ice with void — both pits have honest snow lips, gaps <=4.4.)
-//   BEAT 5 THE GLADE STAR (MASTER · finish) x 134..164 — CP2 (lit). A growing Snowball Roller owns the lane,
-//          a Snow-Boo and a Blizzard Bat crowd the approach — then the STAR SWITCH: spin the star-pole and
-//          EVERY dead string in the glade blazes on while three ice walls melt in sequence across the chasm
-//          bridge. Run it as it opens. The level's firework moment.
+// spin a dark W6Lantern lit and its linked ThawBlock MELTS open. Introduce it under light pressure, twist it
+// into a ROUTE CHOICE (melting is forever — the frozen top WAS the high road), escalate it into flames you
+// FIGHT for, then mid-slide between thaw pockets while a snowball owns the lane, and master it at the GLADE
+// STAR: one whack and the whole glade blazes back — under falling ice.
+//
+// RETUNE (owner call, Sept 4 2026): Glimmerfields is POST-STORY MASTERY — one column right of D5, still
+// main-game fair. This is w6's "the first flame you fight for" level made total: EVERY lantern-lighting
+// moment is now contested. 14 threats over 3 lanes (D5's 5-5 ran 13), TWO checkpoints only (CP0 + one lit
+// lantern at 55% — the walk-back is part of the price, the D5 law), ice+void composed honestly (this level's
+// district licence: both pond pits have marked lips, arcs, and a signpost), and the finale bridge runs its
+// staggered melt under a three-icicle WAVE. Full introduce->twist->escalate->master:
+//   BEAT 1 THE DARK GLADE (INTRODUCE)       x -8..36  — CP0. Snow-Boo #1 drifts the gloom and CONTESTS the
+//          first lantern pair (stare = a standable ice block — the verb that buys every window in this
+//          level). Dead strings overhead; a startled winter crow.
+//   BEAT 2 THE FROZEN SHELF (TWIST)         x 36..64  — the ThawBlock BRIDGE-BLOCKER route choice: frozen,
+//          its top is the STAIR to a slick high road; melted, it's the DOOR to the low road. A Frostbite
+//          Penguin squawks the junction while you decide, Blizzard Bat #3 owns the shelf air (and its Bat
+//          Wings reward), penguin #1 patrols the low road — both routes contested, choice intact.
+//   BEAT 3 THE GUARDED FLAMES (ESCALATE A)  x 64..110 — the Mystery Igloo in its clear pocket; the QUIET
+//          PROP cottage; GOLDEN PUMPKIN #2 sealed in a ThawBlock VAULT, its lantern flanked by TWO Spooky
+//          Snowmen; then CP1 — THE one lit mid lantern (x97.5, 55%) — in the level's engineered hush; then
+//          wall D fought for past a penguin patrol while Snow-Boo #2 drifts in off the pit lip.
+//   BEAT 4 THE THAW POCKETS (ESCALATE B — THE SET-PIECE) x 108..134 — pit #1, land ON ice, spin lantern E
+//          under Blizzard Bat #1's beat; then the ROLLER CORRIDOR: a snowball lane crosses the pond between
+//          walls E and F and lantern F stands MID-LANE — spin-light in stride (hop the ball, spin the flame)
+//          or bonk the wall and reset against the next ball. Then pit #2, jumped FROM the ice at slide speed
+//          (momentum management — the 6-4 licence). Three winter mechanics composed: ice + thaw + roller.
+//   BEAT 5 THE GLADE STAR (MASTER · finish) x 134..164 — skate IN on fresh ice: a growing Snowball Roller
+//          owns the lane, Spooky Snowman #3 creeps it, a Snow-Boo and Blizzard Bat #2 crowd the star pole —
+//          then the STAR SWITCH: every dead string blazes on while three ice walls melt in 0.5s sequence
+//          across the chasm bridge... which is capped by THREE SpikeIcicles dropping in a phase wave. Time
+//          the whack, run the melt, thread the wave. The level's firework moment, now a mastery exam.
 //   RUN-OUT                                 x 164..185 — the town-side strings still burn; the gate under
 //          festival light.
 // Reads UNMISTAKABLY Glimmerfields: W6PAL moonlit snow + blue-violet night, dead bulb-strings that WAKE, warm
 // lantern pools pushed into G.lightPools, icy-cyan cold spirits, snow-shouldered pines, the aurora breathing
-// over the far peaks. Three lanes busy the whole way (ground snowmen/penguins/roller · air Blizzard Bats ·
-// floating Snow-Boos). Comparable heights throughout (tap 1.8 / held 2.6 / double 3.3; main-route step-ups
-// <=2.1, pit gaps <=4.4, every blocker wall h>=3.6 = clearly GATED on the lantern verb, never almost-jumpable).
-// Deterministic to the tooth — fixed enemy phases, the roller on a fixed lane clock, the star's melt stagger on
-// a fixed 0.5s cadence, lanterns/thaws one-way switches; seeded rand() only inside baked cosmetic deco. No
-// Math.random on the critical path. NO Leap of Faith (both already live elsewhere — sacred). HEARTS ALWAYS:
-// pits cost a heart + the lantern walk-back, nothing one-shots.
-// CLEAR-PATCH LAW (igloo @ x71): zero patrol/dive coverage within ~6u by construction — penguin #1's patrol
-// tops out at x52.6 (19u clear, wakeR 5 can't reach), snowman A homes at x84 with aggroR 7 (the igloo's
-// interact edge x73.8 sits 10u+ outside his creep trigger), both Blizzard Bat homes are 52u/74u away (they
-// drift after diving — kept far per the air-diver rule), the roller lane ends at x138. Snow-Boos are
-// stare-controlled chasers with no patrol home (the w5l1 Shadow-Copy precedent): boo #1 is the beat-1 teaching
-// kill and the level's own verb freezes any tag-along harmless — opening stays a deliberate safe act.
+// over the far peaks. Three lanes busy the whole way (ground penguins/snowmen/rollers · air Blizzard Bats on
+// staggered phases 0.3/0.7/1.1 with periods 3.2/3.0/3.4 — never synced · float/ceiling Snow-Boos and the
+// bridge icicles). Comparable heights throughout (tap 1.8 / held 2.6 / double 3.3; main-route step-ups <=2.0,
+// pit gaps 4.4 and 4.0 (held clears with margin), every blocker wall h>=3.6 = clearly GATED on the lantern
+// verb, never almost-jumpable). Deterministic to the tooth — fixed enemy phases, both rollers on fixed lane
+// clocks, the icicle wave on fixed 4.2s clocks (phases 0/1.4/2.8), the star's melt stagger on a fixed 0.5s
+// cadence, lanterns/thaws one-way switches; seeded rand() only inside baked cosmetic deco. No Math.random on
+// the critical path. NO Leap of Faith (both already live elsewhere — sacred). HEARTS ALWAYS: pits cost a
+// heart + the lantern walk-back, nothing one-shots; telegraphs never dip below 0.6s (icicle tele 0.7s,
+// penguin squawk 0.5s + visible approach, rollers visible their whole run).
+//
+// SPAWN SAFETY (the law: no threat reaches an IDLE player at either respawn point — reach math):
+//   CP0 (x2):  boo #1 home x18, leash chaseR 14 < distance 16 (2.0u margin — never chases a spawner);
+//              penguin #3 wake edge = patrol min 30.5 - wakeR 4.5 = x26 (24u clear); everything else >40u.
+//   CP1 (x97.5): snowman B home 90 + aggroR 5.5 = reach x95.5 (2.0u margin; snowmen only move when the
+//              player is inside aggroR of them); penguin #2 wake edge = patrol min 103.3 - wakeR 4.5 =
+//              x98.8 (1.3u margin — an idle player never triggers the squawk, so the 8u slide never comes);
+//              boo #2 home 115.5, leash edge 115.5-14 = x101.5 (4.0u margin); bat #1 dive-aggro edge =
+//              patrol min 114.5 - aggroR 4.5 = x110 (12.5u); snowman #3/roller lanes/icicles all >37u.
+// CLEAR-PATCH LAW (igloo @ x71, interact edge ~x73.8): penguin #1's patrol tops out at x52.6 (19u clear,
+// wakeR 5 can't reach); snowman A homes at x84 with aggroR 5.5 (creep edge x78.5 — 4.7u outside the
+// interact edge, and snowmen don't patrol); Blizzard Bat homes are 17.7u/45u/73u away (they drift after
+// diving — kept far per the air-diver rule); Snow-Boo homes (18/115.5/143) are all >=15u from the igloo per
+// the boo-leash law; roller lane #1 ends at x120.6 (46.8u). Opening stays a deliberate safe act.
 
 // ---- THE QUIET PROP: a snowed-in cottage at the glade's edge, dark like everything else — except ONE window,
 // lit by one stubborn candle, a wrapped gift waiting on the doorstep and the path swept clear. Somebody in the
@@ -103,26 +123,30 @@ function buildW6L4(G){
   const deco = new THREE.Group();          // all static scenery bakes to one draw call at the tail
   const L2 = w6LightsBegin();              // THE DEAD STRINGS — built dark, woken by the star (see the ticker)
 
-  // =============================== BEAT 1 — THE DARK GLADE (x -8..36): INTRODUCE light-thaws-ice ===============================
+  // =============================== BEAT 1 — THE DARK GLADE (x -8..36): INTRODUCE, contested ===============================
   groundX(G, -8, 110, SNOW);                                            // the snow road runs unbroken to pit #1 at 110
   G.ents.add(new Checkpoint(2, 0, 1.6, 0, {noLight:true}));             // CP0 — start
   signPost(G, 5, 1.7, -0.12, "GLIMMERGLADE. The night the flame went out, every festival string in the glade went dark with it - and the frost moved in behind them. But the ice remembers warmth: LIGHT SOMETHING. Give a dark lantern a good whack and see what lets go.");
-  // SNOW-BOO #1 — the teaching chaser: it drifts at you the moment you look away; STARE it and it freezes into
-  // a standable ice block (the D4 rule's winter twist, learned in 6-1 — here it LIVES in the dark). The candy
-  // road walks you straight into the lesson; almost every run pops it here for the drop.
-  G.ents.add(new SnowBoo(G, 14, 0.4, 0, {phase:0.0, speed:1.8}));
-  candyLine(G, [[6,0.9,0],[9,0.9,0],[12,0.9,0]], 3);
+  // SNOW-BOO #1 — the teaching chaser AND the first flame's keeper: it drifts at you the moment you look away;
+  // STARE it and it freezes into a standable ice block (learned in 6-1 — here it LIVES in the dark, and it
+  // will tail you right into lantern A's pocket: freeze it to buy the spin window, or pop it for the drop).
+  // Home x18 — leashed chaseR 14 stops 2u short of an idle player at CP0 (spawn-safety law; was x14).
+  G.ents.add(new SnowBoo(G, 18, 0.4, 0, {phase:0.0, speed:1.8}));
+  candyLine(G, [[8,0.9,0],[11,0.9,0],[14,0.9,0]], 3);                   // the candy road walks you into the lesson
   G.ents.add(new Crow(9, 0.95, 2.4));                                   // reactive winter crow — flaps off when neared
-  // THE FIRST PAIR — lantern A + wall A on flat safe ground: nothing else nearby, nothing rushed. Spin the
-  // lantern (attack within ~1.7u), the wall melts, the verb is yours. Wall h4.0 = clearly GATED (double 3.3
-  // can't scrape it — never almost-jumpable, per comparable-heights law).
+  // THE FIRST PAIR — lantern A + wall A on flat ground, boo #1 drifting the pocket. Spin the lantern (attack
+  // within ~1.7u), the wall melts, the verb is yours — earned, not handed (this district's whole thesis).
+  // Wall h4.0 = clearly GATED (double 3.3 can't scrape it — never almost-jumpable, per comparable-heights law).
   const lanA = new W6Lantern(G, 22, 0); G.ents.add(lanA);
   G.ents.add(new ThawBlock(G, 25.5, 0, 2.0, 4.0, {lantern:lanA}));
   candyLine(G, [[19.5,0.9,0],[23,0.9,0],[27,0.9,0]], 3);                // the arc walks you lantern -> doorway
   candyLine(G, [[31,0.9,0],[34,0.9,0]], 2);
 
-  // =============================== BEAT 2 — THE FROZEN SHELF (x 36..64): TWIST — melting is a CHOICE ===============================
+  // =============================== BEAT 2 — THE FROZEN SHELF (x 36..64): TWIST — a contested CHOICE ===============================
   signPost(G, 34, 1.7, 0.1, "Mind how you melt. Frozen, that block is a STAIR to the high shelf. Melted, it's a DOOR to the easy road. The glade doesn't refreeze - and it doesn't judge.");
+  // PENGUIN #3 (retune) — the junction's heckler: it patrols the choice-point itself, so reading the sign and
+  // lighting lantern B happen under squawk pressure (0.5s telegraph + the whole waddle visible — tap clears it).
+  G.ents.add(new FrostbitePenguin(G, 32.5, 0, 0, {phase:0.2, range:2.0, dir:1, speed:1.25}));
   // THE BRIDGE-BLOCKER — block B plugs the ground path at 2.0 tall: hop its top (main-route step-up 2.0 <= 2.1)
   // and it's the stair onto the slick high road; light lantern B and it's a door onto the safe low road. The
   // choice is real but never a trap: double-jump (3.3 onto the 2.6 shelf) re-opens the high road after a melt.
@@ -130,7 +154,7 @@ function buildW6L4(G){
   G.ents.add(new ThawBlock(G, 40, 0, 2.2, 2.0, {lantern:lanB}));
   candyLine(G, [[40,3.1,0],[42.5,3.3,0]], 2);                           // the frozen-stair lure, visible from the ground
   // HIGH ROAD — a slick ice-shelf hop line (over safe ground the whole way: ice NEVER hangs over void here —
-  // that combination waits for beat 4, this level's one licence). Gaps ~0.9, rises <=0.6: tap-hops with slide.
+  // that composition waits for beat 4, this level's licence). Gaps ~0.9, rises <=0.6: tap-hops with slide.
   w6IcePlat(G, 44,   2.6, 0, 2.6, 3);
   w6IcePlat(G, 47.5, 3.2, 0, 2.6, 3);
   w6IcePlat(G, 51,   3.6, 0, 2.6, 3);
@@ -139,15 +163,18 @@ function buildW6L4(G){
   candyLine(G, [[44,3.4,0],[47.5,4.0,0],[51,4.4,0]], 3);                // high-road candy IN PLAIN SIGHT overhead
   candyLine(G, [[54.5,4.0,0],[58,3.2,0]], 2);                          //   (the low road looks up and itches — junction law)
   G.ents.add(new BonkLantern(G, 51, 4.9, 0, 'bat'));                    // shelf reward — Bat Wings for the road ahead
+  // BLIZZARD BAT #3 (retune) — the shelf's air lane: squeak-telegraphed snapshot dive guarding the reward and
+  // the back half of the hop line. Phase 0.7 / period 3.0 — staggered against bats #1 and #2, never synced.
+  // Home 17.7u from the igloo (air-diver rule: divers drift after diving, kept far).
+  G.ents.add(new BlizzardBat(G, 53.5, 5.6, 0, {phase:0.7, range:2.5, period:3.0, aggroR:4.5}));
   // LOW ROAD — the melted door's easy line, patrolled honest: penguin #1's squawk IS the telegraph
   G.ents.add(new FrostbitePenguin(G, 50, 0, 0, {phase:0.0, range:2.6, dir:1, speed:1.2}));
   candyLine(G, [[46,0.9,0],[50,0.9,0],[54,0.9,0]], 3);
   candyLine(G, [[62,0.9,0],[64.5,0.9,0]], 2);                           // both roads rejoin here
 
-  // =============================== BEAT 3 — THE GUARDED FLAMES (x 64..108): ESCALATE A + CP1 + igloo + GP vault ===============================
-  G.ents.add(new Checkpoint(66, 0, 1.6, 1));                            // CP1 — LIT, first of the two mid lanterns
-  // THE MYSTERY IGLOO — Frostmere's gamble, in its CLEAR POCKET (the numbers live in the header comment: every
-  // patrol/dive home 10u+ away by construction; the pocket is the level's one deliberate hush before the fight)
+  // =============================== BEAT 3 — THE GUARDED FLAMES (x 64..110): ESCALATE A + igloo + GP vault + CP1 ===============================
+  // THE MYSTERY IGLOO — Frostmere's gamble, in its CLEAR POCKET (the numbers live in the header: every patrol/
+  // dive/leash reach 4.7u+ outside the interact edge by construction — the level's one deliberate hush)
   const igloo = new MysteryIgloo(71, 0, -0.4, -0.15);
   G.coffins.push(igloo); G.ents.add(igloo);
   // the quiet prop sits at the route's edge past the igloo — one lit window in the dark (never signposted)
@@ -171,53 +198,79 @@ function buildW6L4(G){
   _w6l4vault = vault; _w6l4gp = false;
   candyLine(G, [[90.5,1.2,0],[93,3.4,0],[94.7,4.6,0]], 3);              // the climb traced (telegraphs the double-jump)
   deco.add(w6SnowmanDeco(87.5, -2.4, 0.9, 0.4));                        // one INNOCENT deco snowman among the guards — good luck
-  // WALL D — the first flame you FIGHT for: lantern D behind a penguin's patrol with a Snow-Boo drifting in
-  // (freeze the boo, bait the squawk, spin the lantern in the gap — the whole level's toolkit in one pocket)
-  G.ents.add(new FrostbitePenguin(G, 99.5, 0, 0, {phase:0.5, range:2.0, dir:-1, speed:1.3, wakeR:4.5}));
-  G.ents.add(new SnowBoo(G, 104, 0.4, 0, {phase:0.6, speed:2.0}));      // the wall's keeper, drifting before the ice
-  const lanD = new W6Lantern(G, 102.5, 0); G.ents.add(lanD);
-  G.ents.add(new ThawBlock(G, 105.5, 0, 2.0, 4.0, {lantern:lanD}));
-  candyLine(G, [[99,0.9,0],[101,0.9,0]], 2);
+  // CP1 — THE one lit mid-level lantern (retune: was two, at 66 and 135.5 — D5 law says ONE, and the walk-back
+  // is part of the price). x97.5 = 55% of the course, in an ENGINEERED HUSH between the guard pockets:
+  // snowman B's creep reach tops at 95.5 (2.0u short), penguin #2's wake edge is 98.8 (1.3u past), boo #2's
+  // leash edge is 101.5 (4.0u past). An idle player here is untouchable — the reach math is the placement.
+  G.ents.add(new Checkpoint(97.5, 0, 1.6, 1));                          // CP1 — LIT. Every death past here walks from HERE.
+  // WALL D — the first flame you FIGHT for, now a proper toll: lantern D behind penguin #2's patrol while
+  // Snow-Boo #2 drifts in off the pit lip (freeze the boo, bait the squawk, spin the lantern in the gap — the
+  // whole level's toolkit in one pocket). Penguin slideT trimmed to 0.9 so a baited right-slide dies sooner.
+  G.ents.add(new FrostbitePenguin(G, 104.8, 0, 0, {phase:0.5, range:1.5, dir:-1, speed:1.3, wakeR:4.5, slideT:0.9}));
+  G.ents.add(new SnowBoo(G, 115.5, 0.4, 0, {phase:0.6, speed:2.0}));    // boo #2 — home ON the pond edge past the pit; its
+                                                                        //   14u leash pulls it across pit #1 at anyone past x101.5
+  const lanD = new W6Lantern(G, 102.8, 0); G.ents.add(lanD);
+  G.ents.add(new ThawBlock(G, 106, 0, 2.0, 4.0, {lantern:lanD}));
+  candyLine(G, [[100,0.9,0],[101.8,0.9,0]], 2);
 
-  // =============================== BEAT 4 — THE THAW POCKETS (x 108..134): ESCALATE B — momentum between melts ===============================
-  signPost(G, 108, 1.7, -0.1, "The pond ahead is pure ice - slick as a Boo's manners - and more frost-walls squat on it. Spin their lanterns IN STRIDE: the ice lets go faster than you think. Whatever you do, don't stop sliding.");
-  // PIT #1 (x 110..114.4, gap 4.4 — held clears with margin; honest snow lips, winter dressing below): the one
-  // district licence at work — you LAND ON ICE off a void jump. Room to gather yourself before wall E.
-  w6IceX(G, 114.4, 134);                                                // the frozen pond — tag:'ice', slick underfoot
+  // =============================== BEAT 4 — THE THAW POCKETS (x 108..134): ESCALATE B — THE SET-PIECE ===============================
+  signPost(G, 108, 1.7, -0.1, "Two bites of void with a frozen pond between them - and something keeps ROLLING across the far half. Spin the lanterns IN STRIDE (the ice lets go faster than you think), hop what rolls at you, and JUMP when the pond runs out. Don't stop sliding.");
+  // PIT #1 (x 110..114.4, gap 4.4 — held clears with margin; honest lips, winter dressing below): the district
+  // licence at work — you LAND ON ICE off a void jump, sliding straight into lantern E's spin window. Boo #2
+  // drifts at you across the gap (stare-freeze it mid-air and its 2.2s block is a stepping stone — the same
+  // blessed expert line as the chasm) and bat #1 works the pond air (dive-aggro edge x110: a player reading
+  // the beat from the lip at 109.5 is safe; step in to bait the dive, jump on its recovery).
+  w6IceX(G, 114.4, 130);                                                // POND A + the roller corridor — tag:'ice', slick underfoot
   candyLine(G, [[109,1.4,0],[112.2,2.3,0],[115.2,1.3,0]], 3);          // the arc traces the jump
-  // THE MOMENTUM PAIRS — lantern then wall, 3u apart: at slide speed the collider ghosts (0.1s) before you
-  // arrive. Learn it on E, own it on F. A mistimed spin just means a bump and a re-approach — never a hit.
-  const lanE = new W6Lantern(G, 117.5, 0); G.ents.add(lanE);
-  G.ents.add(new ThawBlock(G, 120.5, 0, 1.8, 4.0, {lantern:lanE}));
-  candyLine(G, [[116.5,0.9,0],[118.5,0.9,0]], 2);
-  const lanF = new W6Lantern(G, 125, 0); G.ents.add(lanF);
-  G.ents.add(new ThawBlock(G, 128, 0, 1.8, 4.0, {lantern:lanF}));
-  candyLine(G, [[122,0.9,0],[124.5,0.9,0],[127,0.9,0]], 3);
-  // BLIZZARD BAT #1 — the air lane over the pond (squeak-telegraphed snapshot dive; home 52u from the igloo)
-  G.ents.add(new BlizzardBat(G, 123, 5.4, 0, {phase:0.3, range:3, period:3.2, aggroR:4.5}));
-  candyLine(G, [[130,1.0,0],[132.5,1.1,0]], 2);                         // skate-out candy under the bat's beat
+  const lanE = new W6Lantern(G, 116.6, 0); G.ents.add(lanE);
+  G.ents.add(new ThawBlock(G, 119, 0, 1.8, 4.0, {lantern:lanE}));      // wall E spans 118.1..119.9
+  candyLine(G, [[115.6,0.9,0],[117.8,0.9,0]], 2);
+  G.ents.add(new BlizzardBat(G, 117, 5.4, 0, {phase:0.3, range:2.5, period:3.2, aggroR:4.5}));   // bat #1 — the pond's sky
+  // THE ROLLER CORRIDOR — the chained set-piece: between walls E and F a snowball lane crosses the pond
+  // (125.6 -> 120.6 on a fixed 2.9s clock, growing 0.35 -> 0.8 as it comes: tap-hoppable early, held late)
+  // and lantern F stands MID-LANE at 124.5 — spin-light IN STRIDE, hopping the ball as you swing (a spin
+  // lands airborne too), or bonk the frozen wall and reset against the next ball. Clean window between balls
+  // ~1.5s; the hop-over is ALWAYS available; a mistimed run costs a bump, never a cheap hit. The ball dies
+  // 0.7u past wall E's face and spawns 0.15u short of wall F's — it never clips unmelted ice.
+  G.ents.add(new SnowballRoller(G, 125.6, 0, 0, {x1:120.6, speed:3.6, r0:0.35, r1:0.8, pause:1.5, phase:0.0}));
+  const lanF = new W6Lantern(G, 124.5, 0); G.ents.add(lanF);
+  G.ents.add(new ThawBlock(G, 127, 0, 1.8, 4.0, {lantern:lanF}));      // wall F spans 126.1..127.9
+  candyLine(G, [[121.3,0.9,0],[123,0.9,0],[124.7,0.9,0]], 3);
+  // PIT #2 (x 130..134, gap 4.0) — the gap AFTER the ice run (momentum management, the retune's new licence
+  // for 6-3/6-4/6-5): 2.1u of reaction ice past wall F's doorway, the glassy sheen ends visibly at the lip,
+  // the arc traces the jump, and the sign called it. Land ON ice again — beat 5 skates in.
+  candyLine(G, [[128.8,1.3,0],[131.9,2.2,0],[135,1.3,0]], 3);          // the exit arc — jump where the candy jumps
 
-  // =============================== BEAT 5 — THE GLADE STAR (x 134..164): MASTER + CP2 + the firework finale ===============================
-  groundX(G, 134, 152, SNOW);
-  G.ents.add(new Checkpoint(135.5, 0, 1.6, 2));                         // CP2 — LIT, second mid lantern (finale falls walk from HERE)
-  // THE ROLLER LANE — a snowball rolls 148 -> 138 on a fixed clock, GROWING as it comes (cute at the far end,
-  // knee-high boulder by yours): hop it early and it's a tap, hop it late and it wants the held jump. Learn the
-  // lane. A Snow-Boo drifts the gloom (freeze it — the block is a step OVER the roller, the level teaching
-  // itself) and Blizzard Bat #2 dives the sky: three lanes, every threat on its own readable clock.
-  G.ents.add(new SnowballRoller(G, 148, 0, 0, {x1:138, speed:3.4, r0:0.35, r1:0.85, pause:1.4, phase:0.6}));
+  // =============================== BEAT 5 — THE GLADE STAR (x 134..164): MASTER + the firework finale ===============================
+  w6IceX(G, 134, 142);                                                  // the skate-in — pit #2 lands on ice, momentum carries
+  groundX(G, 142, 152, SNOW);                                           // honest snow under the star pole (the whack itself is stable)
+  // THE GAUNTLET — four threats on four readable clocks, no checkpoint here anymore (retune: the finale is
+  // walked from CP1 — the D5 price): roller #2 rolls 148 -> 138 growing knee-high (hop early = tap, late =
+  // held), Spooky Snowman #3 creeps the icy half while you watch the lane, a Snow-Boo drifts the gloom
+  // (freeze it — the block is a step OVER the roller, the level teaching itself) and Blizzard Bat #2 dives
+  // the sky (phase 1.1 / period 3.4 — staggered against #1 and #3). Stare control vs lane timing: watching
+  // the snowman and boo makes them safe, but the roller demands the lane and the bat punishes lingering.
+  G.ents.add(new SpookySnowman(G, 140.5, 0, 0, {phase:0.4, aggroR:5.5}));
+  G.ents.add(new SnowballRoller(G, 148, 0, 0, {x1:138, speed:3.6, r0:0.35, r1:0.85, pause:1.4, phase:0.6}));
   G.ents.add(new SnowBoo(G, 143, 0.4, 0, {phase:1.2, speed:2.2}));
   G.ents.add(new BlizzardBat(G, 145, 5.6, 0, {phase:1.1, range:3.5, period:3.4, aggroR:5}));
   candyLine(G, [[138.5,0.9,0],[141.5,0.9,0],[144.5,0.9,0],[147,0.9,0]], 4);   // the hop rhythm, traced
-  signPost(G, 147, 1.7, 0.1, "THE GLADE STAR. Every string in Glimmerfields runs home to that pole - the whole glade went dark the night it did. One good WHACK should do it. Word of advice: be ready to RUN.");
+  signPost(G, 147, 1.7, 0.1, "THE GLADE STAR. Every string in Glimmerfields runs home to that pole - the whole glade went dark the night it did. One good WHACK should do it. Be ready to RUN - and watch the ice-teeth over the bridge. They drop in a wave.");
   // THE STAR SWITCH — lantern G (r:14, the master pool) wears the gold star; my ticker below does the fireworks
   const lanStar = new W6Lantern(G, 150, 0, {r:14}); G.ents.add(lanStar);
   const star = w6l4StarPole(150); S.add(star.grp);
   const starLight = new THREE.PointLight(0xffd23f, 0, 16); starLight.position.set(150, 3.4, 0); S.add(starLight);
   { const ext = mesh('cyl',[0.05,0.07,1.9,5], mat(W6PAL.woodD)); ext.position.set(150, 2.15, 0); deco.add(ext); }   // the pole runs up from the cage to the star
-  // THE CHASM = PIT #2 (x 152..164): a snow-shelf bridge with three frozen walls sealing it — h3.6 on the segs
-  // means no double-jump sneaks by (gated on the star, telegraphed by the sign + the star's ember pulse).
-  // Bridge hops are small (gaps <=1.4, rises <=1.1) — the challenge is the RUN, not the jumps: hit the star and
-  // H1 melts NOW, H2 at +0.5s, H3 at +1.0s while every dead string in the glade blazes on overhead.
+  // THE CHASM (x 152..164): a snow-shelf bridge with three frozen walls sealing it — h3.6 on the segs means no
+  // double-jump sneaks by (gated on the star, telegraphed by the sign + the star's ember pulse). Bridge hops
+  // are small (gaps <=1.4, rises <=1.1) — the challenge is the RUN: hit the star and H1 melts NOW, H2 at
+  // +0.5s, H3 at +1.0s while every dead string in the glade blazes on overhead... and (retune) THREE
+  // SpikeIcicles cap the bridge from the festival wire, dropping in a left-to-right WAVE (fixed 4.2s clocks,
+  // phases 0 / 1.4 / 2.8; 0.7s shimmer + growing floor glow each — the bombardment language). The icicle
+  // clock runs from level start, so the wave's alignment with YOUR run is set by WHEN you whack the star:
+  // stand at the pole, read the wave, swing on the beat. That's the mastery exam — the spin itself becomes a
+  // timed input. Mortar-free otherwise: no shells, no chasers on the bridge; hanging icicles are harmless
+  // until they fall, and every drop is readable from the lip before you ever commit.
   // KNOWN EXPERT LINE (blessed, not a bug): boo #3 can be lured over the chasm, stare-frozen mid-air, and its
   // 2.2s ice block double-jumped from to clear a sealed wall — a starless cheese demanding total mastery of the
   // district verb. That's joy #2 (The Hunt) doing its job; casual play never brushes it, the star route stands.
@@ -228,8 +281,13 @@ function buildW6L4(G){
   G.ents.add(new ThawBlock(G, 154.6, 0.6, 1.4, 3.6, {lantern:lanStar}));
   G.ents.add(new ThawBlock(G, 158.4, 1.1, 1.4, 3.6, {lantern:melt2}));
   G.ents.add(new ThawBlock(G, 162.2, 0.6, 1.4, 3.6, {lantern:melt3}));
+  // THE ICICLE WAVE — hangYs sit on the dead string's sag line (the wire grew teeth when the glade froze);
+  // each targets its own bridge platform (floorY = the plat top), tips hang 0.6u+ above a runner's head.
+  G.ents.add(new SpikeIcicle(G, 154.6, 3.6, {floorY:0.6, phase:0.0, period:4.2}));
+  G.ents.add(new SpikeIcicle(G, 158.9, 4.95, {floorY:1.1, phase:1.4, period:4.2}));
+  G.ents.add(new SpikeIcicle(G, 162.2, 3.8, {floorY:0.6, phase:2.8, period:4.2}));
   candyLine(G, [[153.5,1.6,0],[156.4,2.1,0]], 2);                       // bridge candy sits clear of every frozen wall
-  candyLine(G, [[160.3,2.1,0],[163.3,1.6,0]], 2);                       //   (nothing to vacuum through the ice)
+  candyLine(G, [[160.3,2.1,0],[163.3,1.6,0]], 2);                       //   and every icicle column (nothing baits a drop)
 
   // =============================== RUN-OUT (x 164..185): the town side still burns ===============================
   groundX(G, 164, 185, SNOW);
@@ -243,7 +301,7 @@ function buildW6L4(G){
   w6String(L2, 40,5.6, 51,6.0);  w6String(L2, 51,6.0, 61,5.4);          // over the frozen shelf
   w6String(L2, 68,4.0, 80,4.2);                                         // the igloo hush
   w6String(L2, 136,4.0, 150,3.2);                                       // the last string runs home into the star pole
-  w6String(L2, 150,3.4, 158.4,5.2); w6String(L2, 158.4,5.2, 166,3.8);   // ACROSS the chasm — the blaze you run under
+  w6String(L2, 150,3.4, 158.4,5.2); w6String(L2, 158.4,5.2, 166,3.8);   // ACROSS the chasm — the blaze you run under (and the wire the icicles grew from)
   const darkMats = w6l4DarkFinish(G, L2);
   for(const [px,ph] of [[2,3.2],[12,3.4],[22,3.2],[40,5.6],[51,6.0],[61,5.4],[68,4.0],[80,4.2],[136,4.0]]) deco.add(w6LightPost(px, -1.6, ph));
   { const bp = w6LightPost(158.4, -1.2, 4.1); bp.position.y = 1.1; deco.add(bp); }   // the bridge's own post rides seg 2
@@ -295,15 +353,16 @@ function buildW6L4(G){
   // three-depth Glimmerfields skyline (snowdrifts & birches / the lamplit village / the great blue peaks) + aurora
   w6Parallax(S, -8, 185);
 
-  // themed crevasse dressing under both true pits (visual — the fall is the hazard; a heart + the walk back)
+  // themed crevasse dressing under all three true pits (visual — the fall is the hazard; a heart + the walk back)
   pitDressing(G, 110, 114.4, 'winter');
+  pitDressing(G, 130, 134, 'winter');
   pitDressing(G, 152, 164, 'winter');
 
-  // exit + the W6 tail. clutter placed manually on the SNOW spans only (the pond keeps its baked sparkle flecks;
-  // nothing scatters over the two pits or under the bridge)
+  // exit + the W6 tail. clutter placed manually on the SNOW spans only (both ponds keep their baked sparkle
+  // flecks; nothing scatters over the three pits or under the bridge)
   w6LevelFinish(G, -8, 185, null);
   w6Clutter(G, -8, 108, 'winter');
-  w6Clutter(G, 134, 150, 'winter');
+  w6Clutter(G, 142, 150, 'winter');
   w6Clutter(G, 164, 183, 'winter');
 
   return {spawnX: 0, exitX: 178};
@@ -322,8 +381,9 @@ function updateW6L4(G, dt){
       G.fx.spawn(new THREE.Vector3(96, 5.2, 0), 0xffd23f, 14, {speed:3, life:0.6});
     }
   }
-  // (lanterns, thaw blocks, the roller clock, the aurora and the bulb sets all self-tick deterministically
-  // through G.ents from their fixed clocks; the melt stagger is the star ticker's 0.5s cadence — covenant holds.)
+  // (lanterns, thaw blocks, both roller clocks, the icicle wave, the aurora and the bulb sets all self-tick
+  // deterministically through G.ents from their fixed clocks; the melt stagger is the star ticker's 0.5s
+  // cadence — covenant holds.)
 }
 
-W6_LEVELS.push({id:'w6l4', district:'w6', name:'GLIMMERGLADE', build:buildW6L4, update:updateW6L4, parTime:160});
+W6_LEVELS.push({id:'w6l4', district:'w6', name:'GLIMMERGLADE', build:buildW6L4, update:updateW6L4, parTime:168});

@@ -1,5 +1,10 @@
 // ============ LEVEL 6-5 — GRUMBLE'S DOORSTEP (District 6 · Frostmere · Glimmerfields) ============
-// The approach to Grumble's hill — the district's SET-PIECE finale and the week-one mastery exam. Somewhere up
+// POST-STORY PRESSURE PASS (owner call, Sept 4 2026): Glimmerfields is post-story content — everyone here has
+// already beaten all 25 base levels and Grimm. 6-5 is THE DISTRICT EXAM, one column right of D5 on the curve
+// but still MAIN-GAME FAIR (never Nightmare, never Kaizo): 15 enemies, 4 mortar batteries whose patterns now
+// INTERLEAVE at the seams, 5 spike icicles, 3 roller lanes, TWO gaps (one straight off the ice — momentum
+// management), and exactly ONE lit lantern past the halfway mark. The walk-back is part of the price.
+// The approach to Grumble's hill — the district's SET-PIECE finale and its mastery exam. Somewhere up
 // that hill, the corrupted guardian has turned the festival's snowball cannons on his own road: THE SNOWBALL
 // BOMBARDMENT (the owner's archetype, made canon July 22 2026 — "3-4 ground enemies and something shot at them
 // from the sky that needs to be dodged over and over"). Mortars lob arcing snowballs onto FIXED impact points on
@@ -10,25 +15,36 @@
 //   BEAT 1 THE LAST QUIET LANE            x -8..30   — CP0. Festival lights, the Mystery Igloo in its clear
 //          pocket (CLEAR-PATCH law — nothing patrols within ~10u), a rolling snowball lane to warm up on, a
 //          Spooky Snowman pretending very hard to be decoration. The QUIET PROP waits in a drift.
-//   BEAT 2 THE FIRST BARRAGE (INTRODUCE)  x 30..64   — battery A: a 4-point left-to-right sweep on open snow,
-//          a penguin lane underneath. THE HIGH ROAD branches up a ridge ABOVE the mortars' aim — harder jumps,
-//          more candy, bombardment-free: the strategic trade, visible from below (the "next run" itch).
-//   BEAT 3 THE GLAZE BARRAGE (TWIST)      x 64..96   — CP1. The same sweep... over ICE. Momentum vs pattern:
-//          you can't stop quick on the glaze, so plan the stops. A Snow-Boo stared solid = mobile snow-fort.
-//   BEAT 4 THE ICICLE PASS (ESCALATE)     x 96..132  — CP2. Mortars slalom with a SpikeIcicle ceiling stretch,
-//          a growing snowball lane and a penguin between them — three lanes, every threat on its own clock.
-//          A glacial crevasse (the level's one pit) caps the pass.
-//   BEAT 5 GRUMBLE'S HILL (MASTER · gate) x 135.5..181 — the doorstep gauntlet: mortars on an ice apron, the
-//          GARLAND CLIMB up the hill face (the gated verb, candy-telegraphed), the crest crossed UNDER FIRE
-//          (Grumble shells his own doorstep now), a Blizzard Bat diving the top, then down to the door.
+//   BEAT 2 THE FIRST BARRAGE (INTRODUCE)  x 30..58   — battery A: now a 5-point sweep whose LAST crater (x61)
+//          reaches onto the ice, into battery B's opening bars — THE A/B SEAM (x59..67): crossing the battery
+//          boundary means reading TWO clocks for ~8u, with an honest 2.1u lane between their nearest craters
+//          plus a second roller lane and a Snow-Boo working the seam. THE HIGH ROAD ridge floats ABOVE both
+//          batteries' aim — harder jumps, more candy, bombardment-free: the trade, visible from below.
+//   BEAT 3 THE GLAZE BARRAGE (TWIST)      x 58..92   — the sweep... over ICE (34u, the district's longest run).
+//          Momentum vs pattern; a Snowman stalks the craters (watch it or dodge — pick), a stared-solid Boo is
+//          a snow-fort, a Blizzard Bat dives the rejoin — and the glaze ENDS AT A CREVASSE (x92..95.5): the
+//          6-5 momentum exam, gap-after-ice, honest snow lips, a staring crow on the lip. NO lantern back here
+//          any more (exam law) — a glaze death walks back from the start.
+//   BEAT 4 THE ICICLE PASS (ESCALATE)     x 95.5..132 — THE lantern (x96.6, ~55%, the level's ONE lit
+//          checkpoint) then the slalom: 3 icicle clocks, battery C stretched to FOUR craters (the last at
+//          x122 composing with the crevasse-guard Snowman), a faster boulder lane and a penguin between them.
+//          A second glacial crevasse caps the pass.
+//   BEAT 5 GRUMBLE'S HILL (MASTER · gate) x 135.5..181 — the doorstep gauntlet: mortars on an ice apron, TWO
+//          Snow-Boos covering each other's blind spots at the hill's foot, the GARLAND CLIMB up the hill face
+//          — now with TWO alternating SpikeIcicles hung beside the climb volume (dodge-while-climbing under
+//          mortar fire: the hardest honest moment in the game — full 0.7s telegraphs, 2.1s between drops,
+//          climb-off always available) — the crest crossed UNDER FIRE (max 3 simultaneous threats, capped),
+//          a Blizzard Bat diving the top, then down to the door.
 // Reads UNMISTAKABLY Glimmerfields: W6PAL moonlit snow on the deep blue-violet night, warm festival bulbs strung
 // the whole way (five shared mats, one twinkle ticker), aurora ribbons, snowfall, cyan cold-spirit glow — and the
 // far hill wears one ENORMOUS snowman silhouette, waiting. Three lanes busy throughout (ground penguins/snowmen/
-// rollers/boos · air mortar arcs + Blizzard Bats · the icicle ceiling). Comparable heights (tap 1.8 / held 2.6 /
-// double 3.3; main road flat + one 3.5u tap-gap; high-road rises <=1.7 with over-clearance; the 4.6 hill is CLIMB-
-// gated, verb candy-telegraphed). HEARTS ALWAYS: every mortar/icicle/graze costs a heart, the crevasse costs a
-// heart + the lantern walk-back — nothing one-shots. Deterministic to the flake: every battery on a fixed clock
-// from level start, fixed enemy phases, NO Math.random on the critical path; seeded rand() only inside baked deco.
+// rollers · float Snow-Boos ×4 · air mortar arcs + phase-staggered Blizzard Bats · the 5-icicle ceiling).
+// Comparable heights (tap 1.8 / held 2.6 / double 3.3; main road flat + TWO 3.5u tap-gaps — the first launched
+// off glaze ice, momentum management, both with honest snow lips; high-road rises <=1.7 with over-clearance;
+// the 4.6 hill is CLIMB-gated, verb candy-telegraphed). HEARTS ALWAYS: every mortar/icicle/graze costs a heart,
+// each crevasse costs a heart + the walk-back (CP0 covers the first, the lone lantern the second) — nothing
+// one-shots. Deterministic to the flake: every battery on a fixed clock from level start, fixed enemy phases,
+// NO Math.random on the critical path; seeded rand() only inside baked deco.
 // GP: NONE (all three of the district's Golden Pumpkins live in 6-1..6-4). NO Old Shortcut here (the Wrong
 // Snowman keeps his own level). NO Leap of Faith — both of the game's two are placed and sacred.
 
@@ -134,7 +150,7 @@ function buildW6L5(G){
   const L = w6LightsBegin();               // festival light strings — 5 shared mats + one twinkle ticker
 
   // =============================== BEAT 1 — THE LAST QUIET LANE (x -8..30) ===============================
-  groundX(G, -8, 64, SNOW);                                            // snow road runs unbroken to the glaze at 64
+  groundX(G, -8, 58, SNOW);                                            // snow road runs unbroken to the glaze at 58
   G.ents.add(new Checkpoint(2, 0, 1.6, 0, {noLight:true}));            // CP0 — start
   signPost(G, 5, 1.7, -0.12, "GRUMBLE'S DOORSTEP. The hill lobs snowballs at anyone who knocks - watch the road: a cold blue glow marks where the sky lands next. Stand ANYWHERE else. Or take the ridge - he can't hit what flies above his aim.");
   // festival lights still strung down the lane — the town never stopped decorating his road
@@ -144,9 +160,11 @@ function buildW6L5(G){
   w6String(L, 19, 2.95, 27, 2.95, {z:-1.8});
   candyLine(G, [[6,0.9,0],[9,0.9,0],[12,0.9,0]], 3);
   G.ents.add(new Crow(10, 0.95, 2.3));                                 // winter crow #1 — flaps off when neared
-  // THE MYSTERY IGLOO — the gamble, in its CLEAR POCKET (CLEAR-PATCH law): roller lane starts at 24 (10u clear),
-  // the snowman holds at 30 (a player at the igloo sits beyond its watchR — it stays pure decoration), mortars
-  // begin at 37, bats live past 96. Opening it is a deliberate, safe act; the ambush spawns on the kit's 1s grace.
+  // THE MYSTERY IGLOO — the gamble, in its CLEAR POCKET (CLEAR-PATCH law, re-verified for the exam roster):
+  // roller lane #1 starts at 24 (10u clear), lane #2 at 48, the snowman holds at 30 (a player at the igloo sits
+  // beyond its watchR 19..41 — it stays pure decoration), mortars begin at 37, the nearest Snow-Boo home is 58
+  // (44u; leashed chaseR 14 → active zone 44..72), bats live past 83. Opening it is a deliberate, safe act;
+  // the ambush spawns on the kit's 1s grace.
   { const ig = new MysteryIgloo(14, 0, -0.6, 0.35); G.coffins.push(ig); G.ents.add(ig); }
   // THE QUIET PROP (never signposted): the buried mailbox, one letter frozen mid-delivery, addressed with a heart
   deco.add(w6l5Mailbox(22.5, -1.9));
@@ -156,13 +174,23 @@ function buildW6L5(G){
   // head-pop, the blind waddle, the ANGRY rebuild — the rebuilt-and-furious pacing this doorstep deserves.
   G.ents.add(new SpookySnowman(G, 30, 0, 0, {phase:0.0, watchR:11, aggroR:7}));
 
-  // =============================== BEAT 2 — THE FIRST BARRAGE (x 30..64): INTRODUCE the mortars ===============================
-  // battery A — a 4-point sweep marching toward the hill (impacts 37/43/49/55, 6u apart: ~4.2u of safe lane
-  // between any two craters). Learn the glow, learn the rhythm; candy sits exactly where the dodge does.
-  w6l5Mortar(G, {period:6.4, cx:46, volley:[[0.9,37],[1.8,43],[2.7,49],[3.6,55]]});
+  // =============================== BEAT 2 — THE FIRST BARRAGE (x 30..58): INTRODUCE the mortars ===============================
+  // battery A — now a FIVE-point sweep marching toward the hill (impacts 37/43/49/55/61, 6u apart: ~4.2u of
+  // safe lane between any two craters). The LAST crater (x61) lands past the ice lip, inside battery B's
+  // opening bars — THE A/B SEAM: crossing x59..67 means reading two independent clocks (A period 6.4 · B 7.0;
+  // their drift means the overlap changes, but the lane between craters 61 and 65 — x62..64, 2.1u — is safe
+  // from BOTH even when they land together, and the ridge floats above it all). Learn the glow, learn the
+  // rhythm; candy sits exactly where the dodge does — and now runs INTO the seam lane.
+  w6l5Mortar(G, {period:6.4, cx:46, volley:[[0.9,37],[1.8,43],[2.7,49],[3.6,55],[4.6,61]]});
   candyLine(G, [[40,0.9,0],[45.2,0.9,0]], 2);                          // the dodge rhythm, traced
-  candyLine(G, [[52,0.9,0],[58,0.9,0]], 2);
+  candyLine(G, [[52,0.9,0],[57.9,0.9,0],[63,0.9,0]], 3);              // ...ending in the seam's honest lane (x62..64)
   G.ents.add(new FrostbitePenguin(G, 46, 0, 0, {phase:0.4, range:2.4, dir:-1}));   // ground pressure under the sweep — no camping
+  // SNOWBALL ROLLER #2 — a second, FASTER lane under the sweep's back half (48->62.5): hop craters AND the ball,
+  // rolling right into the seam read. Phase-staggered off lane #1 (both pure clocks; near-miss energy, no RNG).
+  G.ents.add(new SnowballRoller(G, 48, 0, 0, {x1:62.5, speed:3.6, r0:0.32, r1:1.0, pause:1.1, phase:2.6}));
+  // SNOW-BOO #1 — works the seam itself (home x58, leashed chaseR 14 -> active 44..72): stare it solid and its
+  // ice block is a mortar-proof fort in the two-clock zone — the district's signature trade, taught mid-exam.
+  G.ents.add(new SnowBoo(G, 58, 0, 0, {phase:0.8, speed:2.1, range:9, freezeMax:2.6}));
   // THE HIGH ROAD — a ridge line ABOVE the mortars' aim (impacts only bite below y1.25): trade harder jumps for
   // bombardment safety. Every ledge visible from the low road, candy overhead the whole way (the junction rule).
   platform(G, 38, 1.7, 0, 2.6, 3, RIDGE);                              // R1 spans 36.7..39.3 (+1.7 held from snow — over-clearance)
@@ -172,42 +200,67 @@ function buildW6L5(G){
   platform(G, 59, 4.0, 0, 3.0, 3, RIDGE);                              // R5 spans 57.5..60.5 (+0.4, gap 2.5)
   candyLine(G, [[38,2.5,0],[41,3.6,0],[42.5,4.0,0]], 3);              // candy telegraphs the way up...
   candyLine(G, [[48,4.6,0],[53.5,4.4,0]], 2);
-  candyLine(G, [[59,4.8,0],[62,4.8,0]], 2);                            // ...and off the ridge toward CP1
+  candyLine(G, [[59,4.8,0],[62,4.8,0]], 2);                            // ...and off the ridge, out over the two-clock seam
 
-  // =============================== BEAT 3 — THE GLAZE BARRAGE (x 64..96): TWIST — the sweep, on ice ===============================
-  G.ents.add(new Checkpoint(61.5, 0, 1.6, 1));                         // CP1 — LIT, mid-level mercy before the glaze
-  signPost(G, 63, 1.7, 0.1, "THE GLAZE. The barrage keeps its rhythm, but the ice keeps your speed - plan your stops before you need them. And a Boo stared solid makes a fine snow-fort, if you can bear the company.");
-  w6IceX(G, 64, 96);                                                   // tag:'ice' — slick underfoot, glossy telegraphed sheen
-  // battery B — the SAME learned sweep, one point longer, over the glaze: momentum vs pattern (the twist)
-  w6l5Mortar(G, {period:7.0, cx:81, volley:[[1.0,69],[1.9,75],[2.8,81],[3.7,87],[4.6,93]]});
+  // =============================== BEAT 3 — THE GLAZE BARRAGE (x 58..92): TWIST — two clocks, on ice ===============================
+  // NO mid-level lantern back here any more (exam law: CP0 + exactly ONE lit lantern at ~55%) — a glaze death
+  // walks back from the start. The old lantern's spot keeps its signpost; the words now carry the warning.
+  signPost(G, 63, 1.7, 0.1, "THE GLAZE. Two batteries argue over this stretch - where their aims cross, read BOTH rhythms. The ice keeps your speed, so plan your stops... and mind the far end: the glaze quits before the ground comes back. Carry the RIGHT speed off the ice - not all of it.");
+  w6IceX(G, 58, 92);                                                   // tag:'ice' — 34u, the district's LONGEST run... and it ends at a crevasse
+  // battery B — the SAME learned sweep over the glaze, its opening bar pulled LEFT into the seam (x65): momentum
+  // vs pattern (the twist), and the last crater (87) sits 4.1u clear of the crevasse lip — knockback pushes AWAY
+  // from a burst and can never chain a fall (the C-battery law, applied here too).
+  w6l5Mortar(G, {period:7.0, cx:76, volley:[[0.2,65],[1.0,69],[1.9,75],[2.8,81],[3.7,87]]});
   candyLine(G, [[66,0.9,0],[72,0.9,0],[78,0.9,0]], 3);                // the safe-lane rhythm, traced across the ice
   candyLine(G, [[84,0.9,0],[90,0.9,0]], 2);
   G.ents.add(new FrostbitePenguin(G, 74, 0, 0, {phase:1.1, range:2.6, speed:1.3, slideSpeed:9.5}));   // a local — slides FASTER on home ice
-  // SNOW-BOO #1 — the stare-freeze twist WORKS WITH the gimmick: stared solid it's a standable, mortar-proof
+  // SNOW-BOO #2 — the stare-freeze twist WORKS WITH the gimmick: stared solid it's a standable, mortar-proof
   // snow-fort (block top clears the impact window). The learned rule becomes cover. freezeMax up for real shelter.
   G.ents.add(new SnowBoo(G, 80, 0, 0, {phase:0.3, speed:2.0, range:9, freezeMax:2.6}));
+  // SPOOKY SNOWMAN #2 — mid-glaze, home x84 between craters 81/87: the exam's cruelest honest question. Watching
+  // it means standing still; the batteries punish standing still — so dodge FACING BACKWARD, or eat the hops.
+  // Its edge-guard means it can never hop the crevasse (probes ground ahead; the gap is a hard moat) — designed
+  // aggro zone 77..91, and the far lip at 95.5 stays out of reach forever.
+  G.ents.add(new SpookySnowman(G, 84, 0, 0, {phase:1.1, watchR:11, aggroR:7}));
   // the ridge carries on over the glaze — the dry, mortar-free road for those who can hold it
   platform(G, 65.5, 3.8, 0, 3.0, 3, RIDGE);                            // R6 spans 64..67 (gap 3.5 tap, -0.2)
   platform(G, 71, 4.2, 0, 3.0, 3, RIDGE);                              // R7 spans 69.5..72.5 (+0.4, gap 2.5)
   platform(G, 77, 3.9, 0, 3.4, 3, RIDGE);                              // R8 spans 75.3..78.7 (-0.3, gap 2.8)
   platform(G, 83, 4.3, 0, 3.0, 3, RIDGE);                              // R9 spans 81.5..84.5 (+0.4, gap 2.8)
   platform(G, 89, 3.4, 0, 3.0, 3, RIDGE);                              // R10 spans 87.5..90.5 (-0.9, gap 3.0)
-  platform(G, 93, 1.8, 0, 2.6, 3, RIDGE);                              // step-down spans 91.7..94.3 — rejoin at the pass
+  platform(G, 93, 1.8, 0, 2.6, 3, RIDGE);                              // step-down spans 91.7..94.3 — hangs OVER the glaze crevasse: the high road's dry crossing
   G.ents.add(new BonkLantern(G, 71, 5.6, 0, 'bat'));                   // high-road prize: BAT WINGS for the run ahead
   G.ents.add(new Heart(83, 5.4, 0));                                   // ...and the Heart the low road sees overhead
   candyLine(G, [[65.5,4.6,0],[71,5.0,0]], 2);
   candyLine(G, [[77,4.7,0],[83,5.1,0]], 2);
   candyLine(G, [[89,4.2,0],[93,2.6,0]], 2);
-  // BLIZZARD BAT #1 — the air lane at the rejoin junction (squeak-telegraphed snapshot dive; drifts toward the
-  // player after diving — homed 80u+ from the igloo, per the re-home/clear-patch rule)
-  G.ents.add(new BlizzardBat(G, 96, 5.0, 0, {phase:0.5, range:3, period:3.4, aggroR:4.5}));
-  G.ents.add(new Crow(95, 0.95, 2.4));                                 // winter crow #2, at the ice's edge
+  // BLIZZARD BAT #1 — now dives the CREVASSE APPROACH, both roads at once (squeak-telegraphed snapshot dive;
+  // drifts toward the player after diving — homed 72u from the igloo, per the re-home/clear-patch rule).
+  // Patrols 83.5..88.5 at y5, between R9 and R10 and right over crater 87: the last stretch of ice is contested.
+  // LANTERN SAFETY: max patrol 88.5 + aggroR 4.5 = 93 trigger edge, +2u post-dive drift = 95 — the lit lantern
+  // at 96.6 (player body >=96.2) stays out of reach even before counting the crevasse between them.
+  G.ents.add(new BlizzardBat(G, 80, 5.0, 0, {phase:0.5, range:2.5, period:3.4, aggroR:3.5}));   // retune-verify fix (empirical): home 86/aggro 4.5 dove at the R11 crossing and post-dive re-home drifted its patrol over the lit lantern — from 80/3.5 the designed route can't trigger the dive at all
+  G.ents.add(new Crow(91, 0.95, 2.4));                                 // winter crow #2 — ON the crevasse lip, staring down (the house tell: a crow marks an edge)
 
-  // =============================== BEAT 4 — THE ICICLE PASS (x 96..132): ESCALATE — three lanes, three clocks ===============================
-  groundX(G, 96, 132, SNOW);
-  G.ents.add(new BonkLantern(G, 97.5, 1.5, 0, 'shield'));              // armor up — the pass is the exam's essay question
-  G.ents.add(new Checkpoint(99, 0, 1.6, 2));                           // CP2 — LIT, the second mid lantern (>100u rule)
-  signPost(G, 101, 1.7, -0.1, "THE COLD PANTRY LANE. Icicles above, mortars beyond, and something rolling in between. Grumble REALLY isn't taking visitors tonight. Prove him wrong.");
+  // =============================== THE GLAZE CREVASSE (x 92..95.5) — gap-after-ice, the 6-5 momentum exam ===============================
+  // The ice quits at 92; the ground does not resume until 95.5 — a 3.5u TAP-CLEAR gap (<=4 law) whose approach
+  // is 34u of glaze: momentum management IS the test. Honest by construction: the lip is visible the whole
+  // slide, the crow stares at it, the sign called it, the candy arc traces the jump, and the high road (R11
+  // above) crosses it dry. Battery B's nearest crater (87) is 4.1u clear of the lip. A miss costs a heart +
+  // the walk-back to CP0 (HEARTS ALWAYS — pits never kill). Ground enemies can never cross it (snowman edge-
+  // guard stops at the lip; the penguin's max slide reach is 86.6; rollers ride fixed lanes).
+  candyLine(G, [[91,1.0,0],[93.75,2.4,0],[96.4,1.0,0]], 3);           // the arc, traced off the ice
+
+  // =============================== BEAT 4 — THE ICICLE PASS (x 95.5..132): ESCALATE — four clocks, three lanes ===============================
+  groundX(G, 95.5, 132, SNOW);
+  // THE lantern — the level's ONE lit checkpoint (exam law: CP0 + one, at ~55% of the 174u run). Rest-pocket
+  // math, idle player at 96.6 (body edge 97.0): battery C's first crater 100 (danger edge 99.1, 2.1u clear) ·
+  // roller lane leftmost reach 100.65 (3.6u) · bat trigger+drift tops out at 95, across the crevasse (1.2u) ·
+  // penguin min patrol 110.8 wakeR 5, never wakes (max woken-slide reach 101.9) · snowman #3 aggro zone
+  // 119..134 · icicle 104's drop column 103.5..104.5 · nearest boo home 80 chases to 94 (leash) then floats home.
+  G.ents.add(new Checkpoint(96.6, 0, 1.6, 1));
+  G.ents.add(new BonkLantern(G, 98.0, 1.5, 0, 'shield'));              // armor up — the pass is the exam's essay question
+  signPost(G, 102.4, 1.7, -0.1, "THE COLD PANTRY LANE. Icicles above, mortars beyond, and something rolling in between. Grumble REALLY isn't taking visitors tonight. Prove him wrong.");   // sign sits in the 100.9..107.1 crater-free lane
   // the snow cornice the icicles hang from (baked overhang deco — double-jump apex 3.3 never reaches 5.9)
   for(const cx of [104, 108.5, 113, 117.5, 122]){
     const slab = mesh('box',[4.2,0.5,2.4], mat(W6PAL.snowD)); slab.position.set(cx, 5.9, -0.9); slab.rotation.z = (cx%9<4?0.03:-0.03); deco.add(slab);
@@ -217,31 +270,39 @@ function buildW6L5(G){
   G.ents.add(new SpikeIcicle(G, 104, 5.6, {period:4.4, phase:0.0, len:1.2}));
   G.ents.add(new SpikeIcicle(G, 112, 5.6, {period:4.8, phase:1.4, len:1.2}));
   G.ents.add(new SpikeIcicle(G, 120, 5.6, {period:5.2, phase:2.8, len:1.2}));
-  // battery C — three mortar points INTERLEAVED with the icicle columns: the ground is a slalom of distinct,
-  // separately-clocked threat columns with 3u of honest lane between any two (structured chaos, never bullet-hell)
-  w6l5Mortar(G, {period:6.8, cx:108, volley:[[0.8,100],[2.0,108],[3.2,116]]});
-  // SNOWBALL ROLLER #2 — grows boulder-big right under the icicles (near-miss energy, fixed lane clock).
-  // Lane starts at 101, past the CP2/shield rest pocket — the lantern stop stays a clean breath, not a clip.
-  G.ents.add(new SnowballRoller(G, 101, 0, 0, {x1:124, speed:3.4, r0:0.35, r1:1.05, pause:1.2, phase:2.0}));
+  // battery C — now FOUR mortar points INTERLEAVED with the icicle columns: the ground is a slalom of distinct,
+  // separately-clocked threat columns with 3u of honest lane between any two (structured chaos, never bullet-
+  // hell). The added fourth crater (x122) stretches C's clock over the crevasse approach, composing with the
+  // roller lane's end (124) and the guard-snowman's watch zone — three systems to read at once, all fixed.
+  w6l5Mortar(G, {period:6.8, cx:108, volley:[[0.8,100],[2.0,108],[3.2,116],[4.4,122]]});
+  // SNOWBALL ROLLER #3 — grows boulder-big right under the icicles, and rolls FASTER now (near-miss energy,
+  // fixed lane clock). Lane starts at 101, past the lantern/shield rest pocket — the stop stays a clean breath.
+  G.ents.add(new SnowballRoller(G, 101, 0, 0, {x1:124, speed:3.6, r0:0.35, r1:1.05, pause:1.2, phase:2.0}));
   G.ents.add(new FrostbitePenguin(G, 113, 0, 0, {phase:0.7, range:2.2, wakeR:5}));   // the ground lane's third voice
   candyLine(G, [[102,0.9,0],[106,0.9,0],[110,0.9,0]], 3);             // the slalom line — every piece on safe ground
   candyLine(G, [[114,0.9,0],[118,0.9,0],[122,0.9,0]], 3);
-  // SPOOKY SNOWMAN #2 — guards the crevasse approach, REBUILT-ANGRY pacing: room behind you for the full
+  // SPOOKY SNOWMAN #3 — guards the crevasse approach, REBUILT-ANGRY pacing: room behind you for the full
   // pop-waddle-rebuild arc while battery C still thumps at your back. Watch it or walk backward. Your pick.
   G.ents.add(new SpookySnowman(G, 126.5, 0, 0, {phase:0.6, watchR:11, aggroR:7.5}));
-  // THE CREVASSE — the level's one pit (x 132..135.5, a 3.5u tap-clear gap; a miss = a heart + the CP2 walk-back,
-  // HEARTS ALWAYS). Battery C's last crater lands 11u clear of the lip — knockback can never chain a fall.
+  // THE SECOND CREVASSE (x 132..135.5, a 3.5u tap-clear gap; a miss = a heart + the lantern walk-back, HEARTS
+  // ALWAYS). Battery C's last crater (122) lands 10u clear of the lip — knockback can never chain a fall.
   candyLine(G, [[130.8,1.0,0],[133.7,2.3,0],[136.6,1.0,0]], 3);       // the arc, traced
 
   // =============================== BEAT 5 — GRUMBLE'S HILL (x 135.5..181): MASTER — the doorstep gauntlet ===============================
-  groundX(G, 135.5, 139, SNOW);                                        // a snow landing after the gap (generous, always)
-  w6IceX(G, 139, 149.4);                                               // the ice apron up to the hill's foot
+  groundX(G, 135.5, 138.5, SNOW);                                      // a snow landing after the gap (generous, always)
+  w6IceX(G, 138.5, 149.4);                                             // the ice apron up to the hill's foot (stretched — more glaze under battery D)
   // battery D — the master mix: two craters on the apron ICE, two on the CREST (Grumble shells his own doorstep
   // now — the one place the high ground stopped being safe; escalation with a wink at beat 2's trade)
   w6l5Mortar(G, {period:7.4, cx:148, volley:[[0.9,141.5,0],[1.8,146,0],[3.4,153,4.6],[4.3,157,4.6]]});
   candyLine(G, [[140,0.9,0],[143.8,0.9,0],[147.6,0.9,0]], 3);         // the apron rhythm
-  // SNOW-BOO #2 — drifts the apron; the stared-solid snow-fort trick, one last time, where it matters most
+  // SNOW-BOOS #3 + #4 — TWO drift the apron now, covering each other's blind spots (stare one solid, the other
+  // creeps — the classic flank). BOTH sit inside one forward stare cone from the landing (ranges 8/9, dot>0.25),
+  // so the read is: freeze the pair, cross 9u of ice inside 2.6s, climb while they shatter grumpy behind you.
+  // Base-of-climb simultaneity: boo + boo + climb-icicle A = 3, the cap; craters 146/153 don't reach the base.
+  // SANCTIONED EXPERT TECH: a boo frozen at the hill face is a 1.85u-tall step — a double-jump off its block
+  // (1.85+3.3=5.15 > 4.6) clears the crest and skips the garland entirely. Deterministic, skill-gated, ours.
   G.ents.add(new SnowBoo(G, 143.5, 0, 0, {phase:1.2, speed:2.2, range:8, freezeMax:2.6}));
+  G.ents.add(new SnowBoo(G, 147.4, 0, 0, {phase:2.0, speed:2.3, range:9, freezeMax:2.6}));
   G.ents.add(new Crow(137.5, 0.95, 2.4));                              // winter crow #3, on the gap's far lip
   // THE HILL — a 4.6u face: too high for any jump, GATED by the GARLAND CLIMB (the comparable-heights law:
   // anything past 3.0 gets a verb, and the verb gets candy). The town strung his hill with lights; you climb them.
@@ -251,7 +312,23 @@ function buildW6L5(G){
   G.world.addBox(149.15, 0, 0, 1.0, 5.0, 1.2, {type:'climb'});         // the garland climb (tops 5.0 — the exit hop clears the crest)
   w6String(L, 149.35, 0.35, 149.35, 4.85, {z:0.35, sag:0.15, segs:8}); // the climbable garland's twinkling visual
   candyLine(G, [[149.6,1.4,0],[149.6,2.8,0],[149.6,4.2,0]], 3);       // candy telegraphs the climb verb, rung by rung
-  // THE CREST — crossed under battery D's fire (safe pockets at 150.5..152, ~155, and 158+), a bat diving the top
+  // THE CLIMB ICICLES — Grumble hung icicles on his own garland: two SpikeIcicles flank the climb volume
+  // (148.65..149.65), dodge-while-climbing under battery D's fire = THE HARDEST HONEST MOMENT IN THE GAME.
+  // Honest math: icicle A (x148.85, floorY 0) threatens px<149.35 — dodge by hugging the volume's right edge
+  // (149.65, 0.8u clear) or climbing off; icicle B (x149.55, floorY 4.6 — it shatters on the crest) threatens
+  // the TOP-right, px>149.05 — dodge left (148.65, 0.9u clear). Each half of the volume is always safe from
+  // one of them; phases 2.1s apart on a shared 4.2s period mean THEY NEVER DROP TOGETHER (drop+fall < 0.9s),
+  // both keep the kit's full 0.7s shimmer+drip+floor-glow telegraph, and climb-off is available every frame.
+  // (Reusing the pass's learned language — same glow, same clock-reading, now vertical.)
+  G.ents.add(new SpikeIcicle(G, 148.85, 6.3, {period:4.2, phase:0.6, len:1.1}));
+  G.ents.add(new SpikeIcicle(G, 149.55, 6.3, {period:4.2, phase:2.7, len:1.0, floorY:4.66}));   // floorY 4.66: floor-glow lands at 4.70, ABOVE the crest sheen strip's top (4.68) — the telegraph never hides
+  // the snow cornice the climb icicles hang from (baked deco, NO collider — the climb-off/exit hop stays clear)
+  { const corn = mesh('box',[2.4,0.45,1.9], mat(W6PAL.snowD)); corn.position.set(149.2, 6.45, -0.35); corn.rotation.z=0.04; deco.add(corn);
+    const lump = mesh('sph',[0.5,7,5], mat(W6PAL.snow)); lump.scale.y=0.5; lump.position.set(148.8, 6.75, -0.2); deco.add(lump); }
+  // THE CREST — crossed under battery D's fire (safe pockets at 150.5..152, ~155, and 158+), a bat diving the
+  // top. THE SQUEEZE STAYS CAPPED AT 3 SIMULTANEOUS THREATS (owner cap): crest craters 153/157 ride ONE battery
+  // clock 0.9s apart, + the bat, + icicle B at the lip (its column 149.05..150.05 never overlaps the craters'
+  // 152.1..157.9) — nothing else is allowed up here, and the pockets stay crater-free.
   { const cp1 = w6LightPost(151, -2.5, 1.2); cp1.position.y = 4.6; deco.add(cp1);     // posts lifted to the crest top
     const cp2 = w6LightPost(159, -2.5, 1.2); cp2.position.y = 4.6; deco.add(cp2); }
   w6String(L, 151, 5.75, 159, 5.75, {z:-2.4});                        // Winterfest lights right up to his door
@@ -305,7 +382,8 @@ function buildW6L5(G){
   // three-depth Glimmerfields skyline (snowdrifts & birches / the lamplit village / the great blue peaks) + aurora
   w6Parallax(S, -8, 181);
 
-  // the crevasse's glacial dressing (visual — the fall is the hazard; heart + walk-back, never a death)
+  // both crevasses' glacial dressing (visual — the fall is the hazard; heart + walk-back, never a death)
+  pitDressing(G, 92, 95.5, 'winter');
   pitDressing(G, 132, 135.5, 'winter');
 
   // festival lights live (5 draw calls + one twinkle ticker for every string in the level)
@@ -314,7 +392,7 @@ function buildW6L5(G){
   // exit + the W6 tail. Clutter placed manually on the SNOW spans only (the glaze keeps its frozen sparkle,
   // the crevasse stays bare, the crest is bare wind-scoured pack)
   w6LevelFinish(G, -8, 181, null);
-  w6Clutter(G, -8, 63.5, 'winter');
+  w6Clutter(G, -8, 57.5, 'winter');
   w6Clutter(G, 96.5, 131.5, 'winter');
   w6Clutter(G, 160, 181, 'winter');
 
