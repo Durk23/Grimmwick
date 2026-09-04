@@ -1060,14 +1060,26 @@ const UI = {
     if(!levels.length) levels = [1,2,3,4,5].map(n=>({id:district+'l'+n, name:'LEVEL '+dNum+'-'+n, parTime:0}));
     const sv = G.save.levels || {};
     const fmt = s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
-    // node models: done / avail (first not-done) / lock
-    const nodes=[]; let availSeen=false;
+    // node models: done / avail / lock.
+    // DAYLIGHT chain: a clear in EITHER mode opens the next lantern (owner call, Sept 3 2026) —
+    // the harder clear never counts for less. Story stays safe: districts open only via normal bosses.
+    // NIGHTMARE runs its OWN chain (owner FINAL call, Sept 3 2026: "open no matter what normal mode
+    // is"): conquer a nightmare lantern and the next one opens — daylight progress has no vote here.
+    const nmL = (G.save.nm && G.save.nm.levels) || {};
+    const nodes=[]; let chainOpen=true;
     levels.forEach(lv=>{
       const rec = sv[lv.id]||{};
-      const st = rec.done ? 'done' : (!availSeen ? (availSeen=true,'avail') : 'lock');
+      let st;
+      if(nmOn){
+        st = (nmL[lv.id] && nmL[lv.id].done) ? 'done' : (chainOpen ? 'avail' : 'lock');
+        if(G.nmStarsOn(lv.id) !== 3) chainOpen = false;   // THE LADDER: 3 nightmare stars open the next nightmare lantern (owner call, option A)
+      } else {
+        st = rec.done ? 'done' : (chainOpen ? 'avail' : 'lock');
+        if(!G.levelCleared(lv.id)) chainOpen = false;   // either-mode clears keep the chain open
+      }
       nodes.push({id:lv.id, name:lv.name, par:lv.parTime, best:rec.best, stars:rec.stars||{}, st});
     });
-    const bossReady = !!(sv[levels[levels.length-1].id]||{}).done;
+    const bossReady = G.levelCleared(levels[levels.length-1].id);
     nodes.push({boss:true, name:(world.guardian||'The Guardian').toUpperCase(), st: beaten?'done':(bossReady?'avail':'lock')});
     this._mapNodes = nodes;
     // winding dotted path through the lantern positions (percent coords)
@@ -1086,7 +1098,9 @@ const UI = {
       const starIcon = {time:'⏱', candy:'🍬', clean:'💜'};   // a missed star shows WHAT to hunt, not just that something's missing
       const nmRec = nmOn && !n.boss ? (this.G.save.nm && this.G.save.nm.levels && this.G.save.nm.levels[n.id]) : null;
       const stars = nmOn && !n.boss
-        ? (nmRec && nmRec.done ? `<span>🌑</span>` : `<span class="off">🌑</span>`)
+        ? (nmRec && nmRec.done
+            ? ['time','candy','clean'].map(k=>(nmRec.stars&&nmRec.stars[k])?'<span>🌑</span>':`<span class="off">${starIcon[k]}</span>`).join('')
+            : `<span class="off">🌑</span>`)
         : ((!n.boss && n.st==='done')
           ? ['time','candy','clean'].map(k=>n.stars[k]?'<span>⭐</span>':`<span class="off">${starIcon[k]}</span>`).join('')
           : '&nbsp;');
@@ -1094,7 +1108,7 @@ const UI = {
       let sub;
       if(n.boss) sub = n.st==='done' ? '🔥 relit · fight again?' : (n.st==='avail' ? 'the guardian stirs…' : '🔒 clear '+dNum+'-'+levels.length);
       else if(nmOn){
-        sub = (nmRec && nmRec.best) ? '🌑 best '+fmt(nmRec.best) : 'unconquered';
+        sub = (nmRec && nmRec.best) ? '🌑 best '+fmt(nmRec.best) : (n.st==='lock' ? '🔒 3🌑 the one before' : 'unconquered');
       }
       else {
         const bits=[];
@@ -1137,7 +1151,7 @@ const UI = {
   },
   _mapActivate(i){
     const n=(this._mapNodes||[])[i]; if(!n) return;
-    if(n.st==='lock'){ this.toast(n.boss ? '🔒 Light every lantern on the path first!' : '🔒 Beat the lantern before this one first!'); return; }
+    if(n.st==='lock'){ this.toast(n.boss ? '🔒 Light every lantern on the path first!' : (this.G.nmSel ? '🔒 Earn all 3 NIGHTMARE stars on the level before this one — time, candy, and clean!' : '🔒 Beat the lantern before this one first!')); return; }
     this._mapSetSel(i);
     AUDIO.ui();
     this.hideMap();

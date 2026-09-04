@@ -289,6 +289,25 @@ const G = {
     }catch(e){}
   },
 
+  starsOn(id){
+    const r = this.save && this.save.levels && this.save.levels[id];
+    if(!r || !r.stars) return 0;
+    return (r.stars.time?1:0)+(r.stars.candy?1:0)+(r.stars.clean?1:0);
+  },
+  nmStarsOn(id){
+    const r = this.save && this.save.nm && this.save.nm.levels && this.save.nm.levels[id];
+    if(!r || !r.stars) return 0;
+    return (r.stars.time?1:0)+(r.stars.candy?1:0)+(r.stars.clean?1:0);
+  },
+  // a level counts as CLEARED when beaten in EITHER mode — normal or nightmare (owner call, Sept 3
+  // 2026: a nightmare clear unlocks the next lantern too). Records/stars stay per-mode; only the
+  // unlock chain reads this.
+  levelCleared(id){
+    const s = this.save; if(!s) return false;
+    if(s.levels && s.levels[id] && s.levels[id].done) return true;
+    return !!(s.nm && s.nm.levels && s.nm.levels[id] && s.nm.levels[id].done);
+  },
+
   // a bought trick counts only while EQUIPPED in the Cauldron (they stack; the Nightmare check stays at each call site)
   trickOn(k){
     const s = this.save; if(!s) return false;
@@ -492,10 +511,20 @@ const G = {
     const secs = Math.floor(secsF);
     const collected = this.runCandyPicked||0;
     if(this.nightmare){
-      // nightmare clears track separately: done + best time only — no stars, no night clock, no boards
+      // nightmare clears track separately: done + best + NIGHTMARE'S OWN STARS (owner call, Sept 3
+      // 2026 — option A). Same three hunts under nightmare law (no lanterns, 3 lives), which makes
+      // them brutal badges — and the ladder: 3 nightmare stars open the next nightmare lantern.
+      // The 75 daylight crown stars are a separate set and are never touched.
       const rec = (this.save.nm.levels[id] = this.save.nm.levels[id] || {done:false, best:null});
       rec.done = true;
       if(secsF>=3 && !this.runCozy && (!rec.best || secsF<rec.best)) rec.best = secsF;   // cozy softens nightmare (0.72×dt beats the 1.25×) — cozy runs never bank bests (audit fix)
+      if(!this.runCozy){   // cozy banks neither bests nor nightmare stars
+        const skipN = opts.warp||opts.leap;
+        rec.stars = rec.stars || {};
+        if(skipN || secs <= def.parTime) rec.stars.time = true;
+        if(skipN || collected >= this.levelCandyTotal) rec.stars.candy = true;
+        if(opts.leap || (this.runDamage||0)===0) rec.stars.clean = true;
+      }
       // THE NIGHTMARE board: once all 25 are conquered, the sum of bests goes up — and every
       // improved best resubmits (lower total, Game Center accepts — a living entry)
       if(window.NightBoard && !this.runCozy){
@@ -520,9 +549,10 @@ const G = {
       const idx2 = list2.indexOf(def);
       const fmt2 = t => Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
       setTimeout(()=>UI.levelClear({ levelId:id, levelName:def.name, time:fmt2(secs), best:fmt2(rec.best||secs),
-        isRecord:false, stars:{}, candy:collected, candyTotal:this.levelCandyTotal,
-        nextId:(idx2>=0 && idx2<list2.length-1 && (this.save.levels[id]||{}).done) ? list2[idx2+1].id : null, cozy:false, nightmare:true }), 1500);
-        // ^ NEXT only when the next lantern is lit in NORMAL progression — nightmare must never tour levels the story hasn't opened (audit fix)
+        isRecord:false, stars:rec.stars||{}, candy:collected, candyTotal:this.levelCandyTotal,
+        nextId:(idx2>=0 && idx2<list2.length-1 && this.nmStarsOn(id)===3) ? list2[idx2+1].id : null, cozy:false, nightmare:true }), 1500);
+        // ^ THE NIGHTMARE LADDER (owner call, option A): the next nightmare opens only on all 3
+        //   NIGHTMARE stars for this level — fully independent of daylight progress
       return;
     }
     const skip = opts.warp||opts.leap;   // secret finishes honor their promised rewards
