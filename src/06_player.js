@@ -155,7 +155,7 @@ class Player {
     this.zoeBroom = null; this.zoeBroomBack = null;
     this.flameAura = null; this.flameWisp = null;
     this.blackAura = null; this.blackWisp = null; this.blackWisp2 = null; this.blackRing = null;
-    this.blackHalo = null; this.blackLight = null; this.flameHalo = null;
+    this.blackHalo = null; this.blackLight = null; this.flameHalo = null; this.flameOrbit = null; this.flameLight = null;
     this.wingL = this.wingR = null;   // the rig rebuild dropped any wing meshes with the old body — full-time wings re-attach next frame
     if(this.shieldMesh){ this.shield = false; this.shieldMesh = null; }   // same for the bubble (guardT unchanged → an unbroken Gummy Guard re-forms instantly)
     const c = COSTUMES[costumeKey]||COSTUMES.kid;
@@ -402,9 +402,9 @@ class Player {
       // with the veil now EMBER-RED and clearly visible instead of near-clear): a two-layer red-gold
       // aura, the turning champion's ring with dancing flames, and the flame companion trailing sparks.
       const addM = (c,o)=>new THREE.MeshBasicMaterial({color:c, transparent:true, opacity:o, blending:THREE.AdditiveBlending, depthWrite:false});
-      this.flameAura = new THREE.Mesh(geo('sph',0.52,12,10), addM(0xff6a3a,0.24));
+      this.flameAura = new THREE.Mesh(geo('sph',0.52,12,10), addM(0xff6a3a,0.26));
       this.flameAura.position.y=0.8; this.flameAura.scale.set(1,1.5,1); body.add(this.flameAura);
-      const outer = new THREE.Mesh(geo('sph',0.88,12,10), addM(0xff4a2e,0.12));
+      const outer = new THREE.Mesh(geo('sph',0.88,12,10), addM(0xff4a2e,0.13));
       outer.position.y=0.85; outer.scale.set(1,1.35,1); this.flameAura.userData.outer = outer; body.add(outer);
       // the champion's ring: gold band + five flames dancing on it
       const ring = new THREE.Group();
@@ -426,6 +426,20 @@ class Player {
       const sheath = new THREE.Mesh(geo('cone',0.14,0.34,7), addM(0xff8a3a,0.4)); sheath.position.y=0.14;
       w.add(core, inner, sheath);
       this.flameWisp = w; body.add(w);
+      // the champion's orbit: five gold star-gems circling like living jewelry (spice pass, owner call)
+      const orbit = new THREE.Group();
+      for(let i=0;i<5;i++){
+        const a = i/5*TAU;
+        const gem = mesh('sph',[0.042,6,5], emat(0xffe9a8,0xffd23f,1.1));
+        gem.position.set(Math.cos(a)*0.72, 0, Math.sin(a)*0.72);
+        gem.userData.ph = i*1.9;
+        orbit.add(gem);
+      }
+      orbit.position.y = 0.62;
+      this.flameOrbit = orbit; body.add(orbit);
+      // and the champion's honor: warm GOLD light cast on the world — the First Flame lights the
+      // ground gold the way the Black Flame stains it crimson. Two champions, two glows.
+      this.flameLight = new THREE.PointLight(0xffb35e, 26, 7.5); this.flameLight.position.y = 1.05; body.add(this.flameLight);
       this._flameEmberT = 0;
     }
     if(this.G && this.G.save && this.G.save.blackFlame && !this.G.save.blackFlameOff){
@@ -924,14 +938,19 @@ class Player {
         this.flameRing.rotation.y = ft*0.55;
         for(const fl of this.flameRing.children) if(fl.userData && fl.userData.ph!==undefined) fl.scale.y = 1 + 0.3*Math.sin(ft*6.3 + fl.userData.ph);
       }
+      if(this.flameOrbit){
+        this.flameOrbit.rotation.y = -ft*0.9;   // gems circle against the ring's spin
+        for(const gm of this.flameOrbit.children) gm.position.y = Math.sin(ft*2.8 + gm.userData.ph)*0.1;
+      }
+      if(this.flameLight) this.flameLight.intensity = 23 + Math.sin(ft*6.9)*4 + Math.sin(ft*10.3)*2;   // warm candle-breath flicker
       const fa = ft*1.6;
       this.flameWisp.position.set(Math.cos(fa)*0.8, 0.95+Math.sin(ft*2.1)*0.16, Math.sin(fa)*0.8);
       // the companion's fine spark trail + quiet embers rising from the ring even at rest
       this._flameEmberT -= dt;
       if(this._flameEmberT <= 0){
-        this._flameEmberT = 0.16;
+        this._flameEmberT = 0.12;
         const wp = this.flameWisp.getWorldPosition(new THREE.Vector3());
-        G.fx.spawn(wp, 0xffd98a, 1, {speed:0.25, life:0.5, gravity:-0.2, size:0.45});
+        G.fx.spawn(wp, Math.random()<0.35?0xfff2c4:0xffd98a, 1, {speed:0.25, life:0.5, gravity:-0.2, size:Math.random()<0.25?0.6:0.45});
         if(Math.random() < 0.4){
           const ra = Math.random()*TAU;
           G.fx.spawn(new THREE.Vector3(this.pos.x+Math.cos(ra)*0.62, this.pos.y+0.08, this.pos.z+Math.sin(ra)*0.62),
