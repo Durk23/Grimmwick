@@ -272,20 +272,21 @@ const G = {
     }catch(e){}
   },
 
-  // Apple's rate-this-app card — only ever asked at HAPPY moments (a guardian just freed, the night
-  // just finished), never at boot, never near a death. The OS decides whether a card actually shows
-  // (Apple caps it at 3/year per player); we ask at most twice per save.
+  // Apple's rate-this-app card (owner spec, Sept 4 2026): asked only at HAPPY moments — a 3-star
+  // level win (daylight or nightmare) or a boss defeat — at most 3 invitations per save, spaced by
+  // 10+ minutes of playtime, never on cozy runs, never at boot, never near failure. iOS additionally
+  // enforces its own 3-shows-per-year cap, so generous asks stay tasteful on the player's screen.
   _maybeAskReview(){
     try{
       const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GameCenter;
       if(!P || !P.requestReview) return;
       const s = this.save;
-      const beaten = Object.keys(s.worlds||{}).length;
-      if((beaten===2 && !s.rateAsked) || (s.nightDone && s.rateAsked!=='night')){
-        s.rateAsked = s.nightDone ? 'night' : '2';
-        this.persist();
-        setTimeout(()=>{ try{ P.requestReview(); }catch(e){} }, 3500);   // after the victory fanfare breathes
-      }
+      if(s.rateAsks===undefined) s.rateAsks = s.rateAsked ? (s.rateAsked==='night'?2:1) : 0;   // migrate the old two-ask ledger
+      if(s.rateAsks >= 3) return;                                    // three invitations per save, ever
+      if((s.playT||0) - (s.rateAskAt||0) < 600 && s.rateAsks > 0) return;   // let 10+ minutes of play breathe between asks
+      s.rateAsks++; s.rateAskAt = s.playT||0;
+      this.persist();
+      setTimeout(()=>{ try{ P.requestReview(); }catch(e){} }, 3500);   // after the victory fanfare breathes
     }catch(e){}
   },
 
@@ -524,6 +525,7 @@ const G = {
         if(skipN || secs <= def.parTime) rec.stars.time = true;
         if(skipN || collected >= this.levelCandyTotal) rec.stars.candy = true;
         if(opts.leap || (this.runDamage||0)===0) rec.stars.clean = true;
+        if(this.nmStarsOn(id)===3) this._maybeAskReview();   // a full 3-🌑 nightmare clear is peak joy — the perfect moment to ask
       }
       // THE NIGHTMARE board: once all 25 are conquered, the sum of bests goes up — and every
       // improved best resubmits (lower total, Game Center accepts — a living entry)
@@ -561,6 +563,7 @@ const G = {
       candy: skip ? true : collected >= this.levelCandyTotal,
       clean: opts.leap ? true : (this.runDamage||0)===0,
     };
+    if(stars.time && stars.candy && stars.clean && !this.runCozy) this._maybeAskReview();   // a 3-star win earns the ask (owner spec)
     const rec = this.save.levels[id] || (this.save.levels[id] = {done:false, stars:{}, best:null});
     rec.done = true;
     const isRecord = !this.runCozy && secsF>=3 && (!rec.best || secsF<rec.best);
