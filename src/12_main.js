@@ -101,7 +101,7 @@ const G = {
     if(this.save.nightDone===undefined) this.save.nightDone = (this.save.embers||0) >= 5;
     if(this.save.nightDone && this.save.owned && !this.save.owned.includes('grimm')) this.save.owned.push('grimm');   // existing finishers get playable Grimm
     if(!this.save.crownMoment){
-      const totS = Object.values(this.save.levels||{}).reduce((s,l)=>s + (l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
+      const totS = Object.entries(this.save.levels||{}).reduce((s,[k,l])=>s + ((parseInt(k.slice(1),10)||1)<=5 && l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);   // Grimmwick stars only — Frostmere has its own crown
       if(totS >= 75){   // earned before auto-grant existed: crown them now, celebrate on boot
         this.save.crownMoment = true;
         const om = this.save.ownedMasks || (this.save.ownedMasks = []);   // v1.0 saves predate the wardrobe — init before reading
@@ -111,6 +111,13 @@ const G = {
         setTimeout(()=>{ window.UI && UI.toast('👑 ALL 75 STARS! THE STAR CROWN IS YOURS. Wear it proud, Pip!', 7000); window.AUDIO && AUDIO.goldPumpkin(); }, 4000);
         setTimeout(()=>{ window.NightBoard && NightBoard.refreshNight(this); if(!this.save.cozy && window.NightBoard) NightBoard.checkFlawless(this); }, 7000);   // cozy pauses records — same guard as every other call site
       }
+    }
+    if(!this.save.iceCrowned){   // Ice Crown retro-grant (a vault-restored save may already hold winter's 15)
+      const wS = Object.entries(this.save.levels||{}).reduce((s,[k,l])=>s + (k.slice(0,2)==='w6' && l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
+      if(wS >= 15){ this.save.iceCrowned = true;
+        const om2 = this.save.ownedMasks || (this.save.ownedMasks = []);
+        if(!om2.includes('icecrown')) om2.push('icecrown');
+        this.persist(); }
     }
     if(this.save.nightDone && this.save.nightT===undefined){
       this.save.nightT = this.save._finishT !== undefined ? this.save._finishT : (this.save.playT||0);
@@ -160,8 +167,8 @@ const G = {
       ownedMasks: w.ownedMasks||[], mask: w.mask||null,
       pass: !!w.pass, firstFlame: !!w.firstFlame, firstFlameOff: !!w.firstFlameOff,
       blackFlame: !!w.blackFlame, blackFlameOff: !!w.blackFlameOff,   // the Nightmare's reigning flame is rank-based property, like the First
-      emberPop: !!w.emberPop, batWings: !!w.batWings, gummyGuard: !!w.gummyGuard, sweetTooth: !!w.sweetTooth,   // bought tricks are PROPERTY — they survive the fresh-run reset (Nightmare seals them anyway)
-      trickOff: {ember:true, bat:true, guard:true, sweet:true},   // a FRESH RUN starts with every trick RESTING (audit fix: equipped-by-default re-tainted Flawless on frame one of the reset — re-equip in the Cauldron any time, knowingly)
+      emberPop: !!w.emberPop, batWings: !!w.batWings, gummyGuard: !!w.gummyGuard, sweetTooth: !!w.sweetTooth, frostShoes: !!w.frostShoes,   // bought tricks are PROPERTY — they survive the fresh-run reset (Nightmare seals them anyway)
+      trickOff: {ember:true, bat:true, guard:true, sweet:true, shoes:true},   // a FRESH RUN starts with every trick RESTING (audit fix: equipped-by-default re-tainted Flawless on frame one of the reset — re-equip in the Cauldron any time, knowingly)
       iapSeen: w.iapSeen || [],     // granted-transaction ledger survives resets (a reset must never re-grant old purchases)
       pendingScores: w.pendingScores || undefined,   // earned scores queued offline survive the fresh-run reset
       seenIntro:false, maxHearts:3 };
@@ -312,7 +319,7 @@ const G = {
   // a bought trick counts only while EQUIPPED in the Cauldron (they stack; the Nightmare check stays at each call site)
   trickOn(k){
     const s = this.save; if(!s) return false;
-    const owned = k==='ember' ? s.emberPop : k==='bat' ? s.batWings : k==='guard' ? s.gummyGuard : s.sweetTooth;
+    const owned = k==='ember' ? s.emberPop : k==='bat' ? s.batWings : k==='guard' ? s.gummyGuard : k==='shoes' ? s.frostShoes : s.sweetTooth;
     return !!owned && !(s.trickOff && s.trickOff[k]);
   },
 
@@ -391,12 +398,12 @@ const G = {
     return s;
   },
   switchArea(area){
-    if(area==='hub' || area==='tut' || area.startsWith('boss')) this.nightmare = false;
+    if(area==='hub' || area==='hub2' || area==='tut' || area.startsWith('boss')) this.nightmare = false;
     window.UI && UI.closeDialogue && UI.closeDialogue();   // never carry a stale speech card across areas
     const def = findLevel(area);
     this.area = area;
     this.levelDef = def || null;
-    this.mode = (area==='hub') ? 'free' : 'side';
+    this.mode = (area==='hub' || area==='hub2') ? 'free' : 'side';   // both town squares are free-roam
     this._entering = false;
     this.boss = null;
     if(window.UI && UI.hideBossBar) UI.hideBossBar();   // pause-menu exits skip defeat(), which was the only other hider
@@ -404,6 +411,7 @@ const G = {
     this.lvlPortal = this.warpPortal = this.tutPortal = this._gateGlow = null;
     this.hubEmber = this.hubEmberLight = this.hubLamps = this.gates = this.mayor = this.mayorHome = this.brewMesh = this.hubBoos = null;
     this.hubBraziers = this.hubSmoke = this.hubFlies = this.hubLeaves = this.hubCat = this.hubWindows = this.hubWellGlow = this.hubGuide = null;
+    this.hubFerry = this.fgates = this.hearthlight = this.hubGrumble = this.fhGrimm = this.ferryDock = null;   // Frostmere refs (both squares)
     this.signs = this.coffins = this.bats = this.amb = null;
     if(this.ents) this.ents.clear();
     if(this.fx) this.fx.clear();
@@ -414,7 +422,8 @@ const G = {
     this.world.reset();
     this.ents = new EntityMgr(this.scene);
     this.fx = new Particles(this.scene);
-    AUDIO.setMood(area==='hub' ? 'hub' : (isBossArea ? 'boss' : 'level'));
+    const inWinter = area==='hub2' || (def && (parseInt((def.district||'w1').slice(1),10)||1)>=6);
+    AUDIO.setMood(area==='hub' ? 'hub' : inWinter ? 'winter' : (isBossArea ? 'boss' : 'level'));
     srand(seedFrom(area));   // deco scatter is seeded per area — a level replays IDENTICALLY, pebble for pebble
     if(area==='hub') buildHub(this);
     else if(area==='boss1') buildBossArena(this);
@@ -422,6 +431,8 @@ const G = {
     else if(area==='boss3' && typeof buildBossArena3==='function') buildBossArena3(this);
     else if(area==='boss4' && typeof buildBossArena4==='function') buildBossArena4(this);
     else if(area==='boss5' && typeof buildBossArena5==='function') buildBossArena5(this);
+    else if(area==='boss6' && typeof buildBossArena6==='function') buildBossArena6(this);
+    else if(area==='hub2' && typeof buildFrostHub==='function') buildFrostHub(this);
     else if(area==='tut') buildTutorial(this);
     else if(def) def.build(this);
     // all-candy star baseline: what the build itself placed
@@ -476,7 +487,7 @@ const G = {
     }, 500);
   },
   enterLevel(id){
-    this.nightmare = !!this.nmSel;   // Nightmare is ALWAYS available (owner call, Sept 1 2026) — normal district gates still decide WHICH levels are open
+    this.nightmare = !!this.nmSel && (parseInt(id.slice(1),10)||1) < 6;   // Nightmare is ALWAYS available (owner call, Sept 1 2026) — normal district gates still decide WHICH levels are open. Frostmere plays daylight-only for now (winter nightmare = a later season; keeps the 25-level board pure).
     const def = findLevel(id);
     if(!def){ if(this.state==='map') this.state='play'; UI.toast('🌘 That road is still dark...'); return; }
     if(UI.hideMap) UI.hideMap();
@@ -496,7 +507,8 @@ const G = {
       this.switchArea(id);
       this.state='play';
       UI.fade(false, 450);
-      const dWorld = (typeof WORLDS!=='undefined') ? WORLDS.find(x=>x.key===def.district) : null;
+      let dWorld = (typeof WORLDS!=='undefined') ? WORLDS.find(x=>x.key===def.district) : null;
+      if(!dWorld && typeof FWORLDS!=='undefined') dWorld = FWORLDS.find(x=>x.key===def.district);   // Frostmere districts
       const dList = (typeof LEVEL_LISTS!=='undefined') ? LEVEL_LISTS.find(L=>L.includes(def)) : null;
       const dNum = dList ? dList.indexOf(def)+1 : 1;
       UI.levelIntro(def.name, this.nightmare ? '🌑 NIGHTMARE · '+(dWorld?dWorld.name:'Grimmwick') : (dWorld?dWorld.name:'Grimmwick')+' · Level '+dNum);
@@ -587,7 +599,7 @@ const G = {
     window.NightBoard && NightBoard.onLevelClear(this, id);
     // THE 75TH STAR — the crown arrives the INSTANT it's earned, with fanfare (never behind a claim button)
     if(!this.save.crownMoment){
-      const tot = Object.values(this.save.levels||{}).reduce((s,l)=>s + (l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
+      const tot = Object.entries(this.save.levels||{}).reduce((s,[k,l])=>s + ((parseInt(k.slice(1),10)||1)<=5 && l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);   // Grimmwick's 75 only
       if(tot >= 75){
         this.save.crownMoment = true;
         if(!this.save.ownedMasks.includes('starcrown')) this.save.ownedMasks.push('starcrown');
@@ -595,6 +607,18 @@ const G = {
         if(this.player) this.player.buildRig(this.save.equipped||'kid');
         this.persist();
         setTimeout(()=>{ AUDIO.goldPumpkin(); UI.toast('👑 ALL 75 STARS! THE STAR CROWN IS YOURS. You ARE the night, Pip!', 7000); }, 2400);
+      }
+    }
+    // THE ICE CROWN — all 15 stars of Glimmerfields (owner call, Sept 2026: the winter levels' crown)
+    if(!this.save.iceCrowned && def.district==='w6'){
+      const wtot = Object.entries(this.save.levels||{}).reduce((s,[k,l])=>s + (k.slice(0,2)==='w6' && l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
+      if(wtot >= 15){
+        this.save.iceCrowned = true;
+        if(!this.save.ownedMasks.includes('icecrown')) this.save.ownedMasks.push('icecrown');
+        this.save.mask = 'icecrown';
+        if(this.player) this.player.buildRig(this.save.equipped||'kid');
+        this.persist();
+        setTimeout(()=>{ AUDIO.goldPumpkin(); UI.toast('❄️👑 ALL 15 WINTER STARS! THE ICE CROWN IS YOURS — Frostmere bows, Pip!', 7000); }, 2400);
       }
     }
     setTimeout(()=>UI.levelClear(stats), 1500);   // let the gate celebration land before the card
@@ -612,8 +636,8 @@ const G = {
     if(this.state==='map') this.state='play';
     // step BACK OUT of the gate: closing while standing in the portal's auto-enter radius
     // instantly re-opened the map (the first-visit exit trap) — nudge Pip toward town
-    if(this.area==='hub' && this.player && this.gates){
-      for(const gate of this.gates){
+    if((this.area==='hub' || this.area==='hub2') && this.player && (this.gates || this.fgates)){
+      for(const gate of (this.gates || this.fgates)){
         const dx=this.player.pos.x-gate.x, dz=this.player.pos.z-gate.z, d=Math.hypot(dx,dz);
         if(d<2.4){
           let ux=dx/(d||1), uz=dz/(d||1);
@@ -625,19 +649,20 @@ const G = {
       }
     }
   },
+  _hubFor(district){ return (parseInt((district||'w1').slice(1),10)||1) >= 6 ? 'hub2' : 'hub'; },   // Frostmere districts live off the second square
   toMap(district){
     this.state='transition';
     UI.fade(true, 450);
     setTimeout(()=>{
-      this.switchArea('hub');
+      this.switchArea(this._hubFor(district));
       this.state='map';
       this.mapView = ((district||'w1')==='w1' && !this.nmSel && typeof buildMapScene==='function') ? buildMapScene(this, district||'w1') : null;
       UI.showMap(district||'w1');
       UI.fade(false, 450);
     }, 500);
   },
-  bossAreaFor(district){ return ({w1:'boss1',w2:'boss2',w3:'boss3',w4:'boss4',w5:'boss5'})[district]; },
-  bossBuilt(area){ return area==='boss1' || (area==='boss2' && typeof buildBossArena2==='function') || (area==='boss3' && typeof buildBossArena3==='function') || (area==='boss4' && typeof buildBossArena4==='function') || (area==='boss5' && typeof buildBossArena5==='function'); },
+  bossAreaFor(district){ return ({w1:'boss1',w2:'boss2',w3:'boss3',w4:'boss4',w5:'boss5',w6:'boss6'})[district]; },
+  bossBuilt(area){ return area==='boss1' || (area==='boss2' && typeof buildBossArena2==='function') || (area==='boss3' && typeof buildBossArena3==='function') || (area==='boss4' && typeof buildBossArena4==='function') || (area==='boss5' && typeof buildBossArena5==='function') || (area==='boss6' && typeof buildBossArena6==='function'); },
   startBoss(district){
     // district-aware boss router (the map's boss node calls this). Defers politely if a boss isn't built yet.
     district = district || 'w1';
@@ -661,13 +686,16 @@ const G = {
   },
   returnToHub(afterVictory){
     if(this.area==='tut' && !this.save.tutDone){ this.save.tutDone = true; this.persist(); }   // walking out counts — never replay Gran's yard on next launch
+    // "home" is context-aware: a Frostmere level or boss returns to the Frostmere square
+    const home = this._hubFor(this.levelDef ? this.levelDef.district : (this.area.startsWith('boss') ? this.bossDistrict : 'w1'));
     this.state='transition';
     UI.fade(true, 450);
     setTimeout(()=>{
-      this.switchArea('hub');
+      this.switchArea(home);
       this.state='play';
       UI.fade(false, 450);
-      if(afterVictory) UI.toast(this.save.embers>=5 ? '🎆 THE EVERFLAME BURNS WHOLE! The festival is ON, Grimmwick!' : '🔥 The Everflame flickers a little brighter...');
+      if(afterVictory && home==='hub2') UI.toast('❄️ The Hearthlight glows a shade warmer...');
+      else if(afterVictory) UI.toast(this.save.embers>=5 ? '🎆 THE EVERFLAME BURNS WHOLE! The festival is ON, Grimmwick!' : '🔥 The Everflame flickers a little brighter...');
     }, 500);
   },
   _nightmareTint(){
@@ -684,7 +712,7 @@ const G = {
       // THE NIGHTMARE COVENANT: falls restart the level. No lanterns. No mercy. (Owner spec.)
       const id = this.levelDef.id;
       pl.dead = true;
-      UI.toast('🌑 The nightmare does not forgive.'+((this.save.emberPop||this.save.batWings||this.save.gummyGuard||this.save.sweetTooth)?' Your tricks sleep here.':''));
+      UI.toast('🌑 The nightmare does not forgive.'+((this.save.emberPop||this.save.batWings||this.save.gummyGuard||this.save.sweetTooth||this.save.frostShoes)?' Your tricks sleep here.':''));
       this.state='transition'; UI.fade(true, 400);
       setTimeout(()=>{ this.enterLevel(id); }, 450);
       return;
@@ -798,8 +826,9 @@ const G = {
     const bestKey = district+'boss';
     this.save.lives = 5;
     this.save.worlds[district] = true;
-    // one ember per freed district — the Everflame grows with each
-    this.save.embers = Object.keys(this.save.worlds).filter(k=>this.save.worlds[k]).length;
+    // one ember per freed GRIMMWICK district — the Everflame grows with each (Frostmere's guardians
+    // warm the HEARTHLIGHT instead; its story never touches the ember count or the /5 displays)
+    this.save.embers = ['w1','w2','w3','w4','w5'].filter(k=>this.save.worlds[k]).length;
     const prev = this.save.gp[district]||[false,false,false];
     this.save.gp[district] = prev.map((v,i)=>v||this.runPumpkins[i]);
     this.persist();
@@ -961,18 +990,19 @@ const G = {
       // flawless run is captured — money can never touch the First Flame. THE NIGHT stays open to everything;
       // nightmare needs no taint (it seals tricks outright). Reset Save = the fresh eligible run, as ever.
       if(!this.save.flawlessT && !this.save.nightTricked && !this.nightmare &&
-         (this.trickOn('ember')||this.trickOn('bat')||this.trickOn('guard')||this.trickOn('sweet'))){
+         (this.trickOn('ember')||this.trickOn('bat')||this.trickOn('guard')||this.trickOn('sweet')||this.trickOn('shoes'))){
         this.save.nightTricked = true;   // said out loud the moment it happens — never a silent disqualification (audit fix)
         UI.toast('🏆 A trick is awake! This run counts everywhere except FLAWLESS NIGHT. (Reset Save starts a pure run.)', 6600);
       }
       if(INPUT.pauseEdge){ UI.togglePause(); INPUT.endFrame(); return; }
-      if(this.area!=='hub' && this.area!=='tut') this.runT = (this.runT||0)+dt;
+      if(this.area!=='hub' && this.area!=='hub2' && this.area!=='tut') this.runT = (this.runT||0)+dt;
       this.world.updateMovers(dt);
       this.player.update(dt);
       const eDt = dt * (this.save.cozy ? 0.72 : 1);   // Cozy Mode: enemies at 72% speed
       this.ents.update(eDt, this);
       if(this.boss) this.boss.update(eDt);
       if(this.area==='hub') updateHub(this, dt);
+      else if(this.area==='hub2' && typeof updateFrostHub==='function') updateFrostHub(this, dt);
       else if(this.levelDef) this.levelDef.update(this, dt);
       else if(this.area==='tut') updateTutorial(this, dt);
       else { updateBats(this.bats, dt); updateAmbience(this.amb, this.time); UI.setPrompt(null); }

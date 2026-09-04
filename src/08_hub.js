@@ -271,6 +271,7 @@ function buildHub(G){
     const a=(i/20)*TAU;
     let nearGate = false;
     for(const w of WORLDS){ if(w.open && Math.abs(angleLerp(0,w.angle-a,1))<0.25) nearGate=true; }
+    if(Math.abs(angleLerp(0, Math.PI/2-a, 1))<0.3) nearGate=true;   // the FERRY DOCK way (Winterfest) stays open
     if(nearGate) continue;
     G.world.addBox(Math.sin(a)*(R+2.5), 0, Math.cos(a)*(R+2.5), 6,6,3, {});
   }
@@ -525,6 +526,25 @@ function buildHub(G){
     S.add(mk);
     G.hubGuide = mk;
   }
+  // ---- THE FERRY DOCK (Winterfest): Captain Wraith's restored Salty Phantom waits east of the square.
+  // Visible to everyone from day one (anticipation); it sails only once the night is relit — the ending's
+  // first-snow scene IS the invitation. Frostmere is the destination: G.switchArea('hub2').
+  {
+    const da = Math.PI/2;   // east: x = sin(a)*R
+    const dock = new THREE.Group();
+    for(let i=0;i<5;i++){ const plank=mesh('box',[1.6,0.3,2.6], mat(0x5f5138)); plank.position.set(R-1+i*1.7, -0.1, 0); crook(plank,0.02); dock.add(plank); }
+    for(const pz of [-1.1,1.1]) for(const px of [R+0.5, R+5.5]){ const pile=mesh('cyl',[0.14,0.17,1.4,6], mat(0x46301f)); pile.position.set(px,0.4,pz); dock.add(pile); }
+    const lampP=mesh('cyl',[0.06,0.09,2.4,6], mat(0x46301f)); lampP.position.set(R+5.2,1.2,-1.0); dock.add(lampP);
+    S.add(bakeGroup(dock));
+    const lampF=mesh('sph',[0.13,7,6], emat(0x9fe066,0x9fe066,0.95)); lampF.position.set(R+5.2,2.5,-1.0); S.add(lampF);   // the harbor-green ferry lantern
+    G.world.addBox(R+2.6, -1, 0, 7, 1, 2.6, {});
+    if(typeof galleonSilhouette==='function'){ const ship=galleonSilhouette(0, 0, 1.1); ship.rotation.y=Math.PI/2; ship.position.set(R+9.5, 0, 2.5); S.add(ship); }
+    // a dusting of snow on the dock boards — the ending's first snow settled HERE (story-readers notice)
+    const dust=new THREE.Group();
+    for(let i=0;i<8;i++){ const fl2=mesh('sph',[rand(0.08,0.16),5,4], mat(0xeef3ff)); fl2.scale.y=0.35; fl2.position.set(rand(R-1,R+6), 0.08, rand(-0.9,0.9)); dust.add(fl2); }
+    S.add(bakeGroup(dust));
+    G.ferryDock = new THREE.Vector3(R+3.4, 0, 0);
+  }
   // ---- bats ----
   G.bats = makeBats(S, 9, 40);
   G.hubTime = 0;
@@ -682,6 +702,8 @@ function updateHub(G, dt){
   else if(G.hubGrimm && G.hubGrimm.position.distanceTo(pl.pos)<3.2) prompt = {kind:'grimm', label:'🏮 Talk to Grimm'};
   // shop
   else if(G.shopPos.distanceTo(pl.pos)<3.6) prompt = {kind:'shop', label:'🎩 Costume Cauldron'};
+  // the Winterfest ferry
+  else if(G.ferryDock && G.ferryDock.distanceTo(pl.pos)<3.0) prompt = {kind:'ferry', label:'⛵ The ferry to FROSTMERE'};
   else {
     for(const gate of G.gates){
       const d = Math.hypot(gate.x-pl.pos.x, gate.z-pl.pos.z);
@@ -721,6 +743,16 @@ function updateHub(G, dt){
       UI.dialogue('🫥', lines[G._grimmLine]);
     }
     else if(prompt.kind==='shop') UI.openShop();
+    else if(prompt.kind==='ferry'){
+      if(G.save.nightDone && typeof buildFrostHub==='function'){
+        AUDIO.portal();
+        G.state='transition';
+        UI.fade(true, 500);
+        setTimeout(()=>{ G.switchArea('hub2'); G.state='play'; UI.fade(false, 500); }, 550);
+      } else if(!G.save.nightDone){
+        UI.dialogue('👻', '"Frostmere\'s a WINTER town, lad — and winter trouble waits for no one. But finish relighting OUR night first. Captain\'s orders." He tips his hat at the Everflame.');
+      } else UI.toast('⛵ The ferry is being readied... Frostmere opens with the Winterfest update!');
+    }
     else if(prompt.kind==='enter'){ AUDIO.portal(); G.openMap(prompt.gate.w.key||'w1'); }
     else if(prompt.kind==='soon') UI.toast('🚧 '+prompt.gate.w.name+' is still being built. Coming very soon!');
     else if(prompt.kind==='locked') UI.toast('🔒 This district is still dark... free the other guardians first!');

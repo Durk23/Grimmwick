@@ -473,11 +473,21 @@ class SaltPinch {
 class EmberBolt {
   constructor(G, x, y, z, dir, dirZ){
     this.G = G; this.dir = dir; this.dz = dirZ||0;   // (dir, dz) = facing vector: ±1/0 in side mode, sin/cos(facing) in the free-roam hub
+    // IN FROSTMERE THE EMBER TRAVELS INCOGNITO AS A SNOWBALL (owner call, Sept 2026): same speed, reach,
+    // cooldown, and pop — pure skin. The district decides; no call site changes.
+    this.snow = !!((G.levelDef && G.levelDef.district && (parseInt(G.levelDef.district.slice(1),10)||1)>=6) || G.area==='hub2' || G.area==='boss6');
     this.group = new THREE.Group();
-    const core = mesh('sph',[0.16,8,6], emat(0xff9a50, 0xff6a20, 1));
-    const lick = mesh('cone',[0.1,0.26,5], emat(0xffd23f, 0xff9a50, 0.9));
-    lick.rotation.z = dir>=0 ? -Math.PI/2 : Math.PI/2; lick.position.x = -dir*0.2; lick.position.z = -this.dz*0.2;
-    this.group.add(core, lick);
+    if(this.snow){
+      const core = mesh('sph',[0.17,8,6], emat(0xf0f6ff, 0x9fd8ff, 0.75));
+      const tail = mesh('cone',[0.08,0.22,5], new THREE.MeshLambertMaterial({color:0xdff0ff, emissive:0x8ac8f0, emissiveIntensity:0.5, transparent:true, opacity:0.7}));
+      tail.rotation.z = dir>=0 ? -Math.PI/2 : Math.PI/2; tail.position.x = -dir*0.2; tail.position.z = -this.dz*0.2;
+      this.group.add(core, tail);
+    } else {
+      const core = mesh('sph',[0.16,8,6], emat(0xff9a50, 0xff6a20, 1));
+      const lick = mesh('cone',[0.1,0.26,5], emat(0xffd23f, 0xff9a50, 0.9));
+      lick.rotation.z = dir>=0 ? -Math.PI/2 : Math.PI/2; lick.position.x = -dir*0.2; lick.position.z = -this.dz*0.2;
+      this.group.add(core, lick);
+    }
     this.group.position.set(x,y,z);
     this.speed = 13.5; this.life = 0.52;   // ~7u reach — a pop, not a sniper rifle
     this.dead = false; this.cull = false; this.t = 0;
@@ -485,11 +495,11 @@ class EmberBolt {
   update(dt, G){
     this.t += dt; this.life -= dt;
     const p = this.group.position;
-    if(this.life<=0){ this.dead = true; G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), 0xff9a50, 3, {speed:1.2, life:0.25, gravity:2, size:0.4}); return; }
+    if(this.life<=0){ this.dead = true; G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), this.snow?0xdff0ff:0xff9a50, 3, {speed:1.2, life:0.25, gravity:2, size:0.4}); return; }
     p.x += this.dir*this.speed*dt; p.z += this.dz*this.speed*dt;
     p.y += Math.sin(this.t*22)*0.012;              // a live little flame-flutter
     this.group.rotation.x = this.t*9;
-    G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), Math.random()<0.5?0xffd23f:0xff7a30, 1, {speed:0.6, life:0.22, gravity:1.5, size:0.4});
+    G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), this.snow?(Math.random()<0.5?0xffffff:0xbfe8ff):(Math.random()<0.5?0xffd23f:0xff7a30), 1, {speed:0.6, life:0.22, gravity:1.5, size:0.4});
     for(const e of G.ents.list){
       if(!e.isEnemy || e.dead) continue;
       const ep = e.group.position;
@@ -497,7 +507,7 @@ class EmberBolt {
       const rr = (e.hitR||0.6)+0.45;
       if(dx*dx+dz*dz < rr*rr && Math.abs(dy)<1.1){
         e.takeHit(G.player, 'swing');   // same path a bag-swing uses
-        G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), 0xff9a50, 8, {speed:2.8, life:0.3, gravity:2, size:0.6});
+        G.fx.spawn(new THREE.Vector3(p.x,p.y,p.z), this.snow?0xf0f6ff:0xff9a50, 8, {speed:2.8, life:0.3, gravity:2, size:0.6});
         AUDIO.stomp();
         this.dead = true;   // one ember, one pop
         return;

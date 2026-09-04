@@ -78,7 +78,9 @@ const NIGHT_BOARDS = [
 
 const Night = {
   totalStars(G){
-    return Object.values(G.save.levels||{}).reduce((s,l)=>s + (l.stars ? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
+    // GRIMMWICK'S 75 ONLY — Frostmere stars have their own crown and never shift the Night boards
+    // (a 75-star cap in the encode + Flawless gates assumes exactly the original 25 levels)
+    return Object.entries(G.save.levels||{}).reduce((s,[k,l])=>s + ((parseInt(k.slice(1),10)||1)<=5 && l.stars ? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);
   },
   // ---- local values (the web fallback + your-best row) ----
   localValue(G, key){
@@ -95,7 +97,10 @@ const Night = {
   },
   // sum of nightmare bests, only once every level is conquered
   nightmareTotal(G){
-    const lists = (typeof LEVEL_LISTS!=='undefined') ? LEVEL_LISTS.flat() : (typeof W1_LEVELS!=='undefined' ? W1_LEVELS : []);
+    // THE ORIGINAL 25 ONLY — new Frostmere levels must never retro-lock existing Nightmare conquerors
+    // out of the board (winter has no nightmare yet; if it ever does, it gets its own board)
+    const lists = ((typeof LEVEL_LISTS!=='undefined') ? LEVEL_LISTS.flat() : (typeof W1_LEVELS!=='undefined' ? W1_LEVELS : []))
+      .filter(d=>(parseInt((d.district||'w1').slice(1),10)||1)<=5);
     if(!lists.length || !G.save.nm) return null;
     let tot = 0;
     for(const d of lists){

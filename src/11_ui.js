@@ -437,7 +437,12 @@ const UI = {
       this.el('hearts').textContent = h;
     }
     this.el('candyN').textContent = G.save.candy;
-    this.el('emberN').textContent = G.save.embers+'/5';
+    if(G.area==='hub2' && typeof FWORLDS!=='undefined'){   // Frostmere speaks Hearthlight, not embers
+      const warm = FWORLDS.filter(w=>G.save.worlds[w.key]).length;
+      this.el('emberPill').innerHTML = '❄️ <span id="emberN">'+warm+'/5</span> hearth';
+    } else {
+      this.el('emberPill').innerHTML = '🔥 <span id="emberN">'+G.save.embers+'/5</span> embers';
+    }
     const inLevel = !!G.levelDef || G.area.startsWith('boss');
     this.el('gpPill').style.display = inLevel?'block':'none';
     this.el('livesPill').style.display = inLevel?'block':'none';
@@ -681,13 +686,14 @@ const UI = {
         const pv = this.costumePreview(wornCostume, mkey);
         div.innerHTML = `<div class="sw" style="height:110px;background:radial-gradient(ellipse at 50% 82%, rgba(0,0,0,.35), transparent 60%), linear-gradient(135deg,#3a2f5a66 60%,#5a3f7a66)">${pv?`<img src="${pv}" style="height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))" alt="">`:`<div style="font-size:52px;line-height:110px">${m.icon}</div>`}</div>
           <h4>${m.icon} ${m.name}</h4><p>${m.desc}</p>
-          <button class="btn buy ui-block ${wearing?'ghost2':(ownedM?'':((m.earned||m.earnedNM)?'ghost2':'orange'))}">${wearing?'✓ On · tap to take off':(ownedM?'Wear it':(m.earned?'⭐ Earn all '+m.earned+' stars':(m.earnedNM?'🌑 Conquer the Nightmare':'🍬 '+m.price)))}</button>`;
+          <button class="btn buy ui-block ${wearing?'ghost2':(ownedM?'':((m.earned||m.earnedNM||m.earnedWF)?'ghost2':'orange'))}">${wearing?'✓ On · tap to take off':(ownedM?'Wear it':(m.earned?'⭐ Earn all '+m.earned+' stars':(m.earnedNM?'🌑 Conquer the Nightmare':(m.earnedWF?'❄️ Earn all 15 winter stars':'🍬 '+m.price))))}</button>`;
         const btn = div.querySelector('button');
         this.bindTap(btn, ()=>{
           if(wearing){ G.save.mask = null; }
           else if(ownedM){ G.save.mask = mkey; }
           else if(m.earned){ AUDIO.ui(); this.toast('👑 The Star Crown can\'t be bought. Earn all '+m.earned+' stars! (Check ⬆️ Level Ups)'); return; }
           else if(m.earnedNM){ AUDIO.ui(); this.toast('🌑 The Nightmare Crown can\'t be bought. Conquer all 25 levels in Nightmare Mode!'); return; }
+          else if(m.earnedWF){ AUDIO.ui(); this.toast('❄️ The Ice Crown can\'t be bought. Earn all 15 stars in Frostmere\'s Glimmerfields!'); return; }
           else if(G.save.candy >= m.price){ G.save.candy -= m.price; G.save.ownedMasks.push(mkey); G.save.mask = mkey; AUDIO.buy(); this.toast('🎭 New mask: '+m.name+'!'); }
           else { AUDIO.hurt(); this.toast('Not enough candy! Bonk more Boos 🍬'); return; }
           G.player && G.player.buildRig(G.save.equipped||'kid');
@@ -805,6 +811,9 @@ const UI = {
         {k:'sweet', flag:'sweetTooth', price:20000, icon:'🍭', grad:'linear-gradient(135deg,#ff6bb3 60%,#8f1060)', name:'Sweet Tooth',
          desc:'Every candy that spirits drop comes out DOUBLED, forever. The richest trick in Grimmwick.',
          buyToast:'🍭 SWEET TOOTH! Double candy from every bonk, forever. (It sleeps in Nightmare.)'},
+        {k:'shoes', flag:'frostShoes', price:10000, icon:'❄️', grad:'linear-gradient(135deg,#9fd8ff 60%,#1a4a80)', name:'Snow Shoes',
+         desc:'Frostmere-made: run a step quicker on the ground and keep your grip on ICE, every level, forever. Jumps stay honest — only your feet get faster.',
+         buyToast:'❄️ SNOW SHOES! Quick feet and sure grip, forever. (They sleep in Nightmare.)'},
       ];
       for(const tk of TRICKS){
         const owned = !!G.save[tk.flag];
@@ -1007,11 +1016,16 @@ const UI = {
         h += `<div class="mcloud" style="top:${9+i*14}%;width:${190+i*80}px;animation-duration:${55+i*28}s;animation-delay:-${13+i*21}s"></div>`;
       this.el('mapSky').innerHTML = h + '<div id="mapVig"></div>';
     }
-    const world = (typeof WORLDS!=='undefined' && WORLDS.find(w=>w.key===this._mapDistrict)) || {name:'Pumpkin Patch', guardian:'The Guardian'};
+    const world = (typeof WORLDS!=='undefined' && WORLDS.find(w=>w.key===this._mapDistrict))
+      || (typeof FWORLDS!=='undefined' && FWORLDS.find(w=>w.key===this._mapDistrict))
+      || {name:'Pumpkin Patch', guardian:'The Guardian'};
     const dNum = parseInt(this._mapDistrict.slice(1),10)||1;
+    const frost = dNum >= 6;   // Frostmere districts speak Hearthlight, not embers
     const beaten = !!(G.save.worlds && G.save.worlds[this._mapDistrict]);
-    this.el('mapTitle').textContent = world.name.toUpperCase()+' · District '+dNum;
-    this.el('mapEmber').textContent = beaten ? '🔥 Ember recovered! The district burns warm again!' : '🌑 Ember stolen. '+world.guardian+' still holds it';
+    this.el('mapTitle').textContent = world.name.toUpperCase()+' · '+(frost ? 'Frostmere · Winter District '+(dNum-5) : 'District '+dNum);
+    this.el('mapEmber').textContent = frost
+      ? (beaten ? '🔥 The Hearthlight glows! This corner of winter is warm again!' : '❄️ The deep cold holds here. '+world.guardian+' waits')
+      : (beaten ? '🔥 Ember recovered! The district burns warm again!' : '🌑 Ember stolen. '+world.guardian+' still holds it');
     this.el('mapCozy').style.display = G.save.cozy ? 'block' : 'none';
     this.el('mapHint').style.display = INPUT.isTouch ? 'none' : 'block';
     this.renderMap(world, dNum, beaten);
@@ -1052,7 +1066,7 @@ const UI = {
     if(INPUT.isTouch) this.el('touchBtns').style.display='flex';
   },
   renderMap(world, dNum, beaten){
-    const nmOn = !!this.G.nmSel;   // must match enterLevel's arming rule exactly — a stale nightDone term here left the toggle invisible for new players (audit fix)
+    const nmOn = !!this.G.nmSel && dNum < 6;   // must match enterLevel's arming rule exactly — a stale nightDone term here left the toggle invisible for new players (audit fix). Frostmere maps are always daylight (no winter nightmare yet).
     this.el('map-screen').classList.toggle('nm', nmOn);
     this.el('map-screen').style.background = this.G.mapView ? 'transparent' : '';   // re-own the 3D transparency EVERY render — a stale inline 'transparent' let the disposed 3D frame bleed through the first nightmare toggle (repro-proven fix)
     const G=this.G, district=this._mapDistrict;
@@ -1125,7 +1139,7 @@ const UI = {
         <div class="mtime">${sub}</div>
       </div>`;
     });
-    html += `<button id="nmToggle" class="ui-block">${nmOn ? '🌑 NIGHTMARE: ON' : '🌙 Nightmare Mode'}</button>`;   // ALWAYS offered (owner call, Sept 1 2026) — the pure-skill mode is open from night one
+    if(dNum < 6) html += `<button id="nmToggle" class="ui-block">${nmOn ? '🌑 NIGHTMARE: ON' : '🌙 Nightmare Mode'}</button>`;   // ALWAYS offered (owner call, Sept 1 2026) — the pure-skill mode is open from night one. (The Nightmare hasn't found Frostmere yet — winter remix is a later season beat, and the 25-level board stays pure.)
     const wrap=this.el('mapWrap');
     wrap.innerHTML = html;
     const nt = document.getElementById('nmToggle');
@@ -1252,6 +1266,7 @@ const UI = {
       w3:{e:'🧹', t:'GUARDIAN FREED!', b:'Broomhilda cackles a THANK-you and loops the moon. The third ember is yours! Witchwood\'s cauldrons bubble bright tonight.'},
       w4:{e:'⚓', t:'GUARDIAN FREED!', b:'Captain Wraith tips his hat as THE SEA RUSHES BACK. The fourth ember is yours! Ghost Harbor floats again tonight.'},
       w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'The spell of forgetting is broken: the town remembers its oldest friend, the one it was named after. The Everflame burns whole. Grimm keeps every lantern lit as night watchman.<br><b>You saved Grimmwick, Pip. 🏮</b>'},
+      w6:{e:'⛄', t:'GUARDIAN THAWED!', b:'You pat Grumble back together SMALL — and his grin comes back with him. The Glimmerfields blaze with festival light, and the Hearthlight takes its first warm breath.<br><b>Winterfest is coming, Pip. ❄️</b>'},
     };
     const c = COPY[stats.district] || COPY.w1;
     this.el('vEmoji').textContent = c.e;

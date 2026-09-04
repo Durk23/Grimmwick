@@ -78,6 +78,7 @@ const PIT_FX = {   // per-theme: danger glow color, eruption burst colors, risin
   castle: { glow:0xff8a3a, burst:[0xffa030,0xff5030], mote:0xffc060 },
   brewP:  { glow:0xb37dff, burst:[0xb37dff,0x8a5fd0], mote:0xb37dff },   // witch's-brew lava, purple (w1l4)
   brewG:  { glow:0x9fe066, burst:[0x9fe066,0x4fae66], mote:0x9fe066 },   // witch's-brew lava, green (w3l4)
+  winter: { glow:0x7ae8ff, burst:[0xa8dcf4,0xe8f6ff], mote:0xbfe8ff },   // Frostmere crevasse-cold
 };
 // BUBBLING BREW-LAVA (owner call, Aug 2026): the flat bog slabs read as "empty floor" even though the
 // splash fired. This is the proper bed for surface-pits: a hot pulsing brew surface, proud bubble domes,
@@ -138,6 +139,11 @@ function pitDressing(G, x1, x2, theme, bedTop=-4.3){   // bedTop: spike-base hei
     } else if(theme==='harbor'){ // dead coral spears + splintered ship timbers
       const c = mesh('cone',[0.17,rand(0.8,1.4),4], mat(0x9a8f86)); c.position.set(px,BY,pz); c.rotation.z=rand(-0.35,0.35); g.add(c);
       if(i%4===0){ const t = mesh('box',[0.16,rand(0.9,1.4),0.16], mat(0x4a3a30)); t.position.set(px,BY+0.2,pz); t.rotation.z=rand(-0.5,0.5); g.add(t); }
+    } else if(theme==='winter'){ // a glacial crevasse: ice spears glinting up from the blue-dark, drifted snow between
+      const s = new THREE.Mesh(geo('cone',0.17,rand(1.0,1.7),5), new THREE.MeshLambertMaterial({color:0xa8dcf4, emissive:0x3a8ec8, emissiveIntensity:0.5, transparent:true, opacity:0.85}));
+      s.position.set(px,BY,pz); s.rotation.z=rand(-0.25,0.25); g.add(s);
+      if(i%4===0){ const dr = mesh('sph',[rand(0.2,0.4),6,5], mat(0xdfe8f8)); dr.scale.y=0.45; dr.position.set(px,BY+0.05,pz); g.add(dr); }
+      if(i%6===0){ const gl2 = mesh('sph',[0.12,6,5], emat(0x7ae8ff,0x7ae8ff,0.8)); gl2.position.set(px,BY+0.1,pz); g.add(gl2); }
     } else if(theme==='castle'){ // iron spikes rising from MOLTEN forge-glow (lava seams between the teeth)
       const s = mesh('cone',[0.15,rand(1.0,1.6),4], mat(0x6a6f7a)); s.position.set(px,BY,pz); g.add(s);
       if(i%5===0){ const gt = mesh('box',[0.4,0.5,0.24], mat(0x5a4f20)); gt.position.set(px,BY+0.05,pz); gt.rotation.z=rand(-0.4,0.4); g.add(gt); }

@@ -27,6 +27,7 @@ const MASKS = {
   witchhat:    {name:'Witch\'s Hat', price:300, icon:'🧙', desc:'Properly crooked, personally enchanted. Fits over anything.'},
   starcrown:   {name:'THE STAR CROWN', price:0, earned:75, icon:'👑', desc:'All 75 stars. Every level, every challenge. Cannot be bought, only EARNED.'},
   nightcrown:  {name:'THE NIGHTMARE CROWN', price:0, earnedNM:true, icon:'🌑', desc:'All 25 levels conquered in the Nightmare. Black iron, smoldering embers. Cannot be bought — only survived.'},
+  icecrown:    {name:'THE ICE CROWN', price:0, earnedWF:true, icon:'❄️', desc:'All 15 stars of Glimmerfields. Carved from Frostmere\'s oldest ice. Cannot be bought — only braved.'},
 };
 function buildMask(key){
   const g = new THREE.Group();
@@ -108,6 +109,20 @@ function buildMask(key){
     const coal = mesh('sph',[0.09,8,7], emat(0x2a0a10, 0xff3a20, 1.2)); coal.position.set(0,0.85,0); g.add(coal);
     const halo = new THREE.Mesh(geo('sph',0.16,8,7), new THREE.MeshBasicMaterial({color:0xff3a30, transparent:true, opacity:0.28, blending:THREE.AdditiveBlending, depthWrite:false}));
     halo.position.set(0,0.85,0); g.add(halo);
+  }
+  else if(key==='icecrown'){       // the Ice Crown — glacial glass points over a silver band, breathing cold light. Braved, never sold.
+    const silverM = emat(0xc8d8ec, 0x7a94c0, 0.5), iceM = new THREE.MeshLambertMaterial({color:0xa8dcf4, emissive:0x5eb8e8, emissiveIntensity:0.85, transparent:true, opacity:0.8});
+    const band = mesh('cyl',[0.34,0.36,0.13,10], silverM); band.position.y=0.42; g.add(band);
+    const rim = mesh('tor',[0.35,0.02,5,16], iceM); rim.rotation.x=Math.PI/2; rim.position.y=0.49; g.add(rim);
+    for(let i=0;i<5;i++){
+      const a = (i/5)*Math.PI*2 + 0.3;
+      const h = i%2===0 ? 0.3 : 0.2;   // alternating tall/short shards — a real crown silhouette
+      const pt = new THREE.Mesh(geo('cone',0.065,h,4), iceM); pt.position.set(Math.cos(a)*0.32, 0.5+h/2, Math.sin(a)*0.32); g.add(pt);
+      if(i%2===0){ const gem = mesh('sph',[0.04,6,5], emat(0x7ae8ff,0x7ae8ff,1)); gem.position.set(Math.cos(a)*0.36, 0.44, Math.sin(a)*0.36); g.add(gem); }
+    }
+    const jewel = mesh('sph',[0.08,8,7], emat(0xdff4ff, 0x7ae8ff, 1.1)); jewel.position.set(0,0.88,0); g.add(jewel);
+    const halo = new THREE.Mesh(geo('sph',0.15,8,7), new THREE.MeshBasicMaterial({color:0x7ae8ff, transparent:true, opacity:0.25, blending:THREE.AdditiveBlending, depthWrite:false}));
+    halo.position.set(0,0.88,0); g.add(halo);
   }
   g.position.set(0, 1.18, 0.02);
   return g;
@@ -522,9 +537,11 @@ class Player {
     this.emberCD = 0.45;
     const {dx: dir, dz} = this._throwDir();
     const x = this.pos.x + dir*0.55, y = this.pos.y + 0.78, z = this.pos.z + dz*0.55;
-    G.ents.add(new EmberBolt(G, x, y, z, dir, dz));
-    AUDIO.tone({f:520, f2:180, type:'sawtooth', t:0.09, vol:0.09});   // a warm whoomph
-    G.fx.spawn(new THREE.Vector3(x,y,z), 0xff9a50, 4, {speed:1.8, life:0.25, gravity:1, size:0.5});
+    const bolt = new EmberBolt(G, x, y, z, dir, dz);
+    G.ents.add(bolt);
+    if(bolt.snow){ AUDIO.noise && AUDIO.noise({t:0.08, vol:0.1, fFrom:1200, fTo:400}); }   // a soft *paff*
+    else AUDIO.tone({f:520, f2:180, type:'sawtooth', t:0.09, vol:0.09});   // a warm whoomph
+    G.fx.spawn(new THREE.Vector3(x,y,z), bolt.snow?0xf0f6ff:0xff9a50, 4, {speed:1.8, life:0.25, gravity:1, size:0.5});
   }
   heal(n){ this.hearts = Math.min(this.maxHearts, this.hearts+n); if(window.UI) UI.updateHUD(); }
   gainShield(){
@@ -572,7 +589,7 @@ class Player {
       return;
     }
     this.hearts -= n;
-    if(this.G.area!=='hub'){
+    if(this.G.area!=='hub' && this.G.area!=='hub2'){   // neither town square tallies damage against clean-run stars
       const first = !(this.G.runDamage>0);
       this.G.runDamage = (this.G.runDamage||0)+n;
       // star hunters deserve to KNOW the instant a clean run dies (falls count too) — but only while the star is still unearned
@@ -710,8 +727,14 @@ class Player {
       }
       if(this.moonT<=0 && window.UI) UI.toast('🌙 ...the moonlight fades.');
     }
-    const speed = 7.2 * (this.moonT>0 ? 1.35 : 1);
-    const accel = this.grounded ? 50 : 28;
+    // ICE (Frostmere's verb): tag:'ice' underfoot = real momentum — weak accel, almost no stop-friction.
+    // SNOW SHOES (the 5th trick): +10% ground speed & snappier accel, plus honest grip on ice — but the
+    // boost applies GROUNDED ONLY, so airborne speed damps back to base and every gap/height in the game
+    // keeps its comparable-heights math (the safe version of the parked "faster Pip" wish).
+    const onIce = this.grounded && this.groundCol && this.groundCol.tag==='ice';
+    const shoes = this.G.trickOn && this.G.trickOn('shoes') && !this.G.nightmare;
+    const speed = 7.2 * (this.moonT>0 ? 1.35 : 1) * (this.grounded && shoes ? 1.10 : 1);
+    const accel = this.grounded ? (onIce ? (shoes ? 20 : 9) : (shoes ? 58 : 50)) : 28;
     if(this.climbing){ /* velocities set by climb logic above */ }
     else if(this.blinkT>0){   // Grimm's shadow phase: locked burst along the leap direction, afterimages trailing
       this.blinkT -= dt;
@@ -725,9 +748,10 @@ class Player {
       if(G.mode!=='side') this.vel.z = damp(this.vel.z, md.z*speed, accel/speed, dt);
       this.facing = angleDamp(this.facing, G.mode==='side' ? (md.x>0?Math.PI/2:-Math.PI/2) : Math.atan2(md.x, md.z), 12, dt);
     } else {
-      const fr = this.grounded?11:1.5;
+      const fr = this.grounded ? (onIce ? (shoes ? 3.2 : 1.4) : 11) : 1.5;   // ice barely lets go — THE slide
       this.vel.x = damp(this.vel.x, 0, fr, dt);
       this.vel.z = damp(this.vel.z, 0, fr, dt);
+      if(onIce && Math.abs(this.vel.x)>3 && Math.random()<dt*8) G.fx.spawn(new THREE.Vector3(this.pos.x, this.pos.y+0.05, this.pos.z), 0xbfe8ff, 1, {speed:0.8, life:0.3});   // skate spray (cosmetic only)
     }
 
     // --- jumping ---

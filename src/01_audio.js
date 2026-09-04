@@ -131,6 +131,11 @@ AudioSys.prototype.startMusic = function(){
              chords:[[196,233],[185,233],[196,247],[175,220]],
              lead:[392,0,466,0,392,440,0,392,0,466,523,0,466,440,0,392],
              drums:true, leadType:'sawtooth', vib:7, vol:0.85 },
+    // WINTERFEST — the Grimmwick waltz recast as a music box: high sine bells, gentle lilt, major-leaning.
+    // Frostmere's square and every winter level ride this mood (regional-identity law).
+    winter:{ step:0.21, bass:[131,0,0,98,0,0,110,0,0,87,0,0], chords:[[262,330],[220,262],[233,294],[196,247]],
+             lead:[523,0,587,659,0,523,494,0,523,440,0,392,523,0,659,784,0,659,587,0,523,494,0,440],
+             drums:false, leadType:'sine', vib:3, vol:0.95 },
   };
   let step = 0;
   const tick = ()=>{
