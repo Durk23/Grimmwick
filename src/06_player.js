@@ -154,7 +154,8 @@ class Player {
     this.grimmAura = null; this.grimmLight = null;
     this.zoeBroom = null; this.zoeBroomBack = null;
     this.flameAura = null; this.flameWisp = null;
-    this.blackAura = null; this.blackWisp = null; this.blackRing = null;
+    this.blackAura = null; this.blackWisp = null; this.blackWisp2 = null; this.blackRing = null;
+    this.blackHalo = null; this.blackLight = null; this.flameHalo = null;
     this.wingL = this.wingR = null;   // the rig rebuild dropped any wing meshes with the old body — full-time wings re-attach next frame
     if(this.shieldMesh){ this.shield = false; this.shieldMesh = null; }   // same for the bubble (guardT unchanged → an unbroken Gummy Guard re-forms instantly)
     const c = COSTUMES[costumeKey]||COSTUMES.kid;
@@ -397,21 +398,23 @@ class Player {
       this.grimmLight = new THREE.PointLight(0xff9a50, 42, 9); this.grimmLight.position.y=1.0; body.add(this.grimmLight);
     }
     if(this.G && this.G.save && this.G.save.firstFlame && !this.G.save.firstFlameOff){
-      // THE FIRST FLAME — championship regalia, kept restrained: a turning ember ring underfoot,
-      // a two-layer aura, a flame companion trailing sparks, embers rising even at rest.
+      // THE FIRST FLAME — championship regalia (owner final call, Sept 4 2026: the classic look,
+      // with the veil now EMBER-RED and clearly visible instead of near-clear): a two-layer red-gold
+      // aura, the turning champion's ring with dancing flames, and the flame companion trailing sparks.
       const addM = (c,o)=>new THREE.MeshBasicMaterial({color:c, transparent:true, opacity:o, blending:THREE.AdditiveBlending, depthWrite:false});
-      this.flameAura = new THREE.Mesh(geo('sph',0.52,12,10), addM(0xff8a3a,0.16));
+      this.flameAura = new THREE.Mesh(geo('sph',0.52,12,10), addM(0xff6a3a,0.24));
       this.flameAura.position.y=0.8; this.flameAura.scale.set(1,1.5,1); body.add(this.flameAura);
-      const outer = new THREE.Mesh(geo('sph',0.88,12,10), addM(0xff6a2e,0.09));
+      const outer = new THREE.Mesh(geo('sph',0.88,12,10), addM(0xff4a2e,0.12));
       outer.position.y=0.85; outer.scale.set(1,1.35,1); this.flameAura.userData.outer = outer; body.add(outer);
-      // the champion's ring: gold band + five small flames riding it
+      // the champion's ring: gold band + five flames dancing on it
       const ring = new THREE.Group();
       const band = new THREE.Mesh(geo('tor',0.62,0.034,6,28), addM(0xffd98a,0.85));
       band.rotation.x = Math.PI/2; ring.add(band);
       for(let i=0;i<5;i++){
         const a = i/5*TAU;
-        const fl = mesh('cone',[0.06,0.19,5], emat(0xffb35e,0xff8a3a,1));
-        fl.position.set(Math.cos(a)*0.62, 0.07, Math.sin(a)*0.62);
+        const fl = mesh('cone',[0.075,0.26,5], emat(0xffb35e,0xff8a3a,1));
+        fl.position.set(Math.cos(a)*0.62, 0.1, Math.sin(a)*0.62);
+        fl.userData.ph = i*1.7;
         ring.add(fl);
       }
       ring.position.y = 0.04;
@@ -426,20 +429,23 @@ class Player {
       this._flameEmberT = 0;
     }
     if(this.G && this.G.save && this.G.save.blackFlame && !this.G.save.blackFlameOff){
-      // THE BLACK FLAME — the Nightmare board's reigning champion: the First Flame's dark twin.
-      // Same regalia bones, black-crimson palette; a double champion wears both and looks like a legend.
+      // THE BLACK FLAME — the Nightmare champion (owner final call, Sept 4 2026: the classic
+      // silhouette wrapped in a deep CRIMSON veil — unmistakably red glass, never clear) — plus the
+      // one honor no other cosmetic carries: the holder casts REAL crimson light on the world.
+      // One player on Earth wears it at a time.
       const addM = (c,o)=>new THREE.MeshBasicMaterial({color:c, transparent:true, opacity:o, blending:THREE.AdditiveBlending, depthWrite:false});
-      this.blackAura = new THREE.Mesh(geo('sph',0.55,12,10), addM(0xd42a3c,0.14));
+      this.blackAura = new THREE.Mesh(geo('sph',0.55,12,10), addM(0xd42a3c,0.28));
       this.blackAura.position.y=0.8; this.blackAura.scale.set(1,1.5,1); body.add(this.blackAura);
-      const bouter = new THREE.Mesh(geo('sph',0.92,12,10), addM(0x8a1424,0.09));
+      const bouter = new THREE.Mesh(geo('sph',0.92,12,10), addM(0x8a1424,0.15));
       bouter.position.y=0.85; bouter.scale.set(1,1.35,1); this.blackAura.userData.outer = bouter; body.add(bouter);
       const bring = new THREE.Group();
-      const bband = new THREE.Mesh(geo('tor',0.66,0.034,6,28), addM(0xff4a30,0.7));
+      const bband = new THREE.Mesh(geo('tor',0.66,0.036,6,28), addM(0xff4a30,0.75));
       bband.rotation.x = Math.PI/2; bring.add(bband);
       for(let i=0;i<5;i++){
         const a = i/5*TAU + 0.35;
-        const fl = mesh('cone',[0.06,0.19,5], emat(0xff4a30,0x8a1020,1));
-        fl.position.set(Math.cos(a)*0.66, 0.07, Math.sin(a)*0.66);
+        const fl = mesh('cone',[0.075,0.26,5], emat(0xff4a30,0x8a1020,1));
+        fl.position.set(Math.cos(a)*0.66, 0.1, Math.sin(a)*0.66);
+        fl.userData.ph = i*1.5;
         bring.add(fl);
       }
       bring.position.y = 0.04;
@@ -450,6 +456,7 @@ class Player {
       const bsheath = new THREE.Mesh(geo('cone',0.14,0.34,7), addM(0xd42a3c,0.4)); bsheath.position.y=0.14;
       bw.add(bcore, binner, bsheath);
       this.blackWisp = bw; body.add(bw);
+      this.blackLight = new THREE.PointLight(0xd42a3c, 30, 8); this.blackLight.position.y = 1.1; body.add(this.blackLight);
       this._blackEmberT = 0;
     }
     // ---- THE MASK SLOT (wardrobe brick #1): any mask over any costume ----
@@ -910,10 +917,13 @@ class Player {
     }
     if(this.flameAura){
       const ft = G.time;
-      this.flameAura.material.opacity = 0.14 + 0.04*Math.sin(ft*2.7);
+      this.flameAura.material.opacity = 0.2 + 0.06*Math.sin(ft*2.7);
       const out2 = this.flameAura.userData.outer;
-      if(out2) out2.material.opacity = 0.08 + 0.03*Math.sin(ft*2.7 + 1.2);
-      if(this.flameRing){ this.flameRing.rotation.y = ft*0.55; }
+      if(out2) out2.material.opacity = 0.1 + 0.04*Math.sin(ft*2.7 + 1.2);
+      if(this.flameRing){
+        this.flameRing.rotation.y = ft*0.55;
+        for(const fl of this.flameRing.children) if(fl.userData && fl.userData.ph!==undefined) fl.scale.y = 1 + 0.3*Math.sin(ft*6.3 + fl.userData.ph);
+      }
       const fa = ft*1.6;
       this.flameWisp.position.set(Math.cos(fa)*0.8, 0.95+Math.sin(ft*2.1)*0.16, Math.sin(fa)*0.8);
       // the companion's fine spark trail + quiet embers rising from the ring even at rest
@@ -931,25 +941,30 @@ class Player {
     }
     if(this.blackAura){
       const bt = G.time;
-      this.blackAura.material.opacity = 0.12 + 0.04*Math.sin(bt*2.3 + 0.7);
+      this.blackAura.material.opacity = 0.24 + 0.07*Math.sin(bt*2.3 + 0.7);
       const bout = this.blackAura.userData.outer;
-      if(bout) bout.material.opacity = 0.07 + 0.03*Math.sin(bt*2.3 + 1.9);
-      if(this.blackRing){ this.blackRing.rotation.y = -bt*0.5; }   // counter-spin to the First Flame's ring
-      const ba = -bt*1.45 + Math.PI;                               // the dark wisp orbits opposite the bright one
+      if(bout) bout.material.opacity = 0.13 + 0.05*Math.sin(bt*2.3 + 1.9);
+      if(this.blackLight) this.blackLight.intensity = 26 + Math.sin(bt*7.3)*5 + Math.sin(bt*11.7)*3;   // ember flicker in the carried light
+      if(this.blackRing){
+        this.blackRing.rotation.y = -bt*0.5;   // counter-spin to the First Flame's ring
+        for(const fl of this.blackRing.children) if(fl.userData && fl.userData.ph!==undefined) fl.scale.y = 1 + 0.32*Math.sin(bt*7.1 + fl.userData.ph);
+      }
+      const ba = -bt*1.45 + Math.PI;
       if(this.blackWisp){
-        this.blackWisp.position.set(Math.cos(ba)*0.84, 0.95+Math.sin(bt*1.9+0.8)*0.16, Math.sin(ba)*0.84);
+        this.blackWisp.position.set(Math.cos(ba)*0.86, 0.95+Math.sin(bt*1.9+0.8)*0.16, Math.sin(ba)*0.86);
         this._blackEmberT -= dt;
         if(this._blackEmberT <= 0){
-          this._blackEmberT = 0.18;
-          const bp = this.blackWisp.getWorldPosition(new THREE.Vector3());
-          G.fx.spawn(bp, 0xff6a50, 1, {speed:0.25, life:0.5, gravity:-0.2, size:0.45});
-          if(Math.random() < 0.4){
+          this._blackEmberT = 0.16;
+          const bpv = this.blackWisp.getWorldPosition(new THREE.Vector3());
+          G.fx.spawn(bpv, 0xff6a50, 1, {speed:0.25, life:0.5, gravity:-0.2, size:0.45});
+          if(Math.random() < 0.5){
             const ra = Math.random()*TAU;
             G.fx.spawn(new THREE.Vector3(this.pos.x+Math.cos(ra)*0.66, this.pos.y+0.08, this.pos.z+Math.sin(ra)*0.66),
               Math.random()<0.5?0xd42a3c:0xff4a30, 1, {speed:0.3, life:0.8, gravity:-0.9, size:0.4});
           }
         }
       }
+    }
     }
     if(this.grimmAura){
       const tt = G.time, flare = this.blinkT>0 ? 0.3 : 0;
