@@ -29,12 +29,12 @@
 //          checkpoint) then the slalom: 3 icicle clocks, battery C stretched to FOUR craters (the last at
 //          x122 composing with the crevasse-guard Snowman), a faster boulder lane and a penguin between them.
 //          A second glacial crevasse caps the pass.
-//   BEAT 5 GRUMBLE'S HILL (MASTER · gate) x 135.5..181 — the doorstep gauntlet: mortars on an ice apron, TWO
-//          Snow-Boos covering each other's blind spots at the hill's foot, the GARLAND CLIMB up the hill face
-//          — now with TWO alternating SpikeIcicles hung beside the climb volume (dodge-while-climbing under
-//          mortar fire: the hardest honest moment in the game — full 0.7s telegraphs, 2.1s between drops,
-//          climb-off always available) — the crest crossed UNDER FIRE (max 3 simultaneous threats, capped),
-//          a Blizzard Bat diving the top, then down to the door.
+//   BEAT 5 GRUMBLE'S HILL (MASTER · gate) x 135.5..181 — THE AVALANCHE (owner seed, Sept 4 2026): Grumble
+//          bowls a GIANT snowball down his hill EVERY 5 SECONDS — it rolls the crest head-on, tumbles off the
+//          lip beside the GARLAND CLIMB, sweeps the ice apron past TWO flanking Snow-Boos, and dies in the
+//          crevasse. Double-jump it, SPIN-SHATTER it (the timely hit), or stomp-RIDE it; the distant WHUMP
+//          is your 5-count. Icicle B still guards the climb's lip (max 3 simultaneous threats, capped),
+//          a Blizzard Bat dives the crest, then down to the quiet door.
 // Reads UNMISTAKABLY Glimmerfields: W6PAL moonlit snow on the deep blue-violet night, warm festival bulbs strung
 // the whole way (five shared mats, one twinkle ticker), aurora ribbons, snowfall, cyan cold-spirit glow — and the
 // far hill wears one ENORMOUS snowman silhouette, waiting. Three lanes busy throughout (ground penguins/snowmen/
@@ -290,15 +290,21 @@ function buildW6L5(G){
 
   // =============================== BEAT 5 — GRUMBLE'S HILL (x 135.5..181): MASTER — the doorstep gauntlet ===============================
   groundX(G, 135.5, 138.5, SNOW);                                      // a snow landing after the gap (generous, always)
-  w6IceX(G, 138.5, 149.4);                                             // the ice apron up to the hill's foot (stretched — more glaze under battery D)
-  // battery D — the master mix: two craters on the apron ICE, two on the CREST (Grumble shells his own doorstep
-  // now — the one place the high ground stopped being safe; escalation with a wink at beat 2's trade)
-  w6l5Mortar(G, {period:7.4, cx:148, volley:[[0.9,141.5,0],[1.8,146,0],[3.4,153,4.6],[4.3,157,4.6]]});
+  w6IceX(G, 138.5, 149.4);                                             // the ice apron up to the hill's foot (glaze under the avalanche lane)
+  // THE AVALANCHE (owner seed, Sept 4 2026 — replaces battery D so the threat cap holds): GRUMBLE HIMSELF
+  // bowls a GIANT snowball down his hill EVERY 5 SECONDS — released at the crest's far edge, it rolls the
+  // crest, TUMBLES off the climb-side lip, crashes onto the ice apron, and sweeps left until the second
+  // crevasse swallows it (its bite cuts out 1.5u before the lip — the dying ball can never bump anyone in).
+  // Counters, all taught by now: DOUBLE-JUMP it (top 2.8 vs the 3.3 double) · the TIMELY HIT (spin shatters
+  // it into candy — standing your ground in its path IS the timing test) · STOMP-BOUNCE off its top (the
+  // expert line: ride the balls). One fixed clock from level start; the distant WHUMP is your 5-count.
+  G.ents.add(new AvalancheSpawner(G, {x:159.2, y:4.6, dir:-1, speed:5, r:1.4, period:5, firstAt:2.0, endX:134.2}));
   candyLine(G, [[140,0.9,0],[143.8,0.9,0],[147.6,0.9,0]], 3);         // the apron rhythm
   // SNOW-BOOS #3 + #4 — TWO drift the apron now, covering each other's blind spots (stare one solid, the other
   // creeps — the classic flank). BOTH sit inside one forward stare cone from the landing (ranges 8/9, dot>0.25),
   // so the read is: freeze the pair, cross 9u of ice inside 2.6s, climb while they shatter grumpy behind you.
-  // Base-of-climb simultaneity: boo + boo + climb-icicle A = 3, the cap; craters 146/153 don't reach the base.
+  // Base-of-climb simultaneity: boo + boo + the avalanche pass = 3, the cap (the ball crosses the base in
+  // ~0.6s of each 5s cycle, announced by the WHUMP + the crash off the lip — freeze the boos, count the five).
   // SANCTIONED EXPERT TECH: a boo frozen at the hill face is a 1.85u-tall step — a double-jump off its block
   // (1.85+3.3=5.15 > 4.6) clears the crest and skips the garland entirely. Deterministic, skill-gated, ours.
   G.ents.add(new SnowBoo(G, 143.5, 0, 0, {phase:1.2, speed:2.2, range:8, freezeMax:2.6}));
@@ -312,31 +318,35 @@ function buildW6L5(G){
   G.world.addBox(149.15, 0, 0, 1.0, 5.0, 1.2, {type:'climb'});         // the garland climb (tops 5.0 — the exit hop clears the crest)
   w6String(L, 149.35, 0.35, 149.35, 4.85, {z:0.35, sag:0.15, segs:8}); // the climbable garland's twinkling visual
   candyLine(G, [[149.6,1.4,0],[149.6,2.8,0],[149.6,4.2,0]], 3);       // candy telegraphs the climb verb, rung by rung
-  // THE CLIMB ICICLES — Grumble hung icicles on his own garland: two SpikeIcicles flank the climb volume
-  // (148.65..149.65), dodge-while-climbing under battery D's fire = THE HARDEST HONEST MOMENT IN THE GAME.
-  // Honest math: icicle A (x148.85, floorY 0) threatens px<149.35 — dodge by hugging the volume's right edge
-  // (149.65, 0.8u clear) or climbing off; icicle B (x149.55, floorY 4.6 — it shatters on the crest) threatens
-  // the TOP-right, px>149.05 — dodge left (148.65, 0.9u clear). Each half of the volume is always safe from
-  // one of them; phases 2.1s apart on a shared 4.2s period mean THEY NEVER DROP TOGETHER (drop+fall < 0.9s),
-  // both keep the kit's full 0.7s shimmer+drip+floor-glow telegraph, and climb-off is available every frame.
-  // (Reusing the pass's learned language — same glow, same clock-reading, now vertical.)
-  G.ents.add(new SpikeIcicle(G, 148.85, 6.3, {period:4.2, phase:0.6, len:1.1}));
-  G.ents.add(new SpikeIcicle(G, 149.55, 6.3, {period:4.2, phase:2.7, len:1.0, floorY:4.66}));   // floorY 4.66: floor-glow lands at 4.70, ABOVE the crest sheen strip's top (4.68) — the telegraph never hides
+  // THE CLIMB GAUNTLET — climb the garland while GRUMBLE'S AVALANCHE FLIES OVERHEAD (each ball tumbles off
+  // the crest lip right beside the climb every 5s — visible above, WHUMP-counted, a ~0.3s pass) and icicle B
+  // guards the TOP-right lip (px>149.05 — dodge left at 148.65, 0.9u clear; full 0.7s shimmer+glow telegraph;
+  // it shatters on the crest, floorY 4.66 so its glow rides ABOVE the sheen strip). Climb-off is available
+  // every frame; icicle A retired with battery D so the corridor holds the ≤3 cap: ball flyover + icicle B
+  // + nothing else allowed here. THE HARDEST HONEST MOMENT IN THE GAME, now with a 5-second heartbeat.
+  G.ents.add(new SpikeIcicle(G, 149.55, 6.3, {period:4.2, phase:2.7, len:1.0, floorY:4.66}));
   // the snow cornice the climb icicles hang from (baked deco, NO collider — the climb-off/exit hop stays clear)
   { const corn = mesh('box',[2.4,0.45,1.9], mat(W6PAL.snowD)); corn.position.set(149.2, 6.45, -0.35); corn.rotation.z=0.04; deco.add(corn);
     const lump = mesh('sph',[0.5,7,5], mat(W6PAL.snow)); lump.scale.y=0.5; lump.position.set(148.8, 6.75, -0.2); deco.add(lump); }
-  // THE CREST — crossed under battery D's fire (safe pockets at 150.5..152, ~155, and 158+), a bat diving the
-  // top. THE SQUEEZE STAYS CAPPED AT 3 SIMULTANEOUS THREATS (owner cap): crest craters 153/157 ride ONE battery
-  // clock 0.9s apart, + the bat, + icicle B at the lip (its column 149.05..150.05 never overlaps the craters'
-  // 152.1..157.9) — nothing else is allowed up here, and the pockets stay crater-free.
+  // THE CREST — crossed AGAINST the avalanche: every 5s a giant ball rolls head-on down this lane (double-jump
+  // it, spin-shatter it, or stomp-ride it), a bat diving the top, icicle B at the lip. THE SQUEEZE STAYS CAPPED
+  // AT 3 SIMULTANEOUS THREATS (owner cap): ball + bat + icicle B, on three different clocks, all telegraphed —
+  // the light posts mark where the ball passes; the pockets behind them are yours between WHUMPs.
   { const cp1 = w6LightPost(151, -2.5, 1.2); cp1.position.y = 4.6; deco.add(cp1);     // posts lifted to the crest top
     const cp2 = w6LightPost(159, -2.5, 1.2); cp2.position.y = 4.6; deco.add(cp2); }
   w6String(L, 151, 5.75, 159, 5.75, {z:-2.4});                        // Winterfest lights right up to his door
   candyLine(G, [[151,5.5,0],[155,5.5,0],[158.5,5.5,0]], 3);           // the crest pockets, traced
   G.ents.add(new BlizzardBat(G, 155.5, 7.6, 0, {phase:1.3, range:2.5, period:3.8, aggroR:5}));
-  // the mortars themselves crown the crest's back edge — you finally WALK PAST the things that shelled you
-  deco.add(w6l5MortarTube(151.8, 4.6, -2.3, 0.9));
-  deco.add(w6l5MortarTube(157.6, 4.6, -2.3, 0.9));
+  // GRUMBLE'S AMMO — pyramids of giant snowballs stacked at the crest's back edge, right where the avalanche
+  // releases: you finally WALK PAST the arsenal that rolled at you (and the boss hint lands: he THROWS these)
+  { for(const ax of [152.2, 157.8]){
+      const pile = new THREE.Group();
+      const pb = mat(W6PAL.snowD);
+      const b1=mesh('sph',[0.8,10,8], pb); b1.position.set(ax-0.5,5.2,-2.3); pile.add(b1);
+      const b2=mesh('sph',[0.8,10,8], pb); b2.position.set(ax+0.6,5.2,-2.4); pile.add(b2);
+      const b3=mesh('sph',[0.75,10,8], pb); b3.position.set(ax,6.2,-2.35); pile.add(b3);
+      deco.add(pile);
+  } }
   // DESCEND the far side to the doorstep court (drops are free; the steps are the graceful line)
   groundX(G, 160, 181, SNOW);
   platform(G, 162, 3.0, 0, 2.6, 3, RIDGE);                             // spans 160.7..163.3 (drop 1.6)

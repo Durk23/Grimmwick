@@ -117,6 +117,31 @@ area pip falls in and death action happens"):
   penguin lanes that slide across panels without cracking them (they're light — the tell that
   weight matters) · trap-route panels over TRUE deep water on marked trap branches (D5 trap law).
 
+## THE AVALANCHE — expansion set-piece archetype (owner seed, Sept 4 2026)
+A GIANT snowball released on a fixed clock (default **every 5 seconds**) that rolls THROUGH the
+course. Counters: double-jump it (top 2.8 vs the 3.3 double) · the **TIMELY HIT** (spin/pound
+shatters it into candy — standing in its path to swing IS the timing test) · stomp-BOUNCE off its
+top (a moving platform — the expert line rides the balls). Terrain-following (rolls flats, tumbles
+off ledges, dies in pits — bite cut 1.5u before its end so a dying ball never bumps anyone in).
+Kit: `AvalancheBall`/`AvalancheSpawner` in 09zm. ✅ FIRST DEPLOYMENT: 6-5's finale — Grumble bowls
+them down his own hill (replaced mortar battery D; plants his P3 rolling-ring hint). **w7–w10: one
+FULL avalanche level per district** ("the one with the snowballs") — whole-level release clocks,
+e.g. w7: balls crossing CRACKING LAKES (shatter the panels ahead of you — dodge the ball, then its
+holes); w8: mine-shaft slopes where balls accelerate; w9/w10 escalations. A few levels of the 25, per the owner.
+
+## w7+ roster seeds (owner, Sept 4 2026): HAUNTED POLAR BEARS & REINDEER
+- **THE SOMNAMBEAR** (haunted polar bear, w7 Frozen Lake Fell) — a huge pale bear sleepwalking a
+  fixed patrol, eyes closed, snoring little ghost-flakes. Harmless until WOKEN (attack it, or let
+  its patrol meet you): one furious telegraphed swipe-lunge... then it yawns and resumes sleepwalking.
+  On the lakes its lunge SLAM instantly shatters nearby CrackIce panels — the bear rewrites the floor.
+  Cute-spooky bar: it wears a tiny nightcap. Field Guide: "Do not wake. It needs its hundred years."
+- **THE WRAITHDEER TEAM** (haunted reindeer, w7/w8 air lane) — a spectral sleigh-team of 3-4 glowing
+  reindeer that sweeps through on a fixed route pulling NOTHING (the ghost of a delivery round that
+  never ended). You HEAR the sleigh bells ~1s out — the jingle IS the telegraph — then they streak
+  across the lane. Antlers glow the cold cyan; the lead deer's nose glows warm amber (never named —
+  the joke is in the glow). Solo variant: a single Wraithdeer that CHARGES like a Skelly with a
+  bell-shake telegraph, antlers down.
+
 ## Ship plan
 1. Foundation: ice physics + snowfall + string-lights builder + kit file (09zm_w6kit) +
    enemies (07z) + WORLDS/map/save wiring + ferry dock + Frostmere square (08b).

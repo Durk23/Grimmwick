@@ -496,6 +496,87 @@ function w6GiftBox(x, z, s=1, col){
   return g;
 }
 
+// =============================== 8b) THE AVALANCHE (owner seed, Sept 4 2026) ===============================
+// A GIANT snowball released on a fixed clock (default every 5s) that rolls THROUGH the course — double-jump
+// it, or land the TIMELY HIT: a spin/pound SHATTERS it into candy (standing in its path to swing is the
+// timing test — mistime it and the ball wins). A stomp doesn't hurt it: you BOUNCE off the top (a moving
+// high-road step, DKC energy). It follows the terrain: rolls the flats, tumbles off ledges, and dies at
+// endX (or in a pit) as harmless spectacle — touchDamage cuts out 1.5u before its end so a dying ball can
+// never knock anyone into the hole it's about to fill. Deterministic: releases ride one fixed clock from
+// level start; every run meets every ball at the same step. Hearts-always: contact = 1 heart, never more.
+class AvalancheBall extends Enemy {
+  constructor(G, x, y, opts={}){
+    super(G, x, y, 0);
+    this.dir = opts.dir||-1; this.speed = opts.speed||5; this.r = opts.r||1.4;
+    this.endX = opts.endX!==undefined?opts.endX:(x + this.dir*60);
+    this.cull = false;                     // it rolls the WHOLE course — never despawn off-camera
+    this.hitR = this.r*0.9; this.headH = this.r*2; this.hitY = this.r; this.touchR = this.r*0.95;
+    this.touchDamage = 1; this.candyDrop = 3;
+    this.vy = 0; this.falling = false;
+    const snow = emat(0xf0f4ff, 0x8aa4d0, 0.22);
+    this.ball = mesh('sph',[this.r,14,12], snow); this.group.add(this.ball);
+    for(let i=0;i<7;i++){ const fl=mesh('sph',[rand(0.1,0.18),5,4], mat(0x5a6478)); const a=i/7*TAU; fl.position.set(Math.cos(a)*this.r*0.88, Math.sin(a)*this.r*0.88, this.r*0.3); this.ball.add(fl); }
+    this.group.position.y = y + this.r;
+    G.scene.add(this.group);
+  }
+  takeHit(player, kind){
+    if(this.dead) return;
+    if(kind==='stomp'){                    // the top is a springboard, not a weak point
+      AUDIO.stomp && AUDIO.stomp();
+      this.ball.scale.y = 0.82;            // a big soft squash; update() eases it back
+      return;
+    }
+    this.die();                            // the TIMELY HIT — spin/pound shatters it (Enemy.die pays the candy)
+  }
+  update(dt){
+    this.t += dt;
+    const p = this.group.position;
+    this.ball.scale.y = damp(this.ball.scale.y, 1, 8, dt);
+    p.x += this.dir*this.speed*dt;
+    this.ball.rotation.z += -this.dir*(this.speed/this.r)*dt;
+    const gh = this.G.world.groundHeight(p.x, p.z, p.y + 0.5);
+    if(this.falling){
+      this.vy -= 26*dt; p.y += this.vy*dt;
+      if(gh > -Infinity && p.y - this.r <= gh){ p.y = gh + this.r; this.falling=false; this.vy=0;
+        this.G.fx.spawn(new THREE.Vector3(p.x, gh+0.15, p.z), 0xf0f4ff, 8, {speed:2.5, life:0.4});
+        this.G.camc && this.G.camc.shake(0.12, 0.2); }
+      else if(p.y < -4){ this.candyDrop = 0; this.die(); return; }   // swallowed by a pit — quiet spectacle, no loot down a hole
+    } else {
+      if(gh === -Infinity || (p.y - this.r) - gh > 0.45){ this.falling = true; this.vy = 0; }
+      else p.y = gh + this.r;
+    }
+    // a dying ball is harmless: cut the bite before the end so it can't bump anyone into its own grave
+    if(this.dir<0 ? p.x <= this.endX+1.5 : p.x >= this.endX-1.5) this.touchDamage = 0;
+    if(this.dir<0 ? p.x <= this.endX : p.x >= this.endX){
+      if(this.candyDrop && !this._endBurst){ this._endBurst=true; }
+      this.candyDrop = 0; this.die(); return;                        // end of the line — pure snow-burst
+    }
+    // rolling rumble when near (cosmetic)
+    const pl = this.G.player;
+    if(pl && Math.abs(pl.pos.x-p.x)<9 && Math.random()<dt*3) this.G.fx.spawn(new THREE.Vector3(p.x-this.dir*this.r, p.y-this.r*0.6, p.z), 0xeef3ff, 1, {speed:1.2, life:0.3});
+    this.touchPlayer(dt); this.updateShadow();
+  }
+}
+// AvalancheSpawner(G, {x, y, dir, speed, r, period, firstAt, endX}): the release clock. One fixed timeline
+// from level start (firstAt, then every period seconds) — the level's heartbeat. Distant WHUMP on release.
+class AvalancheSpawner {
+  constructor(G, opts={}){
+    this.G=G; this.dead=false; this.cull=false; this.isEnemy=false; this.group=new THREE.Group();
+    this.x=opts.x||0; this.y=opts.y||0; this.o=opts;
+    this.period=opts.period||5; this.nextAt=opts.firstAt!==undefined?opts.firstAt:1.5;
+    this.t=0;
+  }
+  update(dt, G){
+    this.t += dt;
+    if(this.t >= this.nextAt){
+      this.nextAt += this.period;
+      G.ents.add(new AvalancheBall(G, this.x, this.y, this.o));
+      G.fx.spawn(new THREE.Vector3(this.x, this.y+1.2, 0), 0xf0f4ff, 6, {speed:2, life:0.4});
+      AUDIO.noise && AUDIO.noise({t:0.3, vol:0.12, fFrom:220, fTo:60});   // the distant WHUMP — count your five seconds
+    }
+  }
+}
+
 // =============================== 9) LEVEL REGISTRY ===============================
 const W6_LEVELS = [];
 LEVEL_LISTS.push(W6_LEVELS);   // findLevel / completeLevel / renderMap pick w6 up from here
