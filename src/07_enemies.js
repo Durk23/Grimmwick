@@ -491,9 +491,17 @@ class SwoopBat extends Enemy {
       this.st += dt;
       p.y += Math.sin(this.st*40)*0.02;                          // agitated hover
       if(this.st>0.45 && pl){
-        this.state='dive'; this.st=0;
-        this.diveFrom.copy(p);
-        this.diveTo.set(pl.pos.x, pl.pos.y+0.3, 0);              // snapshot taken NOW — move and it misses
+        // MEGA-DIVE GUARD (w7 fleet audit, deterministic repro): if the player TELEPORTED mid-telegraph
+        // (a pit/plunge respawn), the raw snapshot sent the bat on a cross-level dive and re-homed it ON
+        // the checkpoint — camping fresh respawns. A target beyond 1.6× aggro reach = the meal is gone:
+        // shrug back to patrol instead.
+        if(Math.abs(pl.pos.x - p.x) > this.aggroR*1.6 + 2){
+          this.state='patrol'; this.cool = 1.2;
+        } else {
+          this.state='dive'; this.st=0;
+          this.diveFrom.copy(p);
+          this.diveTo.set(pl.pos.x, pl.pos.y+0.3, 0);            // snapshot taken NOW — move and it misses
+        }
       }
     } else if(this.state==='dive'){
       this.st += dt;
@@ -507,7 +515,11 @@ class SwoopBat extends Enemy {
       p.y = this.diveFrom.y + (this.baseY-this.diveFrom.y)*u;
       if(u>=1){
         this.state='patrol'; this.cool = 1.6;
-        this.home.x = p.x - Math.sin(this.t*(TAU/this.period))*this.rangeX;  // resume patrol from here, no teleport
+        // resume patrol from here, no teleport — but BOUNDED (w7 audit): drift toward the player is the
+        // designed trait, unbounded migration onto checkpoints/gamble pockets is not. Tether to birth-home.
+        if(this._home0x===undefined) this._home0x = this.home.x;
+        const nh = p.x - Math.sin(this.t*(TAU/this.period))*this.rangeX;
+        this.home.x = clamp(nh, this._home0x - this.rangeX - 4, this._home0x + this.rangeX + 4);
       }
     }
     this.touchPlayer(dt);

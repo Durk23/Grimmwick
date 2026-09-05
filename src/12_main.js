@@ -432,6 +432,10 @@ const G = {
     else if(area==='boss4' && typeof buildBossArena4==='function') buildBossArena4(this);
     else if(area==='boss5' && typeof buildBossArena5==='function') buildBossArena5(this);
     else if(area==='boss6' && typeof buildBossArena6==='function') buildBossArena6(this);
+    else if(area==='boss7' && typeof buildBossArena7==='function') buildBossArena7(this);
+    else if(area==='boss8' && typeof buildBossArena8==='function') buildBossArena8(this);
+    else if(area==='boss9' && typeof buildBossArena9==='function') buildBossArena9(this);
+    else if(area==='boss10' && typeof buildBossArena10==='function') buildBossArena10(this);
     else if(area==='hub2' && typeof buildFrostHub==='function') buildFrostHub(this);
     else if(area==='tut') buildTutorial(this);
     else if(def) def.build(this);
@@ -661,8 +665,8 @@ const G = {
       UI.fade(false, 450);
     }, 500);
   },
-  bossAreaFor(district){ return ({w1:'boss1',w2:'boss2',w3:'boss3',w4:'boss4',w5:'boss5',w6:'boss6'})[district]; },
-  bossBuilt(area){ return area==='boss1' || (area==='boss2' && typeof buildBossArena2==='function') || (area==='boss3' && typeof buildBossArena3==='function') || (area==='boss4' && typeof buildBossArena4==='function') || (area==='boss5' && typeof buildBossArena5==='function') || (area==='boss6' && typeof buildBossArena6==='function'); },
+  bossAreaFor(district){ return ({w1:'boss1',w2:'boss2',w3:'boss3',w4:'boss4',w5:'boss5',w6:'boss6',w7:'boss7',w8:'boss8',w9:'boss9',w10:'boss10'})[district]; },
+  bossBuilt(area){ return area==='boss1' || (area==='boss2' && typeof buildBossArena2==='function') || (area==='boss3' && typeof buildBossArena3==='function') || (area==='boss4' && typeof buildBossArena4==='function') || (area==='boss5' && typeof buildBossArena5==='function') || (area==='boss6' && typeof buildBossArena6==='function') || (area==='boss7' && typeof buildBossArena7==='function') || (area==='boss8' && typeof buildBossArena8==='function') || (area==='boss9' && typeof buildBossArena9==='function') || (area==='boss10' && typeof buildBossArena10==='function'); },
   startBoss(district){
     // district-aware boss router (the map's boss node calls this). Defers politely if a boss isn't built yet.
     district = district || 'w1';

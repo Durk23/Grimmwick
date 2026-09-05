@@ -142,6 +142,25 @@ holes); w8: mine-shaft slopes where balls accelerate; w9/w10 escalations. A few 
   the joke is in the glow). Solo variant: a single Wraithdeer that CHARGES like a Skelly with a
   bell-shake telegraph, antlers down.
 
+## SIGNATURE CONTRAPTIONS (owner directive, Sept 4 2026 — "fun cool obstacles like the gears, not plain and simple")
+The D5 gear-platform standard applied to winter: every district gets a CRAFTED MACHINE family —
+brass + ice + bolts + character, motion readable at a glance, the machine IS the platform/hazard.
+Nothing ships as a plain moving box.
+- **w7 FROZEN LAKE FELL**: THE ICE POLISHER (brass lake-buffing contraption trundling fixed routes —
+  ride the roof, dodge the spinning front brush; comedy + machinery) · THE ICE-SAW MILL (circular
+  saw blades traveling tracks, cutting blocks that float off as platforms on open-water lanes) ·
+  THE ROPE-TOW (a frozen ski-tow cable loop with T-bars — grab and ride across the deep ice,
+  hop bar to bar; moving climb-grips) · the fishery's half-frozen MILL WHEEL (ride the paddles around).
+- **w8 THE ICICLE MINES**: MINECART RUNS on real rails (DKC energy) · ORE-BUCKET CABLE LINES ridden
+  over chasms · rotating CRYSTAL DRILL HEADS (gear DNA, mining skin) · Knocker counterweight lifts.
+- **w9 EVERGREEN DEEP**: THE GIANT MUSIC BOX — rotating pin-cylinder, the pins are platforms, the
+  tune plays as it turns (platforming synced to music; the jewel) · ORNAMENT WRECKING-BAUBLES
+  swinging from the great pines · CANDY-CANE PENDULUMS · chimney-smoke updrafts at the camps.
+- **w10 THE AURORA PALACE**: FROZEN FOUNTAIN GEYSERS (freeze mid-air into temporary pillars on
+  clocks) · THE CLOCKWORK ADVENT WALL (numbered doors opening/shutting on schedule — open doors
+  are the path; some hide treats or ambushes) · MARCHING TOY-SOLDIER platforms · FROST ORGAN PIPES
+  that launch on air blasts. All deterministic, all telegraphed, all gorgeous.
+
 ## Ship plan
 1. Foundation: ice physics + snowfall + string-lights builder + kit file (09zm_w6kit) +
    enemies (07z) + WORLDS/map/save wiring + ferry dock + Frostmere square (08b).

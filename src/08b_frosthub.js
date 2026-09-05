@@ -7,11 +7,11 @@
 
 // Frostmere's five winter districts (one ships per month through winter — the five featuring shots)
 const FWORLDS = [
-  {key:'w6',  name:'Glimmerfields',    sub:'the festival farms',  guardian:'Grumble, the Abominable Snowman', angle:-0.72,        color:0xffb85e, open:true},
-  {key:'w7',  name:'Evergreen Deep',   sub:'the whispering pines', guardian:'???', angle:-1.55,               color:0x58e08a, open:false},
-  {key:'w8',  name:'The Icicle Mines', sub:'the glittering dark',  guardian:'???', angle:Math.PI+1.55,        color:0x7ae8ff, open:false},
-  {key:'w9',  name:'Frozen Lake Fell', sub:'the great white ice',  guardian:'???', angle:Math.PI+0.72,        color:0xb08aff, open:false},
-  {key:'w10', name:'The Aurora Palace',sub:'where the cold sits crowned', guardian:'???', angle:Math.PI-0.28, color:0xff5e6a, open:false},
+  {key:'w6',  name:'Glimmerfields',    sub:'the festival farms',  guardian:'Grumble, the Abominable Snowman', angle:-0.72,      color:0xffb85e, open:true},
+  {key:'w7',  name:'Frozen Lake Fell', sub:'the great white ice',  guardian:'Ursa Major, the Great White', angle:-1.55,         color:0xb08aff, open:false, req:'w6'},
+  {key:'w8',  name:'The Icicle Mines', sub:'the glittering dark',  guardian:'Prismus the Unlit', angle:Math.PI+1.55,            color:0x7ae8ff, open:false, req:'w7'},
+  {key:'w9',  name:'Evergreen Deep',   sub:'the whispering pines', guardian:'Old Tannenbaum', angle:Math.PI+0.72,               color:0x58e08a, open:false, req:'w8'},
+  {key:'w10', name:'The Aurora Palace',sub:'where the cold sits crowned', guardian:'The First Frost', angle:Math.PI-0.28,       color:0xff5e6a, open:false, req:'w9'},
 ];
 
 function buildFrostHub(G){
