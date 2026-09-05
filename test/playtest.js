@@ -58,7 +58,7 @@ const path = require('path');
   check('map closes back to play', s && s.state==='play');
 
   // each level: enter, verify side-scroll movement with a real held key, screenshot
-  const levels = ['w1l1','w1l2','w1l3','w1l4','w1l5','w2l1','w2l2','w2l3','w2l4','w2l5','w3l1','w3l2','w3l3','w3l4','w3l5','w4l1','w4l2','w4l3','w4l4','w4l5','w5l1','w5l2','w5l3','w5l4','w5l5','w6l1','w6l2','w6l3','w6l4','w6l5','w7l1','w7l2','w7l3','w7l4','w7l5','w8l1','w8l2','w8l3','w8l4','w8l5'];
+  const levels = ['w1l1','w1l2','w1l3','w1l4','w1l5','w2l1','w2l2','w2l3','w2l4','w2l5','w3l1','w3l2','w3l3','w3l4','w3l5','w4l1','w4l2','w4l3','w4l4','w4l5','w5l1','w5l2','w5l3','w5l4','w5l5','w6l1','w6l2','w6l3','w6l4','w6l5','w7l1','w7l2','w7l3','w7l4','w7l5','w8l1','w8l2','w8l3','w8l4','w8l5','w9l1','w9l2','w9l3','w9l4','w9l5'];
   for(const id of levels){
     await page.evaluate((i)=>window.__game.scene(i), id);
     await page.waitForTimeout(1400);
@@ -109,7 +109,7 @@ const path = require('path');
   check('next-level into w1l2', s && s.state==='play' && s.area==='w1l2');
 
   // bosses — Pumpkin King (w1) and Mossgrave (w2)
-  for(const [dist, area] of [['w1','boss1'],['w2','boss2'],['w3','boss3'],['w4','boss4'],['w5','boss5'],['w6','boss6'],['w7','boss7'],['w8','boss8']]){
+  for(const [dist, area] of [['w1','boss1'],['w2','boss2'],['w3','boss3'],['w4','boss4'],['w5','boss5'],['w6','boss6'],['w7','boss7'],['w8','boss8'],['w9','boss9']]){
     await page.evaluate((d)=>window.G.startBoss(d), dist);
     await page.waitForTimeout(1800);
     s = await state();

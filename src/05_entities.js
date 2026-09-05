@@ -78,6 +78,7 @@ class Candy {
 }
 function candyLine(G, pts, n){
   // scatter candies along a polyline/arc of points
+  if(n===1 || pts.length===1){ const p=pts[0]; for(let i=0;i<n;i++) G.ents.add(new Candy(p[0],p[1],p[2])); return; }
   for(let i=0;i<n;i++){
     const t = i/(n-1);
     const seg = Math.min(Math.floor(t*(pts.length-1)), pts.length-2);

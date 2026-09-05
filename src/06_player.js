@@ -733,7 +733,14 @@ class Player {
     // keeps its comparable-heights math (the safe version of the parked "faster Pip" wish).
     const onIce = this.grounded && this.groundCol && this.groundCol.tag==='ice';
     const shoes = this.G.trickOn && this.G.trickOn('shoes') && !this.G.nightmare;
-    const speed = 7.2 * (this.moonT>0 ? 1.35 : 1) * (this.grounded && shoes ? 1.10 : 1);
+    // TINSEL TANGLE (w9's Tinsel Tangler): a time attack, not a heart attack — 40% slow while wrapped;
+    // a spin shakes it off early. Runners, mind the lasso.
+    if(this._tangled>0){
+      this._tangled -= dt;
+      if(this.attackT>0) this._tangled = 0;
+      if(Math.random()<dt*10) G.fx.spawn(new THREE.Vector3(this.pos.x, this.pos.y+0.2, this.pos.z), pick([0xffd23f,0xd83a4a,0x7ae8ff]), 1, {speed:0.8, life:0.4});
+    }
+    const speed = 7.2 * (this.moonT>0 ? 1.35 : 1) * (this.grounded && shoes ? 1.10 : 1) * (this._tangled>0 ? 0.6 : 1);
     const accel = this.grounded ? (onIce ? (shoes ? 20 : 9) : (shoes ? 58 : 50)) : 28;
     if(this.climbing){ /* velocities set by climb logic above */ }
     else if(this.blinkT>0){   // Grimm's shadow phase: locked burst along the leap direction, afterimages trailing
