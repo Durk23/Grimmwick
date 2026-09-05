@@ -844,7 +844,7 @@ const UI = {
         const off = owned && !!(G.save.trickOff && G.save.trickOff[tk.k]);
         const div = document.createElement('div'); div.className='item';
         div.innerHTML = `<div class="sw" style="background:${tk.grad};display:flex;align-items:center;justify-content:center;font-size:30px">${tk.icon}</div>
-          <h4>${tk.name}${owned?(off?' · off':' · equipped'):''}</h4><p>${tk.desc} <i>Tricks stack — equip any or all. Sleeps in Nightmare Mode and rests for Flawless runs.</i></p>
+          <h4>${tk.name}${owned?(off?' · off':' · equipped'):''}</h4><p>${tk.desc} <i>Tricks stack — equip any or all. They sleep in Nightmare Mode.</i></p>
           <button class="btn buy ui-block ${owned&&off?'ghost2':'orange'}">${owned?(off?'OFF — TAP TO EQUIP':'✓ EQUIPPED'):('🍬 '+tk.price)}</button>`;
         wire(div.querySelector('button'), ()=>{
           if(!owned){
@@ -1090,7 +1090,7 @@ const UI = {
     if(INPUT.isTouch) this.el('touchBtns').style.display='flex';
   },
   renderMap(world, dNum, beaten){
-    const nmOn = !!this.G.nmSel && dNum < 6;   // must match enterLevel's arming rule exactly — a stale nightDone term here left the toggle invisible for new players (audit fix). Frostmere maps are always daylight (no winter nightmare yet).
+    const nmOn = !!this.G.nmSel;   // must match enterLevel's arming rule exactly — a stale nightDone term here left the toggle invisible for new players (audit fix). ERA II: winter has the Nightmare too.
     this.el('map-screen').classList.toggle('nm', nmOn);
     this.el('map-screen').style.background = this.G.mapView ? 'transparent' : '';   // re-own the 3D transparency EVERY render — a stale inline 'transparent' let the disposed 3D frame bleed through the first nightmare toggle (repro-proven fix)
     const G=this.G, district=this._mapDistrict;
@@ -1163,7 +1163,7 @@ const UI = {
         <div class="mtime">${sub}</div>
       </div>`;
     });
-    if(dNum < 6) html += `<button id="nmToggle" class="ui-block">${nmOn ? '🌑 NIGHTMARE: ON' : '🌙 Nightmare Mode'}</button>`;   // ALWAYS offered (owner call, Sept 1 2026) — the pure-skill mode is open from night one. (The Nightmare hasn't found Frostmere yet — winter remix is a later season beat, and the 25-level board stays pure.)
+    html += `<button id="nmToggle" class="ui-block">${nmOn ? '🌑 NIGHTMARE: ON' : '🌙 Nightmare Mode'}</button>`;   // ALWAYS offered (owner call, Sept 1 2026) — and everywhere: ERA II's nightmare ladder covers the whole game, winter included.
     const wrap=this.el('mapWrap');
     wrap.innerHTML = html;
     const nt = document.getElementById('nmToggle');

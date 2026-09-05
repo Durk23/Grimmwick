@@ -526,6 +526,25 @@ function buildHub(G){
     S.add(mk);
     G.hubGuide = mk;
   }
+  // ---- THE CHAMPIONS' PLINTH (the Era model, owner lock Sept 5 2026): every leaderboard era's #1 names
+  // are carved here FOREVER when the era closes. Era I — the original 25's night/flawless/nightmare —
+  // belongs to the founders. The board resets; the stone does not. ----
+  {
+    const pg = new THREE.Group();
+    const base = mesh('box',[2.6,0.5,2.6], mat(0x3d2f5c)); base.position.set(-12.5,0.25,-8.5); pg.add(base);
+    const shaft = mesh('box',[1.7,2.2,1.7], mat(0x4a3a6e)); shaft.position.set(-12.5,1.6,-8.5); crook(shaft,0.02); pg.add(shaft);
+    const cap = mesh('box',[2.1,0.35,2.1], mat(0x3d2f5c)); cap.position.set(-12.5,2.85,-8.5); pg.add(cap);
+    // the twin flames atop — one gold, one black-red: the two ladders' crowns
+    const f1 = mesh('cone',[0.2,0.5,7], emat(0xffb35e,0xff8a3a,1)); f1.position.set(-12.9,3.3,-8.5); pg.add(f1);
+    const f2 = mesh('cone',[0.2,0.5,7], emat(0xd42a3c,0x8a1424,1)); f2.position.set(-12.1,3.3,-8.5); pg.add(f2);
+    // Era I plaque — carved lines (abstract glyph rows; the dialogue tells the story)
+    for(let i=0;i<4;i++){ const line = mesh('box',[1.2,0.07,0.04], emat(0xd9c8ff,0x9a7fd0,0.35)); line.position.set(-12.5, 2.3-i*0.28, -7.62); pg.add(line); }
+    const eraNum = mesh('box',[0.5,0.5,0.05], emat(0xffd98a,0xffb35e,0.5)); eraNum.position.set(-12.5,1.05,-7.62); pg.add(eraNum);
+    S.add(pg);
+    G.world.addBox(-12.5, 0, -8.5, 2.6, 3, 2.6, {});
+    G.plinthPos = new THREE.Vector3(-12.5, 0, -8.5);
+  }
+
   // ---- THE FERRY DOCK (Winterfest): Captain Wraith's restored Salty Phantom waits east of the square.
   // Visible to everyone from day one (anticipation); it sails only once the night is relit — the ending's
   // first-snow scene IS the invitation. Frostmere is the destination: G.switchArea('hub2').
@@ -704,6 +723,8 @@ function updateHub(G, dt){
   else if(G.shopPos.distanceTo(pl.pos)<3.6) prompt = {kind:'shop', label:'🎩 Costume Cauldron'};
   // the Winterfest ferry
   else if(G.ferryDock && G.ferryDock.distanceTo(pl.pos)<3.0) prompt = {kind:'ferry', label:'⛵ The ferry to FROSTMERE'};
+  // the Champions' Plinth
+  else if(G.plinthPos && G.plinthPos.distanceTo(pl.pos)<3.0) prompt = {kind:'plinth', label:'🏛️ Read the Champions\' Plinth'};
   else {
     for(const gate of G.gates){
       const d = Math.hypot(gate.x-pl.pos.x, gate.z-pl.pos.z);
@@ -743,6 +764,9 @@ function updateHub(G, dt){
       UI.dialogue('🫥', lines[G._grimmLine]);
     }
     else if(prompt.kind==='shop') UI.openShop();
+    else if(prompt.kind==='plinth'){
+      UI.dialogue('🏛️', '"ERA I — THE FOUNDER\'S NIGHT. Before the ferry sailed, when the night was twenty-five levels long, the first runners set the first times. Their boards are closed; their flames were real. The stone remembers what the ladder forgets." — Each era\'s champions join this plinth when the next era begins.');
+    }
     else if(prompt.kind==='ferry'){
       if(G.save.nightDone && typeof buildFrostHub==='function'){
         AUDIO.portal();

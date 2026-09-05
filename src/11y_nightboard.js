@@ -67,17 +67,17 @@ const APP_URL = 'https://apps.apple.com/app/id6804521352';   // Grimmwick on the
 
 // Tab order = the player's journey (owner call, Sept 2 2026): the open board first, then the mastery
 // exam, then the gauntlet. 🌙 everyone → 🏆 pure Pip → 🌑 no mercy.
+// THE TWO-LADDER ERA MODEL (owner lock, Sept 5 2026): TWO boards, forever — each measuring THE WHOLE
+// GAME as it currently exists. Every expansion re-mints both ladders as a new ERA (fresh GC ids); the
+// outgoing champions are carved on the Champions' Plinth in the town square. Era I (the original 25's
+// night/flawless/nightmare boards) is retired and honored in stone. One flame per ladder: 🔥 First
+// Flame = reigning #1 on THE NIGHT · 🖤 Black Flame = reigning #1 on THE NIGHTMARE. Crowns (Star/Ice/
+// Nightmare) are UNLOCKS, never boards.
 const NIGHT_BOARDS = [
-  { key:'night', id:'grimmwick.night', icon:'🌙', name:'THE NIGHT',
-    sub:'Everyone who saved Grimmwick. Fastest night wins; fewest deaths breaks ties.' },
-  { key:'flawless', id:'grimmwick.flawless', icon:'🏆', name:'FLAWLESS NIGHT',
-    sub:'ALL 75 stars: every level, every challenge. Fastest total clock wins. Pure Pip — bought tricks rest here.' },
-  { key:'nightmare', id:'grimmwick.nightmare', icon:'🌑', name:'THE NIGHTMARE',
-    sub:'All 25 levels beaten with no lanterns and no mercy. Sum of your best times. The brutal board.' },
-  { key:'winterfest', id:'grimmwick.winterfest', icon:'❄️', name:'WINTERFEST',
-    sub:'Ferry landing to the First Frost\'s invitation — the winter 25, fastest first. All are welcome.' },
-  { key:'longnight', id:'grimmwick.longnight', icon:'🌌', name:'THE LONG NIGHT',
-    sub:'New Game to BOTH invitations. All 50 levels, one clock. The whole of Grimmwick — the Everest board.' },
+  { key:'night', id:'grimmwick.night2', icon:'🌙', name:'THE NIGHT',
+    sub:'ERA II · The whole game, one clock: New Game to BOTH invitations — all 50 levels. Fastest night holds the First Flame.' },
+  { key:'nightmare', id:'grimmwick.nightmare2', icon:'🌑', name:'THE NIGHTMARE',
+    sub:'ERA II · All 50 levels beaten under nightmare law. Sum of your best times. The Black Flame burns at the top.' },
 ];
 
 const Night = {
@@ -89,24 +89,23 @@ const Night = {
   // ---- local values (the web fallback + your-best row) ----
   localValue(G, key){
     const sv = G.save;
-    if(key==='night') return sv.nightDone && sv.nightT && sv.nightEligible!==false
-      ? encodeNight(Math.round(sv.nightT*100), sv.nightDeaths||0, this._dmgFor(sv), this.totalStars(G)) : null;
-    if(key==='flawless') return sv.flawlessT
-      ? encodeNight(Math.round(sv.flawlessT*100), sv.flawlessDeaths||0, sv.flawlessDmg||0, 75) : null;
+    // ERA II values: raw centiseconds on both ladders — two clocks, no composite packing, a 10-year-old
+    // can read the board. Cozy anywhere along the run = record paused (the standing law).
+    if(key==='night') return (sv.longNightT && sv.nightEligible!==false && sv.winterEligible!==false)
+      ? Math.round(sv.longNightT*100) : null;
     if(key==='nightmare'){
       const t = this.nightmareTotal(G);
-      return t != null ? Math.round(t*100) : null;   // raw centiseconds — no composite packing on this board
+      return t != null ? Math.round(t*100) : null;
     }
-    if(key==='winterfest') return (sv.winterDone && sv.winterT && sv.winterEligible!==false) ? Math.round(sv.winterT*100) : null;
-    if(key==='longnight') return (sv.longNightT && sv.nightEligible!==false && sv.winterEligible!==false) ? Math.round(sv.longNightT*100) : null;
     return null;
   },
   // sum of nightmare bests, only once every level is conquered
-  nightmareTotal(G){
-    // THE ORIGINAL 25 ONLY — new Frostmere levels must never retro-lock existing Nightmare conquerors
-    // out of the board (winter has no nightmare yet; if it ever does, it gets its own board)
-    const lists = ((typeof LEVEL_LISTS!=='undefined') ? LEVEL_LISTS.flat() : (typeof W1_LEVELS!=='undefined' ? W1_LEVELS : []))
-      .filter(d=>(parseInt((d.district||'w1').slice(1),10)||1)<=5);
+  nightmareTotal(G, only25){
+    // ERA II: the ladder sums ALL levels (the whole game under nightmare law). only25=true scopes to the
+    // original Grimmwick 25 — that filtered total still gates the NIGHTMARE CROWN + NIGHTBREAKER, whose
+    // inscription ("all 25 levels conquered") is a heritage promise that never moves.
+    let lists = ((typeof LEVEL_LISTS!=='undefined') ? LEVEL_LISTS.flat() : (typeof W1_LEVELS!=='undefined' ? W1_LEVELS : []));
+    if(only25) lists = lists.filter(d=>(parseInt((d.district||'w1').slice(1),10)||1)<=5);
     if(!lists.length || !G.save.nm) return null;
     let tot = 0;
     for(const d of lists){
@@ -122,11 +121,11 @@ const Night = {
   // THE LIVING ENTRY: after completion, every star earned (and better stats) re-improves the score,
   // so the board reflects the player's CURRENT stars, not completion-day stars.
   refreshNight(G){
+    // ERA II: THE NIGHT = the all-50 clock (longNightT), raw centiseconds, resubmitted whenever eligible
     const sv = G.save;
-    if(!sv.nightDone || sv.nightEligible===false || !sv.nightSubmitted) return;
-    const timeCS = Math.round((sv.nightT||0)*100);
-    if(timeCS<=0) return;
-    GC.submit('grimmwick.night', encodeNight(timeCS, sv.nightDeaths||0, this._dmgFor(sv), this.totalStars(G)), Math.min(sv.candyLifetime||0, 999999999));
+    const v = this.localValue(G, 'night');
+    if(v==null || v<=0) return;
+    GC.submit('grimmwick.night2', v, 0);
   },
   // ---- submissions (queued while signed out; Game Center keeps each player's best) ----
   queuePending(board, value, context){
@@ -149,6 +148,8 @@ const Night = {
   // THE FLAWLESS CHECK — fires on every clear/boss: the moment a save has the finished game AND all 75
   // stars (in any order, across any number of nights), the clock stops and the run is banked. Cozy taints it.
   checkFlawless(G){
+    return;   // ERA II (owner lock, Sept 5 2026): the FLAWLESS board is retired — stars are a crown hunt,
+              // not a ladder. The capture plumbing below stays dormant for the historical record.
     const sv = G.save;
     if(sv.flawlessT || sv.nightCozy || sv.nightTricked) return;   // cozy OR an equipped bought trick disqualifies — the First Flame is unbuyable
     if(!sv.nightDone || this.totalStars(G) < 75) return;
@@ -164,7 +165,7 @@ const Night = {
   // Checked on boot and board open; state flips fire the take/lose toasts.
   async checkFirstFlame(G){
     if(!G || !G.save || !GC.native() || !GC.authed) return;
-    const r = await GC.load('grimmwick.flawless', false, 1);
+    const r = await GC.load('grimmwick.night2', false, 1);   // ERA II: the First Flame crowns THE NIGHT's reigning #1
     if(!r || r.error) return;
     const had = !!G.save.firstFlame;
     const rankKnown = typeof r.localRank === 'number' && r.localRank >= 1;
@@ -178,7 +179,7 @@ const Night = {
     G.save.firstFlame = isChamp;
     G.persist && G.persist();
     if(isChamp){
-      window.UI && UI.toast('🔥 THE FIRST FLAME IS YOURS. The Everflame favors the fastest flawless night. Guard it.', 6800);
+      window.UI && UI.toast('🔥 THE FIRST FLAME IS YOURS. The fastest night in all of Grimmwick — both towns bow. Guard it.', 6800);
       window.AUDIO && AUDIO.goldPumpkin();
     } else {
       const champ = (r.entries && r.entries[0] && !r.entries[0].me && r.entries[0].name) ? r.entries[0].name : 'a new champion';
@@ -192,7 +193,7 @@ const Night = {
   // Same rank-watcher rules: only positive evidence (a real rank > 1) ever takes it away.
   async checkBlackFlame(G){
     if(!G || !G.save || !GC.native() || !GC.authed) return;
-    const r = await GC.load('grimmwick.nightmare', false, 1);
+    const r = await GC.load('grimmwick.nightmare2', false, 1);   // ERA II ladder
     if(!r || r.error) return;
     const had = !!G.save.blackFlame;
     const rankKnown = typeof r.localRank === 'number' && r.localRank >= 1;
@@ -358,7 +359,7 @@ const Night = {
       list.innerHTML = `<div class="nb-note">${this._friends ? 'No friends on this board yet. Recruit some rivals! 👥' : 'The board is empty. Be the FIRST name on it. 🏮'}</div>`;
       return;
     }
-    list.innerHTML = hdr + r.entries.map(e => this._row(e.rank, (e.rank===1 ? (this._sel==='flawless' ? '🔥 ' : this._sel==='nightmare' ? '🖤 ' : '') : '')+e.name, e.value, e.context, e.me)).join('');
+    list.innerHTML = hdr + r.entries.map(e => this._row(e.rank, (e.rank===1 ? (this._sel==='night' ? '🔥 ' : this._sel==='nightmare' ? '🖤 ' : '') : '')+e.name, e.value, e.context, e.me)).join('');
     if(r.localRank && !r.entries.some(e=>e.me)){
       list.innerHTML += this._row(r.localRank, GC.alias||'You', r.localValue!=null?r.localValue:0, r.localContext!=null?r.localContext:null, true);
     }

@@ -412,7 +412,7 @@ const G = {
     this.lvlPortal = this.warpPortal = this.tutPortal = this._gateGlow = null;
     this.hubEmber = this.hubEmberLight = this.hubLamps = this.gates = this.mayor = this.mayorHome = this.brewMesh = this.hubBoos = null;
     this.hubBraziers = this.hubSmoke = this.hubFlies = this.hubLeaves = this.hubCat = this.hubWindows = this.hubWellGlow = this.hubGuide = null;
-    this.hubFerry = this.fgates = this.hearthlight = this.hubGrumble = this.fhGrimm = this.ferryDock = null;   // Frostmere refs (both squares)
+    this.hubFerry = this.fgates = this.hearthlight = this.hubGrumble = this.fhGrimm = this.ferryDock = this.plinthPos = null;   // Frostmere + plinth refs (both squares)
     this.signs = this.coffins = this.bats = this.amb = null;
     if(this.ents) this.ents.clear();
     if(this.fx) this.fx.clear();
@@ -496,7 +496,7 @@ const G = {
     }, 500);
   },
   enterLevel(id){
-    this.nightmare = !!this.nmSel && (parseInt(id.slice(1),10)||1) < 6;   // Nightmare is ALWAYS available (owner call, Sept 1 2026) — normal district gates still decide WHICH levels are open. Frostmere plays daylight-only for now (winter nightmare = a later season; keeps the 25-level board pure).
+    this.nightmare = !!this.nmSel;   // Nightmare is ALWAYS available (owner call, Sept 1 2026) — and since the ERA II lock (Sept 5) it covers the WHOLE game, winter included: same levels, nightmare law. The most brutal fair content on the store, by design.
     const def = findLevel(id);
     if(!def){ if(this.state==='map') this.state='play'; UI.toast('🌘 That road is still dark...'); return; }
     if(UI.hideMap) UI.hideMap();
@@ -551,9 +551,11 @@ const G = {
       // THE NIGHTMARE board: once all 25 are conquered, the sum of bests goes up — and every
       // improved best resubmits (lower total, Game Center accepts — a living entry)
       if(window.NightBoard && !this.runCozy){
+        // ERA II ladder: the board sums ALL 50; the CROWN keeps its heritage promise (the original 25)
         const tot = NightBoard.nightmareTotal(this);
-        if(tot != null){
-          GC.submit('grimmwick.nightmare', Math.round(tot*100), 25);
+        if(tot != null) GC.submit('grimmwick.nightmare2', Math.round(tot*100), 50);
+        const tot25 = NightBoard.nightmareTotal(this, true);
+        if(tot25 != null){
           if(!this.save.nm.conquered){ this.save.nm.conquered = true;
             // THE CORONATION (owner call, Sept 2 2026): conquering all 25 grants the full regalia —
             // NIGHTBREAKER (the outfit) + THE NIGHTMARE CROWN (black iron, next to the Star Crown).
@@ -978,13 +980,11 @@ const G = {
       if(!this.save.winterDone){
         this.save.winterDone = true;
         this.save.winterT = Math.max(1, wT);
-        this.save.winterEligible = !this.save.cozy;   // cozy pauses records — same law as THE NIGHT
+        this.save.winterEligible = !this.save.cozy;   // cozy pauses records — the standing law
         if(this.save.nightDone) this.save.longNightT = this.save.playT||0;
         this.persist();
-        if(this.save.winterEligible && window.GC){
-          GC.submit('grimmwick.winterfest', Math.round(this.save.winterT*100), 0);
-          if(this.save.longNightT && this.save.nightEligible!==false) GC.submit('grimmwick.longnight', Math.round(this.save.longNightT*100), 0);
-        }
+        // ERA II: THE NIGHT = the whole-game clock, captured here at the second invitation
+        if(window.NightBoard) NightBoard.refreshNight(this);
       }
     }
     window.NightBoard && NightBoard.onBossDefeated(this, district);
@@ -1109,11 +1109,8 @@ const G = {
       // THE FLAWLESS RULE (owner call, Sept 2 2026): an EQUIPPED trick taints Flawless eligibility until the
       // flawless run is captured — money can never touch the First Flame. THE NIGHT stays open to everything;
       // nightmare needs no taint (it seals tricks outright). Reset Save = the fresh eligible run, as ever.
-      if(!this.save.flawlessT && !this.save.nightTricked && !this.nightmare &&
-         (this.trickOn('ember')||this.trickOn('bat')||this.trickOn('guard')||this.trickOn('sweet')||this.trickOn('shoes'))){
-        this.save.nightTricked = true;   // said out loud the moment it happens — never a silent disqualification (audit fix)
-        UI.toast('🏆 A trick is awake! This run counts everywhere except FLAWLESS NIGHT. (Reset Save starts a pure run.)', 6600);
-      }
+      // (ERA II: the Flawless board is retired — tricks no longer taint anything. Both ladders welcome
+      // every playstyle; Nightmare still seals bought tricks at the door. nightTricked stays dormant.)
       if(INPUT.pauseEdge){ UI.togglePause(); INPUT.endFrame(); return; }
       // QUICK RESTART (speedrun package): R re-enters the current level/boss with a near-zero fade —
       // restart friction is the #1 grind-killer for runners

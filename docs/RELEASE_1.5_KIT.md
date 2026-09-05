@@ -15,7 +15,8 @@ Captain Wraith's ferry now sails from the town square to FROSTMERE — the town 
 • 5 NEW GUARDIANS — including a sleepwalking polar bear the size of a house and a snowman who will not stay down
 • A NEW ENDING — this time, Grimm holds the lantern
 • SPEEDRUNNER'S KIT — live run timer, instant restart, and GHOST RACING: your best run becomes a ghost you race
-• TWO NEW LEADERBOARDS — ❄️ Winterfest and 🌌 THE LONG NIGHT: all 50 levels, one clock
+• A NEW ERA — the leaderboards are reborn as TWO ladders covering the WHOLE game: THE NIGHT (all 50, one clock) and THE NIGHTMARE (all 50 under nightmare law — yes, winter has a Nightmare now)
+• THE CHAMPIONS' PLINTH — Era I's champions are carved in the town square, forever
 • ❄️ SNOW SHOES — a new candy Trick: quicker feet, real grip on ice
 • 👑 THE ICE CROWN — all 15 Glimmerfields stars. Cannot be bought. Only braved.
 
@@ -37,10 +38,13 @@ NO ADS. EVER. ❄️ THE WINTERFEST UPDATE: 25 free new levels, ghost racing, an
 This update adds 25 free levels (a winter expansion), a speedrun timer/ghost-replay system (all local — ghost replays are stored on-device only and never uploaded), and two new Game Center leaderboards submitted with this version. No changes to In-App Purchases: the three consumable candy packs remain available via the pause menu ("🍬 Candy Store") or the Costume Cauldron in the hub town; all levels and story content are free. The app continues to use Apple's standard SKStoreReviewController rating prompt after positive gameplay moments.
 ```
 
-## Game Center — create BEFORE submitting, attach to the version
-Two new leaderboards (same pattern as the first three: classic, lower-is-better, score = centiseconds, integer):
-1. **ID:** `grimmwick.winterfest` · **Name:** Winterfest · Score format: Elapsed time — To the hundredth of a second · Sort: Low to High
-2. **ID:** `grimmwick.longnight` · **Name:** The Long Night · same format/sort
+## Game Center — create BEFORE submitting, attach to the version (THE TWO-LADDER ERA MODEL, owner lock Sept 5)
+Two new leaderboards (classic, lower-is-better, Elapsed time — to the hundredth of a second):
+1. **ID:** `grimmwick.night2` · **Name:** The Night (Era II) — the whole game, one clock
+2. **ID:** `grimmwick.nightmare2` · **Name:** The Nightmare (Era II) — all 50 under nightmare law
+The three ERA I boards (`grimmwick.night` / `.flawless` / `.nightmare`) are RETIRED: leave them in ASC
+(do not delete — history), simply don't attach them going forward; the app no longer references them.
+The Champions' Plinth in the town square honors Era I in-game. Flames now: 🔥 = #1 on night2 · 🖤 = #1 on nightmare2.
 
 ## Submission order (the dance)
 1. Wait for 1.4 released. 2. Create version 1.5 → paste blocks above. 3. Set the Subtitle (field unlocks now).
