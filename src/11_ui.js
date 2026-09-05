@@ -1267,6 +1267,10 @@ const UI = {
       w4:{e:'⚓', t:'GUARDIAN FREED!', b:'Captain Wraith tips his hat as THE SEA RUSHES BACK. The fourth ember is yours! Ghost Harbor floats again tonight.'},
       w5:{e:'🎆', t:'THE NIGHT IS RELIT!', b:'The spell of forgetting is broken: the town remembers its oldest friend, the one it was named after. The Everflame burns whole. Grimm keeps every lantern lit as night watchman.<br><b>You saved Grimmwick, Pip. 🏮</b>'},
       w6:{e:'⛄', t:'GUARDIAN THAWED!', b:'You pat Grumble back together SMALL — and his grin comes back with him. The Glimmerfields blaze with festival light, and the Hearthlight takes its first warm breath.<br><b>Winterfest is coming, Pip. ❄️</b>'},
+      w7:{e:'🐻‍❄️', t:'GUARDIAN WOKEN GENTLY!', b:'Ursa Major sits up, yawns for eleven seconds, and finds you with her nose. One slow, approving boop. She pads off to nap by the Hearthlight — and the great lake glitters easy again.<br><b>She bows first, Pip. 🛌</b>'},
+      w8:{e:'💎', t:'THE LIGHT GIVEN BACK!', b:'Prismus opens every facet at once and lets ten thousand swallowed glows stream home into the walls. The mines blaze like a crystal cathedral — and he settles into the ceiling as its chandelier, keeper of lights forever.<br><b>The deep remembers how to shine. ✨</b>'},
+      w9:{e:'🎄', t:'THE TREE STANDS!', b:'Old Tannenbaum kneels... and PLANTS HIMSELF, roots settling where they always belonged. Tier by tier his ornaments relight, the star last of all, and the song picks back up mid-verse — right where it stopped.<br><b>The forest sings again, Pip. 🎶</b>'},
+      w10:{e:'❄️', t:'THE FIRST WINTER IS INVITED!', b:'Not defeated — INVITED. Grimm holds the lantern and says what only he could say: "I know what you are. I was what you are. Come to the festival — both of them." The Hearthlight ROARS alight, whole and warm, and the aurora turns gold over two towns at once.<br><b>The First Frost makes it snow, gently, on every festival from now on. It always wanted to. 🏮</b>'},
     };
     const c = COPY[stats.district] || COPY.w1;
     this.el('vEmoji').textContent = c.e;

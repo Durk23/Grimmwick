@@ -96,7 +96,9 @@ function w6Aurora(G, x1, x2){
   G.ents.add({ dead:false, cull:false, isEnemy:false, t:rand(0,9), group:new THREE.Group(),
     update(dt){ this.t+=dt;
       for(let i=0;i<ribbons.length;i++){ const rb=ribbons[i];
-        rb.material.opacity = 0.07 + Math.sin(this.t*0.35 + i*2.1)*0.05 + 0.04;
+        // breathe around a PER-RIBBON BASE (w10 audit fix: the old absolute assign overwrote any
+        // district boost every frame — the aurora's home cranks userData.base instead)
+        rb.material.opacity = (rb.userData.base!==undefined?rb.userData.base:0.11) + Math.sin(this.t*0.35 + i*2.1)*0.05;
         rb.position.y = 16+i*2.6 + Math.sin(this.t*0.22 + i)*0.8;
         rb.scale.y = 1 + Math.sin(this.t*0.5 + i*1.7)*0.18;
       } } });
