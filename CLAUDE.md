@@ -287,10 +287,15 @@ Joy #2 (The Hunt) is promoted to a market ambition. Everything serves it: the de
 the moat (runs learnable to the frame — most platformers can't offer this); every district ships a warp
 skip-line, secret boss takedowns, and DOCUMENTED sanctioned tech (boo-freeze steps, avalanche-ball
 stomp-rides, ice momentum carries, climb-exit hops); boss clocks stamp at the last hit so cutscenes
-never pollute records. THE SPEEDRUNNER PACKAGE (build before the 1.5 playthrough): live HUD run timer
-w/ PB delta (settings toggle) · QUICK RESTART (R key / one-tap, near-zero fade) · GHOST RACING v1
-(race your own PB ghost per level — ~10 samples/sec recording, translucent playback; determinism makes
-it exact) · Frostmere boards ("Fastest Winterfest" + winter districts) in the Night Board tab.
+never pollute records. ✅ THE SPEEDRUNNER PACKAGE (BUILT, Sept 5): live HUD run timer + PB line (`save.runTimer`, default ON,
+pause toggle; `UI.tickTimer`) · QUICK RESTART (R key → `G.quickRestart()`, 120ms fades, full run-state
+reset) · GHOST RACING v1 (`grimmwick_ghosts` localStorage key — device-local, NOT vaulted, survives
+resets; ~10Hz Int16-quantized samples, banked on any faster non-cozy daylight finish in `_bankGhost`;
+spectral mini-Pip playback on the runT clock; `save.ghostOff` toggle) · TWO NEW BOARDS (five total,
+capped forever): ❄️ WINTERFEST (`grimmwick.winterfest`, ferry landing → First Frost invite, `winterT`)
++ 🌌 THE LONG NIGHT (`grimmwick.longnight`, New Game → both invitations, `longNightT`) — first
+completion locks the entry, cozy = ineligible, raw centiseconds; GC ids created in ASC at 1.5.
+NO per-level/per-district GC boards ever (owner sprawl call) — ghosts are the per-level competition.
 New-mechanic rule: every mechanic must have a fast-line answer (crack panels reward never stopping;
 machines are rideable shortcuts as much as obstacles). Nothing on the critical path may be RNG, waity,
 or unskippable.

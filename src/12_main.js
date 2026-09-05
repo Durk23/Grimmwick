@@ -75,7 +75,8 @@ const G = {
   _migrateSave(){
     if(!this.save.maxHearts) this.save.maxHearts = 3;
     if(this.save.upMagnet===undefined) this.save.upMagnet = 0;
-    if(!this.save.trickOff) this.save.trickOff = {};   // per-trick equip toggles (owner call: tricks stack — equip any or all)
+    if(!this.save.trickOff) this.save.trickOff = {};
+    if(this.save.runTimer===undefined) this.save.runTimer = true;   // the speedrun package's live clock, on by default (toggle in pause)   // per-trick equip toggles (owner call: tricks stack — equip any or all)
     if(!this.save.iapSeen) this.save.iapSeen = [];      // granted StoreKit transaction ids — the double-grant guard
     if(!this.save.claimed) this.save.claimed = [];
     if(this.save.candyLifetime===undefined) this.save.candyLifetime = this.save.candy||0;   // old saves: seed with the balance
@@ -454,6 +455,10 @@ const G = {
     }
     if(this.mode==='side') this.camc.snapSide(this.player);
     else this.camc.snapBehind(this.player.pos, Math.atan2(this.player.pos.x, this.player.pos.z)+0);
+    // ghost lifecycle (speedrun package): fresh recording per level entry; the PB ghost joins the grid
+    this._ghost = null;
+    if(def){ this._ghostRec = []; this._ghostAcc = 0; this._spawnGhost(area); }
+    else this._ghostRec = null;
     UI.updateHUD();
   },
   // ---------- flow ----------
@@ -601,6 +606,7 @@ const G = {
     const stats = { levelId:id, levelName:def.name, time:fmt(secs), best:fmt(rec.best||secs), isRecord,
       stars, candy:collected, candyTotal:this.levelCandyTotal, nextId, cozy:this.runCozy };
     window.NightBoard && NightBoard.onLevelClear(this, id);
+    this._bankGhost(id, secsF);   // speedrun package: a faster finish becomes the new ghost
     // THE 75TH STAR — the crown arrives the INSTANT it's earned, with fanfare (never behind a claim button)
     if(!this.save.crownMoment){
       const tot = Object.entries(this.save.levels||{}).reduce((s,[k,l])=>s + ((parseInt(k.slice(1),10)||1)<=5 && l.stars? (l.stars.time?1:0)+(l.stars.candy?1:0)+(l.stars.clean?1:0) : 0), 0);   // Grimmwick's 75 only
@@ -664,6 +670,99 @@ const G = {
       UI.showMap(district||'w1');
       UI.fade(false, 450);
     }, 500);
+  },
+  // ================= THE SPEEDRUNNER PACKAGE (owner north star, Sept 5 2026) =================
+  quickRestart(){
+    if(this.state!=='play' && this.state!=='paused') return;
+    const ps = UI.el && UI.el('pause-screen'); if(ps) ps.style.display='none';
+    if(this.levelDef){
+      const id = this.levelDef.id;
+      this.state='transition';
+      UI.fade(true, 120);
+      setTimeout(()=>{
+        // enterLevel's run-reset core, minus the intro card and the long fades
+        const def = findLevel(id);
+        this.currentLevel = id;
+        this.runPumpkins = (this.save.gp[def.district]||[false,false,false]).slice();
+        this.runCandy0=this.save.candy; this.runT0=this.time;
+        this.runT = 0; this.runCandyPicked = 0; this.runDamage = 0;
+        this.runCozy = !!this.save.cozy;
+        this.save.lives = this.nightmare ? 3 : 5; this.persist();
+        this.switchArea(id);
+        this.state='play';
+        UI.fade(false, 120);
+        if(this.nightmare) this._nightmareTint();
+      }, 140);
+    } else if(this.area.startsWith('boss')){
+      this.startBoss(this.bossDistrict||'w1');
+    }
+  },
+  // ---- ghosts: device-local PB replays, stored OUTSIDE the save (never vaulted, survive resets) ----
+  _ghosts(){
+    if(this.__ghosts) return this.__ghosts;
+    try{ this.__ghosts = JSON.parse(Store.get('grimmwick_ghosts')||'{}'); }catch(e){ this.__ghosts = {}; }
+    return this.__ghosts;
+  },
+  _ghostEnc(arr){
+    // quantize to decimeters, pack Int16 LE, base64
+    const n = Math.min(arr.length, 4800);
+    const u8 = new Uint8Array(n*2);
+    const dv = new DataView(u8.buffer);
+    for(let i=0;i<n;i++) dv.setInt16(i*2, Math.max(-32000, Math.min(32000, Math.round(arr[i]*10))), true);
+    let s=''; for(let i=0;i<u8.length;i++) s += String.fromCharCode(u8[i]);
+    return btoa(s);
+  },
+  _ghostDec(b64){
+    try{
+      const s = atob(b64);
+      const dv = new DataView(new ArrayBuffer(s.length));
+      for(let i=0;i<s.length;i++) dv.setUint8(i, s.charCodeAt(i));
+      const out = new Float32Array(s.length/2);
+      for(let i=0;i<out.length;i++) out[i] = dv.getInt16(i*2, true)/10;
+      return out;
+    }catch(e){ return null; }
+  },
+  _spawnGhost(id){
+    this._ghost = null;
+    if(this.nightmare || this.save.ghostOff) return;
+    const g = this._ghosts()[id];
+    if(!g || !g.d) return;
+    const arr = this._ghostDec(g.d);
+    if(!arr || arr.length<4) return;
+    // the spectral runner: a ghost-pale mini-Pip, additive candle trail, zero collision, zero lights
+    const gm = new THREE.MeshLambertMaterial({color:0xdfe6ff, emissive:0x8fa8e0, emissiveIntensity:0.45, transparent:true, opacity:0.34, depthWrite:false});
+    const mesh0 = new THREE.Group();
+    const body=new THREE.Mesh(geo('sph',0.32,9,8), gm); body.position.y=0.62; body.scale.set(1,1.35,0.9); mesh0.add(body);
+    const head=new THREE.Mesh(geo('sph',0.26,9,8), gm); head.position.y=1.18; mesh0.add(head);
+    const flame=new THREE.Mesh(geo('cone',0.09,0.26,6), new THREE.MeshBasicMaterial({color:0xffd98a, transparent:true, opacity:0.5, blending:THREE.AdditiveBlending, depthWrite:false}));
+    flame.position.y=1.55; mesh0.add(flame);
+    this.scene.add(mesh0);
+    this._ghost = {arr, t:g.t, mesh:mesh0, flame};
+  },
+  _tickGhost(){
+    const gh=this._ghost;
+    const idx = this.runT*10;
+    const n = gh.arr.length/2;
+    if(idx >= n-1){
+      gh.mesh.visible = this.runT*10 < n+20;   // linger 2s at the finish, then bow out
+      if(gh.mesh.visible){ gh.mesh.position.y += 0.02; gh.mesh.children.forEach(c=>{ if(c.material) c.material.opacity=Math.max(0,(c.material.opacity||0.3)-0.004); }); }
+      return;
+    }
+    const i0=Math.floor(idx), f=idx-i0;
+    const x = gh.arr[i0*2]*(1-f) + gh.arr[(i0+1)*2]*f;
+    const y = gh.arr[i0*2+1]*(1-f) + gh.arr[(i0+1)*2+1]*f;
+    gh.mesh.position.set(x, y, 0);
+    gh.mesh.rotation.y = (gh.arr[(i0+1)*2]-gh.arr[i0*2]) >= 0 ? Math.PI/2 : -Math.PI/2;
+    gh.flame.scale.setScalar(1+Math.sin(this.time*9)*0.25);
+  },
+  _bankGhost(id, secsF){
+    if(this.runCozy || this.nightmare || !this._ghostRec || this._ghostRec.length<4) return;
+    const g = this._ghosts();
+    if(!g[id] || secsF < g[id].t){
+      g[id] = {t: secsF, d: this._ghostEnc(this._ghostRec)};
+      try{ Store.set('grimmwick_ghosts', JSON.stringify(g)); }catch(e){}
+      if(g[id] && window.UI) setTimeout(()=>UI.toast('👻 NEW GHOST! Your best run haunts this level now — race it.'), 2600);
+    }
   },
   bossAreaFor(district){ return ({w1:'boss1',w2:'boss2',w3:'boss3',w4:'boss4',w5:'boss5',w6:'boss6',w7:'boss7',w8:'boss8',w9:'boss9',w10:'boss10'})[district]; },
   bossBuilt(area){ return area==='boss1' || (area==='boss2' && typeof buildBossArena2==='function') || (area==='boss3' && typeof buildBossArena3==='function') || (area==='boss4' && typeof buildBossArena4==='function') || (area==='boss5' && typeof buildBossArena5==='function') || (area==='boss6' && typeof buildBossArena6==='function') || (area==='boss7' && typeof buildBossArena7==='function') || (area==='boss8' && typeof buildBossArena8==='function') || (area==='boss9' && typeof buildBossArena9==='function') || (area==='boss10' && typeof buildBossArena10==='function'); },
@@ -871,6 +970,23 @@ const G = {
       this.save.nightCandy = this.save.candyLifetime||0;
       this.persist();
     }
+    // THE WINTER BOARDS (speedrun package): Winterfest = ferry landing → the First Frost's invitation;
+    // THE LONG NIGHT = New Game → BOTH invitations (all 50). Captured once; bests improve via re-fights.
+    if(district==='w10'){
+      const wT = (this.save.playT||0) - (this.save.winterStartT||0);
+      // first completion locks the entry (a fresh attempt = Reset Save, the same law as THE NIGHT)
+      if(!this.save.winterDone){
+        this.save.winterDone = true;
+        this.save.winterT = Math.max(1, wT);
+        this.save.winterEligible = !this.save.cozy;   // cozy pauses records — same law as THE NIGHT
+        if(this.save.nightDone) this.save.longNightT = this.save.playT||0;
+        this.persist();
+        if(this.save.winterEligible && window.GC){
+          GC.submit('grimmwick.winterfest', Math.round(this.save.winterT*100), 0);
+          if(this.save.longNightT && this.save.nightEligible!==false) GC.submit('grimmwick.longnight', Math.round(this.save.longNightT*100), 0);
+        }
+      }
+    }
     window.NightBoard && NightBoard.onBossDefeated(this, district);
     this._maybeAskReview();
     if(this.save._finishT !== undefined){ delete this.save._finishT; this.persist(); }
@@ -999,7 +1115,20 @@ const G = {
         UI.toast('🏆 A trick is awake! This run counts everywhere except FLAWLESS NIGHT. (Reset Save starts a pure run.)', 6600);
       }
       if(INPUT.pauseEdge){ UI.togglePause(); INPUT.endFrame(); return; }
+      // QUICK RESTART (speedrun package): R re-enters the current level/boss with a near-zero fade —
+      // restart friction is the #1 grind-killer for runners
+      if(INPUT.restartEdge && (this.levelDef || this.area.startsWith('boss'))){ this.quickRestart(); INPUT.endFrame(); return; }
       if(this.area!=='hub' && this.area!=='hub2' && this.area!=='tut') this.runT = (this.runT||0)+dt;
+      // GHOST RACING (speedrun package): record ~10 samples/sec of this run; drive the PB ghost on the same clock
+      if(this.levelDef && !this.nightmare){
+        this._ghostAcc = (this._ghostAcc||0)+dt;
+        while(this._ghostAcc >= 0.1){
+          this._ghostAcc -= 0.1;
+          if(this._ghostRec && this._ghostRec.length < 4800) this._ghostRec.push(this.player.pos.x, this.player.pos.y);
+        }
+        if(this._ghost) this._tickGhost();
+      }
+      if(this.save.runTimer && window.UI && UI.tickTimer) UI.tickTimer(this);
       this.world.updateMovers(dt);
       this.player.update(dt);
       const eDt = dt * (this.save.cozy ? 0.72 : 1);   // Cozy Mode: enemies at 72% speed

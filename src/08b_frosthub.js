@@ -185,7 +185,9 @@ function buildFrostHub(G){
 
   // first arrival — let the moment breathe
   if(!G.save.metFrostmere){
-    G.save.metFrostmere = true; G.persist();
+    G.save.metFrostmere = true;
+    G.save.winterStartT = G.save.playT||0;   // the WINTERFEST board's clock starts the moment you step off the ferry
+    G.persist();
     setTimeout(()=>{ window.UI && UI.toast('❄️ FROSTMERE — the town where winter never ends.', 5200); }, 900);
     setTimeout(()=>{ window.UI && UI.dialogue && UI.dialogue('🫥', '"Their Hearthlight froze solid, Pip. Whole flame, solid ice. The deep cold has spirits of its own... and this town was too shy to ask for help. So I asked for them."'); }, 6400);
   }

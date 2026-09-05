@@ -188,6 +188,7 @@ const UI = {
         <div class="hud-pill">🍬 <span id="candyN">0</span></div>
         <div class="hud-pill" id="livesPill" style="display:none">👻 ×<span id="livesN">5</span></div>
         <div class="hud-pill" id="gpPill" style="display:none">🎃 <span id="gpN">0/3</span></div>
+        <div class="hud-pill" id="timerPill" style="display:none;font-variant-numeric:tabular-nums">⏱ <span id="timerN">0:00.0</span><span id="timerBest" style="opacity:.65;font-size:11px"></span></div>
         <div class="hud-pill" id="emberPill">🔥 <span id="emberN">0/5</span> embers</div>
       </div>
       <button id="pauseBtn" class="ui-block">⚙️</button>
@@ -233,6 +234,8 @@ const UI = {
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🎵 Music</span><input type="range" id="musVol" class="ui-block" min="0" max="100" value="50" style="width:150px"></div>
           <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><span>🔊 Sounds</span><input type="range" id="sfxVol" class="ui-block" min="0" max="100" value="80" style="width:150px"></div>
           <button class="btn ghost2 ui-block" id="cozyBtn">🧸 Cozy Mode: OFF</button>
+          <button class="btn ghost2 ui-block" id="timerBtn">⏱ Run Timer: ON</button>
+          <button class="btn ghost2 ui-block" id="ghostBtn">👻 Race Your Ghost: ON</button>
           <button class="btn ghost2 ui-block" id="howBtn">📖 How to Play</button>
           <button class="btn ghost2 ui-block" id="resetBtn">🗑️ Reset Save (candy &amp; outfits stay)</button>
           <button class="btn ghost2 ui-block" id="feedbackBtn">💬 Send Feedback</button>
@@ -353,6 +356,8 @@ const UI = {
     tap('pauseShopBtn', ()=>{ this.togglePause(false); AUDIO.ui(); this.G.state='shop'; this.el('shop-screen').style.display='flex'; this.renderShop('costumes'); });
     tap('pauseCandyBtn', ()=>{ this.togglePause(false); AUDIO.ui(); this.G.state='shop'; this.el('shop-screen').style.display='flex'; this.renderShop('candy'); });
     tap('cozyBtn', ()=>{ G.toggleCozy(); this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(G.save.cozy?'ON':'OFF'); });
+    tap('timerBtn', ()=>{ G.save.runTimer = !G.save.runTimer; G.persist(); this.el('timerBtn').textContent = '⏱ Run Timer: '+(G.save.runTimer?'ON':'OFF'); if(!G.save.runTimer) this.el('timerPill').style.display='none'; });
+    tap('ghostBtn', ()=>{ G.save.ghostOff = !G.save.ghostOff; G.persist(); this.el('ghostBtn').textContent = '👻 Race Your Ghost: '+(G.save.ghostOff?'OFF':'ON'); this.toast(G.save.ghostOff?'👻 Your ghost rests.':'👻 Your ghost races again from the next level entry.'); });
     tap('feedbackBtn', ()=>{ AUDIO.ui();   // opens the Mail composer — a player choosing to write is not data collection
       window.location.href = 'mailto:grimmwickgame@gmail.com?subject=' + encodeURIComponent('Grimmwick Feedback')
         + '&body=' + encodeURIComponent('\n\n--\nGrimmwick v1.0 · from the pause menu'); });
@@ -449,6 +454,23 @@ const UI = {
     this.el('livesN').textContent = G.save.lives??5;
     this.el('emberPill').style.display = inLevel?'none':'block';
     if(inLevel) this.el('gpN').textContent = G.runPumpkins.filter(Boolean).length+'/3';
+  },
+  // ---- the live run timer (speedrun package): per-frame, DOM-write only when the string changes ----
+  tickTimer(G){
+    const show = !!(G.levelDef || G.area.startsWith('boss')) && G.state==='play';
+    const pill = this.el('timerPill');
+    if(!show){ if(pill.style.display!=='none') pill.style.display='none'; return; }
+    if(pill.style.display!=='block'){ pill.style.display='block';
+      // PB line: the level best (or boss best) rendered once per entry
+      let best=null;
+      if(G.levelDef){ const rec=G.nightmare ? (G.save.nm.levels[G.levelDef.id]||{}) : (G.save.levels[G.levelDef.id]||{}); best=rec.best; }
+      else best = G.save.best && G.save.best[(G.bossDistrict||'w1')+'boss'];
+      this.el('timerBest').textContent = best ? '  PB '+Math.floor(best/60)+':'+String(Math.floor(best%60)).padStart(2,'0')+'.'+Math.floor((best*10)%10) : '';
+    }
+    const t=G.runT||0;
+    const s = Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0')+'.'+Math.floor((t*10)%10);
+    const n=this.el('timerN');
+    if(n.textContent!==s) n.textContent=s;
   },
   hurtFlash(){
     const v=this.el('hurtvig'); v.style.opacity=1;
@@ -583,6 +605,8 @@ const UI = {
     if(show && G.state!=='play') return;
     this._resetArm=false; this.el('resetBtn').textContent='🗑️ Reset Save (candy & outfits stay)';
     if(show){ G.state='paused'; this.el('pause-screen').style.display='flex'; this.el('cozyBtn').textContent = '🧸 Cozy Mode: '+(this.G.save.cozy?'ON':'OFF');
+      this.el('timerBtn').textContent = '⏱ Run Timer: '+(G.save.runTimer?'ON':'OFF');
+      this.el('ghostBtn').textContent = '👻 Race Your Ghost: '+(G.save.ghostOff?'OFF':'ON');
       const ub = this.el('updateBtn'); if(ub){ ub.style.display = G._updateAvail ? '' : 'none'; if(G._updateAvail) ub.textContent = '🆕 Update Grimmwick (v'+G._updateAvail+' is out!)'; }
       const inLevel = !!G.levelDef || G.area.startsWith('boss');   // Restart/Map only make sense inside a level or boss
       this.el('pauseRestartBtn').style.display = inLevel?'block':'none';

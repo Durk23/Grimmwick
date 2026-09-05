@@ -27,6 +27,7 @@ class InputSys {
       if(e.code==='KeyK'||e.code==='ShiftLeft'){ this.poundEdge=true; }
       if(e.code==='KeyE'){ this.interactEdge=true; }
       if(e.code==='Escape'||e.code==='KeyP'){ this.pauseEdge=true; }
+      if(e.code==='KeyR'){ this.restartEdge=true; }   // QUICK RESTART (speedrun package) — consumed in the main loop
       if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
     });
     addEventListener('keyup', e=>{ this.keys[e.code]=false; });
@@ -159,7 +160,7 @@ class InputSys {
   }
   endFrame(){
     this.jumpEdge=false; this.attackEdge=false; this.poundEdge=false;
-    this.interactEdge=false; this.pauseEdge=false; this.anyEdge=false;
+    this.interactEdge=false; this.pauseEdge=false; this.anyEdge=false; this.restartEdge=false;
     this.camDX=0; this.camDY=0;
   }
 }

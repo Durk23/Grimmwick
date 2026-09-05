@@ -74,6 +74,10 @@ const NIGHT_BOARDS = [
     sub:'ALL 75 stars: every level, every challenge. Fastest total clock wins. Pure Pip — bought tricks rest here.' },
   { key:'nightmare', id:'grimmwick.nightmare', icon:'🌑', name:'THE NIGHTMARE',
     sub:'All 25 levels beaten with no lanterns and no mercy. Sum of your best times. The brutal board.' },
+  { key:'winterfest', id:'grimmwick.winterfest', icon:'❄️', name:'WINTERFEST',
+    sub:'Ferry landing to the First Frost\'s invitation — the winter 25, fastest first. All are welcome.' },
+  { key:'longnight', id:'grimmwick.longnight', icon:'🌌', name:'THE LONG NIGHT',
+    sub:'New Game to BOTH invitations. All 50 levels, one clock. The whole of Grimmwick — the Everest board.' },
 ];
 
 const Night = {
@@ -93,6 +97,8 @@ const Night = {
       const t = this.nightmareTotal(G);
       return t != null ? Math.round(t*100) : null;   // raw centiseconds — no composite packing on this board
     }
+    if(key==='winterfest') return (sv.winterDone && sv.winterT && sv.winterEligible!==false) ? Math.round(sv.winterT*100) : null;
+    if(key==='longnight') return (sv.longNightT && sv.nightEligible!==false && sv.winterEligible!==false) ? Math.round(sv.longNightT*100) : null;
     return null;
   },
   // sum of nightmare bests, only once every level is conquered
