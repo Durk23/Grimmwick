@@ -282,6 +282,19 @@ Speedrunners and leaderboard players compete on discovering + executing the secr
 - **Gaps are core vocabulary**: every level has jumpable gaps - D1: 1-2 friendly gaps, scaling to D5: chained gap sequences over hazards with moving/fading platforms. Falls cost a heart + lantern walk-back, not a life (unless hearts run out).
 - **Enemy density is "a decent amount"** - always something to avoid or bonk (see the difficulty curve for per-district counts); long empty stretches are a design smell. Mix ground patrollers, air floaters, and ceiling droppers so all three lanes of attention stay busy.
 
+## THE SPEEDRUN NORTH STAR (owner directive, Sept 4 2026 — "the goal is to be the best speed runners game on the market")
+Joy #2 (The Hunt) is promoted to a market ambition. Everything serves it: the determinism covenant is
+the moat (runs learnable to the frame — most platformers can't offer this); every district ships a warp
+skip-line, secret boss takedowns, and DOCUMENTED sanctioned tech (boo-freeze steps, avalanche-ball
+stomp-rides, ice momentum carries, climb-exit hops); boss clocks stamp at the last hit so cutscenes
+never pollute records. THE SPEEDRUNNER PACKAGE (build before the 1.5 playthrough): live HUD run timer
+w/ PB delta (settings toggle) · QUICK RESTART (R key / one-tap, near-zero fade) · GHOST RACING v1
+(race your own PB ghost per level — ~10 samples/sec recording, translucent playback; determinism makes
+it exact) · Frostmere boards ("Fastest Winterfest" + winter districts) in the Night Board tab.
+New-mechanic rule: every mechanic must have a fast-line answer (crack panels reward never stopping;
+machines are rideable shortcuts as much as obstacles). Nothing on the critical path may be RNG, waity,
+or unskippable.
+
 ## THE THREE JOYS (owner's north star — every design decision serves one of these)
 
 1. **The First Clear** — challenging and enjoyable to BEAT. Mario-hard: you die, you learn, you triumph. Never unfair, never empty.
