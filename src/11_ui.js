@@ -58,7 +58,7 @@ const UI = {
       /* full screens */
       /* pointer-events:auto is LOAD-BEARING: without it an overflowing card can't be touch-scrolled in landscape,
          stranding everything below the fold (including the close button) */
-      .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; flex-direction:column; gap:18px; text-align:center; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; box-sizing:border-box; pointer-events:auto; padding:calc(16px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-left)) calc(16px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-right)); }
+      .screen { position:absolute; inset:0; background:rgba(10,6,22,.88); display:none; align-items:center; flex-direction:column; gap:18px; text-align:center; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; box-sizing:border-box; pointer-events:auto; padding:calc(16px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left)); }   /* shorthand is top-RIGHT-bottom-LEFT — insets were swapped; harmless on symmetric phones, wrong on the Duo's asymmetric hinge inset */
       .xClose { position:absolute; top:10px; right:10px; width:38px; height:38px; border-radius:12px; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.28); color:#fff; font-size:17px; font-weight:800; font-family:inherit; cursor:pointer; line-height:1; z-index:2; }
       .xClose:active { background:rgba(255,255,255,.22); }
       /* auto-margin centering that degrades to a scroll when the card is taller than the viewport (landscape safe) */

@@ -40,7 +40,14 @@ class CamCtrl {
       const ty = Math.max(player.pos.y, floorY);
       this.pos.x = damp(this.pos.x, tx, 8, dt);
       this.pos.y = damp(this.pos.y, ty+2.3, 4, dt);
-      this.pos.z = damp(this.pos.z, 11.5, 6, dt);
+      // ASPECT-COMPENSATED DISTANCE (iPhone Duo pass, Nov 2026): the FOV is vertical, so a near-square
+      // screen (Duo inner ≈1.42, outer ≈1.46 in landscape; iPad too) sees ~35% less of the level ahead at
+      // the old fixed z=11.5 — unacceptable in a telegraph-and-lookahead game. Hold the HORIZONTAL field
+      // constant instead: z = H/(tan(fov/2)·aspect), H tuned so a 19.5:9 phone gets exactly the classic
+      // 11.5. Clamped [11.5, 18] (never zoom in past the classic; portrait stays sane). Because pos.z is
+      // damped every frame, a mid-game fold/unfold resize becomes a smooth zoom, not a snap.
+      const sideZ = clamp(24.91/(this.cam.aspect||2.167), 11.5, 18);
+      this.pos.z = damp(this.pos.z, sideZ, 6, dt);
       this.cam.position.copy(this.pos);
       if(this.shakeT>0){
         this.shakeT -= dt;
